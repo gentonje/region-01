@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 
 interface NavigationProps {
-  onCurrencyChange: (currency: SupportedCurrency) => void;
+  onCurrencyChange?: (currency: SupportedCurrency) => void;
 }
 
 export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
@@ -55,7 +55,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
   const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
     setCurrency(newCurrency);
-    onCurrencyChange(newCurrency);
+    onCurrencyChange?.(newCurrency);
   };
 
   const menuItems = [
@@ -76,7 +76,9 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
             </Link>
 
             <div className="flex items-center gap-4">
-              <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
+              {onCurrencyChange && (
+                <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
+              )}
               
               <Button
                 variant="ghost"
