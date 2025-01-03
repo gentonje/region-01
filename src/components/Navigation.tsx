@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor } from "lucide-react";
