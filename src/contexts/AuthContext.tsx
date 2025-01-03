@@ -57,9 +57,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-          console.log('User signed out or deleted');
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
           setSession(null);
+          // Clear any potentially invalid session data
+          localStorage.removeItem('supabase.auth.token');
         } else if (currentSession) {
           console.log('Session updated');
           setSession(currentSession);
