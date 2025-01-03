@@ -8,12 +8,14 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
 
   const {
     data,
@@ -82,13 +84,17 @@ export default function Index() {
     }, 3000);
   };
 
+  const handleCurrencyChange = (currency: SupportedCurrency) => {
+    setSelectedCurrency(currency);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {showSplash ? (
         <SplashScreen onComplete={handleSplashComplete} />
       ) : (
         <>
-          <Navigation />
+          <Navigation onCurrencyChange={handleCurrencyChange} />
           <div className="container mx-auto px-4">
             <BreadcrumbNav
               items={[
@@ -108,6 +114,7 @@ export default function Index() {
               isLoading={isLoading}
               isFetchingNextPage={isFetchingNextPage}
               observerRef={ref}
+              selectedCurrency={selectedCurrency}
             />
           </div>
           <BottomNavigation />

@@ -12,6 +12,7 @@ interface ProductListProps {
   isLoading: boolean;
   isFetchingNextPage: boolean;
   observerRef: (node?: Element | null) => void;
+  selectedCurrency: SupportedCurrency;
 }
 
 const ProductSkeleton = () => (
@@ -31,9 +32,10 @@ export const ProductList = ({
   isLoading,
   isFetchingNextPage,
   observerRef,
+  selectedCurrency,
 }: ProductListProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mt-2">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-20">
         {products.map((product) => (
           <div key={product.id}>
@@ -41,7 +43,7 @@ export const ProductList = ({
               product={product}
               getProductImageUrl={getProductImageUrl}
               onClick={() => onProductClick(product)}
-              selectedCurrency="USD"
+              selectedCurrency={selectedCurrency}
             />
           </div>
         ))}

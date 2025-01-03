@@ -31,23 +31,9 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           viewBox="0 0 300 300"
           className="mb-4"
         >
-          {/* First square (back) - Orange */}
           <motion.rect
             x="50"
             y="50"
-            width="200"
-            height="200"
-            rx="20"
-            stroke="#FF6B00"
-            strokeWidth="8"
-            fill="transparent"
-            variants={draw}
-          />
-          
-          {/* Second square (front) - Blue */}
-          <motion.rect
-            x="100"
-            y="100"
             width="200"
             height="200"
             rx="20"
@@ -56,18 +42,21 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             fill="transparent"
             variants={draw}
           />
+          <motion.text
+            x="150"
+            y="150"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="text-2xl font-calligraphy"
+            fill="#FF6B00"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            <tspan x="150" className="text-vivo-orange">Vivo</tspan>
+            <tspan x="150" dy="30" className="text-navy-blue dark:text-white">Shop</tspan>
+          </motion.text>
         </motion.svg>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2 }}
-          className="text-center"
-        >
-          <h1 className="text-[28px] font-bold font-calligraphy">
-            <span className="text-vivo-orange">Vivo</span>
-            <span className="text-navy-blue dark:text-white">Shop</span>
-          </h1>
-        </motion.div>
       </motion.div>
     </div>
   );
