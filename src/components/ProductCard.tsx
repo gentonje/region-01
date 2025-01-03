@@ -1,6 +1,4 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { Button } from "./ui/button";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 interface ProductCardProps {
@@ -15,7 +13,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { convertPrice, currency } = useCurrency();
-  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
   const imageUrl = imageError || !product.storage_path || product.storage_path === 'placeholder.svg'
@@ -33,13 +30,10 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2 truncate">{product.title}</h3>
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
-        <div className="flex justify-between items-center">
+        <div className="flex justify-end items-center">
           <span className="text-lg font-bold">
             {currency} {convertPrice(product.price).toFixed(2)}
           </span>
-          <Button onClick={() => navigate(`/edit-product/${product.id}`)}>
-            Edit Product
-          </Button>
         </div>
       </div>
     </div>
