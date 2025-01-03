@@ -24,7 +24,10 @@ const Index = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('products')
-        .select('*')
+        .select(`
+          *,
+          product_images(storage_path, is_main)
+        `)
         .eq('product_status', 'published')
         .order('created_at', { ascending: false });
       
@@ -32,7 +35,7 @@ const Index = () => {
         console.error('Error fetching products:', error);
         throw error;
       }
-      return data as Product[];
+      return data as (Product & { product_images: { storage_path: string, is_main: boolean }[] })[];
     }
   });
 
@@ -56,6 +59,17 @@ const Index = () => {
     getUser();
   }, [navigate]);
 
+  const getProductImageUrl = (product: Product & { product_images: { storage_path: string, is_main: boolean }[] }) => {
+    const mainImage = product.product_images?.find(img => img.is_main);
+    if (mainImage) {
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl(mainImage.storage_path);
+      return data.publicUrl;
+    }
+    return '/placeholder.svg';
+  };
+
   const ProductSkeleton = () => (
     <Card className="w-full">
       <CardHeader>
@@ -71,14 +85,14 @@ const Index = () => {
     </Card>
   );
 
-  const ProductCard = ({ product }: { product: Product }) => (
+  const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
     <Card className="w-full hover:shadow-lg transition-shadow duration-200">
       <CardHeader>
         <CardTitle className="text-lg font-medium truncate">{product.title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <img
-          src={product.storage_path.startsWith('http') ? product.storage_path : '/placeholder.svg'}
+          src={getProductImageUrl(product)}
           alt={product.title}
           className="w-full h-48 object-cover rounded-md"
         />

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { PlusCircle, Settings, Trash2, DollarSign } from "lucide-react";
+import { PlusCircle, Settings, Trash2, DollarSign, Edit } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -41,6 +41,13 @@ export const Navigation = () => {
                     >
                       <Trash2 className="mr-2 h-4 w-4 inline-block" />
                       Delete Products
+                    </Link>
+                    <Link
+                      to="/edit-product"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-md"
+                    >
+                      <Edit className="mr-2 h-4 w-4 inline-block" />
+                      Edit Products
                     </Link>
                     <Link
                       to="/revenue"
