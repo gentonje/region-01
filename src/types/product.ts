@@ -9,4 +9,12 @@ export interface Product {
   category: string;
   in_stock: boolean;
   product_images: { storage_path: string; is_main: boolean }[];
+  seller_id: string;
+  user_id?: string;
+  shop_id?: string;
+  available_quantity?: number;
+  views?: number;
+  likes?: number;
+  product_status?: string;
+  shipping_info?: string;
 }
