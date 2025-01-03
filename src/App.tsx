@@ -38,18 +38,33 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Error getting initial session:', error);
-          if (mounted) setLoading(false);
+          if (mounted) {
+            setLoading(false);
+            setSession(null);
+          }
           return;
         }
 
-        console.log('Initial session state:', initialSession ? 'Active' : 'None');
+        if (!initialSession) {
+          console.log('No initial session found');
+          if (mounted) {
+            setLoading(false);
+            setSession(null);
+          }
+          return;
+        }
+
+        console.log('Initial session state: Active');
         if (mounted) {
           setSession(initialSession);
           setLoading(false);
         }
       } catch (error) {
         console.error('Error in session initialization:', error);
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+          setSession(null);
+        }
       }
     };
 
@@ -60,11 +75,14 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', _event);
       
       if (mounted) {
-        if (_event === 'SIGNED_OUT') {
-          console.log('User signed out, clearing session');
+        if (_event === 'SIGNED_OUT' || _event === 'USER_DELETED') {
+          console.log('User signed out or deleted, clearing session');
           setSession(null);
-        } else if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
-          console.log('Session updated:', _event);
+        } else if (_event === 'SIGNED_IN') {
+          console.log('User signed in, updating session');
+          setSession(currentSession);
+        } else if (_event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed, updating session');
           setSession(currentSession);
         }
         setLoading(false);
