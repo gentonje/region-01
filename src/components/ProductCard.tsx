@@ -18,7 +18,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
-  const imageUrl = imageError || !product.storage_path
+  const imageUrl = imageError || !product.storage_path || product.storage_path === 'placeholder.svg'
     ? "/placeholder.svg"
     : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${product.storage_path}`;
 
