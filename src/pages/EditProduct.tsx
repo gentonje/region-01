@@ -10,8 +10,6 @@ import { uploadImage } from "@/utils/uploadImage";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
-const MAX_IMAGES = 5;
-
 const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -116,19 +114,6 @@ const EditProduct = () => {
     setIsLoading(true);
     
     try {
-      // Check total number of images (existing + new)
-      const totalNewImages = [mainImage, ...additionalImages].filter(img => img !== null).length;
-      const totalImages = existingImages.length + totalNewImages;
-
-      if (totalImages > MAX_IMAGES) {
-        toast({
-          title: "Error",
-          description: `Maximum of ${MAX_IMAGES} images allowed per product`,
-          variant: "destructive",
-        });
-        return;
-      }
-
       // Update product details
       const { error: updateError } = await supabase
         .from("products")
@@ -179,8 +164,6 @@ const EditProduct = () => {
     }
   };
 
-  const canAddMoreImages = existingImages.length < MAX_IMAGES;
-
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
@@ -195,28 +178,22 @@ const EditProduct = () => {
               isLoading={isLoading}
             />
 
-            {canAddMoreImages ? (
-              [0, 1, 2, 3].map((index) => (
-                <ProductImageUpload
-                  key={index}
-                  label={`Additional Image ${index + 1}${index === 0 ? ' (Required)' : ' (Optional)'}`}
-                  onChange={(file) => {
-                    setAdditionalImages(prev => {
-                      const newImages = [...prev];
-                      newImages[index] = file;
-                      return newImages;
-                    });
-                  }}
-                  required={index === 0}
-                  existingImageUrl={existingImages.find(img => !img.is_main && img.display_order === index)?.publicUrl}
-                  isLoading={isLoading}
-                />
-              ))
-            ) : (
-              <p className="text-yellow-600">
-                Maximum number of images ({MAX_IMAGES}) reached. Delete some images to add new ones.
-              </p>
-            )}
+            {[0, 1, 2, 3].map((index) => (
+              <ProductImageUpload
+                key={index}
+                label={`Additional Image ${index + 1}${index === 0 ? ' (Required)' : ' (Optional)'}`}
+                onChange={(file) => {
+                  setAdditionalImages(prev => {
+                    const newImages = [...prev];
+                    newImages[index] = file;
+                    return newImages;
+                  });
+                }}
+                required={index === 0}
+                existingImageUrl={existingImages.find(img => !img.is_main && img.display_order === index)?.publicUrl}
+                isLoading={isLoading}
+              />
+            ))}
           </div>
 
           <ProductForm

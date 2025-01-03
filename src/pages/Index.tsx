@@ -3,104 +3,73 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { CurrencySelector } from "@/components/CurrencySelector";
-import { ProductCard } from "@/components/ProductCard";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-
-const ITEMS_PER_PAGE = 12;
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Trash2 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage]);
+  }, []);
 
   const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-      // Get total count
-      const { count } = await supabase
-        .from("products")
-        .select("*", { count: "exact", head: true });
-
-      if (count) {
-        setTotalPages(Math.ceil(count / ITEMS_PER_PAGE));
-      }
-
-      // Fetch products with their main images
-      const { data: productsData, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_images!inner (
-            storage_path,
-            is_main
-          )
-        `)
-        .eq('product_images.is_main', true)
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
-      if (error) {
-        console.error("Error fetching products:", error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch products",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Map the products to include the main image storage path
-      const productsWithMainImage = productsData?.map(product => ({
-        ...product,
-        storage_path: product.product_images[0]?.storage_path || 'placeholder.svg'
-      })) || [];
-
-      setProducts(productsWithMainImage);
-    } catch (error: any) {
-      console.error("Error in fetchProducts:", error);
+    if (error) {
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to fetch products",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    setProducts(data || []);
+  };
+
+  const handleDelete = async (productId: string) => {
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", productId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Product deleted successfully",
+    });
+    
+    // Refresh the products list
+    fetchProducts();
   };
 
   const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
-      }
-      navigate("/login");
-    } catch (error: any) {
-      console.error("Error signing out:", error);
-      toast({
-        title: "Error",
-        description: "Failed to sign out",
-        variant: "destructive",
-      });
-    }
+    await supabase.auth.signOut();
+    navigate("/login");
   };
 
   return (
@@ -108,8 +77,7 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Products</h1>
-          <div className="flex items-center gap-4">
-            <CurrencySelector />
+          <div className="space-x-4">
             <Button onClick={() => navigate("/add-product")}>Add Product</Button>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out
@@ -117,63 +85,49 @@ const Index = () => {
           </div>
         </div>
 
-        {loading ? (
-          <div className="text-center py-8">Loading products...</div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No products found</p>
-            <Button className="mt-4" onClick={() => navigate("/add-product")}>
-              Add Your First Product
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
-
-        {totalPages > 1 && (
-          <div className="mt-8">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  {currentPage === 1 ? (
-                    <span className="pointer-events-none opacity-50">
-                      <PaginationPrevious />
-                    </span>
-                  ) : (
-                    <PaginationPrevious
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                    />
-                  )}
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  {currentPage === totalPages ? (
-                    <span className="pointer-events-none opacity-50">
-                      <PaginationNext />
-                    </span>
-                  ) : (
-                    <PaginationNext
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                    />
-                  )}
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+            >
+              <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
+              <p className="text-gray-600 mb-4">{product.description}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-lg font-bold">${product.price}</span>
+                <div className="flex gap-2">
+                  <Button onClick={() => navigate(`/edit-product/${product.id}`)}>
+                    Edit
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="icon">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to delete this product? This action cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(product.id)}
+                          className="bg-red-500 hover:bg-red-600"
+                        >
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
