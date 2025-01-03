@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
-export const Navigation = () => {
+interface NavigationProps {
+  onCurrencyChange: (currency: SupportedCurrency) => void;
+}
+
+export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
@@ -49,6 +53,11 @@ export const Navigation = () => {
     }
   };
 
+  const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
+    setCurrency(newCurrency);
+    onCurrencyChange(newCurrency);
+  };
+
   const menuItems = [
     { icon: Settings, label: "Add Product", path: "/add-product" },
     { icon: Settings, label: "Modify Products", path: "/modify-products" },
@@ -67,7 +76,7 @@ export const Navigation = () => {
             </Link>
 
             <div className="flex items-center gap-4">
-              <CurrencySelector value={currency} onValueChange={setCurrency} />
+              <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
               
               <Button
                 variant="ghost"
