@@ -123,7 +123,7 @@ export const Navigation = () => {
         </div>
       </div>
       {userName && (
-        <div className="pt-16 pb-2 px-4 max-w-7xl mx-auto">
+        <div className="pt-16 pb-1 px-4 max-w-7xl mx-auto">
           <span className="text-sm text-gray-600 dark:text-gray-300">
             Logged in as {userName}
           </span>

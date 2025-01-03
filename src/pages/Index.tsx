@@ -89,28 +89,26 @@ export default function Index() {
       ) : (
         <>
           <Navigation />
-          <div className="container mx-auto px-4 pt-16">
-            <div className="space-y-4">
-              <BreadcrumbNav
-                items={[
-                  { label: "Products", href: "/" }
-                ]}
-              />
-              <ProductFilters
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-              />
-              <ProductList
-                products={allProducts}
-                getProductImageUrl={getProductImageUrl}
-                onProductClick={handleProductClick}
-                isLoading={isLoading}
-                isFetchingNextPage={isFetchingNextPage}
-                observerRef={ref}
-              />
-            </div>
+          <div className="container mx-auto px-4">
+            <BreadcrumbNav
+              items={[
+                { label: "Products", href: "/" }
+              ]}
+            />
+            <ProductFilters
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+            />
+            <ProductList
+              products={allProducts}
+              getProductImageUrl={getProductImageUrl}
+              onProductClick={handleProductClick}
+              isLoading={isLoading}
+              isFetchingNextPage={isFetchingNextPage}
+              observerRef={ref}
+            />
           </div>
           <BottomNavigation />
         </>
