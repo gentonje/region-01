@@ -52,7 +52,7 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
       <div className="h-[32px] overflow-hidden">
         <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
       </div>
-      <div className="h-[24px] overflow-hidden flex items-center justify-between">
+      <div className="h-[32px] overflow-hidden flex items-center justify-between px-0">
         <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
         <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {product.in_stock ? 'In Stock' : 'Out of Stock'}
