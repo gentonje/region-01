@@ -59,7 +59,7 @@ const EditProduct = () => {
           })
         );
 
-        console.log('Fetched images:', imagesWithUrls); // Debug log
+        console.log('Fetched images:', imagesWithUrls);
         setExistingImages(imagesWithUrls || []);
         
         // Set form data
@@ -71,7 +71,7 @@ const EditProduct = () => {
           available_quantity: productData.available_quantity?.toString() || "",
         });
       } catch (error: any) {
-        console.error('Error fetching product:', error); // Debug log
+        console.error('Error fetching product:', error);
         toast({
           title: "Error",
           description: error.message,
@@ -112,7 +112,7 @@ const EditProduct = () => {
         description: "Image deleted successfully",
       });
     } catch (error: any) {
-      console.error('Error deleting image:', error); // Debug log
+      console.error('Error deleting image:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -126,6 +126,15 @@ const EditProduct = () => {
     setIsLoading(true);
     
     try {
+      // Calculate total number of images (existing + new)
+      const existingImagesCount = existingImages.length;
+      const newImagesCount = [mainImage, ...additionalImages.filter(img => img !== null)].length;
+      const totalImagesCount = existingImagesCount + newImagesCount;
+
+      if (totalImagesCount > 5) {
+        throw new Error(`Maximum of 5 images allowed per product. You currently have ${existingImagesCount} images and are trying to add ${newImagesCount} more.`);
+      }
+
       // Update product details
       const { error: updateError } = await supabase
         .from("products")
@@ -166,7 +175,7 @@ const EditProduct = () => {
         navigate("/");
       }, 2000);
     } catch (error: any) {
-      console.error('Error updating product:', error); // Debug log
+      console.error('Error updating product:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -184,8 +193,8 @@ const EditProduct = () => {
     .sort((a, b) => a.display_order - b.display_order)
     .map(img => ({ url: img.publicUrl, id: img.id }));
 
-  console.log('Main image URL:', mainImageUrl); // Debug log
-  console.log('Additional image URLs:', additionalImageUrls); // Debug log
+  console.log('Main image URL:', mainImageUrl);
+  console.log('Additional image URLs:', additionalImageUrls);
 
   return (
     <div className="min-h-screen p-4 bg-gray-50">
@@ -204,7 +213,7 @@ const EditProduct = () => {
             {[0, 1, 2, 3].map((index) => (
               <ProductImageUpload
                 key={index}
-                label={`Additional Image ${index + 1}${index === 0 ? ' (Required)' : ' (Optional)'}`}
+                label={`Additional Image ${index + 1}`}
                 onChange={(file) => {
                   setAdditionalImages(prev => {
                     const newImages = [...prev];
@@ -212,7 +221,6 @@ const EditProduct = () => {
                     return newImages;
                   });
                 }}
-                required={index === 0}
                 existingImageUrl={additionalImageUrls[index]?.url}
                 onDeleteExisting={() => additionalImageUrls[index]?.id && handleDeleteExistingImage(additionalImageUrls[index].id)}
                 isLoading={isLoading}
