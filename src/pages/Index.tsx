@@ -128,13 +128,11 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="pt-16 px-4">
-          <div className="py-2 text-sm text-muted-foreground border-b">
+        <div className="pt-20 px-4">
+          <div className="mb-4 text-sm text-gray-600">
             Logged in as {userName}
           </div>
-          <div className="pt-2">
-            <BreadcrumbNav items={breadcrumbItems} />
-          </div>
+          <BreadcrumbNav items={breadcrumbItems} />
           <ProductDetail
             product={selectedProduct}
             getProductImageUrl={getProductImageUrl}
@@ -154,13 +152,11 @@ const Index = () => {
 
       <Navigation />
       
-      <div className="pt-16 px-4">
-        <div className="py-2 text-sm text-muted-foreground border-b">
+      <div className="pt-20 px-4 space-y-4">
+        <div className="mb-4 text-sm text-gray-600">
           Logged in as {userName}
         </div>
-        <div className="pt-2">
-          <BreadcrumbNav items={[{ label: "Products" }]} />
-        </div>
+        <BreadcrumbNav items={[{ label: "Products" }]} />
         
         <ProductFilters
           searchQuery={searchQuery}

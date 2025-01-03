@@ -57,6 +57,12 @@ export const Navigation = () => {
           </Link>
 
           <div className="flex items-center gap-4">
+            {userName && (
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Logged in as {userName}
+              </span>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -75,7 +81,7 @@ export const Navigation = () => {
                     Manage
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg ml-auto">
+                    <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg">
                       <Link
                         to="/add-product"
                         className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
