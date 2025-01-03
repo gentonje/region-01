@@ -123,7 +123,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <ScrollArea className="max-w-[2000px] mx-auto pt-20 pb-24 h-[calc(100vh-120px)]">
+      <ScrollArea className="max-w-[2000px] mx-auto pt-20 h-[calc(100vh-120px)]">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
           <Suspense fallback={
             Array(ITEMS_PER_PAGE).fill(0).map((_, index) => (
