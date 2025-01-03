@@ -11,11 +11,21 @@ const Login = () => {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
         setShowConfetti(true);
         setTimeout(() => {
-          navigate('/');
+          navigate('/', { replace: true });
+        }, 2000);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setShowConfetti(true);
+        setTimeout(() => {
+          navigate('/', { replace: true });
         }, 2000);
       }
     });
