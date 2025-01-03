@@ -119,7 +119,7 @@ const Index = () => {
         <p className="text-sm font-semibold text-vivo-orange m-1 p-1">
           {product.currency} {product.price?.toFixed(2)}
         </p>
-        <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+        <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 my-2">
           {product.category}
         </span>
       </CardFooter>
