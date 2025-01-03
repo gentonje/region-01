@@ -1,6 +1,12 @@
 import { Link } from "react-router-dom";
-import { Home, ShoppingBag, User, Menu } from "lucide-react";
+import { Home, ShoppingBag, User, Menu, PlusCircle, Settings } from "lucide-react";
 import { Button } from "./ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export const Navigation = () => {
   return (
@@ -13,12 +19,35 @@ export const Navigation = () => {
           </Link>
           
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Menu className="h-5 w-5" />
-            </Button>
+            <Link to="/add-product">
+              <Button variant="ghost" size="icon" className="relative">
+                <PlusCircle className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+              </Button>
+            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/add-product" className="w-full">
+                    Add New Product
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/" className="w-full">
+                    Manage Products
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
@@ -36,8 +65,13 @@ export const Navigation = () => {
                 <ShoppingBag className="h-5 w-5" />
               </Button>
             </Link>
+            <Link to="/add-product">
+              <Button variant="ghost" size="icon">
+                <PlusCircle className="h-5 w-5" />
+              </Button>
+            </Link>
             <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
             </Button>
           </nav>
         </div>
