@@ -43,15 +43,15 @@ export default function ProductDetail() {
       <Breadcrumb className="mb-8">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">
+            <Link to="/" className="flex items-center">
               <Home className="h-4 w-4" />
-            </BreadcrumbLink>
+            </Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">
+            <Link to="/" className="text-sm font-medium">
               Products
-            </BreadcrumbLink>
+            </Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>

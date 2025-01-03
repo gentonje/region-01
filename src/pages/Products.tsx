@@ -10,6 +10,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -36,6 +38,8 @@ export default function Products() {
   if (!data?.products) return <div>No products found</div>;
 
   const totalPages = Math.ceil((data.count || 0) / ITEMS_PER_PAGE);
+  const canGoPrevious = page > 1;
+  const canGoNext = page < totalPages;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -45,10 +49,15 @@ export default function Products() {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-              />
+                disabled={!canGoPrevious}
+                className={!canGoPrevious ? "opacity-50 cursor-not-allowed" : ""}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
             </PaginationItem>
             
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
@@ -63,10 +72,15 @@ export default function Products() {
             ))}
             
             <PaginationItem>
-              <PaginationNext
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-              />
+                disabled={!canGoNext}
+                className={!canGoNext ? "opacity-50 cursor-not-allowed" : ""}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </PaginationItem>
           </PaginationContent>
         </Pagination>
