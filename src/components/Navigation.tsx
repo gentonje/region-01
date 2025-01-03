@@ -48,85 +48,88 @@ export const Navigation = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-calligraphy font-bold">
-            <span className="text-vivo-orange">Vivo</span>
-            <span className="text-navy-blue dark:text-white">Shop</span>
-          </Link>
+    <>
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            <Link to="/" className="text-2xl font-calligraphy font-bold">
+              <span className="text-vivo-orange">Vivo</span>
+              <span className="text-navy-blue dark:text-white">Shop</span>
+            </Link>
 
-          <div className="flex items-center gap-4">
-            {userName && (
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                Logged in as {userName}
-              </span>
-            )}
-            
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              >
+                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <span className="sr-only">Toggle theme</span>
+              </Button>
 
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Manage
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg">
-                      <Link
-                        to="/add-product"
-                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
-                      >
-                        <Settings className="mr-3 h-4 w-4" />
-                        Add Product
-                      </Link>
-                      <Link
-                        to="/modify-products"
-                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
-                      >
-                        <Settings className="mr-3 h-4 w-4" />
-                        Modify Products
-                      </Link>
-                      <Link
-                        to="/admin/users"
-                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
-                      >
-                        <Users className="mr-3 h-4 w-4" />
-                        Manage Users
-                      </Link>
-                      <Link
-                        to="/revenue"
-                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
-                      >
-                        <DollarSign className="mr-3 h-4 w-4" />
-                        Revenue
-                      </Link>
-                      <div className="h-px bg-border my-2" />
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-red-600 dark:text-red-400"
-                      >
-                        <LogOut className="mr-3 h-4 w-4" />
-                        Log Out
-                      </button>
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
+              <NavigationMenu>
+                <NavigationMenuList>
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Manage
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg -translate-x-[calc(100%-120px)]">
+                        <Link
+                          to="/add-product"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
+                        >
+                          <Settings className="mr-3 h-4 w-4" />
+                          Add Product
+                        </Link>
+                        <Link
+                          to="/modify-products"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
+                        >
+                          <Settings className="mr-3 h-4 w-4" />
+                          Modify Products
+                        </Link>
+                        <Link
+                          to="/admin/users"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
+                        >
+                          <Users className="mr-3 h-4 w-4" />
+                          Manage Users
+                        </Link>
+                        <Link
+                          to="/revenue"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
+                        >
+                          <DollarSign className="mr-3 h-4 w-4" />
+                          Revenue
+                        </Link>
+                        <div className="h-px bg-border my-2" />
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-red-600 dark:text-red-400"
+                        >
+                          <LogOut className="mr-3 h-4 w-4" />
+                          Log Out
+                        </button>
+                      </div>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {userName && (
+        <div className="pt-16 pb-2 px-4 max-w-7xl mx-auto">
+          <span className="text-sm text-gray-600 dark:text-gray-300">
+            Logged in as {userName}
+          </span>
+        </div>
+      )}
+    </>
   );
 };
 
