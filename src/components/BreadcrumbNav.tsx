@@ -20,17 +20,17 @@ export const BreadcrumbNav = ({ items }: BreadcrumbNavProps) => {
     <Breadcrumb className="mb-4">
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink as={Link} to="/">
+          <Link to="/" className="hover:text-foreground">
             Home
-          </BreadcrumbLink>
+          </Link>
         </BreadcrumbItem>
         {items.map((item, index) => (
           <BreadcrumbItem key={index}>
             <BreadcrumbSeparator />
             {item.href ? (
-              <BreadcrumbLink as={Link} to={item.href}>
+              <Link to={item.href} className="hover:text-foreground">
                 {item.label}
-              </BreadcrumbLink>
+              </Link>
             ) : (
               <BreadcrumbPage>{item.label}</BreadcrumbPage>
             )}
