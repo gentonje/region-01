@@ -11,29 +11,62 @@ const Login = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Checking session state...");
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Session check result:", session ? "Session found" : "No session");
-      if (session) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 2000);
+    console.log("Initializing auth state...");
+    
+    // Initialize session state
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Session initialization error:", error);
+          setLoading(false);
+          return;
+        }
+
+        console.log("Initial session state:", session ? "Active session" : "No session");
+        
+        if (session) {
+          setShowConfetti(true);
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 2000);
+        }
+      } catch (err) {
+        console.error("Unexpected error during session init:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    initSession();
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session ? "Session exists" : "No session");
+      
       if (event === 'SIGNED_IN' && session) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 2000);
+        try {
+          // Verify session is valid
+          const { data: { user }, error } = await supabase.auth.getUser();
+          
+          if (error) {
+            console.error("Error verifying user session:", error);
+            return;
+          }
+
+          if (user) {
+            console.log("Valid user session established");
+            setShowConfetti(true);
+            setTimeout(() => {
+              navigate('/', { replace: true });
+            }, 2000);
+          }
+        } catch (err) {
+          console.error("Error during sign-in handling:", err);
+        }
       }
     });
 
