@@ -21,28 +21,26 @@ export const Navigation = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/add-product">
-                  <Button variant="ghost" size="sm">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Add Product
-                  </Button>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link to="/delete-products">
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Products
-                  </Button>
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
                 <NavigationMenuTrigger>
                   <Settings className="mr-2 h-4 w-4" />
                   Manage
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="p-4 w-48">
+                    <Link
+                      to="/add-product"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-md"
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4 inline-block" />
+                      Add Product
+                    </Link>
+                    <Link
+                      to="/delete-products"
+                      className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-md"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4 inline-block" />
+                      Delete Products
+                    </Link>
                     <Link
                       to="/"
                       className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-md"
