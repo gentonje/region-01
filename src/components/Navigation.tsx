@@ -4,6 +4,8 @@ import { Button } from "./ui/button";
 import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu, Smartphone, Tablet, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
+import { CurrencySelector } from "./CurrencySelector";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 import {
   Sheet,
   SheetContent,
@@ -17,6 +19,7 @@ export const Navigation = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
+  const [currency, setCurrency] = useState<SupportedCurrency>("USD");
 
   useEffect(() => {
     const getUser = async () => {
@@ -53,7 +56,6 @@ export const Navigation = () => {
     { icon: DollarSign, label: "Revenue", path: "/revenue" },
   ];
 
-  // Only render on mobile screens
   return (
     <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
@@ -65,6 +67,8 @@ export const Navigation = () => {
             </Link>
 
             <div className="flex items-center gap-4">
+              <CurrencySelector value={currency} onValueChange={setCurrency} />
+              
               <Button
                 variant="ghost"
                 size="icon"
