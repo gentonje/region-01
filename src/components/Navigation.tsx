@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { PlusCircle, Settings } from "lucide-react";
+import { PlusCircle, Settings, Trash2 } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -25,6 +25,14 @@ export const Navigation = () => {
                   <Button variant="ghost" size="sm">
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Add Product
+                  </Button>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/delete-products">
+                  <Button variant="ghost" size="sm">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Products
                   </Button>
                 </Link>
               </NavigationMenuItem>

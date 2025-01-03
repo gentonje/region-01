@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import DeleteProducts from "./pages/DeleteProducts";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,14 @@ const App = () => (
             element={
               <PrivateRoute>
                 <EditProduct />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/delete-products"
+            element={
+              <PrivateRoute>
+                <DeleteProducts />
               </PrivateRoute>
             }
           />
