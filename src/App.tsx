@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
@@ -44,39 +45,41 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Index />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/add-product"
-            element={
-              <PrivateRoute>
-                <AddProduct />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/edit-product/:id"
-            element={
-              <PrivateRoute>
-                <EditProduct />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <CurrencyProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Index />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/add-product"
+              element={
+                <PrivateRoute>
+                  <AddProduct />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/edit-product/:id"
+              element={
+                <PrivateRoute>
+                  <EditProduct />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </CurrencyProvider>
   </QueryClientProvider>
 );
 

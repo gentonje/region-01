@@ -3,6 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { CurrencySelector } from "@/components/CurrencySelector";
+import { ProductCard } from "@/components/ProductCard";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,20 +27,36 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 
+const ITEMS_PER_PAGE = 12;
+
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [currentPage]);
 
   const fetchProducts = async () => {
+    const from = (currentPage - 1) * ITEMS_PER_PAGE;
+    const to = from + ITEMS_PER_PAGE - 1;
+
+    const { count } = await supabase
+      .from("products")
+      .select("*", { count: "exact", head: true });
+
+    if (count) {
+      setTotalPages(Math.ceil(count / ITEMS_PER_PAGE));
+    }
+
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .range(from, to);
 
     if (error) {
       toast({
@@ -63,7 +90,6 @@ const Index = () => {
       description: "Product deleted successfully",
     });
     
-    // Refresh the products list
     fetchProducts();
   };
 
@@ -77,7 +103,8 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Products</h1>
-          <div className="space-x-4">
+          <div className="flex items-center gap-4">
+            <CurrencySelector />
             <Button onClick={() => navigate("/add-product")}>Add Product</Button>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out
@@ -85,48 +112,69 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <div
-              key={product.id}
-              className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
-            >
-              <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
-              <p className="text-gray-600 mb-4">{product.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-bold">${product.price}</span>
-                <div className="flex gap-2">
-                  <Button onClick={() => navigate(`/edit-product/${product.id}`)}>
-                    Edit
+            <div key={product.id} className="relative group">
+              <ProductCard product={product} />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this product? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(product.id)}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete Product</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete this product? This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDelete(product.id)}
+                      className="bg-red-500 hover:bg-red-600"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                />
+              </PaginationItem>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <PaginationItem key={page}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(page)}
+                    isActive={currentPage === page}
+                  >
+                    {page}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </div>
