@@ -6,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Confetti from "@/components/Confetti";
+import { Database } from "@/integrations/supabase/types";
+
+type ProductCategory = Database["public"]["Enums"]["product_category"];
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -15,7 +18,7 @@ const AddProduct = () => {
     title: "",
     description: "",
     price: "",
-    category: "Electronics",
+    category: "Electronics" as ProductCategory,
     available_quantity: "",
   });
 
@@ -33,16 +36,16 @@ const AddProduct = () => {
         return;
       }
 
-      const { error } = await supabase.from("products").insert([
-        {
-          ...formData,
-          user_id: userData.user.id,
-          seller_id: userData.user.id,
-          price: parseFloat(formData.price),
-          available_quantity: parseInt(formData.available_quantity),
-          storage_path: "placeholder.svg",
-        },
-      ]);
+      const { error } = await supabase.from("products").insert({
+        title: formData.title,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        user_id: userData.user.id,
+        seller_id: userData.user.id,
+        available_quantity: parseInt(formData.available_quantity),
+        storage_path: "placeholder.svg",
+      });
 
       if (error) throw error;
 
@@ -114,14 +117,19 @@ const AddProduct = () => {
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               value={formData.category}
               onChange={(e) =>
-                setFormData({ ...formData, category: e.target.value })
+                setFormData({ ...formData, category: e.target.value as ProductCategory })
               }
               required
             >
               <option value="Electronics">Electronics</option>
               <option value="Clothing">Clothing</option>
+              <option value="Home & Garden">Home & Garden</option>
               <option value="Books">Books</option>
-              <option value="Home">Home</option>
+              <option value="Sports & Outdoors">Sports & Outdoors</option>
+              <option value="Toys & Games">Toys & Games</option>
+              <option value="Health & Beauty">Health & Beauty</option>
+              <option value="Automotive">Automotive</option>
+              <option value="Food & Beverages">Food & Beverages</option>
               <option value="Other">Other</option>
             </select>
           </div>
