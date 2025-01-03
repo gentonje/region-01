@@ -38,7 +38,7 @@ const Confetti = ({ isActive = true }: ConfettiProps) => {
             animation: {
               enable: true,
               speed: 0.2,
-              minimumValue: 0.1,
+              min: 0.1,  // Changed from minimumValue to min
               sync: false,
             },
           },
