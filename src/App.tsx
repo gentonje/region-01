@@ -9,6 +9,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import { Navigation } from "./components/Navigation";
 
 const queryClient = new QueryClient();
 
@@ -48,33 +51,52 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/"
-            element={
-              <PrivateRoute>
-                <Index />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/add-product"
-            element={
-              <PrivateRoute>
-                <AddProduct />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/edit-product/:id"
-            element={
-              <PrivateRoute>
-                <EditProduct />
-              </PrivateRoute>
-            }
-          />
-        </Routes>
+        <Navigation />
+        <div className="pb-20"> {/* Add padding to account for bottom navigation */}
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoute>
+                  <Products />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/products"
+              element={
+                <PrivateRoute>
+                  <Products />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={
+                <PrivateRoute>
+                  <ProductDetail />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/add-product"
+              element={
+                <PrivateRoute>
+                  <AddProduct />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/edit-product/:id"
+              element={
+                <PrivateRoute>
+                  <EditProduct />
+                </PrivateRoute>
+              }
+            />
+          </Routes>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
