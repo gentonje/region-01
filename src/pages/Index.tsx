@@ -5,6 +5,7 @@ import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Star } from "lucide-react";
 
 interface Product {
   id: string;
@@ -13,6 +14,7 @@ interface Product {
   description: string;
   storage_path: string;
   currency: string;
+  average_rating: number;
 }
 
 const Index = () => {
@@ -70,6 +72,22 @@ const Index = () => {
     return '/placeholder.svg';
   };
 
+  const StarRating = ({ rating }: { rating: number }) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={16}
+            className={`${
+              star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   const ProductSkeleton = () => (
     <Card className="w-full h-[400px]">
       <CardHeader>
@@ -87,22 +105,25 @@ const Index = () => {
 
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
     <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
-      <CardContent className="space-y-4 p-6">
-        <div className="h-60 w-full">
+      <CardContent className="space-y-2 p-6">
+        <div className="h-60 w-full relative">
           <img
             src={getProductImageUrl(product)}
             alt={product.title}
             className="w-full h-full object-cover rounded-md"
           />
+          <div className="absolute bottom-2 right-2">
+            <StarRating rating={product.average_rating || 0} />
+          </div>
         </div>
-        <div className="h-[40px] overflow-hidden">
+        <div className="h-[32px] overflow-hidden">
           <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
         </div>
-        <div className="h-[40px] overflow-hidden">
+        <div className="h-[24px] overflow-hidden">
           <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
         </div>
       </CardContent>
-      <CardFooter className="h-[40px] px-6">
+      <CardFooter className="h-[32px] px-6 pt-0">
         <p className="text-sm font-semibold">
           {product.currency} {product.price?.toFixed(2)}
         </p>
