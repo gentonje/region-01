@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import Particles from "react-tsparticles";
-import type { Container, Engine } from "tsparticles-engine";
-import { loadFull } from "tsparticles";
+import { Engine } from "@tsparticles/engine";
+import Particles from "@tsparticles/react";
+import { loadSlim } from "@tsparticles/slim";
 
 interface ConfettiProps {
   isActive?: boolean;
@@ -9,11 +9,7 @@ interface ConfettiProps {
 
 const Confetti = ({ isActive = true }: ConfettiProps) => {
   const particlesInit = useCallback(async (engine: Engine) => {
-    await loadFull(engine);
-  }, []);
-
-  const particlesLoaded = useCallback(async (container: Container | undefined) => {
-    // Optional: Add any initialization after particles are loaded
+    await loadSlim(engine);
   }, []);
 
   if (!isActive) return null;
@@ -22,7 +18,6 @@ const Confetti = ({ isActive = true }: ConfettiProps) => {
     <Particles
       id="tsparticles"
       init={particlesInit}
-      loaded={particlesLoaded}
       options={{
         fullScreen: {
           enable: true,
