@@ -15,6 +15,8 @@ interface Product {
   storage_path: string;
   currency: string;
   average_rating: number;
+  category: string;
+  in_stock: boolean;
 }
 
 const Index = () => {
@@ -105,7 +107,7 @@ const Index = () => {
 
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
     <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
-      <CardContent className="space-y-2 p-6">
+      <CardContent className="space-y-2">
         <div className="h-60 w-full relative">
           <img
             src={getProductImageUrl(product)}
@@ -119,14 +121,20 @@ const Index = () => {
         <div className="h-[32px] overflow-hidden">
           <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
         </div>
-        <div className="h-[24px] overflow-hidden">
+        <div className="h-[24px] overflow-hidden flex items-center justify-between">
           <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
+          <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {product.in_stock ? 'In Stock' : 'Out of Stock'}
+          </span>
         </div>
       </CardContent>
-      <CardFooter className="h-[32px] px-6 pt-0">
-        <p className="text-sm font-semibold">
+      <CardFooter className="h-[32px] flex items-center justify-between">
+        <p className="text-sm font-semibold text-vivo-orange">
           {product.currency} {product.price?.toFixed(2)}
         </p>
+        <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+          {product.category}
+        </span>
       </CardFooter>
     </Card>
   );
