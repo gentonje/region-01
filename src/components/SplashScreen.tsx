@@ -47,14 +47,14 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             y="150"
             textAnchor="middle"
             dominantBaseline="middle"
-            className="text-[32px] font-calligraphy"
+            className="text-[42px] font-calligraphy"
             fill="#FF6B00"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
             <tspan x="150" dy="-10" className="text-vivo-orange">Vivo</tspan>
-            <tspan x="150" dy="40" className="text-navy-blue dark:text-white">Shop</tspan>
+            <tspan x="150" dy="50" className="text-blue-600 dark:text-blue-400">Shop</tspan>
           </motion.text>
         </motion.svg>
       </motion.div>
