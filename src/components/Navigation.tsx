@@ -79,28 +79,28 @@ export const Navigation = () => {
                       <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg -translate-x-[calc(100%-120px)]">
                         <Link
                           to="/add-product"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-gray-100"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-foreground"
                         >
                           <Settings className="mr-3 h-4 w-4" />
                           Add Product
                         </Link>
                         <Link
                           to="/modify-products"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-gray-100"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-foreground"
                         >
                           <Settings className="mr-3 h-4 w-4" />
                           Modify Products
                         </Link>
                         <Link
                           to="/admin/users"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-gray-100"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-foreground"
                         >
                           <Users className="mr-3 h-4 w-4" />
                           Manage Users
                         </Link>
                         <Link
                           to="/revenue"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-gray-100"
+                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-foreground dark:text-foreground"
                         >
                           <DollarSign className="mr-3 h-4 w-4" />
                           Revenue
