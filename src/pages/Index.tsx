@@ -10,6 +10,8 @@ import { ProductFilters } from "@/components/ProductFilters";
 import { ProductList } from "@/components/ProductList";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { Product } from "@/types/product";
+import { SplashScreen } from "@/components/SplashScreen";
+import { AnimatePresence } from "framer-motion";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -20,10 +22,11 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const {
     data,
-    isLoading,
+    isLoading: isProductsLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
@@ -94,6 +97,16 @@ const Index = () => {
     getUser();
   }, [navigate]);
 
+  // Hide splash screen after initial load
+  React.useEffect(() => {
+    if (!isProductsLoading && data) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 3000); // Show splash screen for at least 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [isProductsLoading, data]);
+
   const getProductImageUrl = (product: Product) => {
     const mainImage = product.product_images?.find(img => img.is_main);
     if (mainImage) {
@@ -116,6 +129,9 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="pt-20 px-4">
+          <div className="mb-4 text-sm text-gray-600">
+            Logged in as {userName}
+          </div>
           <BreadcrumbNav items={breadcrumbItems} />
           <ProductDetail
             product={selectedProduct}
@@ -130,9 +146,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <AnimatePresence>
+        {isLoading && <SplashScreen />}
+      </AnimatePresence>
+
       <Navigation />
       
       <div className="pt-20 px-4 space-y-4">
+        <div className="mb-4 text-sm text-gray-600">
+          Logged in as {userName}
+        </div>
         <BreadcrumbNav items={[{ label: "Products" }]} />
         
         <ProductFilters
@@ -147,7 +170,7 @@ const Index = () => {
             products={allProducts}
             getProductImageUrl={getProductImageUrl}
             onProductClick={setSelectedProduct}
-            isLoading={isLoading}
+            isLoading={isProductsLoading}
             isFetchingNextPage={isFetchingNextPage}
             observerRef={ref}
           />
