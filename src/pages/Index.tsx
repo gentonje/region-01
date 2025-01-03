@@ -17,10 +17,10 @@ export default function Index() {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery({
+  } = useInfiniteQuery<Product[]>({
     queryKey: ["products"],
-    queryFn: async ({ pageParam = 0 }) => {
-      const startRange = pageParam * 10;
+    queryFn: async ({ pageParam }) => {
+      const startRange = (pageParam as number) * 10;
       const endRange = startRange + 9;
 
       const { data: products, error } = await supabase
@@ -36,6 +36,7 @@ export default function Index() {
       if (!lastPage || lastPage.length < 10) return undefined;
       return allPages.length;
     },
+    initialPageParam: 0,
   });
 
   useEffect(() => {
