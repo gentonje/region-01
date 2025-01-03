@@ -8,27 +8,38 @@ import { Users } from "lucide-react";
 interface UserStats {
   id: string;
   username: string | null;
-  product_count: number;
+  product_count: string; // Changed to string as count returns a string
 }
 
 const AdminUsers = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          username,
-          products:products(count)
-        `)
-        .returns<UserStats[]>();
+        .select('id, username');
 
-      if (error) throw error;
-      return data.map(user => ({
-        ...user,
-        product_count: user.products?.[0]?.count || 0
-      }));
+      if (profilesError) throw profilesError;
+
+      // Then get product counts for each profile
+      const profilesWithCounts = await Promise.all(
+        profiles.map(async (profile) => {
+          const { count, error: countError } = await supabase
+            .from('products')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id);
+
+          if (countError) throw countError;
+
+          return {
+            ...profile,
+            product_count: String(count || 0)
+          };
+        })
+      );
+
+      return profilesWithCounts;
     }
   });
 
