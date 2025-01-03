@@ -91,7 +91,7 @@ const Index = () => {
   };
 
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
-    <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
+    <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200 m-1">
       <CardContent className="space-y-2">
         <div className="h-60 w-full relative">
           <img
