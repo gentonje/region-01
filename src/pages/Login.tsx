@@ -9,42 +9,36 @@ const Login = () => {
   const mounted = useRef(true);
 
   useEffect(() => {
-    // Check if there's an existing session
     const checkSession = async () => {
       try {
+        console.log('Checking for existing session on Login page');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error checking session:', error);
+          console.error('Error checking session on Login page:', error);
           return;
         }
 
         if (session && mounted.current) {
-          console.log('Existing session found, redirecting...');
+          console.log('Active session found on Login page, redirecting to home');
           navigate('/', { replace: true });
         }
       } catch (error) {
-        console.error('Error in session check:', error);
+        console.error('Error in Login page session check:', error);
       }
     };
 
     checkSession();
 
-    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event);
+      console.log('Auth state changed on Login page:', event);
       
       if (event === 'SIGNED_IN' && session && mounted.current) {
-        console.log('User signed in, redirecting...');
+        console.log('User signed in on Login page, redirecting to home');
         navigate('/', { replace: true });
-      }
-
-      if (event === 'SIGNED_OUT' && mounted.current) {
-        console.log('User signed out');
       }
     });
 
-    // Cleanup function
     return () => {
       mounted.current = false;
       subscription.unsubscribe();

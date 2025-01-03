@@ -29,23 +29,47 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Initialize session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
+    const initSession = async () => {
+      try {
+        console.log('Checking initial session...');
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting initial session:', error);
+          setLoading(false);
+          return;
+        }
+
+        console.log('Initial session state:', initialSession ? 'Active' : 'None');
+        setSession(initialSession);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error in session initialization:', error);
+        setLoading(false);
+      }
+    };
+
+    initSession();
 
     // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (_event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed successfully');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+      console.log('Auth state changed:', _event);
+      
+      if (_event === 'SIGNED_OUT') {
+        console.log('User signed out, clearing session');
+        setSession(null);
+      } else if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
+        console.log('Session updated:', _event);
+        setSession(currentSession);
       }
-      setSession(session);
+      
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log('Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (loading) {
@@ -53,6 +77,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
+    console.log('No session found, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
