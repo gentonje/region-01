@@ -9,7 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
-import DeleteProducts from "./pages/DeleteProducts";
+import ModifyProducts from "./pages/ModifyProducts";
 
 const queryClient = new QueryClient();
 
@@ -76,10 +76,10 @@ const App = () => (
             }
           />
           <Route
-            path="/delete-products"
+            path="/modify-products"
             element={
               <PrivateRoute>
-                <DeleteProducts />
+                <ModifyProducts />
               </PrivateRoute>
             }
           />
