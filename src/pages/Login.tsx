@@ -1,26 +1,54 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const navigate = useNavigate();
+  const mounted = useRef(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    // Check if there's an existing session
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error checking session:', error);
+          return;
+        }
+
+        if (session && mounted.current) {
+          console.log('Existing session found, redirecting...');
+          navigate('/', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error in session check:', error);
+      }
+    };
+
+    checkSession();
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event);
+      
+      if (event === 'SIGNED_IN' && session && mounted.current) {
+        console.log('User signed in, redirecting...');
         navigate('/', { replace: true });
+      }
+
+      if (event === 'SIGNED_OUT' && mounted.current) {
+        console.log('User signed out');
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        navigate('/', { replace: true });
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    // Cleanup function
+    return () => {
+      mounted.current = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   return (
