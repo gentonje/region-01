@@ -100,31 +100,54 @@ const Index = () => {
   };
 
   const handleDelete = async (productId: string) => {
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", productId);
+    try {
+      // First, delete all reviews associated with the product
+      const { error: reviewsError } = await supabase
+        .from("reviews")
+        .delete()
+        .eq("product_id", productId);
 
-    if (error) {
+      if (reviewsError) {
+        console.error("Error deleting reviews:", reviewsError);
+        throw reviewsError;
+      }
+
+      // Then delete all product images
+      const { error: imagesError } = await supabase
+        .from("product_images")
+        .delete()
+        .eq("product_id", productId);
+
+      if (imagesError) {
+        console.error("Error deleting product images:", imagesError);
+        throw imagesError;
+      }
+
+      // Finally delete the product
+      const { error: productError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", productId);
+
+      if (productError) {
+        console.error("Error deleting product:", productError);
+        throw productError;
+      }
+
+      toast({
+        title: "Success",
+        description: "Product and associated data deleted successfully",
+      });
+      
+      fetchProducts();
+    } catch (error: any) {
+      console.error("Error in handleDelete:", error);
       toast({
         title: "Error",
-        description: "Failed to delete product",
+        description: error.message || "Failed to delete product",
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Success",
-      description: "Product deleted successfully",
-    });
-    
-    fetchProducts();
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
   };
 
   return (
