@@ -38,6 +38,32 @@ export const useProductImages = (productId: string) => {
     }
   };
 
+  const reorderImages = async () => {
+    try {
+      // Get all images for this product
+      const { data: images, error: fetchError } = await supabase
+        .from("product_images")
+        .select("*")
+        .eq("product_id", productId)
+        .order("display_order");
+
+      if (fetchError) throw fetchError;
+
+      // Update display order for each image
+      for (let i = 0; i < images.length; i++) {
+        const { error: updateError } = await supabase
+          .from("product_images")
+          .update({ display_order: i })
+          .eq("id", images[i].id);
+
+        if (updateError) throw updateError;
+      }
+    } catch (error: any) {
+      console.error('Error reordering images:', error);
+      throw error;
+    }
+  };
+
   const handleDeleteImage = async (imageId: string) => {
     try {
       const imageToDelete = existingImages.find(img => img.id === imageId);
@@ -57,7 +83,11 @@ export const useProductImages = (productId: string) => {
 
       if (deleteDbError) throw deleteDbError;
 
-      setExistingImages(prev => prev.filter(img => img.id !== imageId));
+      // After deleting, reorder the remaining images
+      await reorderImages();
+      
+      // Refresh the images list
+      await fetchImages();
       
       toast({
         title: "Success",
