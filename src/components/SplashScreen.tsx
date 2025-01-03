@@ -24,90 +24,68 @@ export const SplashScreen = () => {
       >
         <motion.svg
           width="400"
-          height="120"
-          viewBox="0 0 400 120"
+          height="300"
+          viewBox="0 0 400 300"
           initial="hidden"
           animate="visible"
           className="max-w-[80vw]"
         >
-          {/* Calligraphy "vivo" */}
-          {/* Letter v */}
+          {/* Shop roof */}
           <motion.path
-            d="M20 80 C30 30, 40 80, 50 30"
+            d="M50 150 L200 50 L350 150"
             stroke="#ff6b00"
+            strokeWidth="8"
             variants={draw}
             custom={0}
             style={shape}
-            className="font-calligraphy"
           />
-          {/* Letter i */}
+          
+          {/* Shop walls */}
           <motion.path
-            d="M70 30 Q70 55, 70 80"
+            d="M75 150 L75 250 L325 250 L325 150"
             stroke="#000080"
-            variants={draw}
-            custom={0.5}
-            style={shape}
-          />
-          <motion.circle
-            cx="70"
-            cy="20"
-            r="3"
-            fill="#000080"
-            variants={draw}
-            custom={0.5}
-          />
-          {/* Letter v */}
-          <motion.path
-            d="M90 80 C100 30, 110 80, 120 30"
-            stroke="#ff6b00"
+            strokeWidth="8"
             variants={draw}
             custom={1}
             style={shape}
           />
-          {/* Letter o */}
+          
+          {/* Door */}
           <motion.path
-            d="M140 55 C140 35, 160 35, 160 55 C160 75, 140 75, 140 55"
-            stroke="#000080"
-            variants={draw}
-            custom={1.5}
-            style={shape}
-          />
-
-          {/* Block letters "SHOP" */}
-          {/* Letter S */}
-          <motion.path
-            d="M200 35 C220 35, 220 55, 200 55 C180 55, 180 75, 200 75"
+            d="M175 250 L175 175 L225 175 L225 250"
             stroke="#ff6b00"
             strokeWidth="8"
             variants={draw}
             custom={2}
             style={shape}
           />
-          {/* Letter H */}
+          
+          {/* Windows */}
           <motion.path
-            d="M240 30 L240 80 M240 55 L270 55 M270 30 L270 80"
+            d="M100 175 L150 175 L150 200 L100 200 Z"
             stroke="#000080"
-            strokeWidth="8"
-            variants={draw}
-            custom={2.5}
-            style={shape}
-          />
-          {/* Letter O */}
-          <motion.path
-            d="M290 55 C290 35, 320 35, 320 55 C320 75, 290 75, 290 55"
-            stroke="#ff6b00"
             strokeWidth="8"
             variants={draw}
             custom={3}
             style={shape}
           />
-          {/* Letter P */}
+          
           <motion.path
-            d="M340 30 L340 80 M340 30 C340 30, 370 30, 370 45 C370 60, 340 60, 340 45"
+            d="M250 175 L300 175 L300 200 L250 200 Z"
             stroke="#000080"
             strokeWidth="8"
             variants={draw}
             custom={3.5}
+            style={shape}
+          />
+          
+          {/* Chimney */}
+          <motion.path
+            d="M275 100 L275 50 L300 50 L300 115"
+            stroke="#ff6b00"
+            strokeWidth="8"
+            variants={draw}
+            custom={4}
             style={shape}
           />
         </motion.svg>
