@@ -30,31 +30,33 @@ export const ProductForm = ({
   return (
     <>
       <div className="space-y-2">
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title" className="text-gray-900 font-medium">Title</Label>
         <Input
           id="title"
           value={formData.title}
           onChange={(e) =>
             setFormData({ ...formData, title: e.target.value })
           }
+          className="text-gray-900"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
+        <Label htmlFor="description" className="text-gray-900 font-medium">Description</Label>
         <Input
           id="description"
           value={formData.description}
           onChange={(e) =>
             setFormData({ ...formData, description: e.target.value })
           }
+          className="text-gray-900"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="price">Price</Label>
+        <Label htmlFor="price" className="text-gray-900 font-medium">Price</Label>
         <Input
           id="price"
           type="number"
@@ -63,15 +65,16 @@ export const ProductForm = ({
           onChange={(e) =>
             setFormData({ ...formData, price: e.target.value })
           }
+          className="text-gray-900"
           required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="category">Category</Label>
+        <Label htmlFor="category" className="text-gray-900 font-medium">Category</Label>
         <select
           id="category"
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900"
           value={formData.category}
           onChange={(e) =>
             setFormData({ ...formData, category: e.target.value as ProductCategory })
@@ -92,7 +95,7 @@ export const ProductForm = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="quantity">Available Quantity</Label>
+        <Label htmlFor="quantity" className="text-gray-900 font-medium">Available Quantity</Label>
         <Input
           id="quantity"
           type="number"
@@ -100,6 +103,7 @@ export const ProductForm = ({
           onChange={(e) =>
             setFormData({ ...formData, available_quantity: e.target.value })
           }
+          className="text-gray-900"
           required
         />
       </div>
