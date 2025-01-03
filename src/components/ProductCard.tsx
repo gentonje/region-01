@@ -1,5 +1,6 @@
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ProductCardProps {
   product: {
@@ -13,6 +14,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { convertPrice, currency } = useCurrency();
+  const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
   const imageUrl = imageError || !product.storage_path || product.storage_path === 'placeholder.svg'
@@ -20,7 +22,10 @@ export function ProductCard({ product }: ProductCardProps) {
     : `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${product.storage_path}`;
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={() => navigate(`/product/${product.id}`)}
+    >
       <img
         src={imageUrl}
         alt={product.title}

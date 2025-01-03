@@ -8,24 +8,11 @@ import { ProductCard } from "@/components/ProductCard";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -99,57 +86,6 @@ const Index = () => {
     }
   };
 
-  const handleDelete = async (productId: string) => {
-    try {
-      // First, delete all reviews associated with the product
-      const { error: reviewsError } = await supabase
-        .from("reviews")
-        .delete()
-        .eq("product_id", productId);
-
-      if (reviewsError) {
-        console.error("Error deleting reviews:", reviewsError);
-        throw reviewsError;
-      }
-
-      // Then delete all product images
-      const { error: imagesError } = await supabase
-        .from("product_images")
-        .delete()
-        .eq("product_id", productId);
-
-      if (imagesError) {
-        console.error("Error deleting product images:", imagesError);
-        throw imagesError;
-      }
-
-      // Finally delete the product
-      const { error: productError } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", productId);
-
-      if (productError) {
-        console.error("Error deleting product:", productError);
-        throw productError;
-      }
-
-      toast({
-        title: "Success",
-        description: "Product and associated data deleted successfully",
-      });
-      
-      fetchProducts();
-    } catch (error: any) {
-      console.error("Error in handleDelete:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete product",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -193,37 +129,7 @@ const Index = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="relative group">
-                <ProductCard product={product} />
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Are you sure you want to delete this product? This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => handleDelete(product.id)}
-                        className="bg-red-500 hover:bg-red-600"
-                      >
-                        Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
