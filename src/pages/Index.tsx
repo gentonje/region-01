@@ -24,7 +24,7 @@ export default function Index() {
   } = useInfiniteQuery<Product[]>({
     queryKey: ["products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
-      const startRange = pageParam * 10;
+      const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
 
       let query = supabase
