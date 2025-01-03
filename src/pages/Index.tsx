@@ -71,12 +71,12 @@ const Index = () => {
   };
 
   const ProductSkeleton = () => (
-    <Card className="w-full">
+    <Card className="w-full h-[400px]">
       <CardHeader>
         <Skeleton className="h-4 w-3/4" />
       </CardHeader>
       <CardContent>
-        <Skeleton className="h-32 w-full mb-4" />
+        <Skeleton className="h-48 w-full mb-4" />
         <Skeleton className="h-4 w-1/2" />
       </CardContent>
       <CardFooter>
@@ -86,16 +86,18 @@ const Index = () => {
   );
 
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
-    <Card className="w-full hover:shadow-lg transition-shadow duration-200">
-      <CardHeader>
+    <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
+      <CardHeader className="h-[80px]">
         <CardTitle className="text-lg font-medium truncate">{product.title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <img
-          src={getProductImageUrl(product)}
-          alt={product.title}
-          className="w-full h-48 object-cover rounded-md"
-        />
+        <div className="h-48 w-full">
+          <img
+            src={getProductImageUrl(product)}
+            alt={product.title}
+            className="w-full h-full object-cover rounded-md"
+          />
+        </div>
         <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
       </CardContent>
       <CardFooter>
@@ -111,10 +113,6 @@ const Index = () => {
       <Navigation />
       
       <div className="max-w-[2000px] mx-auto px-4 pt-20 pb-24">
-        <h1 className="text-4xl font-bold text-center mb-8">
-          Welcome, {userName}!
-        </h1>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           {isLoading ? (
             Array(12).fill(0).map((_, index) => (
