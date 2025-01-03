@@ -59,6 +59,7 @@ const EditProduct = () => {
           })
         );
 
+        console.log('Fetched images:', imagesWithUrls); // Debug log
         setExistingImages(imagesWithUrls || []);
         
         // Set form data
@@ -70,6 +71,7 @@ const EditProduct = () => {
           available_quantity: productData.available_quantity?.toString() || "",
         });
       } catch (error: any) {
+        console.error('Error fetching product:', error); // Debug log
         toast({
           title: "Error",
           description: error.message,
@@ -79,7 +81,9 @@ const EditProduct = () => {
       }
     };
 
-    fetchProduct();
+    if (id) {
+      fetchProduct();
+    }
   }, [id, navigate, toast]);
 
   const handleDeleteExistingImage = async (imageId: string) => {
@@ -108,6 +112,7 @@ const EditProduct = () => {
         description: "Image deleted successfully",
       });
     } catch (error: any) {
+      console.error('Error deleting image:', error); // Debug log
       toast({
         title: "Error",
         description: error.message,
@@ -161,6 +166,7 @@ const EditProduct = () => {
         navigate("/");
       }, 2000);
     } catch (error: any) {
+      console.error('Error updating product:', error); // Debug log
       toast({
         title: "Error",
         description: error.message,
@@ -177,6 +183,9 @@ const EditProduct = () => {
     .filter(img => !img.is_main)
     .sort((a, b) => a.display_order - b.display_order)
     .map(img => ({ url: img.publicUrl, id: img.id }));
+
+  console.log('Main image URL:', mainImageUrl); // Debug log
+  console.log('Additional image URLs:', additionalImageUrls); // Debug log
 
   return (
     <div className="min-h-screen p-4 bg-gray-50">

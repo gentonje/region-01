@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { ImagePreview } from "./ImagePreview";
@@ -21,8 +21,14 @@ export const ProductImageUpload = ({
   existingImageUrl,
   onDeleteExisting,
 }: ProductImageUploadProps) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(existingImageUrl || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [inputKey, setInputKey] = useState<string>(Date.now().toString());
+
+  useEffect(() => {
+    if (existingImageUrl) {
+      setPreviewUrl(existingImageUrl);
+    }
+  }, [existingImageUrl]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
