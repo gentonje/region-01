@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { PlusCircle, Settings, Trash2 } from "lucide-react";
+import { PlusCircle, Settings, Trash2, DollarSign } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -42,10 +42,11 @@ export const Navigation = () => {
                       Delete Products
                     </Link>
                     <Link
-                      to="/"
+                      to="/revenue"
                       className="block px-4 py-2 text-sm hover:bg-gray-100 rounded-md"
                     >
-                      My Products
+                      <DollarSign className="mr-2 h-4 w-4 inline-block" />
+                      Revenue
                     </Link>
                   </div>
                 </NavigationMenuContent>
@@ -64,7 +65,7 @@ export const BottomNavigation = () => {
       <div className="grid grid-cols-2 h-16">
         <Link to="/" className="flex items-center justify-center">
           <Button variant="ghost" size="sm">
-            My Products
+            Home
           </Button>
         </Link>
         <Link to="/add-product" className="flex items-center justify-center">
