@@ -90,21 +90,6 @@ const Index = () => {
     );
   };
 
-  const ProductSkeleton = () => (
-    <Card className="w-full h-[400px]">
-      <CardHeader>
-        <Skeleton className="h-4 w-3/4" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-48 w-full mb-4" />
-        <Skeleton className="h-4 w-1/2" />
-      </CardContent>
-      <CardFooter>
-        <Skeleton className="h-4 w-1/4" />
-      </CardFooter>
-    </Card>
-  );
-
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
     <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
       <CardContent className="space-y-2">
@@ -139,11 +124,26 @@ const Index = () => {
     </Card>
   );
 
+  const ProductSkeleton = () => (
+    <Card className="w-full h-[400px]">
+      <CardHeader>
+        <Skeleton className="h-4 w-3/4" />
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-48 w-full mb-4" />
+        <Skeleton className="h-4 w-1/2" />
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-4 w-1/4" />
+      </CardFooter>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <div className="max-w-[2000px] mx-auto px-4 pt-20 pb-24">
+      <div className="max-w-[2000px] mx-auto pt-20 pb-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
           {isLoading ? (
             Array(12).fill(0).map((_, index) => (
