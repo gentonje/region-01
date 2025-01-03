@@ -13,12 +13,15 @@ const Login = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    let mounted = true;
+
     const checkSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
-        console.log("Session check result:", { session, error });
-        
+        console.log("Initial session check:", { session, error });
+
+        if (!mounted) return;
+
         if (error) {
           console.error("Session check error:", error);
           toast({
@@ -34,7 +37,9 @@ const Login = () => {
           console.log("Valid session found, redirecting...");
           setShowConfetti(true);
           setTimeout(() => {
-            navigate('/', { replace: true });
+            if (mounted) {
+              navigate('/', { replace: true });
+            }
           }, 2000);
         } else {
           console.log("No active session found");
@@ -42,25 +47,44 @@ const Login = () => {
         }
       } catch (err) {
         console.error("Unexpected error during session check:", err);
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "An unexpected error occurred. Please try again.",
+          });
+        }
       }
     };
 
     checkSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
-      
+
+      if (!mounted) return;
+
       if (event === 'SIGNED_IN' && session) {
         console.log("User signed in successfully");
         setShowConfetti(true);
         setTimeout(() => {
-          navigate('/', { replace: true });
+          if (mounted) {
+            navigate('/', { replace: true });
+          }
         }, 2000);
+      }
+
+      if (event === 'SIGNED_OUT') {
+        console.log("User signed out");
+        setIsLoading(false);
       }
     });
 
     return () => {
+      mounted = false;
       console.log("Cleaning up auth subscription");
       subscription.unsubscribe();
     };
