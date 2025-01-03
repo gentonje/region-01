@@ -88,7 +88,7 @@ const Index = () => {
   const ProductCard = ({ product }: { product: Product & { product_images: { storage_path: string, is_main: boolean }[] } }) => (
     <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
       <CardHeader className="h-[80px]">
-        <CardTitle className="text-lg font-medium truncate">{product.title}</CardTitle>
+        <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="h-48 w-full">
@@ -98,10 +98,12 @@ const Index = () => {
             className="w-full h-full object-cover rounded-md"
           />
         </div>
-        <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+        <div className="h-[40px] overflow-hidden">
+          <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+        </div>
       </CardContent>
-      <CardFooter>
-        <p className="text-lg font-semibold">
+      <CardFooter className="h-[40px]">
+        <p className="text-sm font-semibold">
           {product.currency} {product.price?.toFixed(2)}
         </p>
       </CardFooter>
@@ -109,7 +111,7 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="max-w-[2000px] mx-auto px-4 pt-20 pb-24">
