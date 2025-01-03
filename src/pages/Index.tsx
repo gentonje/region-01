@@ -150,6 +150,23 @@ const Index = () => {
     }
   };
 
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+      navigate("/login");
+    } catch (error: any) {
+      console.error("Error signing out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
