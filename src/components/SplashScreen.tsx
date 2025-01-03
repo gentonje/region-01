@@ -26,19 +26,66 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
         className="flex flex-col items-center"
       >
         <motion.svg
-          width="300"
-          height="100"
-          viewBox="0 0 300 100"
+          width="400"
+          height="300"
+          viewBox="0 0 400 300"
           className="mb-4"
         >
-          {/* Welcome text path */}
+          {/* Store building */}
           <motion.path
-            d="M10 50 C20 30, 30 30, 40 50 C50 70, 60 70, 70 50 M80 30 L80 70 M90 30 L110 70 L130 30 M140 30 L140 70 M150 30 L170 50 L150 70 M180 30 L180 70 M190 50 L210 30 L210 70"
+            d="M50 200 L50 100 L350 100 L350 200 L50 200 Z" // Main building
             stroke="#FF6B00"
             strokeWidth="2"
             fill="transparent"
             variants={draw}
-            className="stroke-[2]"
+          />
+          <motion.path
+            d="M30 100 L200 20 L370 100" // Roof
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
+          />
+          {/* Door */}
+          <motion.path
+            d="M150 200 L150 140 L200 140 L200 200"
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
+          />
+          {/* Windows */}
+          <motion.path
+            d="M80 130 L120 130 L120 160 L80 160 Z M230 130 L270 130 L270 160 L230 160 Z"
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
+          />
+          {/* Shopping person */}
+          <motion.path
+            d="M180 180 L180 150 M170 160 L190 160 M180 160 C160 180, 200 180, 180 200" // Body and arms
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
+          />
+          <motion.circle
+            cx="180"
+            cy="145"
+            r="5"
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
+          />
+          {/* Shopping cart */}
+          <motion.path
+            d="M160 190 L200 190 M160 200 L200 200 M180 190 L180 200"
+            stroke="#FF6B00"
+            strokeWidth="2"
+            fill="transparent"
+            variants={draw}
           />
         </motion.svg>
         <motion.div
