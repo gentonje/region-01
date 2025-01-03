@@ -176,7 +176,7 @@ const EditProduct = () => {
   const additionalImageUrls = existingImages
     .filter(img => !img.is_main)
     .sort((a, b) => a.display_order - b.display_order)
-    .map(img => img.publicUrl);
+    .map(img => ({ url: img.publicUrl, id: img.id }));
 
   return (
     <div className="min-h-screen p-4 bg-gray-50">
@@ -204,7 +204,8 @@ const EditProduct = () => {
                   });
                 }}
                 required={index === 0}
-                existingImageUrl={additionalImageUrls[index]}
+                existingImageUrl={additionalImageUrls[index]?.url}
+                onDeleteExisting={() => additionalImageUrls[index]?.id && handleDeleteExistingImage(additionalImageUrls[index].id)}
                 isLoading={isLoading}
               />
             ))}

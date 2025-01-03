@@ -10,6 +10,7 @@ interface ProductImageUploadProps {
   required?: boolean;
   isLoading?: boolean;
   existingImageUrl?: string;
+  onDeleteExisting?: () => void;
 }
 
 export const ProductImageUpload = ({
@@ -18,6 +19,7 @@ export const ProductImageUpload = ({
   required = false,
   isLoading = false,
   existingImageUrl,
+  onDeleteExisting,
 }: ProductImageUploadProps) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(existingImageUrl || null);
   const [inputKey, setInputKey] = useState<string>(Date.now().toString());
@@ -35,6 +37,9 @@ export const ProductImageUpload = ({
     setPreviewUrl(null);
     onChange(null);
     setInputKey(Date.now().toString()); // Reset input
+    if (existingImageUrl && onDeleteExisting) {
+      onDeleteExisting();
+    }
   };
 
   return (
