@@ -41,7 +41,7 @@ export const Navigation = () => {
                     Manage
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-64 p-4 origin-top-right transition-all duration-200 ease-in-out">
+                    <div className="w-64 p-4 origin-top-left transition-all duration-200 ease-in-out">
                       <Link
                         to="/add-product"
                         className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
