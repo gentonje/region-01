@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Confetti from "@/components/Confetti";
 import { Database } from "@/integrations/supabase/types";
+import { Loader2 } from "lucide-react";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
@@ -15,6 +16,10 @@ const EditProduct = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [mainImage, setMainImage] = useState<File | null>(null);
+  const [additionalImages, setAdditionalImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -25,13 +30,13 @@ const EditProduct = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data, error } = await supabase
+      const { data: productData, error: productError } = await supabase
         .from("products")
         .select("*")
         .eq("id", id)
         .single();
 
-      if (error) {
+      if (productError) {
         toast({
           title: "Error",
           description: "Failed to fetch product",
@@ -41,23 +46,64 @@ const EditProduct = () => {
         return;
       }
 
+      const { data: imagesData } = await supabase
+        .from("product_images")
+        .select("*")
+        .eq("product_id", id)
+        .order("display_order");
+
+      setExistingImages(imagesData || []);
       setFormData({
-        title: data.title || "",
-        description: data.description || "",
-        price: data.price?.toString() || "",
-        category: data.category || "Electronics",
-        available_quantity: data.available_quantity?.toString() || "",
+        title: productData.title || "",
+        description: productData.description || "",
+        price: productData.price?.toString() || "",
+        category: productData.category || "Electronics",
+        available_quantity: productData.available_quantity?.toString() || "",
       });
     };
 
     fetchProduct();
   }, [id, navigate, toast]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, isMain: boolean) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    if (isMain) {
+      setMainImage(files[0]);
+    } else {
+      const newFiles = Array.from(files);
+      setAdditionalImages(prev => [...prev, ...newFiles].slice(0, 4));
+    }
+  };
+
+  const uploadImage = async (file: File, productId: string, isMain: boolean, order: number) => {
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${productId}/${crypto.randomUUID()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    await supabase.from('product_images').insert({
+      product_id: productId,
+      storage_path: filePath,
+      is_main: isMain,
+      display_order: order
+    });
+
+    return filePath;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
-      const { error } = await supabase
+      // Update product details
+      const { error: updateError } = await supabase
         .from("products")
         .update({
           title: formData.title,
@@ -68,7 +114,21 @@ const EditProduct = () => {
         })
         .eq("id", id);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      // Handle new main image if provided
+      if (mainImage) {
+        const mainImagePath = await uploadImage(mainImage, id!, true, 0);
+        await supabase
+          .from("products")
+          .update({ storage_path: mainImagePath })
+          .eq("id", id);
+      }
+
+      // Handle new additional images
+      for (let i = 0; i < additionalImages.length; i++) {
+        await uploadImage(additionalImages[i], id!, false, existingImages.length + i + 1);
+      }
 
       setShowConfetti(true);
       toast({
@@ -85,6 +145,8 @@ const EditProduct = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -93,6 +155,37 @@ const EditProduct = () => {
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="mainImage">Update Main Product Image</Label>
+            <Input
+              id="mainImage"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleImageChange(e, true)}
+            />
+            {existingImages.find(img => img.is_main) && (
+              <div className="text-sm text-gray-500">
+                Current main image exists
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="additionalImages">Add More Images (Up to 4 total)</Label>
+            <Input
+              id="additionalImages"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => handleImageChange(e, false)}
+            />
+            <div className="text-sm text-gray-500">
+              Current additional images: {existingImages.filter(img => !img.is_main).length}
+              <br />
+              New images selected: {additionalImages.length}
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input
@@ -168,8 +261,15 @@ const EditProduct = () => {
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Update Product
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating Product...
+              </>
+            ) : (
+              'Update Product'
+            )}
           </Button>
         </form>
       </div>
