@@ -24,51 +24,100 @@ export const SplashScreen = () => {
       >
         <motion.svg
           width="300"
-          height="300"
-          viewBox="0 0 600 600"
+          height="100"
+          viewBox="0 0 300 100"
           initial="hidden"
           animate="visible"
           className="max-w-[80vw]"
         >
+          {/* Letter V */}
+          <motion.path
+            d="M10 10 L30 80 L50 10"
+            stroke="#ff6b00"
+            variants={draw}
+            custom={0}
+            style={shape}
+          />
+          {/* Letter i */}
+          <motion.path
+            d="M60 30 L60 80"
+            stroke="#000080"
+            variants={draw}
+            custom={0.5}
+            style={shape}
+          />
           <motion.circle
-            className="circle-path"
-            cx="100"
-            cy="100"
-            r="80"
+            cx="60"
+            cy="15"
+            r="3"
+            fill="#000080"
+            variants={draw}
+            custom={0.5}
+          />
+          {/* Letter v */}
+          <motion.path
+            d="M70 30 L85 80 L100 30"
             stroke="#ff6b00"
             variants={draw}
             custom={1}
             style={shape}
           />
-          <motion.line
-            x1="220"
-            y1="30"
-            x2="360"
-            y2="170"
+          {/* Letter o */}
+          <motion.circle
+            cx="120"
+            cy="55"
+            r="25"
             stroke="#000080"
+            variants={draw}
+            custom={1.5}
+            style={shape}
+          />
+          {/* Letter s */}
+          <motion.path
+            d="M160 35 C180 35, 180 45, 160 55 C140 65, 140 75, 160 75"
+            stroke="#ff6b00"
             variants={draw}
             custom={2}
             style={shape}
           />
-          <motion.line
-            x1="220"
-            y1="170"
-            x2="360"
-            y2="30"
+          {/* Letter h */}
+          <motion.path
+            d="M180 10 L180 80"
             stroke="#000080"
             variants={draw}
             custom={2.5}
             style={shape}
           />
-          <motion.rect
-            width="140"
-            height="140"
-            x="410"
-            y="30"
-            rx="20"
-            stroke="#ff6b00"
+          <motion.path
+            d="M180 55 C180 65, 190 75, 200 75 C210 75, 220 65, 220 55 L220 30"
+            stroke="#000080"
             variants={draw}
             custom={3}
+            style={shape}
+          />
+          {/* Letter o */}
+          <motion.circle
+            cx="240"
+            cy="55"
+            r="25"
+            stroke="#ff6b00"
+            variants={draw}
+            custom={3.5}
+            style={shape}
+          />
+          {/* Letter p */}
+          <motion.path
+            d="M270 30 L270 100"
+            stroke="#000080"
+            variants={draw}
+            custom={4}
+            style={shape}
+          />
+          <motion.path
+            d="M270 30 C270 30, 290 30, 290 55 C290 80, 270 80, 270 55"
+            stroke="#000080"
+            variants={draw}
+            custom={4.5}
             style={shape}
           />
         </motion.svg>
@@ -86,7 +135,7 @@ export const SplashScreen = () => {
 };
 
 const shape: React.CSSProperties = {
-  strokeWidth: 10,
+  strokeWidth: 6,
   strokeLinecap: "round",
   fill: "transparent",
 };
