@@ -160,6 +160,13 @@ export type Database = {
             referencedRelation: "shops"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "products_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
