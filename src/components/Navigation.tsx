@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu, Smartphone, Tablet, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import {
