@@ -14,7 +14,7 @@ export const ProductGrid = ({ products }: { products: Product[] }) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
       {products.map((product) => (
-        <Link to={`/product/${product.id}`} key={product.id}>
+        <Link to={`/products/${product.id}`} key={product.id}>
           <Card className="h-full hover:shadow-lg transition-shadow">
             <CardContent className="p-4">
               <div className="aspect-square overflow-hidden rounded-lg mb-4">

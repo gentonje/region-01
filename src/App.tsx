@@ -52,7 +52,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Navigation />
-        <div className="pb-20"> {/* Add padding to account for bottom navigation */}
+        <div className="pb-20">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route
@@ -72,7 +72,7 @@ const App = () => (
               }
             />
             <Route
-              path="/product/:id"
+              path="/products/:id"
               element={
                 <PrivateRoute>
                   <ProductDetail />
