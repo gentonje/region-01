@@ -11,7 +11,6 @@ const Login = () => {
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
-    // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setShowConfetti(true);
