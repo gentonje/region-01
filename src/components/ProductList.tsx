@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
+import { CurrencySelector } from "./CurrencySelector";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface ProductListProps {
   products: Product[];
@@ -31,28 +33,39 @@ export const ProductList = ({
   isFetchingNextPage,
   observerRef,
 }: ProductListProps) => {
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-20">
-      {products.map((product) => (
-        <div key={product.id}>
-          <ProductCard
-            product={product}
-            getProductImageUrl={getProductImageUrl}
-            onClick={() => onProductClick(product)}
-          />
-        </div>
-      ))}
+    <div className="space-y-4">
+      <div className="flex justify-end mb-4">
+        <CurrencySelector
+          value={selectedCurrency}
+          onValueChange={setSelectedCurrency}
+        />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-20">
+        {products.map((product) => (
+          <div key={product.id}>
+            <ProductCard
+              product={product}
+              getProductImageUrl={getProductImageUrl}
+              onClick={() => onProductClick(product)}
+              selectedCurrency={selectedCurrency}
+            />
+          </div>
+        ))}
 
-      {(isFetchingNextPage || isLoading) &&
-        Array(4)
-          .fill(0)
-          .map((_, index) => (
-            <div key={`skeleton-${index}`}>
-              <ProductSkeleton />
-            </div>
-          ))}
+        {(isFetchingNextPage || isLoading) &&
+          Array(4)
+            .fill(0)
+            .map((_, index) => (
+              <div key={`skeleton-${index}`}>
+                <ProductSkeleton />
+              </div>
+            ))}
 
-      <div ref={observerRef} style={{ height: "10px" }} />
+        <div ref={observerRef} style={{ height: "10px" }} />
+      </div>
     </div>
   );
 };
