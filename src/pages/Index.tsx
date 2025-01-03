@@ -6,6 +6,7 @@ import { ProductList } from "@/components/ProductList";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { SplashScreen } from "@/components/SplashScreen";
 import { useInView } from "react-intersection-observer";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
@@ -48,10 +49,14 @@ export default function Index() {
   const allProducts = data?.pages.flat() || [];
 
   const getProductImageUrl = (product: Product) => {
-    if (!product.storage_path) return "/placeholder.svg";
-    return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/images/${
-      product.storage_path
-    }`;
+    if (!product.product_images?.length) return "/placeholder.svg";
+    
+    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
+    if (!mainImage) return "/placeholder.svg";
+
+    return supabase.storage
+      .from("images")
+      .getPublicUrl(mainImage.storage_path).data.publicUrl;
   };
 
   const handleProductClick = (product: Product) => {
@@ -72,6 +77,11 @@ export default function Index() {
         <>
           <Navigation />
           <div className="container mx-auto px-4 pt-20">
+            <BreadcrumbNav
+              items={[
+                { label: "Products", href: "/" }
+              ]}
+            />
             <ProductList
               products={allProducts}
               getProductImageUrl={getProductImageUrl}
