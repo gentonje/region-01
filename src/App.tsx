@@ -75,14 +75,17 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', _event);
       
       if (mounted) {
-        if (_event === 'SIGNED_OUT' || _event === 'USER_DELETED') {
-          console.log('User signed out or deleted, clearing session');
+        if (_event === 'SIGNED_OUT') {
+          console.log('User signed out, clearing session');
           setSession(null);
         } else if (_event === 'SIGNED_IN') {
           console.log('User signed in, updating session');
           setSession(currentSession);
         } else if (_event === 'TOKEN_REFRESHED') {
           console.log('Token refreshed, updating session');
+          setSession(currentSession);
+        } else if (_event === 'USER_UPDATED') {
+          console.log('User updated, updating session');
           setSession(currentSession);
         }
         setLoading(false);
