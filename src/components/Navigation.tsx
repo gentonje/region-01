@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users, LogOut } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users, LogOut, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { toast } from "sonner";
 
 export const Navigation = () => {
@@ -47,6 +47,13 @@ export const Navigation = () => {
     }
   };
 
+  const menuItems = [
+    { icon: Settings, label: "Add Product", path: "/add-product" },
+    { icon: Settings, label: "Modify Products", path: "/modify-products" },
+    { icon: Users, label: "Manage Users", path: "/admin/users" },
+    { icon: DollarSign, label: "Revenue", path: "/revenue" },
+  ];
+
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
@@ -68,56 +75,38 @@ export const Navigation = () => {
                 <span className="sr-only">Toggle theme</span>
               </Button>
 
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Manage
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg -translate-x-[calc(100%-120px)]">
-                        <Link
-                          to="/add-product"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-gray-900 dark:text-gray-100"
-                        >
-                          <Settings className="mr-3 h-4 w-4" />
-                          Add Product
-                        </Link>
-                        <Link
-                          to="/modify-products"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-gray-900 dark:text-gray-100"
-                        >
-                          <Settings className="mr-3 h-4 w-4" />
-                          Modify Products
-                        </Link>
-                        <Link
-                          to="/admin/users"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-gray-900 dark:text-gray-100"
-                        >
-                          <Users className="mr-3 h-4 w-4" />
-                          Manage Users
-                        </Link>
-                        <Link
-                          to="/revenue"
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-gray-900 dark:text-gray-100"
-                        >
-                          <DollarSign className="mr-3 h-4 w-4" />
-                          Revenue
-                        </Link>
-                        <div className="h-px bg-border my-2" />
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-red-600 dark:text-red-400"
-                        >
-                          <LogOut className="mr-3 h-4 w-4" />
-                          Log Out
-                        </button>
-                      </div>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle className="text-left">Menu</SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 flex flex-col gap-4">
+                    {menuItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors"
+                      >
+                        <item.icon className="mr-3 h-4 w-4" />
+                        {item.label}
+                      </Link>
+                    ))}
+                    <div className="h-px bg-border my-2" />
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors text-red-600 dark:text-red-400"
+                    >
+                      <LogOut className="mr-3 h-4 w-4" />
+                      Log Out
+                    </button>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>
