@@ -11,11 +11,12 @@ import {
 
 export const Navigation = () => {
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-white/50 backdrop-blur-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-xl font-bold">
-            Products
+            <span className="text-vivo-orange">Vivo</span>
+            <span className="text-navy-blue">Shop</span>
           </Link>
 
           <NavigationMenu>
@@ -61,7 +62,7 @@ export const Navigation = () => {
 
 export const BottomNavigation = () => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/50 backdrop-blur-sm border-t border-gray-200 md:hidden">
       <div className="grid grid-cols-2 h-16">
         <Link to="/" className="flex items-center justify-center">
           <Button variant="ghost" size="sm">
