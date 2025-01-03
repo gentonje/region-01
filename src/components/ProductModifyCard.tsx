@@ -46,7 +46,7 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => onDelete(product.id)}
+                  onClick={async () => await onDelete(product.id)}
                   className="bg-red-500 hover:bg-red-600"
                 >
                   Delete
