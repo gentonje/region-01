@@ -8,6 +8,8 @@ import { ProductForm } from "@/components/ProductForm";
 import { uploadImage } from "@/utils/uploadImage";
 import { useProductImages } from "@/hooks/useProductImages";
 import { ProductImageSection } from "@/components/ProductImageSection";
+import { Button } from "@/components/ui/button";
+import { Navigation, BottomNavigation } from "@/components/Navigation";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
@@ -137,16 +139,17 @@ const EditProduct = () => {
     }
   };
 
-  const mainImageUrl = existingImages.find(img => img.is_main)?.publicUrl;
-  const additionalImageUrls = existingImages
-    .filter(img => !img.is_main)
-    .sort((a, b) => a.display_order - b.display_order)
-    .map(img => ({ url: img.publicUrl, id: img.id }));
-
   return (
-    <div className="min-h-screen p-4 bg-gray-50">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
+    <div className="min-h-screen p-4 bg-gray-50 pb-20">
+      <Navigation />
+      
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mt-20">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Edit Product</h1>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            Cancel
+          </Button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <ProductImageSection
@@ -154,8 +157,11 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={mainImageUrl}
-            additionalImageUrls={additionalImageUrls}
+            mainImageUrl={existingImages.find(img => img.is_main)?.publicUrl}
+            additionalImageUrls={existingImages
+              .filter(img => !img.is_main)
+              .sort((a, b) => a.display_order - b.display_order)
+              .map(img => ({ url: img.publicUrl, id: img.id }))}
             onDeleteExisting={handleDeleteImage}
             isLoading={isLoading}
           />
@@ -169,6 +175,7 @@ const EditProduct = () => {
         </form>
       </div>
       <Confetti isActive={showConfetti} />
+      <BottomNavigation />
     </div>
   );
 };

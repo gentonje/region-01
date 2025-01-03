@@ -7,6 +7,8 @@ import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageUpload } from "@/components/ProductImageUpload";
 import { uploadImage } from "@/utils/uploadImage";
+import { Button } from "@/components/ui/button";
+import { Navigation, BottomNavigation } from "@/components/Navigation";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
@@ -105,9 +107,16 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-gray-50">
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
+    <div className="min-h-screen p-4 bg-gray-50 pb-20">
+      <Navigation />
+      
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mt-20">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Add New Product</h1>
+          <Button variant="outline" onClick={() => navigate("/")}>
+            Cancel
+          </Button>
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
@@ -144,6 +153,7 @@ const AddProduct = () => {
         </form>
       </div>
       <Confetti isActive={showConfetti} />
+      <BottomNavigation />
     </div>
   );
 };
