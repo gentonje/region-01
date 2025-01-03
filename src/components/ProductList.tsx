@@ -1,9 +1,8 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Product } from "@/types/product";
-
-const ProductCard = React.lazy(() => import("./ProductCard"));
+import ProductCard from "./ProductCard";
 
 interface ProductListProps {
   products: Product[];
@@ -34,25 +33,15 @@ export const ProductList = ({
 }: ProductListProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
-      <Suspense
-        fallback={Array(20)
-          .fill(0)
-          .map((_, index) => (
-            <div key={index} className="m-1">
-              <ProductSkeleton />
-            </div>
-          ))}
-      >
-        {products.map((product) => (
-          <div key={product.id} className="m-1">
-            <ProductCard
-              product={product}
-              getProductImageUrl={getProductImageUrl}
-              onClick={() => onProductClick(product)}
-            />
-          </div>
-        ))}
-      </Suspense>
+      {products.map((product) => (
+        <div key={product.id} className="m-1">
+          <ProductCard
+            product={product}
+            getProductImageUrl={getProductImageUrl}
+            onClick={() => onProductClick(product)}
+          />
+        </div>
+      ))}
 
       {(isFetchingNextPage || isLoading) &&
         Array(4)
