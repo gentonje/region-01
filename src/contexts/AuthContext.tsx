@@ -22,47 +22,55 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const initSession = async () => {
       try {
         console.log('Initializing session...');
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
-        if (error) {
-          console.error('Error getting session:', error);
-          if (mounted) {
-            setSession(null);
-            setLoading(false);
-          }
-          return;
-        }
-
+        // First try to recover the session from localStorage
+        const { data: { session: storedSession } } = await supabase.auth.getSession();
+        
         if (mounted) {
-          console.log('Session state:', currentSession ? 'Active' : 'No session');
-          setSession(currentSession);
+          if (storedSession) {
+            console.log('Found stored session');
+            setSession(storedSession);
+          } else {
+            console.log('No stored session found');
+            setSession(null);
+          }
           setLoading(false);
         }
       } catch (error) {
         console.error('Session initialization error:', error);
         if (mounted) {
+          // Clear the session if there's an error
           setSession(null);
           setLoading(false);
+          
+          // Clear any invalid session data
+          await supabase.auth.signOut();
         }
       }
     };
 
+    // Initialize the session
     initSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+    // Set up the auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          console.log('User signed out or deleted');
           setSession(null);
         } else if (currentSession) {
+          console.log('Session updated');
           setSession(currentSession);
         }
         setLoading(false);
       }
     });
 
+    // Cleanup function
     return () => {
+      console.log('Cleaning up auth subscription');
       mounted = false;
       subscription.unsubscribe();
     };

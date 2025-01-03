@@ -10,6 +10,8 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!session) {
     console.log('No active session, redirecting to login');
+    // Clear any potentially invalid session data
+    localStorage.removeItem('supabase.auth.token');
     return <Navigate to="/login" replace />;
   }
 
