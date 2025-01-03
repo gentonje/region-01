@@ -1,33 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { ProductModifyCard } from "@/components/ProductModifyCard";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
+import { Button } from "@/components/ui/button";
 
 const ITEMS_PER_PAGE = 6;
 
-const DeleteProducts = () => {
+const ModifyProducts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<any[]>([]);
@@ -49,7 +31,6 @@ const DeleteProducts = () => {
         return;
       }
 
-      // Get total count of user's products
       const { count: totalCount } = await supabase
         .from("products")
         .select("*", { count: 'exact', head: true })
@@ -58,7 +39,6 @@ const DeleteProducts = () => {
       const total = totalCount || 0;
       setTotalPages(Math.ceil(total / ITEMS_PER_PAGE));
 
-      // Fetch paginated products
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -109,7 +89,7 @@ const DeleteProducts = () => {
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 pt-20">
-        <h1 className="text-2xl font-bold mb-6">Manage Products</h1>
+        <h1 className="text-2xl font-bold mb-6">Modify Products</h1>
         
         {isLoading ? (
           <div className="text-center py-8">Loading...</div>
@@ -120,40 +100,11 @@ const DeleteProducts = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div
+              <ProductModifyCard
                 key={product.id}
-                className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
-              >
-                <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
-                <p className="text-gray-600 mb-4">{product.description}</p>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold">${product.price}</span>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Product</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this product? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(product.id)}
-                          className="bg-red-500 hover:bg-red-600"
-                        >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </div>
+                product={product}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
@@ -203,4 +154,4 @@ const DeleteProducts = () => {
   );
 };
 
-export default DeleteProducts;
+export default ModifyProducts;
