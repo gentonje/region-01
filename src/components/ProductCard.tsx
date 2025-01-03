@@ -55,7 +55,7 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
       <div className="h-[32px] overflow-hidden">
         <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
       </div>
-      <div className="h-[32px] overflow-hidden flex items-center justify-between px-0">
+      <div className="h-[32px] overflow-hidden flex items-center justify-between px-0 m-1">
         <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
         <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {product.in_stock ? 'In Stock' : 'Out of Stock'}
@@ -63,7 +63,7 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
       </div>
     </CardContent>
     <CardFooter className="h-[32px] flex items-center justify-between">
-      <p className="text-sm font-semibold text-vivo-orange">
+      <p className="text-base font-semibold text-vivo-orange ml-1">
         {product.currency} {product.price?.toFixed(2)}
       </p>
     </CardFooter>
