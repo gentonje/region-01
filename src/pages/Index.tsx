@@ -97,7 +97,7 @@ const Index = () => {
           <img
             src={getProductImageUrl(product)}
             alt={product.title}
-            className="w-full h-full object-cover rounded-md"
+            className="w-full h-full object-cover rounded-md mt-2"
           />
           <div className="absolute bottom-2 right-2">
             <StarRating rating={product.average_rating || 0} />
