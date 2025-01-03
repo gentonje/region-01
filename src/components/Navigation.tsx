@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -59,6 +59,13 @@ export const Navigation = () => {
                         Modify Products
                       </Link>
                       <Link
+                        to="/admin/users"
+                        className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
+                      >
+                        <Users className="mr-2 h-4 w-4 inline-block" />
+                        Manage Users
+                      </Link>
+                      <Link
                         to="/revenue"
                         className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
                       >
@@ -106,11 +113,18 @@ export const BottomNavigation = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-t border-border md:hidden">
-      <div className="grid grid-cols-1 h-12">
+      <div className="grid grid-cols-2 h-16">
         <div className="flex items-center justify-center">
           {deviceInfo.icon}
           <span className="text-sm">{deviceInfo.text}</span>
         </div>
+        <Link 
+          to="/admin/users" 
+          className="flex items-center justify-center hover:bg-accent/50 transition-colors"
+        >
+          <Users className="w-4 h-4 mr-2" />
+          <span className="text-sm">Users</span>
+        </Link>
       </div>
     </div>
   );
