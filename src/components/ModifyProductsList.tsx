@@ -8,7 +8,7 @@ interface ModifyProductsListProps {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
-  onDelete: (productId: string) => void;
+  onDelete: (productId: string) => Promise<void>;
   isMobile: boolean;
 }
 
