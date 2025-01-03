@@ -55,22 +55,39 @@ const ModifyProducts = () => {
       }
 
       const { count: totalCount } = await query;
-
       const total = totalCount || 0;
-      setTotalPages(Math.ceil(total / ITEMS_PER_PAGE));
+      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE);
+      
+      // Adjust currentPage if it exceeds the total pages
+      if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
+        setCurrentPage(calculatedTotalPages);
+        return; // Exit and let the useEffect trigger a new fetch with the corrected page
+      }
 
-      const { data, error } = await query
-        .range((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE - 1);
+      setTotalPages(calculatedTotalPages);
 
-      if (error) throw error;
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      const end = Math.min(start + ITEMS_PER_PAGE - 1, total - 1);
 
-      if (append) {
-        setProducts(prev => [...prev, ...(data || [])]);
-        setHasMore((currentPage * ITEMS_PER_PAGE) < total);
+      // Only fetch if we have valid range
+      if (start <= end) {
+        const { data, error } = await query.range(start, end);
+
+        if (error) throw error;
+
+        if (append) {
+          setProducts(prev => [...prev, ...(data || [])]);
+          setHasMore((currentPage * ITEMS_PER_PAGE) < total);
+        } else {
+          setProducts(data || []);
+        }
       } else {
-        setProducts(data || []);
+        // If range is invalid, reset products
+        setProducts([]);
+        setHasMore(false);
       }
     } catch (error: any) {
+      console.error("Error fetching products:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to fetch products",
