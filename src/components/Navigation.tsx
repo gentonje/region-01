@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { supabase } from "@/integrations/supabase/client";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,9 +12,40 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { toast } from "sonner";
 
 export const Navigation = () => {
   const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+        
+        setUserName(profile?.full_name || user.email || "");
+      }
+    };
+
+    getUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to log out");
+    }
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
@@ -25,6 +57,12 @@ export const Navigation = () => {
           </Link>
 
           <div className="flex items-center gap-4">
+            {userName && (
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                Logged in as {userName}
+              </span>
+            )}
+            
             <Button
               variant="ghost"
               size="icon"
@@ -43,35 +81,43 @@ export const Navigation = () => {
                     Manage
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <div className="w-64 p-4 origin-top-left transition-all duration-200 ease-in-out">
+                    <div className="w-72 p-4 bg-background/80 backdrop-blur-lg border rounded-lg shadow-lg">
                       <Link
                         to="/add-product"
-                        className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
+                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
                       >
-                        <Settings className="mr-2 h-4 w-4 inline-block" />
+                        <Settings className="mr-3 h-4 w-4" />
                         Add Product
                       </Link>
                       <Link
                         to="/modify-products"
-                        className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
+                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
                       >
-                        <Settings className="mr-2 h-4 w-4 inline-block" />
+                        <Settings className="mr-3 h-4 w-4" />
                         Modify Products
                       </Link>
                       <Link
                         to="/admin/users"
-                        className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
+                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
                       >
-                        <Users className="mr-2 h-4 w-4 inline-block" />
+                        <Users className="mr-3 h-4 w-4" />
                         Manage Users
                       </Link>
                       <Link
                         to="/revenue"
-                        className="block px-4 py-2 text-sm hover:bg-accent rounded-md"
+                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left"
                       >
-                        <DollarSign className="mr-2 h-4 w-4 inline-block" />
+                        <DollarSign className="mr-3 h-4 w-4" />
                         Revenue
                       </Link>
+                      <div className="h-px bg-border my-2" />
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center w-full px-4 py-2.5 text-sm hover:bg-accent rounded-md text-left text-red-600 dark:text-red-400"
+                      >
+                        <LogOut className="mr-3 h-4 w-4" />
+                        Log Out
+                      </button>
                     </div>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
