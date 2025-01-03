@@ -1,27 +1,34 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Confetti from "@/components/Confetti";
-import { useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("Checking session state...");
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Session check result:", session ? "Session found" : "No session");
       if (session) {
         setShowConfetti(true);
         setTimeout(() => {
           navigate('/', { replace: true });
         }, 2000);
       }
+      setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session ? "Session exists" : "No session");
       if (event === 'SIGNED_IN' && session) {
         setShowConfetti(true);
         setTimeout(() => {
@@ -30,8 +37,19 @@ const Login = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
