@@ -38,10 +38,10 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 const ProductCard = ({ product, getProductImageUrl, onClick }: ProductCardProps) => (
   <Card 
-    className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+    className="w-full h-[380px] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
     onClick={onClick}
   >
-    <CardContent className="px-0 space-y-2">
+    <CardContent className="px-0 space-y-1">
       <div 
         className="h-60 w-full relative"
         onClick={(e) => {
@@ -62,14 +62,14 @@ const ProductCard = ({ product, getProductImageUrl, onClick }: ProductCardProps)
           {product.category}
         </span>
       </div>
-      <div className="h-[32px] overflow-hidden m-1">
+      <div className="h-[28px] overflow-hidden mx-1">
         <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
       </div>
-      <div className="h-[32px] overflow-hidden flex items-center px-0 m-1">
+      <div className="h-[28px] overflow-hidden flex items-center px-0 mx-1">
         <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
       </div>
     </CardContent>
-    <CardFooter className="flex flex-col space-y-2">
+    <CardFooter className="flex flex-col space-y-1 pt-0">
       <p className="text-base font-semibold text-vivo-orange ml-1 w-full">
         {product.currency} {product.price?.toFixed(2)}
       </p>

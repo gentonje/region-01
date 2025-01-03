@@ -14,7 +14,7 @@ interface ProductListProps {
 }
 
 const ProductSkeleton = () => (
-  <Card className="w-full h-[400px] m-1">
+  <Card className="w-full h-[380px] m-1">
     <Skeleton className="h-60 w-full" />
     <div className="p-4 space-y-3">
       <Skeleton className="h-4 w-3/4" />
@@ -32,9 +32,9 @@ export const ProductList = ({
   observerRef,
 }: ProductListProps) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-20">
       {products.map((product) => (
-        <div key={product.id} className="m-1">
+        <div key={product.id}>
           <ProductCard
             product={product}
             getProductImageUrl={getProductImageUrl}
@@ -47,7 +47,7 @@ export const ProductList = ({
         Array(4)
           .fill(0)
           .map((_, index) => (
-            <div key={`skeleton-${index}`} className="m-1">
+            <div key={`skeleton-${index}`}>
               <ProductSkeleton />
             </div>
           ))}

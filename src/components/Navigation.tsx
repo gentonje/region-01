@@ -106,7 +106,7 @@ export const BottomNavigation = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-t border-border md:hidden">
-      <div className="grid grid-cols-1 h-16">
+      <div className="grid grid-cols-1 h-12">
         <div className="flex items-center justify-center">
           {deviceInfo.icon}
           <span className="text-sm">{deviceInfo.text}</span>
