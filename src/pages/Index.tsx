@@ -20,22 +20,22 @@ export default function Index() {
   } = useInfiniteQuery({
     queryKey: ["products"],
     queryFn: async ({ pageParam = 0 }) => {
-      const from = pageParam * 10;
-      const to = from + 9;
+      const startRange = pageParam * 10;
+      const endRange = startRange + 9;
 
-      const { data, error } = await supabase
+      const { data: products, error } = await supabase
         .from("products")
         .select("*, product_images(*)")
-        .range(from, to)
+        .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Product[];
+      return products as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
-      return lastPage?.length === 10 ? allPages.length : undefined;
+      if (!lastPage || lastPage.length < 10) return undefined;
+      return allPages.length;
     },
-    initialPageSize: 10,
   });
 
   useEffect(() => {
