@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
+import { LazyMotion, domAnimation } from "framer-motion";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
@@ -28,53 +29,55 @@ function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <AuthProvider>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/"
-                  element={
-                    <PrivateRoute>
-                      <Index />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/add-product"
-                  element={
-                    <PrivateRoute>
-                      <AddProduct />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/edit-product/:id"
-                  element={
-                    <PrivateRoute>
-                      <EditProduct />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/modify-products"
-                  element={
-                    <PrivateRoute>
-                      <ModifyProducts />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <PrivateRoute>
-                      <AdminUsers />
-                    </PrivateRoute>
-                  }
-                />
-              </Routes>
-            </BrowserRouter>
+            <LazyMotion features={domAnimation}>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route
+                    path="/"
+                    element={
+                      <PrivateRoute>
+                        <Index />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/add-product"
+                    element={
+                      <PrivateRoute>
+                        <AddProduct />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/edit-product/:id"
+                    element={
+                      <PrivateRoute>
+                        <EditProduct />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/modify-products"
+                    element={
+                      <PrivateRoute>
+                        <ModifyProducts />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/users"
+                    element={
+                      <PrivateRoute>
+                        <AdminUsers />
+                      </PrivateRoute>
+                    }
+                  />
+                </Routes>
+              </BrowserRouter>
+            </LazyMotion>
           </TooltipProvider>
         </AuthProvider>
       </ThemeProvider>

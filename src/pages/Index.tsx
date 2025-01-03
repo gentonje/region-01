@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
@@ -9,31 +9,34 @@ import { useInView } from "react-intersection-observer";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [page, setPage] = useState(1);
   const { ref, inView } = useInView();
 
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
-    useQuery({
-      queryKey: ["products"],
-      queryFn: async ({ pageParam = 1 }) => {
-        const from = (pageParam - 1) * 10;
-        const to = from + 9;
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["products"],
+    queryFn: async ({ pageParam = 0 }) => {
+      const from = pageParam * 10;
+      const to = from + 9;
 
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .range(from, to)
-          .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, product_images(*)")
+        .range(from, to)
+        .order("created_at", { ascending: false });
 
-        if (error) throw error;
-        return data as Product[];
-      },
-      getNextPageParam: (lastPage, allPages) => {
-        return lastPage?.length === 10 ? allPages.length + 1 : undefined;
-      },
-      initialPageSize: 10,
-    });
+      if (error) throw error;
+      return data as Product[];
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage?.length === 10 ? allPages.length : undefined;
+    },
+    initialPageSize: 10,
+  });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -41,12 +44,7 @@ export default function Index() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  useEffect(() => {
-    if (data) {
-      const allProducts = data.pages.flat();
-      setProducts(allProducts);
-    }
-  }, [data]);
+  const allProducts = data?.pages.flat() || [];
 
   const getProductImageUrl = (product: Product) => {
     if (!product.storage_path) return "/placeholder.svg";
@@ -60,7 +58,6 @@ export default function Index() {
   };
 
   const handleSplashComplete = () => {
-    // Wait for 3 seconds after animation completes
     setTimeout(() => {
       setShowSplash(false);
     }, 3000);
@@ -75,7 +72,7 @@ export default function Index() {
           <Navigation />
           <div className="container mx-auto px-4 pt-20">
             <ProductList
-              products={products}
+              products={allProducts}
               getProductImageUrl={getProductImageUrl}
               onProductClick={handleProductClick}
               isLoading={isLoading}
