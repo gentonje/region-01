@@ -6,7 +6,7 @@ const draw = {
     pathLength: 1,
     opacity: 1,
     transition: {
-      pathLength: { delay: i * 0.5, type: "spring", duration: 2.5, bounce: 0 },
+      pathLength: { delay: i * 0.5, type: "spring", duration: 5, bounce: 0 },
       opacity: { delay: i * 0.5, duration: 0.01 },
     },
   }),
@@ -23,16 +23,16 @@ export const SplashScreen = () => {
         className="text-center"
       >
         <motion.svg
-          width="400"
-          height="300"
-          viewBox="0 0 400 300"
+          width="600"
+          height="400"
+          viewBox="0 0 600 400"
           initial="hidden"
           animate="visible"
-          className="max-w-[80vw]"
+          className="max-w-[90vw]"
         >
-          {/* Shop roof */}
+          {/* Main shop building */}
           <motion.path
-            d="M50 150 L200 50 L350 150"
+            d="M100 200 L300 100 L500 200"
             stroke="#ff6b00"
             strokeWidth="8"
             variants={draw}
@@ -42,7 +42,7 @@ export const SplashScreen = () => {
           
           {/* Shop walls */}
           <motion.path
-            d="M75 150 L75 250 L325 250 L325 150"
+            d="M125 200 L125 350 L475 350 L475 200"
             stroke="#000080"
             strokeWidth="8"
             variants={draw}
@@ -50,9 +50,9 @@ export const SplashScreen = () => {
             style={shape}
           />
           
-          {/* Door */}
+          {/* Main door */}
           <motion.path
-            d="M175 250 L175 175 L225 175 L225 250"
+            d="M275 350 L275 250 L325 250 L325 350"
             stroke="#ff6b00"
             strokeWidth="8"
             variants={draw}
@@ -60,9 +60,9 @@ export const SplashScreen = () => {
             style={shape}
           />
           
-          {/* Windows */}
+          {/* Left window */}
           <motion.path
-            d="M100 175 L150 175 L150 200 L100 200 Z"
+            d="M150 250 L225 250 L225 300 L150 300 Z"
             stroke="#000080"
             strokeWidth="8"
             variants={draw}
@@ -70,8 +70,9 @@ export const SplashScreen = () => {
             style={shape}
           />
           
+          {/* Right window */}
           <motion.path
-            d="M250 175 L300 175 L300 200 L250 200 Z"
+            d="M375 250 L450 250 L450 300 L375 300 Z"
             stroke="#000080"
             strokeWidth="8"
             variants={draw}
@@ -81,21 +82,77 @@ export const SplashScreen = () => {
           
           {/* Chimney */}
           <motion.path
-            d="M275 100 L275 50 L300 50 L300 115"
+            d="M400 150 L400 80 L425 80 L425 165"
             stroke="#ff6b00"
             strokeWidth="8"
             variants={draw}
             custom={4}
             style={shape}
           />
+
+          {/* Shopping Cart */}
+          <motion.path
+            d="M50 380 L75 380 L90 360 L100 360 L110 380 L120 380"
+            stroke="#000080"
+            strokeWidth="4"
+            variants={draw}
+            custom={4.5}
+            style={shape}
+          />
+          <motion.path
+            d="M60 385 C60 390, 65 390, 65 385"
+            stroke="#000080"
+            strokeWidth="3"
+            variants={draw}
+            custom={5}
+            style={shape}
+          />
+          <motion.path
+            d="M110 385 C110 390, 115 390, 115 385"
+            stroke="#000080"
+            strokeWidth="3"
+            variants={draw}
+            custom={5}
+            style={shape}
+          />
+
+          {/* Parked Car */}
+          <motion.path
+            d="M500 370 L550 370 L560 350 L490 350 L500 370"
+            stroke="#ff6b00"
+            strokeWidth="4"
+            variants={draw}
+            custom={5.5}
+            style={shape}
+          />
+          <motion.circle
+            cx="505"
+            cy="370"
+            r="5"
+            stroke="#000080"
+            strokeWidth="2"
+            variants={draw}
+            custom={6}
+            style={shape}
+          />
+          <motion.circle
+            cx="545"
+            cy="370"
+            r="5"
+            stroke="#000080"
+            strokeWidth="2"
+            variants={draw}
+            custom={6}
+            style={shape}
+          />
         </motion.svg>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 4 }}
-          className="mt-4 text-2xl font-bold text-foreground"
+          transition={{ delay: 6 }}
+          className="mt-4 text-2xl font-calligraphy text-vivo-orange"
         >
-          Loading Products...
+          Enjoy your shopping
         </motion.h1>
       </motion.div>
     </div>
