@@ -6,8 +6,8 @@ const draw = {
     pathLength: 1,
     opacity: 1,
     transition: {
-      pathLength: { delay: i * 1.5, type: "spring", duration: 15, bounce: 0 },
-      opacity: { delay: i * 1.5, duration: 0.01 },
+      pathLength: { delay: i * 0.5, type: "spring", duration: 5, bounce: 0 },
+      opacity: { delay: i * 0.5, duration: 0.01 },
     },
   }),
 };
@@ -149,7 +149,7 @@ export const SplashScreen = () => {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 16 }}
+          transition={{ delay: 6 }}
           className="mt-4 text-2xl font-calligraphy text-vivo-orange"
         >
           Enjoy your shopping

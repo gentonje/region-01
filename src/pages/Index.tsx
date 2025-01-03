@@ -97,12 +97,12 @@ const Index = () => {
     getUser();
   }, [navigate]);
 
-  // Hide splash screen after initial load with extended duration
+  // Hide splash screen after initial load
   React.useEffect(() => {
     if (!isProductsLoading && data) {
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 16000); // Extended to 16 seconds to ensure the full 15-second animation plays
+      }, 3000); // Show splash screen for at least 3 seconds
       return () => clearTimeout(timer);
     }
   }, [isProductsLoading, data]);
