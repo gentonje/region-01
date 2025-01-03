@@ -73,11 +73,20 @@ const EditProduct = () => {
     setIsLoading(true);
     
     try {
-      // Only count new images being added
-      const newImagesCount = [mainImage, ...additionalImages.filter(img => img !== null)].length;
-      
-      if (newImagesCount > (5 - existingImages.length)) {
-        throw new Error(`Cannot add ${newImagesCount} new images. You already have ${existingImages.length} images. Maximum total is 5.`);
+      // Count new images being added (excluding null values)
+      const newImagesCount = [
+        mainImage,
+        ...additionalImages.filter(img => img !== null)
+      ].filter(Boolean).length;
+
+      // Get current number of images in the database
+      const currentImagesCount = existingImages.length;
+
+      // Calculate total images after update
+      const totalImagesAfterUpdate = currentImagesCount + newImagesCount;
+
+      if (totalImagesAfterUpdate > 5) {
+        throw new Error(`Cannot add ${newImagesCount} new images. You already have ${currentImagesCount} images. Maximum total is 5.`);
       }
 
       const { error: updateError } = await supabase
