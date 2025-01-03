@@ -35,37 +35,24 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           <motion.rect
             x="50"
             y="50"
-            width="150"
-            height="150"
+            width="200"
+            height="200"
             rx="20"
             stroke="#FF6B00"
-            strokeWidth="4"
+            strokeWidth="8"
             fill="transparent"
             variants={draw}
           />
           
-          {/* Second square (middle) - Blue */}
+          {/* Second square (front) - Blue */}
           <motion.rect
             x="100"
             y="100"
-            width="150"
-            height="150"
+            width="200"
+            height="200"
             rx="20"
             stroke="#000080"
-            strokeWidth="4"
-            fill="transparent"
-            variants={draw}
-          />
-          
-          {/* Third square (front) - Orange */}
-          <motion.rect
-            x="150"
-            y="150"
-            width="150"
-            height="150"
-            rx="20"
-            stroke="#FF6B00"
-            strokeWidth="4"
+            strokeWidth="8"
             fill="transparent"
             variants={draw}
           />
