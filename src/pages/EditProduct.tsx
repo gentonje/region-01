@@ -29,47 +29,54 @@ const EditProduct = () => {
 
   useEffect(() => {
     const fetchProduct = async () => {
-      const { data: productData, error: productError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
+      try {
+        // Fetch product details
+        const { data: productData, error: productError } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .single();
 
-      if (productError) {
+        if (productError) throw productError;
+
+        // Fetch all product images
+        const { data: imagesData, error: imagesError } = await supabase
+          .from("product_images")
+          .select("*")
+          .eq("product_id", id)
+          .order("display_order");
+
+        if (imagesError) throw imagesError;
+
+        // Get public URLs for all images
+        const imagesWithUrls = await Promise.all(
+          (imagesData || []).map(async (image) => {
+            const { data } = supabase
+              .storage
+              .from('images')
+              .getPublicUrl(image.storage_path);
+            return { ...image, publicUrl: data.publicUrl };
+          })
+        );
+
+        setExistingImages(imagesWithUrls || []);
+        
+        // Set form data
+        setFormData({
+          title: productData.title || "",
+          description: productData.description || "",
+          price: productData.price?.toString() || "",
+          category: productData.category || "Electronics",
+          available_quantity: productData.available_quantity?.toString() || "",
+        });
+      } catch (error: any) {
         toast({
           title: "Error",
-          description: "Failed to fetch product",
+          description: error.message,
           variant: "destructive",
         });
         navigate("/");
-        return;
       }
-
-      const { data: imagesData } = await supabase
-        .from("product_images")
-        .select("*")
-        .eq("product_id", id)
-        .order("display_order");
-
-      // Get public URLs for existing images
-      const imagesWithUrls = await Promise.all(
-        (imagesData || []).map(async (image) => {
-          const { data: { publicUrl } } = supabase
-            .storage
-            .from('images')
-            .getPublicUrl(image.storage_path);
-          return { ...image, publicUrl };
-        })
-      );
-
-      setExistingImages(imagesWithUrls || []);
-      setFormData({
-        title: productData.title || "",
-        description: productData.description || "",
-        price: productData.price?.toString() || "",
-        category: productData.category || "Electronics",
-        available_quantity: productData.available_quantity?.toString() || "",
-      });
     };
 
     fetchProduct();
@@ -164,6 +171,13 @@ const EditProduct = () => {
     }
   };
 
+  // Get main image and additional images
+  const mainImageUrl = existingImages.find(img => img.is_main)?.publicUrl;
+  const additionalImageUrls = existingImages
+    .filter(img => !img.is_main)
+    .sort((a, b) => a.display_order - b.display_order)
+    .map(img => img.publicUrl);
+
   return (
     <div className="min-h-screen p-4 bg-gray-50">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
@@ -174,7 +188,7 @@ const EditProduct = () => {
             <ProductImageUpload
               label="Main Product Image"
               onChange={setMainImage}
-              existingImageUrl={existingImages.find(img => img.is_main)?.publicUrl}
+              existingImageUrl={mainImageUrl}
               isLoading={isLoading}
             />
 
@@ -190,7 +204,7 @@ const EditProduct = () => {
                   });
                 }}
                 required={index === 0}
-                existingImageUrl={existingImages.find(img => !img.is_main && img.display_order === index)?.publicUrl}
+                existingImageUrl={additionalImageUrls[index]}
                 isLoading={isLoading}
               />
             ))}
