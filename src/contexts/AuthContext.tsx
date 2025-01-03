@@ -23,15 +23,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Initializing session...');
         
-        // First try to recover the session from localStorage
-        const { data: { session: storedSession } } = await supabase.auth.getSession();
+        // Clear any potentially stale session data
+        localStorage.removeItem('supabase.auth.token');
+        
+        // Get fresh session
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session initialization error:', error);
+          throw error;
+        }
         
         if (mounted) {
-          if (storedSession) {
-            console.log('Found stored session');
-            setSession(storedSession);
+          if (currentSession) {
+            console.log('Found valid session');
+            setSession(currentSession);
           } else {
-            console.log('No stored session found');
+            console.log('No valid session found');
             setSession(null);
           }
           setLoading(false);
@@ -39,11 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } catch (error) {
         console.error('Session initialization error:', error);
         if (mounted) {
-          // Clear the session if there's an error
           setSession(null);
           setLoading(false);
-          
-          // Clear any invalid session data
           await supabase.auth.signOut();
         }
       }
@@ -60,7 +65,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (event === 'SIGNED_OUT') {
           console.log('User signed out');
           setSession(null);
-          // Clear any potentially invalid session data
           localStorage.removeItem('supabase.auth.token');
         } else if (currentSession) {
           console.log('Session updated');
