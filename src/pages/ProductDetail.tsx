@@ -71,7 +71,7 @@ export default function ProductDetail() {
         <div className="w-full">
           <Carousel className="w-full">
             <CarouselContent>
-              {product.product_images.map((image: any) => (
+              {product.product_images?.map((image: any) => (
                 <CarouselItem key={image.id}>
                   <div className="aspect-square overflow-hidden rounded-lg">
                     <img
