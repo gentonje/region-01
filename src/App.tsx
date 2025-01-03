@@ -28,6 +28,8 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Initialize session
     const initSession = async () => {
       try {
@@ -36,38 +38,42 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Error getting initial session:', error);
-          setLoading(false);
+          if (mounted) setLoading(false);
           return;
         }
 
         console.log('Initial session state:', initialSession ? 'Active' : 'None');
-        setSession(initialSession);
-        setLoading(false);
+        if (mounted) {
+          setSession(initialSession);
+          setLoading(false);
+        }
       } catch (error) {
         console.error('Error in session initialization:', error);
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     initSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, currentSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
       console.log('Auth state changed:', _event);
       
-      if (_event === 'SIGNED_OUT') {
-        console.log('User signed out, clearing session');
-        setSession(null);
-      } else if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
-        console.log('Session updated:', _event);
-        setSession(currentSession);
+      if (mounted) {
+        if (_event === 'SIGNED_OUT') {
+          console.log('User signed out, clearing session');
+          setSession(null);
+        } else if (_event === 'SIGNED_IN' || _event === 'TOKEN_REFRESHED') {
+          console.log('Session updated:', _event);
+          setSession(currentSession);
+        }
+        setLoading(false);
       }
-      
-      setLoading(false);
     });
 
     return () => {
       console.log('Cleaning up auth subscription');
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

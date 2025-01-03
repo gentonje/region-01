@@ -41,6 +41,7 @@ const Login = () => {
 
     return () => {
       mounted.current = false;
+      console.log('Cleaning up auth subscription');
       subscription.unsubscribe();
     };
   }, [navigate]);
