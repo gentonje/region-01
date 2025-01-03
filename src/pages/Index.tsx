@@ -7,15 +7,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import ProductDetail from "@/components/ProductDetail";
+import { ProductFilters } from "@/components/ProductFilters";
 
 interface Product {
   id: string;
@@ -39,7 +32,7 @@ const Index = () => {
   const [userName, setUserName] = useState<string>("");
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
@@ -68,7 +61,7 @@ const Index = () => {
         query = query.ilike('title', `%${searchQuery}%`);
       }
 
-      if (selectedCategory) {
+      if (selectedCategory && selectedCategory !== 'all') {
         query = query.eq('category', selectedCategory);
       }
 
@@ -157,35 +150,12 @@ const Index = () => {
       <Navigation />
       
       <div className="pt-20 px-4 space-y-4">
-        <div className="flex gap-4 items-center">
-          <Input
-            placeholder="Search products..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="max-w-sm"
-          />
-          <Select
-            value={selectedCategory}
-            onValueChange={setSelectedCategory}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
-              <SelectItem value="Electronics">Electronics</SelectItem>
-              <SelectItem value="Clothing">Clothing</SelectItem>
-              <SelectItem value="Home & Garden">Home & Garden</SelectItem>
-              <SelectItem value="Books">Books</SelectItem>
-              <SelectItem value="Sports & Outdoors">Sports & Outdoors</SelectItem>
-              <SelectItem value="Toys & Games">Toys & Games</SelectItem>
-              <SelectItem value="Health & Beauty">Health & Beauty</SelectItem>
-              <SelectItem value="Automotive">Automotive</SelectItem>
-              <SelectItem value="Food & Beverages">Food & Beverages</SelectItem>
-              <SelectItem value="Other">Other</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <ProductFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
 
         <ScrollArea className="h-[calc(100vh-80px)]">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
