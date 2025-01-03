@@ -48,6 +48,9 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
         <div className="absolute bottom-2 right-2">
           <StarRating rating={product.average_rating || 0} />
         </div>
+        <span className="absolute top-4 left-2 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+          {product.category}
+        </span>
       </div>
       <div className="h-[32px] overflow-hidden">
         <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
@@ -63,9 +66,6 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
       <p className="text-sm font-semibold text-vivo-orange">
         {product.currency} {product.price?.toFixed(2)}
       </p>
-      <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
-        {product.category}
-      </span>
     </CardFooter>
   </Card>
 );
