@@ -13,7 +13,6 @@ import EditProduct from "./pages/EditProduct";
 import ModifyProducts from "./pages/ModifyProducts";
 import AdminUsers from "./pages/AdminUsers";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -30,62 +29,43 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Initialize session
     const initSession = async () => {
       try {
-        console.log('Checking initial session...');
-        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        console.log('Initializing session...');
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Error getting initial session:', error);
+          console.error('Error getting session:', error);
           if (mounted) {
-            setLoading(false);
             setSession(null);
+            setLoading(false);
           }
           return;
         }
 
-        if (!initialSession) {
-          console.log('No initial session found');
-          if (mounted) {
-            setLoading(false);
-            setSession(null);
-          }
-          return;
-        }
-
-        console.log('Initial session state: Active');
         if (mounted) {
-          setSession(initialSession);
+          console.log('Session state:', currentSession ? 'Active' : 'No session');
+          setSession(currentSession);
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error in session initialization:', error);
+        console.error('Session initialization error:', error);
         if (mounted) {
-          setLoading(false);
           setSession(null);
+          setLoading(false);
         }
       }
     };
 
     initSession();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
-      console.log('Auth state changed:', _event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (_event === 'SIGNED_OUT') {
-          console.log('User signed out, clearing session');
+        if (event === 'SIGNED_OUT') {
           setSession(null);
-        } else if (_event === 'SIGNED_IN') {
-          console.log('User signed in, updating session');
-          setSession(currentSession);
-        } else if (_event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed, updating session');
-          setSession(currentSession);
-        } else if (_event === 'USER_UPDATED') {
-          console.log('User updated, updating session');
+        } else if (currentSession) {
           setSession(currentSession);
         }
         setLoading(false);
@@ -93,7 +73,6 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     });
 
     return () => {
-      console.log('Cleaning up auth subscription');
       mounted = false;
       subscription.unsubscribe();
     };
@@ -104,7 +83,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!session) {
-    console.log('No session found, redirecting to login');
+    console.log('No active session, redirecting to login');
     return <Navigate to="/login" replace />;
   }
 
