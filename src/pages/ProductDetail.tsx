@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
@@ -24,15 +23,23 @@ export default function ProductDetail() {
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
+      if (!id) throw new Error("Product ID is required");
+      
       const { data: product, error } = await supabase
         .from("products")
-        .select("*, product_images(*)")
+        .select(`
+          *,
+          product_images (*)
+        `)
         .eq("id", id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      if (!product) throw new Error("Product not found");
+      
       return product;
     },
+    enabled: !!id,
   });
 
   if (isLoading) return <div>Loading...</div>;
