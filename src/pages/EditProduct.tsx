@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import Confetti from "@/components/Confetti";
 import { Database } from "@/integrations/supabase/types";
-import { Loader2 } from "lucide-react";
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageUpload } from "@/components/ProductImageUpload";
+import { uploadImage } from "@/utils/uploadImage";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
@@ -140,7 +139,9 @@ const EditProduct = () => {
 
       // Handle new additional images
       for (let i = 0; i < additionalImages.length; i++) {
-        await uploadImage(additionalImages[i], id!, false, existingImages.length + i + 1);
+        if (additionalImages[i]) {
+          await uploadImage(additionalImages[i], id!, false, existingImages.length + i + 1);
+        }
       }
 
       setShowConfetti(true);

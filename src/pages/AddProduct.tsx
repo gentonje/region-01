@@ -6,6 +6,7 @@ import Confetti from "@/components/Confetti";
 import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageUpload } from "@/components/ProductImageUpload";
+import { uploadImage } from "@/utils/uploadImage";
 
 type ProductCategory = Database["public"]["Enums"]["product_category"];
 
@@ -60,7 +61,7 @@ const AddProduct = () => {
           user_id: userData.user.id,
           seller_id: userData.user.id,
           available_quantity: parseInt(formData.available_quantity),
-          storage_path: "placeholder.svg", // Will be updated after image upload
+          storage_path: "placeholder.svg",
         })
         .select()
         .single();
