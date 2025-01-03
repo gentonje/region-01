@@ -29,6 +29,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				'vivo-orange': '#FF6B00',
 				'navy-blue': '#000080',
+				'shop-blue': '#D3E4FD',
+				'juba-green': '#F2FCE2',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

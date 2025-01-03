@@ -18,8 +18,8 @@ export const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-calligraphy font-bold">
-            <span className="text-vivo-orange">Vivo</span>
-            <span className="text-navy-blue dark:text-white">Shop-Juba</span>
+            <span className="bg-shop-blue px-2 py-1 rounded">Vivo</span>
+            <span className="bg-juba-green px-2 py-1 rounded">Shop-Juba</span>
           </Link>
 
           <div className="flex items-center gap-4">
