@@ -1,5 +1,4 @@
-import { Suspense, lazy } from "react";
-import { useEffect, useState } from "react";
+import React, { Suspense, lazy, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
