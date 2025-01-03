@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor, Users, LogOut, Menu } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sheet,
@@ -54,8 +53,9 @@ export const Navigation = () => {
     { icon: DollarSign, label: "Revenue", path: "/revenue" },
   ];
 
+  // Only render on mobile screens
   return (
-    <>
+    <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
@@ -118,7 +118,7 @@ export const Navigation = () => {
           </span>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
@@ -149,6 +149,7 @@ export const BottomNavigation = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Only render on mobile screens
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-t border-border md:hidden">
       <div className="grid grid-cols-2 h-16">
