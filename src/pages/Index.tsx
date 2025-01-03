@@ -108,7 +108,7 @@ const Index = () => {
             <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
           </div>
           <div className="h-[24px] overflow-hidden flex items-center justify-between">
-            <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
+            <CardTitle className="text-sm font-medium truncate m-1 p-1">{product.title}</CardTitle>
             <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
               {product.in_stock ? 'In Stock' : 'Out of Stock'}
             </span>
@@ -116,7 +116,7 @@ const Index = () => {
         </div>
       </CardContent>
       <CardFooter className="h-[32px] flex items-center justify-between">
-        <p className="text-sm font-semibold text-vivo-orange">
+        <p className="text-sm font-semibold text-vivo-orange m-1 p-1">
           {product.currency} {product.price?.toFixed(2)}
         </p>
         <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
