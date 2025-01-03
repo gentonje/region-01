@@ -3,29 +3,20 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import Confetti from "@/components/Confetti";
-import { useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 2000);
+        navigate('/', { replace: true });
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 2000);
+        navigate('/', { replace: true });
       }
     });
 
@@ -47,7 +38,6 @@ const Login = () => {
           redirectTo={window.location.origin}
         />
       </div>
-      <Confetti isActive={showConfetti} />
     </div>
   );
 };
