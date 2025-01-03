@@ -17,6 +17,7 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   getProductImageUrl: (product: Product) => string;
+  onClick?: () => void;
 }
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -35,8 +36,11 @@ const StarRating = ({ rating }: { rating: number }) => {
   );
 };
 
-const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
-  <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
+const ProductCard = ({ product, getProductImageUrl, onClick }: ProductCardProps) => (
+  <Card 
+    className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+    onClick={onClick}
+  >
     <CardContent className="px-0 space-y-2">
       <div className="h-60 w-full relative">
         <img
@@ -52,7 +56,7 @@ const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
           {product.category}
         </span>
       </div>
-      <div className="h-[32px] overflow-hidden">
+      <div className="h-[32px] overflow-hidden m-1">
         <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
       </div>
       <div className="h-[32px] overflow-hidden flex items-center justify-between px-0 m-1">

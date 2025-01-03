@@ -2,12 +2,20 @@ import React, { Suspense, lazy, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star } from "lucide-react";
 import { useInView } from "react-intersection-observer";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import ProductDetail from "@/components/ProductDetail";
 
 interface Product {
   id: string;
@@ -19,6 +27,7 @@ interface Product {
   average_rating: number;
   category: string;
   in_stock: boolean;
+  product_images: { storage_path: string; is_main: boolean }[];
 }
 
 const ITEMS_PER_PAGE = 20;
@@ -29,6 +38,9 @@ const Index = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState<string>("");
   const { ref, inView } = useInView();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
     data,
@@ -37,12 +49,12 @@ const Index = () => {
     hasNextPage,
     isFetchingNextPage
   } = useInfiniteQuery({
-    queryKey: ['products'],
+    queryKey: ['products', searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
       const start = pageParam * ITEMS_PER_PAGE;
       const end = start + ITEMS_PER_PAGE - 1;
 
-      const { data, error, count } = await supabase
+      let query = supabase
         .from('products')
         .select(`
           *,
@@ -51,6 +63,16 @@ const Index = () => {
         .eq('product_status', 'published')
         .order('created_at', { ascending: false })
         .range(start, end);
+
+      if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
+      }
+
+      if (selectedCategory) {
+        query = query.eq('category', selectedCategory);
+      }
+
+      const { data, error, count } = await query;
 
       if (error) {
         console.error('Error fetching products:', error);
@@ -105,60 +127,102 @@ const Index = () => {
   };
 
   const ProductSkeleton = () => (
-    <Card className="w-full h-[400px]">
-      <CardHeader>
+    <Card className="w-full h-[400px] m-1">
+      <Skeleton className="h-60 w-full" />
+      <div className="p-4 space-y-3">
         <Skeleton className="h-4 w-3/4" />
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-48 w-full mb-4" />
         <Skeleton className="h-4 w-1/2" />
-      </CardContent>
-      <CardFooter>
-        <Skeleton className="h-4 w-1/4" />
-      </CardFooter>
+      </div>
     </Card>
   );
+
+  if (selectedProduct) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="pt-20 px-4">
+          <ProductDetail
+            product={selectedProduct}
+            getProductImageUrl={getProductImageUrl}
+            onBack={() => setSelectedProduct(null)}
+          />
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <ScrollArea className="max-w-[2000px] mx-auto pt-20 h-[calc(100vh-80px)]">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
-          <Suspense fallback={
-            Array(ITEMS_PER_PAGE).fill(0).map((_, index) => (
-              <div key={index} className="m-1">
-                <ProductSkeleton />
-              </div>
-            ))
-          }>
-            {data?.pages.map((page, i) => (
-              <React.Fragment key={i}>
-                {page.products.map((product) => (
-                  <div key={product.id} className="m-1">
-                    <ProductCard 
-                      product={product} 
-                      getProductImageUrl={getProductImageUrl}
-                    />
-                  </div>
-                ))}
-              </React.Fragment>
-            ))}
-          </Suspense>
-
-          {/* Loading indicator */}
-          {(isFetchingNextPage || isLoading) && (
-            Array(4).fill(0).map((_, index) => (
-              <div key={`skeleton-${index}`} className="m-1">
-                <ProductSkeleton />
-              </div>
-            ))
-          )}
-
-          {/* Intersection observer target */}
-          <div ref={ref} style={{ height: '10px' }} />
+      <div className="pt-20 px-4 space-y-4">
+        <div className="flex gap-4 items-center">
+          <Input
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="max-w-sm"
+          />
+          <Select
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="Electronics">Electronics</SelectItem>
+              <SelectItem value="Clothing">Clothing</SelectItem>
+              <SelectItem value="Home & Garden">Home & Garden</SelectItem>
+              <SelectItem value="Books">Books</SelectItem>
+              <SelectItem value="Sports & Outdoors">Sports & Outdoors</SelectItem>
+              <SelectItem value="Toys & Games">Toys & Games</SelectItem>
+              <SelectItem value="Health & Beauty">Health & Beauty</SelectItem>
+              <SelectItem value="Automotive">Automotive</SelectItem>
+              <SelectItem value="Food & Beverages">Food & Beverages</SelectItem>
+              <SelectItem value="Other">Other</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </ScrollArea>
+
+        <ScrollArea className="h-[calc(100vh-80px)]">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
+            <Suspense fallback={
+              Array(ITEMS_PER_PAGE).fill(0).map((_, index) => (
+                <div key={index} className="m-1">
+                  <ProductSkeleton />
+                </div>
+              ))
+            }>
+              {data?.pages.map((page, i) => (
+                <React.Fragment key={i}>
+                  {page.products.map((product) => (
+                    <div key={product.id} className="m-1">
+                      <ProductCard 
+                        product={product} 
+                        getProductImageUrl={getProductImageUrl}
+                        onClick={() => setSelectedProduct(product)}
+                      />
+                    </div>
+                  ))}
+                </React.Fragment>
+              ))}
+            </Suspense>
+
+            {(isFetchingNextPage || isLoading) && (
+              Array(4).fill(0).map((_, index) => (
+                <div key={`skeleton-${index}`} className="m-1">
+                  <ProductSkeleton />
+                </div>
+              ))
+            )}
+
+            <div ref={ref} style={{ height: '10px' }} />
+          </div>
+        </ScrollArea>
+      </div>
 
       <BottomNavigation />
     </div>
