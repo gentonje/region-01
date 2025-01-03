@@ -36,7 +36,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const ProductCard = ({ product, getProductImageUrl }: ProductCardProps) => (
-  <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200 m-1">
+  <Card className="w-full h-[400px] hover:shadow-lg transition-shadow duration-200">
     <CardContent className="space-y-2">
       <div className="h-60 w-full relative">
         <img
