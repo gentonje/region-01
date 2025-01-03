@@ -37,7 +37,7 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             width="200"
             height="200"
             rx="20"
-            stroke="#000080"
+            stroke="#FF6B00"
             strokeWidth="8"
             fill="transparent"
             variants={draw}
@@ -47,14 +47,14 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
             y="150"
             textAnchor="middle"
             dominantBaseline="middle"
-            className="text-2xl font-calligraphy"
+            className="text-[32px] font-calligraphy"
             fill="#FF6B00"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            <tspan x="150" className="text-vivo-orange">Vivo</tspan>
-            <tspan x="150" dy="30" className="text-navy-blue dark:text-white">Shop</tspan>
+            <tspan x="150" dy="-10" className="text-vivo-orange">Vivo</tspan>
+            <tspan x="150" dy="40" className="text-navy-blue dark:text-white">Shop</tspan>
           </motion.text>
         </motion.svg>
       </motion.div>
