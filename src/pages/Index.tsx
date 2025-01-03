@@ -7,10 +7,13 @@ import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { SplashScreen } from "@/components/SplashScreen";
 import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { ProductFilters } from "@/components/ProductFilters";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
   const { ref, inView } = useInView();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const {
     data,
@@ -19,16 +22,26 @@ export default function Index() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: async ({ pageParam }) => {
-      const startRange = (pageParam as number) * 10;
+    queryKey: ["products", searchQuery, selectedCategory],
+    queryFn: async ({ pageParam = 0 }) => {
+      const startRange = pageParam * 10;
       const endRange = startRange + 9;
 
-      const { data: products, error } = await supabase
+      let query = supabase
         .from("products")
         .select("*, product_images(*)")
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
+
+      if (searchQuery) {
+        query = query.ilike("title", `%${searchQuery}%`);
+      }
+
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
+      }
+
+      const { data: products, error } = await query;
 
       if (error) throw error;
       return products as Product[];
@@ -76,20 +89,28 @@ export default function Index() {
       ) : (
         <>
           <Navigation />
-          <div className="container mx-auto px-4 pt-20">
-            <BreadcrumbNav
-              items={[
-                { label: "Products", href: "/" }
-              ]}
-            />
-            <ProductList
-              products={allProducts}
-              getProductImageUrl={getProductImageUrl}
-              onProductClick={handleProductClick}
-              isLoading={isLoading}
-              isFetchingNextPage={isFetchingNextPage}
-              observerRef={ref}
-            />
+          <div className="container mx-auto px-4 pt-16">
+            <div className="space-y-4">
+              <BreadcrumbNav
+                items={[
+                  { label: "Products", href: "/" }
+                ]}
+              />
+              <ProductFilters
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+              <ProductList
+                products={allProducts}
+                getProductImageUrl={getProductImageUrl}
+                onProductClick={handleProductClick}
+                isLoading={isLoading}
+                isFetchingNextPage={isFetchingNextPage}
+                observerRef={ref}
+              />
+            </div>
           </div>
           <BottomNavigation />
         </>
