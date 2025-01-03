@@ -62,17 +62,17 @@ const ProductCard = ({ product, getProductImageUrl, onClick }: ProductCardProps)
           {product.category}
         </span>
       </div>
-      <div className="h-[28px] overflow-hidden mx-1">
-        <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
-      </div>
       <div className="h-[28px] overflow-hidden flex items-center px-0 mx-1">
         <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
       </div>
-    </CardContent>
-    <CardFooter className="flex flex-col space-y-1 pt-0">
-      <p className="text-base font-semibold text-vivo-orange ml-1 w-full">
+      <p className="text-base font-semibold text-vivo-orange mx-1">
         {product.currency} {product.price?.toFixed(2)}
       </p>
+      <div className="h-[28px] overflow-hidden mx-1">
+        <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+      </div>
+    </CardContent>
+    <CardFooter className="flex flex-col space-y-1 pt-0">
       <span className={`text-xs px-2 py-1 rounded-full w-fit ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
         {product.in_stock ? 'In Stock' : 'Out of Stock'}
       </span>
