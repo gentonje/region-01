@@ -1,28 +1,58 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Confetti from "@/components/Confetti";
-import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setShowConfetti(true);
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 2000);
-      }
-    });
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        console.log("Session check result:", { session, error });
+        
+        if (error) {
+          console.error("Session check error:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "There was a problem checking your login status. Please try again.",
+          });
+          setIsLoading(false);
+          return;
+        }
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+          console.log("Valid session found, redirecting...");
+          setShowConfetti(true);
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 2000);
+        } else {
+          console.log("No active session found");
+          setIsLoading(false);
+        }
+      } catch (err) {
+        console.error("Unexpected error during session check:", err);
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session);
+      
       if (event === 'SIGNED_IN' && session) {
+        console.log("User signed in successfully");
         setShowConfetti(true);
         setTimeout(() => {
           navigate('/', { replace: true });
@@ -30,8 +60,19 @@ const Login = () => {
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
