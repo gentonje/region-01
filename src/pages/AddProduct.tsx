@@ -110,7 +110,7 @@ const AddProduct = () => {
     <div className="min-h-screen p-4 bg-gray-50 pb-20">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 mt-20">
+      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Add New Product</h1>
           <Button variant="outline" onClick={() => navigate("/")}>
