@@ -6,8 +6,25 @@ import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { ProductModifyCard } from "@/components/ProductModifyCard";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useInView } from "react-intersection-observer";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 15;
+
+const ProductSkeleton = () => (
+  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow space-y-4">
+    <Skeleton className="h-6 w-3/4" />
+    <Skeleton className="h-4 w-full" />
+    <div className="flex justify-between items-center">
+      <Skeleton className="h-6 w-24" />
+      <div className="space-x-2">
+        <Skeleton className="h-8 w-8 inline-block" />
+        <Skeleton className="h-8 w-8 inline-block" />
+      </div>
+    </div>
+  </div>
+);
 
 const ModifyProducts = () => {
   const navigate = useNavigate();
@@ -16,12 +33,28 @@ const ModifyProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
+  const isMobile = useIsMobile();
+  
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+  });
 
   useEffect(() => {
-    fetchProducts();
-  }, [currentPage]);
+    if (isMobile && inView && hasMore && !isLoading) {
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [inView, hasMore, isMobile, isLoading]);
 
-  const fetchProducts = async () => {
+  useEffect(() => {
+    if (isMobile) {
+      fetchProducts(true);
+    } else {
+      fetchProducts(false);
+    }
+  }, [currentPage, isMobile]);
+
+  const fetchProducts = async (append = false) => {
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -48,7 +81,12 @@ const ModifyProducts = () => {
 
       if (error) throw error;
 
-      setProducts(data || []);
+      if (append) {
+        setProducts(prev => [...prev, ...(data || [])]);
+        setHasMore((currentPage * ITEMS_PER_PAGE) < total);
+      } else {
+        setProducts(data || []);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -74,7 +112,12 @@ const ModifyProducts = () => {
         description: "Product deleted successfully",
       });
       
-      fetchProducts();
+      // Refresh the current page
+      if (isMobile) {
+        setProducts(prev => prev.filter(p => p.id !== productId));
+      } else {
+        fetchProducts(false);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -84,6 +127,14 @@ const ModifyProducts = () => {
     }
   };
 
+  const renderSkeletons = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array(3).fill(null).map((_, index) => (
+        <ProductSkeleton key={`skeleton-${index}`} />
+      ))}
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <Navigation />
@@ -91,61 +142,67 @@ const ModifyProducts = () => {
       <div className="max-w-7xl mx-auto px-4 pt-20">
         <h1 className="text-2xl font-bold mb-6">Modify Products</h1>
         
-        {isLoading ? (
-          <div className="text-center py-8">Loading...</div>
-        ) : products.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.map((product) => (
+            <ProductModifyCard
+              key={product.id}
+              product={product}
+              onDelete={handleDelete}
+            />
+          ))}
+        </div>
+
+        {isLoading && renderSkeletons()}
+
+        {!isLoading && products.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-600">No products found</p>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
-              <ProductModifyCard
-                key={product.id}
-                product={product}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
         )}
 
-        {!isLoading && products.length > 0 && (
-          <div className="mt-8 flex justify-center">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </Button>
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </Button>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+        {isMobile ? (
+          <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+            {hasMore && <div className="loading">Loading more...</div>}
           </div>
+        ) : (
+          !isLoading && products.length > 0 && (
+            <div className="mt-8 flex justify-center">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => prev - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => prev + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )
         )}
       </div>
 
