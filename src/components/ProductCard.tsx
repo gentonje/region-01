@@ -42,7 +42,13 @@ const ProductCard = ({ product, getProductImageUrl, onClick }: ProductCardProps)
     onClick={onClick}
   >
     <CardContent className="px-0 space-y-2">
-      <div className="h-60 w-full relative">
+      <div 
+        className="h-60 w-full relative"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick?.();
+        }}
+      >
         <img
           src={getProductImageUrl(product)}
           alt={product.title}

@@ -1,31 +1,17 @@
-import React, { Suspense, lazy, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
-import { Card } from "@/components/ui/card";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ProductDetail from "@/components/ProductDetail";
 import { ProductFilters } from "@/components/ProductFilters";
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  description: string;
-  storage_path: string;
-  currency: string;
-  average_rating: number;
-  category: string;
-  in_stock: boolean;
-  product_images: { storage_path: string; is_main: boolean }[];
-}
+import { ProductList } from "@/components/ProductList";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { Product } from "@/types/product";
 
 const ITEMS_PER_PAGE = 20;
-
-const ProductCard = lazy(() => import("../components/ProductCard"));
 
 const Index = () => {
   const navigate = useNavigate();
@@ -82,13 +68,13 @@ const Index = () => {
     initialPageParam: 0
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -108,7 +94,7 @@ const Index = () => {
     getUser();
   }, [navigate]);
 
-  const getProductImageUrl = (product: Product & { product_images: { storage_path: string, is_main: boolean }[] }) => {
+  const getProductImageUrl = (product: Product) => {
     const mainImage = product.product_images?.find(img => img.is_main);
     if (mainImage) {
       const { data } = supabase.storage
@@ -119,21 +105,18 @@ const Index = () => {
     return '/placeholder.svg';
   };
 
-  const ProductSkeleton = () => (
-    <Card className="w-full h-[400px] m-1">
-      <Skeleton className="h-60 w-full" />
-      <div className="p-4 space-y-3">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-    </Card>
-  );
+  const allProducts = data?.pages.flatMap(page => page.products) || [];
+
+  const breadcrumbItems = selectedProduct
+    ? [{ label: selectedProduct.category }, { label: selectedProduct.title }]
+    : [];
 
   if (selectedProduct) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <div className="pt-20 px-4">
+          <BreadcrumbNav items={breadcrumbItems} />
           <ProductDetail
             product={selectedProduct}
             getProductImageUrl={getProductImageUrl}
@@ -150,6 +133,8 @@ const Index = () => {
       <Navigation />
       
       <div className="pt-20 px-4 space-y-4">
+        <BreadcrumbNav items={[{ label: "Products" }]} />
+        
         <ProductFilters
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -158,39 +143,14 @@ const Index = () => {
         />
 
         <ScrollArea className="h-[calc(100vh-80px)]">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-0.5">
-            <Suspense fallback={
-              Array(ITEMS_PER_PAGE).fill(0).map((_, index) => (
-                <div key={index} className="m-1">
-                  <ProductSkeleton />
-                </div>
-              ))
-            }>
-              {data?.pages.map((page, i) => (
-                <React.Fragment key={i}>
-                  {page.products.map((product) => (
-                    <div key={product.id} className="m-1">
-                      <ProductCard 
-                        product={product} 
-                        getProductImageUrl={getProductImageUrl}
-                        onClick={() => setSelectedProduct(product)}
-                      />
-                    </div>
-                  ))}
-                </React.Fragment>
-              ))}
-            </Suspense>
-
-            {(isFetchingNextPage || isLoading) && (
-              Array(4).fill(0).map((_, index) => (
-                <div key={`skeleton-${index}`} className="m-1">
-                  <ProductSkeleton />
-                </div>
-              ))
-            )}
-
-            <div ref={ref} style={{ height: '10px' }} />
-          </div>
+          <ProductList
+            products={allProducts}
+            getProductImageUrl={getProductImageUrl}
+            onProductClick={setSelectedProduct}
+            isLoading={isLoading}
+            isFetchingNextPage={isFetchingNextPage}
+            observerRef={ref}
+          />
         </ScrollArea>
       </div>
 

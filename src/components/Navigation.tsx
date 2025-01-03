@@ -21,7 +21,7 @@ export const Navigation = () => {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className="text-2xl font-calligraphy font-bold">
             <span className="text-vivo-orange">Vivo</span>
-            <span className="text-navy-blue dark:text-white">Shop-Juba</span>
+            <span className="text-navy-blue dark:text-white">Shop</span>
           </Link>
 
           <div className="flex items-center gap-4">

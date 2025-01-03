@@ -1,5 +1,6 @@
-import React from "react";
 import { Input } from "@/components/ui/input";
+import { Filter } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -7,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProductFiltersProps {
   searchQuery: string;
@@ -21,6 +23,8 @@ export const ProductFilters = ({
   selectedCategory,
   setSelectedCategory,
 }: ProductFiltersProps) => {
+  const isMobile = useIsMobile();
+
   return (
     <div className="flex gap-4 items-center">
       <Input
@@ -33,8 +37,12 @@ export const ProductFilters = ({
         value={selectedCategory}
         onValueChange={setSelectedCategory}
       >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Category" />
+        <SelectTrigger className={isMobile ? "w-[48px]" : "w-[180px]"}>
+          {isMobile ? (
+            <Filter className="h-4 w-4" />
+          ) : (
+            <SelectValue placeholder="Category" />
+          )}
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Categories</SelectItem>
