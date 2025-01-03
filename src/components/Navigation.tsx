@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Smartphone, Tablet, Monitor } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -76,14 +77,39 @@ export const Navigation = () => {
 };
 
 export const BottomNavigation = () => {
+  const getDeviceIcon = () => {
+    if (window.innerWidth < 640) return <Smartphone className="w-4 h-4 mr-2" />;
+    if (window.innerWidth < 768) return <Tablet className="w-4 h-4 mr-2" />;
+    return <Monitor className="w-4 h-4 mr-2" />;
+  };
+
+  const getDeviceText = () => {
+    if (window.innerWidth < 640) return "Mobile";
+    if (window.innerWidth < 768) return "Tablet";
+    return "Desktop";
+  };
+
+  const [deviceInfo, setDeviceInfo] = useState({ icon: getDeviceIcon(), text: getDeviceText() });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDeviceInfo({
+        icon: getDeviceIcon(),
+        text: getDeviceText()
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-t border-border md:hidden">
       <div className="grid grid-cols-1 h-16">
-        <Link to="/add-product" className="flex items-center justify-center">
-          <Button variant="ghost" size="sm">
-            Manage Products
-          </Button>
-        </Link>
+        <div className="flex items-center justify-center">
+          {deviceInfo.icon}
+          <span className="text-sm">{deviceInfo.text}</span>
+        </div>
       </div>
     </div>
   );
