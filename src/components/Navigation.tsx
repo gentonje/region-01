@@ -141,6 +141,21 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                           <DropdownMenuItem onClick={() => handleCurrencyChange("UGX")}>
                             UGX
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("RWF")}>
+                            RWF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("ETB")}>
+                            ETB
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("ERN")}>
+                            ERN
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("DJF")}>
+                            DJF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("TZS")}>
+                            TZS
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TooltipTrigger>
