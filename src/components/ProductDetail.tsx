@@ -6,7 +6,7 @@ import { ProductGallery } from "./product/ProductGallery";
 import { ProductReviews } from "./product/ProductReviews";
 import { Product } from "@/types/product";
 import { Skeleton } from "./ui/skeleton";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -20,6 +20,8 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
   const [selectedImage, setSelectedImage] = useState<string>(
     product.product_images?.find(img => !img.is_main)?.storage_path || product.product_images?.[0]?.storage_path || ''
   );
+
+  const queryClient = useQueryClient();
 
   const { data: similarProducts } = useQuery({
     queryKey: ['similar-products', product.id, product.category],
@@ -53,6 +55,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
       if (error) throw error;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cartItems'] });
       toast.success('Added to cart successfully');
     },
     onError: (error) => {

@@ -19,6 +19,7 @@ export const CartIndicator = () => {
 
       return count || 0;
     },
+    refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   return (
