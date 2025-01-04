@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -8,47 +8,11 @@ export const useProductImages = (productId?: string) => {
   const [additionalImages, setAdditionalImages] = useState<(File | null)[]>([null, null, null, null]);
   const { toast } = useToast();
 
-  const uploadImages = async (mainImage: File | null, additionalImages: (File | null)[]) => {
-    if (!mainImage) throw new Error("Main image is required");
-
-    const uploadFile = async (file: File, isMain: boolean, order: number) => {
-      console.log("Uploading file:", file.name);
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      
-      const { error: uploadError, data } = await supabase.storage
-        .from('images')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        throw new Error(`Failed to upload image: ${uploadError.message}`);
-      }
-
-      console.log("File uploaded successfully:", fileName);
-      return fileName;
-    };
-
-    try {
-      console.log("Starting main image upload...");
-      const mainImagePath = await uploadFile(mainImage, true, 0);
-      
-      console.log("Starting additional images upload...");
-      const additionalImagePaths = await Promise.all(
-        additionalImages
-          .filter((file): file is File => file !== null)
-          .map((file, index) => uploadFile(file, false, index + 1))
-      );
-
-      return {
-        mainImagePath,
-        additionalImagePaths,
-      };
-    } catch (error: any) {
-      console.error('Error in uploadImages:', error);
-      throw new Error(`Failed to upload images: ${error.message}`);
+  useEffect(() => {
+    if (productId) {
+      fetchImages();
     }
-  };
+  }, [productId]);
 
   const fetchImages = async () => {
     try {
@@ -77,6 +41,48 @@ export const useProductImages = (productId?: string) => {
         description: "Failed to load product images",
         variant: "destructive",
       });
+    }
+  };
+
+  const uploadImages = async (mainImage: File | null, additionalImages: (File | null)[]) => {
+    try {
+      console.log("Starting image upload process...");
+      if (!mainImage) throw new Error("Main image is required");
+
+      const uploadFile = async (file: File) => {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('images')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error(`Failed to upload image: ${uploadError.message}`);
+        }
+
+        console.log("File uploaded successfully:", fileName);
+        return fileName;
+      };
+
+      console.log("Uploading main image...");
+      const mainImagePath = await uploadFile(mainImage);
+      
+      console.log("Processing additional images...");
+      const additionalImagePaths = await Promise.all(
+        additionalImages
+          .filter((file): file is File => file !== null)
+          .map(file => uploadFile(file))
+      );
+
+      return {
+        mainImagePath,
+        additionalImagePaths,
+      };
+    } catch (error: any) {
+      console.error('Error in uploadImages:', error);
+      throw new Error(`Failed to upload images: ${error.message}`);
     }
   };
 

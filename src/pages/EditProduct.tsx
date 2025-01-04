@@ -18,24 +18,50 @@ const EditProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages, existingImages, handleDeleteImage } = useProductImages(id);
 
+  // Fetch product and its images
   const { data: product, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       if (!id) throw new Error("No product ID provided");
       
-      const { data, error } = await supabase
+      // Fetch product details
+      const { data: productData, error: productError } = await supabase
         .from("products")
-        .select("*")
+        .select(`
+          *,
+          product_images (
+            id,
+            storage_path,
+            is_main,
+            display_order
+          )
+        `)
         .eq("id", id)
         .single();
 
-      if (error) {
-        console.error("Error fetching product:", error);
+      if (productError) {
+        console.error("Error fetching product:", productError);
         toast.error("Failed to fetch product");
-        throw error;
+        throw productError;
       }
 
-      return data;
+      // Get public URLs for all images
+      if (productData.product_images) {
+        const imagesWithUrls = await Promise.all(
+          productData.product_images.map(async (image: any) => {
+            const { data } = supabase.storage
+              .from('images')
+              .getPublicUrl(image.storage_path);
+            return {
+              ...image,
+              publicUrl: data.publicUrl
+            };
+          })
+        );
+        productData.product_images = imagesWithUrls;
+      }
+
+      return productData;
     },
   });
 
@@ -47,8 +73,27 @@ const EditProduct = () => {
       console.log("Updating product with data:", formData);
       let newStoragePath;
       if (mainImage) {
-        const { mainImagePath } = await uploadImages(mainImage, additionalImages);
+        const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
         newStoragePath = mainImagePath;
+
+        // Insert additional images
+        if (additionalImagePaths.length > 0) {
+          const { error: imagesError } = await supabase
+            .from('product_images')
+            .insert(
+              additionalImagePaths.map((path, index) => ({
+                product_id: id,
+                storage_path: path,
+                is_main: false,
+                display_order: index + 1
+              }))
+            );
+
+          if (imagesError) {
+            console.error("Error saving additional images:", imagesError);
+            throw imagesError;
+          }
+        }
       }
 
       await updateProduct(id, {
@@ -118,8 +163,11 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={product?.storage_path}
-            additionalImageUrls={existingImages.map(img => ({ url: img.publicUrl, id: img.id }))}
+            mainImageUrl={product.storage_path}
+            additionalImageUrls={product.product_images?.map((img: any) => ({
+              url: img.publicUrl,
+              id: img.id
+            })) || []}
             onDeleteExisting={handleDeleteImage}
             isLoading={isLoading}
           />
