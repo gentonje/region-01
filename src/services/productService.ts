@@ -5,6 +5,7 @@ export const createProduct = async (
   formData: ProductFormData,
   storagePath: string
 ) => {
+  console.log("Creating product with data:", formData);
   const { error } = await supabase.from("products").insert({
     title: formData.title,
     description: formData.description,
@@ -15,7 +16,10 @@ export const createProduct = async (
     shipping_info: formData.shipping_info,
   });
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error creating product:", error);
+    throw error;
+  }
 };
 
 export const updateProduct = async (
@@ -23,6 +27,7 @@ export const updateProduct = async (
   formData: ProductFormData,
   storagePath?: string
 ) => {
+  console.log("Updating product with data:", { id, formData, storagePath });
   const updateData: any = {
     title: formData.title,
     description: formData.description,
@@ -41,5 +46,8 @@ export const updateProduct = async (
     .update(updateData)
     .eq("id", id);
 
-  if (error) throw error;
+  if (error) {
+    console.error("Error updating product:", error);
+    throw error;
+  }
 };

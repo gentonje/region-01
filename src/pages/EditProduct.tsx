@@ -10,6 +10,7 @@ import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { updateProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
+import { ProductCategory } from "@/types/product";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const EditProduct = () => {
   const { data: product, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
+      if (!id) throw new Error("No product ID provided");
+      
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -27,8 +30,9 @@ const EditProduct = () => {
         .single();
 
       if (error) {
+        console.error("Error fetching product:", error);
         toast.error("Failed to fetch product");
-        throw new Error(error.message);
+        throw error;
       }
 
       return data;
@@ -40,13 +44,22 @@ const EditProduct = () => {
     
     setIsLoading(true);
     try {
+      console.log("Updating product with data:", formData);
       let newStoragePath;
       if (mainImage) {
         const { mainImagePath } = await uploadImages(mainImage, additionalImages);
         newStoragePath = mainImagePath;
       }
 
-      await updateProduct(id, formData, newStoragePath);
+      await updateProduct(id, {
+        title: formData.title,
+        description: formData.description,
+        price: Number(formData.price),
+        category: formData.category as ProductCategory,
+        available_quantity: Number(formData.available_quantity),
+        shipping_info: formData.shipping_info,
+      }, newStoragePath);
+
       toast.success("Product updated successfully");
       navigate("/modify-products");
     } catch (error) {
@@ -70,6 +83,19 @@ const EditProduct = () => {
     );
   }
 
+  if (!product) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <div className={styles.mainContent}>
+          <div className={styles.formContainer}>
+            <p>Product not found</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <Navigation />
@@ -80,7 +106,7 @@ const EditProduct = () => {
             <h1 className={styles.title}>Edit Product</h1>
             <Button 
               variant="outline" 
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/modify-products")}
               className={styles.cancelButton}
             >
               Cancel
@@ -103,7 +129,7 @@ const EditProduct = () => {
               title: product?.title || "",
               description: product?.description || "",
               price: String(product?.price || ""),
-              category: product?.category || "Other",
+              category: product?.category || "Other" as ProductCategory,
               available_quantity: String(product?.available_quantity || "0"),
             }}
             setFormData={() => {}}
