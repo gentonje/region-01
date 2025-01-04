@@ -13,7 +13,6 @@ import { ProductCategory } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { PRODUCT_CONSTANTS } from "@/constants/product";
 
 interface ProductFormFieldProps {
   form: UseFormReturn<ProductFormData>;
@@ -82,7 +81,7 @@ export const ProductFormField = ({
                     });
                   }}
                 >
-                  <option value="">{PRODUCT_CONSTANTS.SELECT_CATEGORY}</option>
+                  <option value="">Select a category</option>
                   {categories?.map((category) => (
                     <option key={category.name} value={category.name}>
                       {category.name}
