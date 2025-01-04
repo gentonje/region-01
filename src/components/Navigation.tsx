@@ -60,8 +60,8 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
             <Link to="/" className="text-lg font-bold" style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}>
-              <span className="text-primary">السوق</span>
-              <span className="text-foreground"> الحر</span>
+              <span style={{ color: '#F97316' }}>السوق</span>
+              <span style={{ color: '#0EA5E9' }}> الحر</span>
             </Link>
 
             <div className="flex items-center gap-2">
