@@ -15,7 +15,7 @@ export default function Index() {
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
