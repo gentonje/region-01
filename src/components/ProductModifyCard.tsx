@@ -2,6 +2,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductModifyCardProps {
   product: {
@@ -9,16 +10,26 @@ interface ProductModifyCardProps {
     title: string;
     description: string;
     price: number;
+    profiles?: {
+      username?: string;
+      full_name?: string;
+    };
   };
   onDelete: (productId: string) => Promise<void>;
 }
 
 export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
   const navigate = useNavigate();
+  const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
 
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-      <h2 className="text-xl font-semibold mb-2">{product.title}</h2>
+      <div className="flex justify-between items-start mb-2">
+        <h2 className="text-xl font-semibold">{product.title}</h2>
+        <Badge variant="secondary" className="ml-2">
+          {ownerName}
+        </Badge>
+      </div>
       <p className="text-gray-600 mb-4">{product.description}</p>
       <div className="flex justify-between items-center">
         <span className="text-lg font-bold">${product.price}</span>

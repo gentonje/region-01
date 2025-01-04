@@ -4,34 +4,31 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ModifyProductsList } from "@/components/ModifyProductsList";
-import { ModifyProductsPagination } from "@/components/ModifyProductsPagination";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Product } from "@/types/product";
+import { UserProductGroup } from "@/components/UserProductGroup";
 
-const ITEMS_PER_PAGE = 15;
+interface GroupedProducts {
+  [key: string]: {
+    username: string;
+    products: Product[];
+  };
+}
 
 const ModifyProducts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
   const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
-    if (isMobile) {
-      fetchProducts(true);
-    } else {
-      fetchProducts(false);
-    }
-  }, [currentPage, isMobile, searchQuery, selectedCategory]);
+    fetchProducts();
+  }, [searchQuery, selectedCategory]);
 
-  const fetchProducts = async (append = false) => {
+  const fetchProducts = async () => {
     try {
       setIsLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
@@ -40,8 +37,6 @@ const ModifyProducts = () => {
         navigate("/login");
         return;
       }
-
-      console.log("Fetching products for user:", user.id);
 
       let query = supabase
         .from("products")
@@ -54,6 +49,10 @@ const ModifyProducts = () => {
             display_order,
             product_id,
             created_at
+          ),
+          profiles (
+            username,
+            full_name
           )
         `)
         .eq("user_id", user.id)
@@ -67,47 +66,11 @@ const ModifyProducts = () => {
         query = query.eq('category', selectedCategory);
       }
 
-      // First get the count
-      const { count: totalCount } = await supabase
-        .from("products")
-        .select('*', { count: 'exact', head: true })
-        .eq("user_id", user.id);
+      const { data, error } = await query;
 
-      const total = totalCount || 0;
-      console.log("Total products found:", total);
+      if (error) throw error;
 
-      const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE);
-      
-      if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
-        setCurrentPage(calculatedTotalPages);
-        return;
-      }
-
-      setTotalPages(calculatedTotalPages);
-
-      const start = (currentPage - 1) * ITEMS_PER_PAGE;
-      const end = start + ITEMS_PER_PAGE - 1;
-
-      if (start <= end) {
-        const { data, error } = await query.range(start, end);
-
-        if (error) {
-          console.error("Error fetching products:", error);
-          throw error;
-        }
-
-        console.log("Fetched products:", data);
-
-        if (append && data) {
-          setProducts(prev => [...prev, ...data as Product[]]);
-          setHasMore((currentPage * ITEMS_PER_PAGE) < total);
-        } else if (data) {
-          setProducts(data as Product[]);
-        }
-      } else {
-        setProducts([]);
-        setHasMore(false);
-      }
+      setProducts(data as Product[]);
     } catch (error: any) {
       console.error("Error fetching products:", error);
       toast({
@@ -122,7 +85,6 @@ const ModifyProducts = () => {
 
   const handleDelete = async (productId: string) => {
     try {
-      // First delete associated images from storage
       const { data: productImages } = await supabase
         .from('product_images')
         .select('storage_path')
@@ -141,7 +103,6 @@ const ModifyProducts = () => {
         }
       }
 
-      // Then delete the product
       const { error } = await supabase
         .from("products")
         .delete()
@@ -154,11 +115,7 @@ const ModifyProducts = () => {
         description: "Product deleted successfully",
       });
       
-      if (isMobile) {
-        setProducts(prev => prev.filter(p => p.id !== productId));
-      } else {
-        fetchProducts(false);
-      }
+      fetchProducts();
     } catch (error: any) {
       console.error("Error deleting product:", error);
       toast({
@@ -168,6 +125,19 @@ const ModifyProducts = () => {
       });
     }
   };
+
+  // Group products by user
+  const groupedProducts = products.reduce((acc: GroupedProducts, product) => {
+    const userId = product.user_id;
+    if (!acc[userId]) {
+      acc[userId] = {
+        username: product.profiles?.username || product.profiles?.full_name || 'Unknown User',
+        products: []
+      };
+    }
+    acc[userId].products.push(product);
+    return acc;
+  }, {});
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -184,21 +154,28 @@ const ModifyProducts = () => {
             setSelectedCategory={setSelectedCategory}
           />
 
-          <ModifyProductsList
-            products={products}
-            isLoading={isLoading}
-            hasMore={hasMore}
-            onLoadMore={() => setCurrentPage(prev => prev + 1)}
-            onDelete={handleDelete}
-            isMobile={isMobile}
-          />
-
-          <ModifyProductsPagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            isMobile={isMobile}
-          />
+          {isLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {Object.entries(groupedProducts).map(([userId, { username, products }]) => (
+                <UserProductGroup
+                  key={userId}
+                  username={username}
+                  products={products}
+                  onDelete={handleDelete}
+                />
+              ))}
+              
+              {products.length === 0 && (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No products found</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
