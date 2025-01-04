@@ -1,9 +1,10 @@
 import { Card, CardContent, CardFooter } from "./ui/card";
-import { Button } from "./ui/button";
-import { useState, Suspense } from "react";
-import { ProductHeader } from "./product/ProductHeader";
+import { Suspense } from "react";
 import { ProductGallery } from "./product/ProductGallery";
 import { ProductReviews } from "./product/ProductReviews";
+import { ProductInfo } from "./product/ProductInfo";
+import { ProductActions } from "./product/ProductActions";
+import { ProductSimilar } from "./product/ProductSimilar";
 import { Product } from "@/types/product";
 import { Skeleton } from "./ui/skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -25,7 +26,9 @@ const ProductDetail = ({
   selectedCurrency = "SSP" 
 }: ProductDetailProps) => {
   const [selectedImage, setSelectedImage] = useState<string>(
-    product.product_images?.find(img => !img.is_main)?.storage_path || product.product_images?.[0]?.storage_path || ''
+    product.product_images?.find(img => !img.is_main)?.storage_path || 
+    product.product_images?.[0]?.storage_path || 
+    ''
   );
 
   const queryClient = useQueryClient();
@@ -83,7 +86,6 @@ const ProductDetail = ({
     addToCartMutation.mutate();
   };
 
-  // Convert product price to selected currency
   const convertedPrice = convertCurrency(
     product.price || 0,
     (product.currency || "SSP") as SupportedCurrency,
@@ -94,24 +96,14 @@ const ProductDetail = ({
     <div className="space-y-6 pb-20">
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="space-y-6">
-          <Suspense fallback={<Skeleton className="h-8 w-3/4" />}>
-            <ProductHeader
-              title={product.title || ''}
-              category={product.category || 'Other'}
-              averageRating={product.average_rating || 0}
-              onBack={onBack}
-            />
-          </Suspense>
-
-          <Suspense fallback={<Skeleton className="h-6 w-24" />}>
-            <div className="flex items-center justify-between">
-              <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-                product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {product.in_stock ? 'In Stock' : 'Out of Stock'}
-              </span>
-            </div>
-          </Suspense>
+          <ProductInfo
+            title={product.title || ''}
+            category={product.category || 'Other'}
+            averageRating={product.average_rating || 0}
+            inStock={product.in_stock || false}
+            description={product.description || ''}
+            onBack={onBack}
+          />
 
           <Suspense fallback={<Skeleton className="aspect-[4/3] w-full rounded-lg" />}>
             <ProductGallery
@@ -121,74 +113,41 @@ const ProductDetail = ({
               title={product.title || ''}
             />
           </Suspense>
-          
-          <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-            <div className="rounded-md border p-4">
-              <p className="text-sm text-gray-800">{product.description}</p>
-            </div>
-          </Suspense>
 
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-            <ProductReviews productId={product.id} sellerId={product.seller_id || ''} />
+            <ProductReviews 
+              productId={product.id} 
+              sellerId={product.seller_id || ''} 
+            />
           </Suspense>
         </CardContent>
 
-        <CardFooter className="flex justify-between items-center">
-          <p className="text-2xl font-bold text-gray-900">
-            {selectedCurrency} {convertedPrice.toFixed(2)}
-          </p>
-          <Button 
-            onClick={handleAddToCart}
-            disabled={!product.in_stock || addToCartMutation.isPending}
-          >
-            {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
-          </Button>
+        <CardFooter>
+          <ProductActions
+            price={product.price || 0}
+            currency={product.currency || "SSP"}
+            selectedCurrency={selectedCurrency}
+            convertedPrice={convertedPrice}
+            inStock={product.in_stock || false}
+            onAddToCart={handleAddToCart}
+            isAddingToCart={addToCartMutation.isPending}
+          />
         </CardFooter>
       </Card>
 
-      {similarProducts && similarProducts.length > 0 && (
-        <div className="w-full max-w-2xl mx-auto">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Products</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {similarProducts.map((similarProduct) => {
-              const convertedSimilarPrice = convertCurrency(
-                similarProduct.price || 0,
-                (similarProduct.currency || "SSP") as SupportedCurrency,
-                selectedCurrency
-              );
-              
-              return (
-                <Card 
-                  key={similarProduct.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    onBack();
-                    setTimeout(() => {
-                      onBack();
-                    }, 100);
-                  }}
-                >
-                  <CardContent className="p-2">
-                    <div className="aspect-square w-full relative mb-2">
-                      <img
-                        src={getProductImageUrl(similarProduct)}
-                        alt={similarProduct.title || ""}
-                        className="w-full h-full object-cover rounded-md"
-                      />
-                    </div>
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
-                      {similarProduct.title}
-                    </h3>
-                    <p className="text-sm font-medium text-gray-900">
-                      {selectedCurrency} {convertedSimilarPrice.toFixed(2)}
-                    </p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
+      {similarProducts && (
+        <ProductSimilar
+          products={similarProducts}
+          getProductImageUrl={getProductImageUrl}
+          onProductClick={(similarProduct) => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            onBack();
+            setTimeout(() => {
+              onBack();
+            }, 100);
+          }}
+          selectedCurrency={selectedCurrency}
+        />
       )}
     </div>
   );
