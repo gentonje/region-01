@@ -77,7 +77,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="space-y-6">
           <Suspense fallback={<Skeleton className="h-8 w-3/4" />}>
