@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -8,13 +8,14 @@ import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { useState } from "react";
+import ProductDetail from "@/components/ProductDetail";
 
 export default function Index() {
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
     data,
@@ -74,11 +75,15 @@ export default function Index() {
   };
 
   const handleProductClick = (product: Product) => {
-    console.log("Product clicked:", product);
+    setSelectedProduct(product);
   };
 
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     setSelectedCurrency(currency);
+  };
+
+  const handleBack = () => {
+    setSelectedProduct(null);
   };
 
   return (
@@ -91,21 +96,31 @@ export default function Index() {
               { label: "Products", href: "/" }
             ]}
           />
-          <ProductFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-          />
-          <ProductList
-            products={allProducts}
-            getProductImageUrl={getProductImageUrl}
-            onProductClick={handleProductClick}
-            isLoading={isLoading}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-          />
+          {selectedProduct ? (
+            <ProductDetail 
+              product={selectedProduct}
+              getProductImageUrl={getProductImageUrl}
+              onBack={handleBack}
+            />
+          ) : (
+            <>
+              <ProductFilters
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+              <ProductList
+                products={allProducts}
+                getProductImageUrl={getProductImageUrl}
+                onProductClick={handleProductClick}
+                isLoading={isLoading}
+                isFetchingNextPage={isFetchingNextPage}
+                observerRef={ref}
+                selectedCurrency={selectedCurrency}
+              />
+            </>
+          )}
         </div>
       </div>
       <BottomNavigation />
