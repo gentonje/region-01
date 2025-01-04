@@ -56,12 +56,17 @@ export const ModifyProductsList = ({
     </div>
   );
 
+  // Create a Set of unique product IDs to prevent duplicates
+  const uniqueProducts = Array.from(
+    new Map(products.map(product => [product.id, product])).values()
+  );
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
+        {uniqueProducts.map((product) => (
           <ProductModifyCard
-            key={product.id}
+            key={`product-${product.id}`}
             product={product}
             onDelete={onDelete}
           />
@@ -70,7 +75,7 @@ export const ModifyProductsList = ({
 
       {isLoading && renderSkeletons()}
 
-      {!isLoading && products.length === 0 && (
+      {!isLoading && uniqueProducts.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-600">No products found</p>
         </div>
