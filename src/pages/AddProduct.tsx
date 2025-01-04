@@ -47,44 +47,48 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-gray-50 text-gray-900 pb-20">
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate("/")}
-            className="hover:bg-gray-100"
-          >
-            Cancel
-          </Button>
+      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20">
+        <div className="bg-white rounded-lg shadow-sm p-6 overflow-y-auto">
+          <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 pb-4 border-b">
+            <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/")}
+              className="hover:bg-gray-100"
+            >
+              Cancel
+            </Button>
+          </div>
+
+          <div className="space-y-6">
+            <ProductImageSection
+              mainImage={mainImage}
+              setMainImage={setMainImage}
+              additionalImages={additionalImages}
+              setAdditionalImages={setAdditionalImages}
+              additionalImageUrls={[]}
+              onDeleteExisting={() => {}}
+              isLoading={isLoading}
+            />
+
+            <ProductForm
+              formData={{
+                title: "",
+                description: "",
+                price: "",
+                category: "Other",
+                available_quantity: "0",
+              }}
+              setFormData={() => {}}
+              isLoading={isLoading}
+              submitButtonText="Add Product"
+              onSubmit={handleSubmit}
+            />
+          </div>
         </div>
-
-        <ProductImageSection
-          mainImage={mainImage}
-          setMainImage={setMainImage}
-          additionalImages={additionalImages}
-          setAdditionalImages={setAdditionalImages}
-          additionalImageUrls={[]}
-          onDeleteExisting={() => {}}
-          isLoading={isLoading}
-        />
-
-        <ProductForm
-          formData={{
-            title: "",
-            description: "",
-            price: "",
-            category: "Other",
-            available_quantity: "0",
-          }}
-          setFormData={() => {}}
-          isLoading={isLoading}
-          submitButtonText="Add Product"
-          onSubmit={handleSubmit}
-        />
       </div>
     </div>
   );
