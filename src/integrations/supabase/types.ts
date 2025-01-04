@@ -157,13 +157,12 @@ export type Database = {
           likes: number | null
           price: number | null
           product_status: string | null
-          seller_id: string | null
           shipping_info: string | null
           shop_id: string | null
           shop_name: string | null
           storage_path: string
           title: string | null
-          user_id: string | null
+          user_id: string
           views: number | null
         }
         Insert: {
@@ -178,13 +177,12 @@ export type Database = {
           likes?: number | null
           price?: number | null
           product_status?: string | null
-          seller_id?: string | null
           shipping_info?: string | null
           shop_id?: string | null
           shop_name?: string | null
           storage_path: string
           title?: string | null
-          user_id?: string | null
+          user_id: string
           views?: number | null
         }
         Update: {
@@ -199,13 +197,12 @@ export type Database = {
           likes?: number | null
           price?: number | null
           product_status?: string | null
-          seller_id?: string | null
           shipping_info?: string | null
           shop_id?: string | null
           shop_name?: string | null
           storage_path?: string
           title?: string | null
-          user_id?: string | null
+          user_id?: string
           views?: number | null
         }
         Relationships: [
