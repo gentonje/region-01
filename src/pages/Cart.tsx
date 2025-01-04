@@ -5,15 +5,10 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, ShoppingBag } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CartItem } from "@/components/cart/CartItem";
+import { CartSummary } from "@/components/cart/CartSummary";
 
 interface CartItem {
   id: string;
@@ -23,7 +18,7 @@ interface CartItem {
     title: string;
     price: number;
     currency: string;
-    user_id: string; // Add this to get the seller's ID
+    user_id: string;
   };
 }
 
@@ -52,7 +47,7 @@ export default function Cart() {
         .from("profiles")
         .select("address")
         .eq("id", session?.user?.id)
-        .maybeSingle(); // Use maybeSingle instead of single
+        .maybeSingle();
 
       if (error) throw error;
       return data;
@@ -88,6 +83,40 @@ export default function Cart() {
     },
   });
 
+  const deleteItemMutation = useMutation({
+    mutationFn: async (itemId: string) => {
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("id", itemId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      toast({
+        title: "Success",
+        description: "Item removed from cart",
+      });
+    },
+  });
+
+  const clearCartMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .neq("id", "placeholder"); // Delete all items
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      toast({
+        title: "Success",
+        description: "Cart cleared successfully",
+      });
+    },
+  });
+
   const createOrderMutation = useMutation({
     mutationFn: async (paymentMethod: string) => {
       if (!cartItems?.length) throw new Error("Cart is empty");
@@ -100,7 +129,7 @@ export default function Cart() {
         0
       );
 
-      // Create order with all required fields
+      // Create order
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -110,27 +139,17 @@ export default function Cart() {
           payment_method: paymentMethod,
           shipping_address: shippingAddress,
           buyer_id: session.user.id,
-          seller_id: cartItems[0].product.user_id, // Add seller_id from the product
+          seller_id: cartItems[0].product.user_id,
         })
         .select()
         .single();
 
       if (orderError) throw orderError;
-
-      // Clear cart after successful order creation
-      const { error: clearCartError } = await supabase
-        .from("cart_items")
-        .delete()
-        .neq("id", "placeholder");
-
-      if (clearCartError) throw clearCartError;
-
       return order;
     },
     onSuccess: async (order) => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       
-      // Handle different payment methods
       switch (selectedPaymentMethod) {
         case "stripe":
           const { data: sessionUrl, error } = await supabase.functions.invoke("create-checkout-session", {
@@ -191,19 +210,35 @@ export default function Cart() {
     createOrderMutation.mutate(selectedPaymentMethod);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-8 mt-16">
-        <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Shopping Cart</h1>
+          <div className="flex gap-4">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/")}
+            >
+              <ShoppingBag className="mr-2 h-4 w-4" />
+              Continue Shopping
+            </Button>
+            {cartItems?.length > 0 && (
+              <Button
+                variant="destructive"
+                onClick={() => clearCartMutation.mutate()}
+                disabled={clearCartMutation.isPending}
+              >
+                {clearCartMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Clear Cart"
+                )}
+              </Button>
+            )}
+          </div>
+        </div>
         
         {!cartItems?.length ? (
           <Card className="p-6">
@@ -221,71 +256,32 @@ export default function Cart() {
               <h2 className="text-xl font-semibold mb-4">Cart Items</h2>
               <div className="space-y-4">
                 {cartItems.map((item) => (
-                  <div
+                  <CartItem
                     key={item.id}
-                    className="flex justify-between items-center border-b pb-4"
-                  >
-                    <div>
-                      <h3 className="font-medium">{item.product.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Quantity: {item.quantity}
-                      </p>
-                    </div>
-                    <p className="font-medium">
-                      {item.product.currency} {item.product.price * item.quantity}
-                    </p>
-                  </div>
+                    id={item.id}
+                    title={item.product.title}
+                    quantity={item.quantity}
+                    price={item.product.price}
+                    currency={item.product.currency}
+                    onDelete={() => deleteItemMutation.mutate(item.id)}
+                  />
                 ))}
               </div>
             </Card>
 
             <Card className="p-6">
               <h2 className="text-xl font-semibold mb-4">Checkout</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Payment Method
-                  </label>
-                  <Select
-                    value={selectedPaymentMethod}
-                    onValueChange={setSelectedPaymentMethod}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stripe">Credit Card (Stripe)</SelectItem>
-                      <SelectItem value="paypal">PayPal</SelectItem>
-                      <SelectItem value="mpesa">M-Pesa</SelectItem>
-                      <SelectItem value="mtn_momo">MTN Mobile Money</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <p className="flex justify-between mb-2">
-                    <span>Total</span>
-                    <span className="font-bold">
-                      {cartItems[0]?.product.currency}{" "}
-                      {cartItems.reduce(
-                        (sum, item) => sum + item.product.price * item.quantity,
-                        0
-                      )}
-                    </span>
-                  </p>
-                  <Button
-                    className="w-full"
-                    onClick={handleCheckout}
-                    disabled={createOrderMutation.isPending}
-                  >
-                    {createOrderMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      "Proceed to Checkout"
-                    )}
-                  </Button>
-                </div>
-              </div>
+              <CartSummary
+                currency={cartItems[0]?.product.currency || "USD"}
+                totalAmount={cartItems.reduce(
+                  (sum, item) => sum + item.product.price * item.quantity,
+                  0
+                )}
+                selectedPaymentMethod={selectedPaymentMethod}
+                onPaymentMethodChange={setSelectedPaymentMethod}
+                onCheckout={handleCheckout}
+                isLoading={createOrderMutation.isPending}
+              />
             </Card>
           </div>
         )}
