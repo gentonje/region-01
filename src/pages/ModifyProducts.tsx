@@ -22,10 +22,32 @@ const ModifyProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
   const [usernameSearch, setUsernameSearch] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
+    checkAdminStatus();
     fetchProducts();
   }, []);
+
+  const checkAdminStatus = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+
+      if (error) throw error;
+      setIsAdmin(!!data);
+    } catch (error) {
+      console.error("Error checking admin status:", error);
+      setIsAdmin(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -37,6 +59,7 @@ const ModifyProducts = () => {
         return;
       }
 
+      // Query to fetch products - for admin, fetch all products; for regular users, fetch only their products
       const { data, error } = await supabase
         .from("products")
         .select(`
@@ -54,7 +77,6 @@ const ModifyProducts = () => {
             full_name
           )
         `)
-        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -139,7 +161,9 @@ const ModifyProducts = () => {
       
       <div className="max-w-7xl mx-auto px-4 pt-20">
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold">Modify Products</h1>
+          <h1 className="text-2xl font-bold">
+            {isAdmin ? "Modify All Products" : "Modify Products"}
+          </h1>
           
           <Input
             placeholder="Search by username..."
