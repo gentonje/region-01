@@ -59,9 +59,9 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            <Link to="/" className="text-lg font-calligraphy font-bold">
-              <span className="text-vivo-orange">Vivo</span>
-              <span className="text-navy-blue">Shop</span>
+            <Link to="/" className="text-lg font-bold" style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}>
+              <span className="text-primary">السوق</span>
+              <span className="text-foreground"> الحر</span>
             </Link>
 
             <div className="flex items-center gap-2">
