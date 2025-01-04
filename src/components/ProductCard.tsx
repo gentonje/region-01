@@ -33,14 +33,13 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
-  // First try to find the main image
-  const mainImage = product.product_images?.find(img => img.is_main);
-  // If no main image is found, fall back to the first image
-  const imageToUse = mainImage || product.product_images?.[0];
-  // Get the image URL using the selected image or fall back to the product's storage path
-  const imageUrl = imageToUse 
-    ? getProductImageUrl({ ...product, product_images: [imageToUse] }) 
-    : getProductImageUrl(product);
+  // First try to find the main image from product_images
+  const mainImage = product.product_images?.find(img => img.is_main === true);
+  
+  // If no main image is found in product_images, use the product's storage_path
+  const imageUrl = mainImage 
+    ? getProductImageUrl({ ...product, product_images: [mainImage] })
+    : product.storage_path;
 
   return (
     <Card 
