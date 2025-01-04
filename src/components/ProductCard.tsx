@@ -69,8 +69,8 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           <p className="text-xs text-muted-foreground line-clamp-2 px-2 py-1">{product.description}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-1 pt-0">
-        <span className={`text-xs px-2 py-1 rounded-full w-fit ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+      <CardFooter className="flex justify-end pt-0">
+        <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
           {product.in_stock ? 'In Stock' : 'Out of Stock'}
         </span>
       </CardFooter>
