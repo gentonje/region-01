@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ProductFilters } from "@/components/ProductFilters";
+import { Input } from "@/components/ui/input";
 import { Product } from "@/types/product";
 import { UserProductGroup } from "@/components/UserProductGroup";
 
@@ -21,12 +21,11 @@ const ModifyProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [usernameSearch, setUsernameSearch] = useState("");
 
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery, selectedCategory]);
+  }, []);
 
   const fetchProducts = async () => {
     try {
@@ -38,7 +37,7 @@ const ModifyProducts = () => {
         return;
       }
 
-      let query = supabase
+      const { data, error } = await supabase
         .from("products")
         .select(`
           *,
@@ -57,16 +56,6 @@ const ModifyProducts = () => {
         `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-
-      if (searchQuery) {
-        query = query.ilike('title', `%${searchQuery}%`);
-      }
-
-      if (selectedCategory && selectedCategory !== 'all') {
-        query = query.eq('category', selectedCategory);
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
 
@@ -139,6 +128,11 @@ const ModifyProducts = () => {
     return acc;
   }, {});
 
+  // Filter groups based on username search
+  const filteredGroups = Object.entries(groupedProducts).filter(([_, { username }]) =>
+    username.toLowerCase().includes(usernameSearch.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <Navigation />
@@ -147,11 +141,11 @@ const ModifyProducts = () => {
         <div className="space-y-6">
           <h1 className="text-2xl font-bold">Modify Products</h1>
           
-          <ProductFilters
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
+          <Input
+            placeholder="Search by username..."
+            value={usernameSearch}
+            onChange={(e) => setUsernameSearch(e.target.value)}
+            className="max-w-sm"
           />
 
           {isLoading ? (
@@ -160,7 +154,7 @@ const ModifyProducts = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {Object.entries(groupedProducts).map(([userId, { username, products }]) => (
+              {filteredGroups.map(([userId, { username, products }]) => (
                 <UserProductGroup
                   key={userId}
                   username={username}
