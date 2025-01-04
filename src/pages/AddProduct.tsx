@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { createProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
+import { ProductCategory } from "@/types/product";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const AddProduct = () => {
     title: "",
     description: "",
     price: "",
-    category: "Other",
+    category: "Other" as ProductCategory,
     available_quantity: "0",
   });
 
