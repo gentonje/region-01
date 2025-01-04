@@ -5,58 +5,65 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   session: Session | null;
-  user: User | null;  // Add the user property
+  user: User | null;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
-  user: null,  // Add default value for user
+  user: null,
   loading: true,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);  // Add user state
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     let mounted = true;
+
+    const handleAuthError = async () => {
+      console.log('Handling auth error - clearing session');
+      if (mounted) {
+        setSession(null);
+        setUser(null);
+        // Clear any potentially invalid tokens
+        localStorage.removeItem('supabase.auth.token');
+        await supabase.auth.signOut();
+        toast.error("Session expired. Please login again.");
+      }
+    };
 
     const initSession = async () => {
       try {
         console.log('Initializing session...');
         
-        // Get fresh session
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session initialization error:', error);
-          throw error;
+          await handleAuthError();
+          return;
         }
         
         if (mounted) {
           if (currentSession) {
             console.log('Found valid session');
             setSession(currentSession);
-            setUser(currentSession.user);  // Set the user when session is found
+            setUser(currentSession.user);
           } else {
             console.log('No valid session found');
             setSession(null);
-            setUser(null);  // Clear user when no session
+            setUser(null);
           }
-          setLoading(false);
         }
       } catch (error) {
         console.error('Session initialization error:', error);
+        await handleAuthError();
+      } finally {
         if (mounted) {
-          setSession(null);
-          setUser(null);  // Clear user on error
           setLoading(false);
-          // Clear any potentially invalid tokens
-          localStorage.removeItem('supabase.auth.token');
-          await supabase.auth.signOut();
-          toast.error("Session expired. Please login again.");
         }
       }
     };
@@ -69,17 +76,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          console.log('User signed out or token refreshed');
-          setSession(currentSession);
-          setUser(currentSession?.user || null);  // Update user on auth state change
-          if (!currentSession) {
-            localStorage.removeItem('supabase.auth.token');
+        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          console.log('User signed out or deleted');
+          setSession(null);
+          setUser(null);
+          localStorage.removeItem('supabase.auth.token');
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Token refreshed');
+          if (currentSession) {
+            setSession(currentSession);
+            setUser(currentSession.user);
           }
         } else if (currentSession) {
           console.log('Session updated');
           setSession(currentSession);
-          setUser(currentSession.user);  // Update user when session changes
+          setUser(currentSession.user);
         }
         setLoading(false);
       }
