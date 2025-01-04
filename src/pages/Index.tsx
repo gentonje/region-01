@@ -33,6 +33,7 @@ export default function Index() {
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
+        .eq('product_status', 'published')
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
@@ -46,7 +47,11 @@ export default function Index() {
 
       const { data: products, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
+
       return products as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
