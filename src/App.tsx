@@ -6,8 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { LazyMotion, domAnimation } from "framer-motion";
-import { useState, useEffect } from "react";
-import { SplashScreen } from "@/components/SplashScreen";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import AddProduct from "./pages/AddProduct";
@@ -25,22 +23,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [isInitialLoad] = useState(() => {
-    const hasLoaded = localStorage.getItem("hasLoadedApp");
-    if (!hasLoaded) {
-      localStorage.setItem("hasLoadedApp", "true");
-      return true;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    if (!isInitialLoad) {
-      setShowSplash(false);
-    }
-  }, [isInitialLoad]);
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -48,55 +30,51 @@ function App() {
           <LazyMotion features={domAnimation}>
             <Toaster />
             <Sonner />
-            {showSplash && isInitialLoad ? (
-              <SplashScreen onComplete={() => setShowSplash(false)} />
-            ) : (
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/login" element={<Login />} />
-                  <Route
-                    path="/"
-                    element={
-                      <PrivateRoute>
-                        <Index />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/add-product"
-                    element={
-                      <PrivateRoute>
-                        <AddProduct />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/edit-product/:id"
-                    element={
-                      <PrivateRoute>
-                        <EditProduct />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/modify-products"
-                    element={
-                      <PrivateRoute>
-                        <ModifyProducts />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/admin/users"
-                    element={
-                      <PrivateRoute>
-                        <AdminUsers />
-                      </PrivateRoute>
-                    }
-                  />
-                </Routes>
-              </BrowserRouter>
-            )}
+            <BrowserRouter>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/"
+                  element={
+                    <PrivateRoute>
+                      <Index />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/add-product"
+                  element={
+                    <PrivateRoute>
+                      <AddProduct />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/edit-product/:id"
+                  element={
+                    <PrivateRoute>
+                      <EditProduct />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/modify-products"
+                  element={
+                    <PrivateRoute>
+                      <ModifyProducts />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <PrivateRoute>
+                      <AdminUsers />
+                    </PrivateRoute>
+                  }
+                />
+              </Routes>
+            </BrowserRouter>
           </LazyMotion>
         </TooltipProvider>
       </AuthProvider>

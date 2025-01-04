@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { Navigation, BottomNavigation } from "@/components/Navigation";
-import { SplashScreen } from "@/components/SplashScreen";
 import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { useState } from "react";
 
 export default function Index() {
-  const [showSplash, setShowSplash] = useState(true);
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -55,7 +53,7 @@ export default function Index() {
     initialPageParam: 0,
   });
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -78,48 +76,36 @@ export default function Index() {
     console.log("Product clicked:", product);
   };
 
-  const handleSplashComplete = () => {
-    setTimeout(() => {
-      setShowSplash(false);
-    }, 3000);
-  };
-
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     setSelectedCurrency(currency);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {showSplash ? (
-        <SplashScreen onComplete={handleSplashComplete} />
-      ) : (
-        <>
-          <Navigation onCurrencyChange={handleCurrencyChange} />
-          <div className="container mx-auto px-4">
-            <BreadcrumbNav
-              items={[
-                { label: "Products", href: "/" }
-              ]}
-            />
-            <ProductFilters
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
-            <ProductList
-              products={allProducts}
-              getProductImageUrl={getProductImageUrl}
-              onProductClick={handleProductClick}
-              isLoading={isLoading}
-              isFetchingNextPage={isFetchingNextPage}
-              observerRef={ref}
-              selectedCurrency={selectedCurrency}
-            />
-          </div>
-          <BottomNavigation />
-        </>
-      )}
+      <Navigation onCurrencyChange={handleCurrencyChange} />
+      <div className="container mx-auto px-4">
+        <BreadcrumbNav
+          items={[
+            { label: "Products", href: "/" }
+          ]}
+        />
+        <ProductFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+        />
+        <ProductList
+          products={allProducts}
+          getProductImageUrl={getProductImageUrl}
+          onProductClick={handleProductClick}
+          isLoading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          observerRef={ref}
+          selectedCurrency={selectedCurrency}
+        />
+      </div>
+      <BottomNavigation />
     </div>
   );
 }
