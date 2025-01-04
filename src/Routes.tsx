@@ -9,27 +9,16 @@ import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
-import Onboarding from './pages/Onboarding';
-import { UserTypeSelection } from './components/UserTypeSelection';
 
 export const Routes = () => {
   return (
     <RouterRoutes>
-      <Route path="/" element={<Index />} />
       <Route path="/login" element={<Login />} />
       <Route
-        path="/user-type"
+        path="/"
         element={
           <PrivateRoute>
-            <UserTypeSelection />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/onboarding"
-        element={
-          <PrivateRoute>
-            <Onboarding />
+            <Index />
           </PrivateRoute>
         }
       />

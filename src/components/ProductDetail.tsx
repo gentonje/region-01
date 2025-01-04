@@ -9,7 +9,6 @@ import { Skeleton } from "./ui/skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductDetailProps {
   product: Product;
@@ -23,7 +22,6 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
   );
 
   const queryClient = useQueryClient();
-  const { session } = useAuth();
 
   const { data: similarProducts } = useQuery({
     queryKey: ['similar-products', product.id, product.category],
@@ -71,10 +69,6 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
   });
 
   const handleAddToCart = () => {
-    if (!session) {
-      toast.error('Please log in to add items to cart');
-      return;
-    }
     if (!product.in_stock) {
       toast.error('This product is out of stock');
       return;
