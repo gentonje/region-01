@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { useProductImages } from "@/hooks/useProductImages";
 import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
-import { createProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";

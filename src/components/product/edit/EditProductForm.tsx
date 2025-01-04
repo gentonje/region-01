@@ -61,6 +61,17 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     }
   };
 
+  // Find the main image URL from product_images
+  const mainImageUrl = product.product_images?.find(img => img.is_main)?.publicUrl || product.storage_path;
+  
+  // Get additional images excluding the main one
+  const additionalImageUrls = product.product_images
+    ?.filter(img => !img.is_main)
+    .map(img => ({
+      url: img.publicUrl || '',
+      id: img.id
+    })) || [];
+
   return (
     <div className="space-y-6">
       <ProductImageSection
@@ -68,11 +79,8 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
         setMainImage={setMainImage}
         additionalImages={additionalImages}
         setAdditionalImages={setAdditionalImages}
-        mainImageUrl={product.storage_path}
-        additionalImageUrls={product.product_images?.map((img) => ({
-          url: img.publicUrl || '',
-          id: img.id
-        })) || []}
+        mainImageUrl={mainImageUrl}
+        additionalImageUrls={additionalImageUrls}
         onDeleteExisting={handleDeleteImage}
         isLoading={isLoading}
       />
