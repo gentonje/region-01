@@ -64,7 +64,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
             {product.title}
           </CardTitle>
         </div>
-        <p className="text-base font-semibold text-vivo-orange mx-1">
+        <p className="text-base font-semibold text-vivo-orange pl-1 pr-1">
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </p>
         <div className="h-[42px] overflow-hidden mx-3 my-2">
