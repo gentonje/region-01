@@ -12,7 +12,7 @@ interface ProductCardProps {
 
 const StarRating = ({ rating }: { rating: number }) => {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((star) => (
         <Star
           key={star}
@@ -35,12 +35,12 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
 
   return (
     <Card 
-      className="w-full h-[380px] hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+      className="w-full h-[380px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
       onClick={onClick}
     >
-      <CardContent className="px-0 space-y-1">
+      <CardContent className="px-0 space-y-2 relative">
         <div 
-          className="h-60 w-full relative"
+          className="h-60 w-full relative overflow-hidden rounded-t-lg"
           onClick={(e) => {
             e.stopPropagation();
             onClick?.();
@@ -49,30 +49,36 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           <img
             src={getProductImageUrl(product)}
             alt={product.title || ""}
-            className="w-full h-full object-cover rounded-md mt-2"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
-          <div className="absolute bottom-2 right-2">
+          <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
             <StarRating rating={product.average_rating || 0} />
           </div>
-          <span className="absolute top-4 left-2 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800">
+          <span className="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
             {product.category}
           </span>
         </div>
-        <div className="px-3">
-          <CardTitle className="text-sm font-medium truncate">
+        <div className="px-4 pt-2">
+          <CardTitle className="text-sm font-medium truncate text-gray-800">
             {product.title}
           </CardTitle>
         </div>
-        <p className="text-base font-semibold text-vivo-orange pl-1 pr-1">
+        <p className="text-base font-semibold text-orange-500 pl-4 pr-4">
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </p>
-        <div className="h-[42px] overflow-hidden mx-3 my-2">
-          <p className="text-xs text-muted-foreground line-clamp-2 px-2 py-1">{product.description}</p>
+        <div className="h-[42px] overflow-hidden mx-4">
+          <p className="text-xs text-gray-600 line-clamp-2">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-0 -mt-2">
-        <span className={`text-xs px-2 py-1 rounded-full ${product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+        <span 
+          className={`text-xs px-3 py-1.5 rounded-full font-medium 
+            ${product.in_stock 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+            } transition-colors`}
+        >
           {product.in_stock ? 'In Stock' : 'Out of Stock'}
         </span>
       </CardFooter>
