@@ -9,6 +9,7 @@ import { ProductImageSection } from "@/components/ProductImageSection";
 import { createProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
+import { supabase } from "@/integrations/supabase/client";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -35,9 +36,51 @@ const AddProduct = () => {
       console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
 
       console.log("Creating product...");
-      await createProduct(formData, mainImagePath);
-      console.log("Product created successfully");
+      const { data: productData, error: productError } = await supabase
+        .from("products")
+        .insert({
+          title: formData.title,
+          description: formData.description,
+          price: Number(formData.price),
+          category: formData.category,
+          available_quantity: Number(formData.available_quantity),
+          storage_path: mainImagePath,
+          shipping_info: formData.shipping_info,
+        })
+        .select()
+        .single();
 
+      if (productError) throw productError;
+
+      // Insert main image into product_images table
+      const { error: mainImageError } = await supabase
+        .from("product_images")
+        .insert({
+          product_id: productData.id,
+          storage_path: mainImagePath,
+          is_main: true,
+          display_order: 0
+        });
+
+      if (mainImageError) throw mainImageError;
+
+      // Insert additional images into product_images table
+      if (additionalImagePaths.length > 0) {
+        const additionalImagesData = additionalImagePaths.map((path, index) => ({
+          product_id: productData.id,
+          storage_path: path,
+          is_main: false,
+          display_order: index + 1
+        }));
+
+        const { error: additionalImagesError } = await supabase
+          .from("product_images")
+          .insert(additionalImagesData);
+
+        if (additionalImagesError) throw additionalImagesError;
+      }
+
+      console.log("Product created successfully");
       toast.success("Product added successfully!");
       navigate("/");
     } catch (error: any) {
