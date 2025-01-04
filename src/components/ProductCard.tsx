@@ -83,11 +83,6 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
               <span className="text-gray-400">Image not available</span>
             </div>
           )}
-          <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-            <span className="text-sm text-gray-700">
-              {owner?.username || owner?.full_name || 'Unknown Seller'}
-            </span>
-          </div>
           <span className="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
             {product.category}
           </span>
