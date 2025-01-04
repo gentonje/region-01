@@ -15,8 +15,8 @@ import { UserTypeSelection } from './components/UserTypeSelection';
 export const Routes = () => {
   return (
     <RouterRoutes>
-      <Route path="/login" element={<Login />} />
       <Route path="/" element={<Index />} />
+      <Route path="/login" element={<Login />} />
       <Route
         path="/user-type"
         element={
