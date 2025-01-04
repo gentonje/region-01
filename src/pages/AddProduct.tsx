@@ -9,7 +9,7 @@ import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -52,7 +52,6 @@ const AddProduct = () => {
           category: data.category,
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
-          shipping_info: data.shipping_info,
           user_id: user.id // Add the user_id here
         })
         .select()
