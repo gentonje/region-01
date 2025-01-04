@@ -56,6 +56,49 @@ const EditProduct = () => {
     retry: 1
   });
 
+  const handleSubmit = async (formData: any) => {
+    try {
+      if (!id) throw new Error("Product ID is required");
+
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({
+          title: formData.title,
+          description: formData.description,
+          price: Number(formData.price),
+          category: formData.category,
+          available_quantity: Number(formData.available_quantity),
+          storage_path: formData.mainImagePath || product?.storage_path,
+        })
+        .eq("id", id);
+
+      if (updateError) throw updateError;
+
+      // If new additional images were uploaded, insert them
+      if (formData.additionalImagePaths?.length > 0) {
+        const imageInserts = formData.additionalImagePaths.map((path: string, index: number) => ({
+          product_id: id,
+          storage_path: path,
+          is_main: false,
+          display_order: index + 1,
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .insert(imageInserts);
+
+        if (imagesError) throw imagesError;
+      }
+
+      toast.success("Product updated successfully!");
+      navigate("/modify-products");
+    } catch (error: any) {
+      console.error("Error updating product:", error);
+      toast.error(error.message || "Failed to update product");
+      throw error;
+    }
+  };
+
   if (error) {
     return (
       <div className={styles.container}>
