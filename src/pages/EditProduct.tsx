@@ -18,51 +18,59 @@ const EditProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages, existingImages, handleDeleteImage } = useProductImages(id);
 
-  // Fetch product and its images
-  const { data: product, isLoading: isLoadingProduct } = useQuery({
+  // Enhanced error handling in the query
+  const { data: product, isLoading: isLoadingProduct, error: productError } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
+      console.log("Fetching product with ID:", id);
       if (!id) throw new Error("No product ID provided");
       
-      // Fetch product details
-      const { data: productData, error: productError } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_images (
-            id,
-            storage_path,
-            is_main,
-            display_order
-          )
-        `)
-        .eq("id", id)
-        .single();
+      try {
+        const { data: productData, error: productError } = await supabase
+          .from("products")
+          .select(`
+            *,
+            product_images (
+              id,
+              storage_path,
+              is_main,
+              display_order
+            )
+          `)
+          .eq("id", id)
+          .single();
 
-      if (productError) {
-        console.error("Error fetching product:", productError);
-        toast.error("Failed to fetch product");
-        throw productError;
+        if (productError) {
+          console.error("Error fetching product:", productError);
+          throw productError;
+        }
+
+        console.log("Fetched product data:", productData);
+
+        // Get public URLs for all images
+        if (productData.product_images) {
+          const imagesWithUrls = await Promise.all(
+            productData.product_images.map(async (image: any) => {
+              const { data } = supabase.storage
+                .from('images')
+                .getPublicUrl(image.storage_path);
+              return {
+                ...image,
+                publicUrl: data.publicUrl
+              };
+            })
+          );
+          productData.product_images = imagesWithUrls;
+        }
+
+        return productData;
+      } catch (error) {
+        console.error("Error in queryFn:", error);
+        throw error;
       }
-
-      // Get public URLs for all images
-      if (productData.product_images) {
-        const imagesWithUrls = await Promise.all(
-          productData.product_images.map(async (image: any) => {
-            const { data } = supabase.storage
-              .from('images')
-              .getPublicUrl(image.storage_path);
-            return {
-              ...image,
-              publicUrl: data.publicUrl
-            };
-          })
-        );
-        productData.product_images = imagesWithUrls;
-      }
-
-      return productData;
     },
+    retry: 2, // Retry failed requests up to 2 times
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
   const handleSubmit = async (formData: any) => {
@@ -78,6 +86,7 @@ const EditProduct = () => {
 
         // Insert additional images
         if (additionalImagePaths.length > 0) {
+          console.log("Uploading additional images:", additionalImagePaths);
           const { error: imagesError } = await supabase
             .from('product_images')
             .insert(
@@ -107,13 +116,28 @@ const EditProduct = () => {
 
       toast.success("Product updated successfully");
       navigate("/modify-products");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating product:", error);
-      toast.error("Failed to update product");
+      toast.error(error.message || "Failed to update product");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Show error state
+  if (productError) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <div className={styles.mainContent}>
+          <div className={styles.formContainer}>
+            <p className="text-red-500">Error loading product: {(productError as Error).message}</p>
+            <Button onClick={() => navigate("/modify-products")}>Go Back</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoadingProduct) {
     return (
@@ -135,6 +159,7 @@ const EditProduct = () => {
         <div className={styles.mainContent}>
           <div className={styles.formContainer}>
             <p>Product not found</p>
+            <Button onClick={() => navigate("/modify-products")}>Go Back</Button>
           </div>
         </div>
       </div>
