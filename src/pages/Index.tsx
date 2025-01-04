@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -9,7 +9,7 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
-import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Index() {
   const { ref, inView } = useInView();
@@ -25,15 +25,14 @@ export default function Index() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["all-products", searchQuery, selectedCategory],
+    queryKey: ["products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
 
       let query = supabase
         .from("products")
-        .select("*, product_images(*), profiles!products_user_id_fkey(username, full_name)")
-        .eq('product_status', 'published')
+        .select("*, product_images(*)")
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
@@ -47,11 +46,7 @@ export default function Index() {
 
       const { data: products, error } = await query;
 
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-
+      if (error) throw error;
       return products as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
@@ -92,6 +87,25 @@ export default function Index() {
     setSelectedProduct(null);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation onCurrencyChange={handleCurrencyChange} />
+        <div className="container mx-auto px-4 mt-20">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation onCurrencyChange={handleCurrencyChange} />
@@ -99,7 +113,7 @@ export default function Index() {
         <div className="mt-20">
           <BreadcrumbNav
             items={[
-              { label: "Home", href: "/" }
+              { label: "Products", href: "/" }
             ]}
           />
           {selectedProduct ? (
