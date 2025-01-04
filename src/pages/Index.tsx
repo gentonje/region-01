@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
-import { Navigation, BottomNavigation } from "@/components/Navigation";
+import { Navigation, BottomNavigation } from '@/components/Navigation';
 import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
@@ -17,6 +17,8 @@ export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [sortOrder, setSortOrder] = useState<string>("none");
 
   const {
     data,
@@ -25,7 +27,7 @@ export default function Index() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCategory],
+    queryKey: ["products", searchQuery, selectedCategory, priceRange, sortOrder],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
@@ -33,8 +35,10 @@ export default function Index() {
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
-        .range(startRange, endRange)
-        .order("created_at", { ascending: false });
+        .eq('product_status', 'published')
+        .gte('price', priceRange.min)
+        .lte('price', priceRange.max)
+        .range(startRange, endRange);
 
       if (searchQuery) {
         query = query.ilike("title", `%${searchQuery}%`);
@@ -42,6 +46,15 @@ export default function Index() {
 
       if (selectedCategory !== "all") {
         query = query.eq("category", selectedCategory);
+      }
+
+      // Apply sorting if specified
+      if (sortOrder === "asc") {
+        query = query.order('price', { ascending: true });
+      } else if (sortOrder === "desc") {
+        query = query.order('price', { ascending: false });
+      } else {
+        query = query.order("created_at", { ascending: false });
       }
 
       const { data: products, error } = await query;
@@ -87,6 +100,14 @@ export default function Index() {
     setSelectedProduct(null);
   };
 
+  const handlePriceRangeChange = (min: number, max: number) => {
+    setPriceRange({ min, max });
+  };
+
+  const handleSortChange = (sort: string) => {
+    setSortOrder(sort);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -129,6 +150,8 @@ export default function Index() {
                 setSearchQuery={setSearchQuery}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                onPriceRangeChange={handlePriceRangeChange}
+                onSortChange={handleSortChange}
               />
               <ProductList
                 products={allProducts}
