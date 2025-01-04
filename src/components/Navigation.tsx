@@ -35,15 +35,33 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("full_name")
-          .eq("id", user.id)
-          .single();
-        
-        setUserName(profile?.full_name || user.email || "");
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.error("Error fetching user:", userError);
+          return;
+        }
+
+        if (user) {
+          try {
+            const { data: profile, error: profileError } = await supabase
+              .from("profiles")
+              .select("full_name")
+              .eq("id", user.id)
+              .single();
+
+            if (profileError) {
+              console.error("Error fetching profile:", profileError);
+              return;
+            }
+
+            setUserName(profile?.full_name || user.email || "");
+          } catch (error) {
+            console.error("Error in profile fetch:", error);
+          }
+        }
+      } catch (error) {
+        console.error("Error in user fetch:", error);
       }
     };
 
