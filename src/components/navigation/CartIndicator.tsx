@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -26,25 +27,27 @@ export function CartIndicator() {
   });
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative"
-          onClick={() => navigate("/cart")}
-        >
-          <ShoppingCart className="h-5 w-5" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-              {cartCount}
-            </span>
-          )}
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>Cart ({cartCount} items)</p>
-      </TooltipContent>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative"
+            onClick={() => navigate("/cart")}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartCount}
+              </span>
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Cart ({cartCount} items)</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
