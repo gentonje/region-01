@@ -94,7 +94,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
                 <img
                   src={thumbnailUrls[image.storage_path]}
                   alt={`${title} ${index + 1}`}
-                  className="w-full h-full object-cover relative z-10 mt-8"
+                  className="w-full h-full object-cover relative z-10 mt-8 py-2"
                   loading="lazy"
                   onError={() => handleThumbnailError(image.storage_path)}
                 />
