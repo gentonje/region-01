@@ -2,6 +2,8 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductCardProps {
   product: Product;
@@ -27,38 +29,22 @@ const StarRating = ({ rating }: { rating: number }) => {
 };
 
 const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }: ProductCardProps) => {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+
   const convertedPrice = convertCurrency(
     product.price || 0,
     (product.currency || "SSP") as SupportedCurrency,
     selectedCurrency
   );
 
-  // Log the product images data for debugging
-  console.log('Product Images:', {
-    productId: product.id,
-    allImages: product.product_images,
-    storagePath: product.storage_path
-  });
-
   // First try to find the main image from product_images
   const mainImage = product.product_images?.find(img => img.is_main === true);
-  
-  // Log the selected main image for debugging
-  console.log('Selected Main Image:', {
-    productId: product.id,
-    mainImage: mainImage
-  });
   
   // If no main image is found in product_images, use the product's storage_path
   const imageUrl = mainImage 
     ? getProductImageUrl({ ...product, product_images: [mainImage] })
     : product.storage_path;
-
-  // Log the final image URL for debugging
-  console.log('Final Image URL:', {
-    productId: product.id,
-    imageUrl: imageUrl
-  });
 
   return (
     <Card 
@@ -73,12 +59,29 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
             onClick?.();
           }}
         >
+          {imageLoading && !imageError && (
+            <div className="absolute inset-0 bg-gray-100 animate-pulse">
+              <Skeleton className="w-full h-full" />
+            </div>
+          )}
           <img
             src={imageUrl}
             alt={product.title || ""}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className={`w-full h-full object-cover transition-all duration-300 group-hover:scale-105 ${
+              imageLoading ? 'opacity-0' : 'opacity-100'
+            }`}
             loading="lazy"
+            onLoad={() => setImageLoading(false)}
+            onError={() => {
+              setImageLoading(false);
+              setImageError(true);
+            }}
           />
+          {imageError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <span className="text-gray-400">Image not available</span>
+            </div>
+          )}
           <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
             <StarRating rating={product.average_rating || 0} />
           </div>
