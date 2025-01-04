@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AuthContextType {
   session: Session | null;
@@ -22,9 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const initSession = async () => {
       try {
         console.log('Initializing session...');
-        
-        // Clear any potentially stale session data
-        localStorage.removeItem('supabase.auth.token');
         
         // Get fresh session
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
@@ -49,7 +47,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (mounted) {
           setSession(null);
           setLoading(false);
+          // Clear any potentially invalid tokens
+          localStorage.removeItem('supabase.auth.token');
           await supabase.auth.signOut();
+          toast.error("Session expired. Please login again.");
         }
       }
     };
@@ -62,10 +63,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
-          setSession(null);
-          localStorage.removeItem('supabase.auth.token');
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          console.log('User signed out or token refreshed');
+          setSession(currentSession);
+          if (!currentSession) {
+            localStorage.removeItem('supabase.auth.token');
+          }
         } else if (currentSession) {
           console.log('Session updated');
           setSession(currentSession);

@@ -10,6 +10,9 @@ const Login = () => {
   const mounted = useRef(true);
 
   useEffect(() => {
+    // Clear any existing tokens on mount
+    localStorage.removeItem('supabase.auth.token');
+
     const checkSession = async () => {
       try {
         console.log('Checking for existing session on Login page');
