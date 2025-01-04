@@ -19,6 +19,7 @@ interface ProductFormFieldProps {
   name: keyof ProductFormData;
   label: string;
   type?: string;
+  step?: string;
   placeholder?: string;
   formData: ProductFormData;
   setFormData: (data: ProductFormData) => void;
@@ -29,6 +30,7 @@ export const ProductFormField = ({
   name,
   label,
   type = "text",
+  step,
   placeholder,
   formData,
   setFormData,
@@ -91,6 +93,7 @@ export const ProductFormField = ({
               <Input
                 {...field}
                 type={type}
+                step={step}
                 placeholder={placeholder}
                 onChange={(e) => {
                   field.onChange(e);
