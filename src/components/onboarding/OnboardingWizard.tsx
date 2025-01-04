@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { OnboardingStep } from "./OnboardingStep";
 import { ProfileStep } from "./steps/ProfileStep";
 import { ShopStep } from "./steps/ShopStep";
-import { ProductStep } from "./steps/ProductStep";
 import { toast } from "sonner";
 
 export const OnboardingWizard = () => {
@@ -29,7 +28,7 @@ export const OnboardingWizard = () => {
   });
 
   useEffect(() => {
-    if (onboardingProgress?.length === 3) {
+    if (onboardingProgress?.length === 2) {
       navigate("/");
     } else if (onboardingProgress) {
       setCurrentStep(onboardingProgress.length);
@@ -44,13 +43,8 @@ export const OnboardingWizard = () => {
     },
     {
       title: "Create Your Shop",
-      component: <ShopStep onComplete={() => setCurrentStep(2)} />,
+      component: <ShopStep onComplete={() => navigate("/")} />,
       step: "shop_created"
-    },
-    {
-      title: "Add Your First Product",
-      component: <ProductStep onComplete={() => navigate("/")} />,
-      step: "first_product"
     }
   ];
 
