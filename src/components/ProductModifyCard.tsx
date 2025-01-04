@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -87,24 +88,26 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
           <span className="text-lg font-bold">${product.price}</span>
           {isAdmin && (
             <div className="flex items-center space-x-2 relative">
-              <Checkbox
+              <Switch
                 id={`publish-${product.id}`}
                 checked={product.product_status === 'published'}
                 onCheckedChange={handlePublishChange}
-                className="cursor-pointer"
                 disabled={isPublishing}
+                className="data-[state=checked]:bg-green-500"
               />
-              {isPublishing && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                </div>
-              )}
-              <label
+              <Label
                 htmlFor={`publish-${product.id}`}
-                className="text-sm text-gray-600 cursor-pointer"
+                className="text-sm text-gray-600 min-w-[80px]"
               >
-                Published
-              </label>
+                {isPublishing ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                    <span>Updating...</span>
+                  </div>
+                ) : (
+                  product.product_status === 'published' ? 'Published' : 'Draft'
+                )}
+              </Label>
             </div>
           )}
         </div>
