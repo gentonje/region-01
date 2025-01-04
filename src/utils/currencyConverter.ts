@@ -21,13 +21,15 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
 
 let ratesCache: Record<string, number> | null = null;
 
-export const convertCurrency = async (
+export const convertCurrency = (
   amount: number,
   fromCurrency: SupportedCurrency,
   toCurrency: SupportedCurrency
-): Promise<number> => {
+): number => {
   if (!ratesCache) {
-    ratesCache = await getCurrencyRates();
+    // If cache is not initialized, return the original amount
+    console.warn('Currency rates not loaded yet');
+    return amount;
   }
 
   if (!ratesCache[fromCurrency] || !ratesCache[toCurrency]) {
@@ -40,6 +42,11 @@ export const convertCurrency = async (
   // Convert from SSP to target currency
   return amountInSSP * ratesCache[toCurrency];
 };
+
+// Initialize rates cache
+getCurrencyRates().then(rates => {
+  ratesCache = rates;
+});
 
 // Refresh rates every hour
 setInterval(async () => {
