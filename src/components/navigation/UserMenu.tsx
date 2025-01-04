@@ -15,9 +15,10 @@ interface UserMenuProps {
   userName: string;
   onLogout: () => Promise<void>;
   isLoading?: boolean;
+  error?: string | null;
 }
 
-export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
+export const UserMenu = ({ userName, onLogout, isLoading, error }: UserMenuProps) => {
   const menuItems = [
     { icon: UserCog, label: "Edit Profile", path: "/edit-profile" },
     { icon: Settings, label: "Add Product", path: "/add-product" },
@@ -37,6 +38,8 @@ export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
           <SheetTitle className="text-left">Menu</SheetTitle>
           {isLoading ? (
             <Skeleton className="h-4 w-[200px]" />
+          ) : error ? (
+            <p className="text-sm text-destructive text-left">{error}</p>
           ) : userName ? (
             <p className="text-sm text-muted-foreground text-left">
               Logged in as {userName}

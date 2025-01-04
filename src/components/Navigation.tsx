@@ -32,15 +32,19 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const [userName, setUserName] = useState("");
   const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getUser = async () => {
       try {
         setIsLoading(true);
+        setError(null);
+        
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         
         if (userError) {
           console.error("Error fetching user:", userError);
+          setError("Could not fetch user details");
           return;
         }
 
@@ -59,7 +63,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           if (profileError) {
             console.error("Error fetching profile:", profileError);
             // Don't throw here, just show a toast and continue with email
-            toast.error("Could not fetch profile details");
+            toast.error("Could not fetch profile details. Using email instead.");
             setUserName(user.email || "");
             return;
           }
@@ -68,11 +72,13 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
         } catch (error) {
           console.error("Error in profile fetch:", error);
           // Use email as fallback if profile fetch fails
+          toast.error("Network error while fetching profile. Using email instead.");
           setUserName(user.email || "");
         }
       } catch (error) {
         console.error("Error in user fetch:", error);
-        toast.error("Could not fetch user details");
+        setError("Could not fetch user details");
+        toast.error("Network error. Please check your internet connection.");
       } finally {
         setIsLoading(false);
       }
@@ -88,7 +94,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
       navigate("/login");
     } catch (error) {
       console.error("Error logging out:", error);
-      toast.error("Failed to log out");
+      toast.error("Failed to log out. Please try again.");
     }
   };
 
