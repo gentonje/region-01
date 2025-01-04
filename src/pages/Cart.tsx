@@ -23,6 +23,7 @@ interface CartItem {
     title: string;
     price: number;
     currency: string;
+    user_id: string; // Add this to get the seller's ID
   };
 }
 
@@ -31,6 +32,40 @@ export default function Cart() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("stripe");
+  const [shippingAddress, setShippingAddress] = useState<string>("");
+
+  // Get current user's ID
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return session;
+    },
+  });
+
+  // Get user's shipping address
+  const { data: userProfile } = useQuery({
+    queryKey: ["userProfile", session?.user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("address")
+        .eq("id", session?.user?.id)
+        .maybeSingle(); // Use maybeSingle instead of single
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  // Set shipping address from profile when available
+  useEffect(() => {
+    if (userProfile?.address) {
+      setShippingAddress(userProfile.address);
+    }
+  }, [userProfile]);
 
   const { data: cartItems, isLoading } = useQuery({
     queryKey: ["cartItems"],
@@ -42,7 +77,8 @@ export default function Cart() {
           product:products (
             title,
             price,
-            currency
+            currency,
+            user_id
           )
         `)
         .order("created_at", { ascending: false });
@@ -55,6 +91,8 @@ export default function Cart() {
   const createOrderMutation = useMutation({
     mutationFn: async (paymentMethod: string) => {
       if (!cartItems?.length) throw new Error("Cart is empty");
+      if (!session?.user?.id) throw new Error("User not authenticated");
+      if (!shippingAddress) throw new Error("Shipping address is required");
 
       // Calculate total amount
       const totalAmount = cartItems.reduce(
@@ -62,25 +100,17 @@ export default function Cart() {
         0
       );
 
-      // Get user's shipping address from profile
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("address")
-        .single();
-
-      if (!profile?.address) {
-        throw new Error("Please add a shipping address to your profile");
-      }
-
-      // Create order
+      // Create order with all required fields
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
-          product_id: cartItems[0].product_id, // For simplicity, using first item
+          product_id: cartItems[0].product_id,
           quantity: cartItems[0].quantity,
           total_amount: totalAmount,
           payment_method: paymentMethod,
-          shipping_address: profile.address,
+          shipping_address: shippingAddress,
+          buyer_id: session.user.id,
+          seller_id: cartItems[0].product.user_id, // Add seller_id from the product
         })
         .select()
         .single();
@@ -111,17 +141,14 @@ export default function Cart() {
           break;
         
         case "paypal":
-          // Redirect to PayPal checkout
           navigate(`/checkout/paypal/${order.id}`);
           break;
         
         case "mpesa":
-          // Redirect to M-Pesa checkout
           navigate(`/checkout/mpesa/${order.id}`);
           break;
         
         case "mtn_momo":
-          // Redirect to MTN MoMo checkout
           navigate(`/checkout/mtn-momo/${order.id}`);
           break;
         
@@ -147,6 +174,15 @@ export default function Cart() {
       toast({
         title: "Cart is empty",
         description: "Please add items to your cart before checking out",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!shippingAddress) {
+      toast({
+        title: "Shipping address required",
+        description: "Please add a shipping address to your profile",
         variant: "destructive",
       });
       return;
