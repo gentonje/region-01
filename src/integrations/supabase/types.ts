@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      currencies: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          rate: number
+          status:
+            | Database["public"]["Enums"]["supported_currency_status"]
+            | null
+          symbol: string | null
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          rate: number
+          status?:
+            | Database["public"]["Enums"]["supported_currency_status"]
+            | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          rate?: number
+          status?:
+            | Database["public"]["Enums"]["supported_currency_status"]
+            | null
+          symbol?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       onboarding_progress: {
         Row: {
           completed_at: string | null
@@ -452,6 +491,7 @@ export type Database = {
         | "Automotive"
         | "Food & Beverages"
         | "Other"
+      supported_currency_status: "active" | "inactive"
       user_type: "buyer" | "seller"
     }
     CompositeTypes: {
