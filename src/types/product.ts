@@ -18,7 +18,13 @@ export interface ProductImage {
   display_order: number;
   created_at?: string;
   publicUrl?: string;
-  product_id?: string; // Made optional since it's not always present in responses
+  product_id?: string;
+}
+
+export interface Profile {
+  username?: string | null;
+  full_name?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface Product {
@@ -41,4 +47,5 @@ export interface Product {
   shipping_info?: string | null;
   currency: string | null;
   product_images: ProductImage[];
+  profiles?: Profile;
 }
