@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProductModifyCardProps {
   product: {
@@ -25,6 +26,26 @@ interface ProductModifyCardProps {
 export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
   const navigate = useNavigate();
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
+
+  // Query to check if the current user is an admin
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+      
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+      
+      return data;
+    }
+  });
   
   const handlePublishChange = async (checked: boolean) => {
     try {
@@ -54,19 +75,21 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <span className="text-lg font-bold">${product.price}</span>
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id={`publish-${product.id}`}
-              checked={product.product_status === 'published'}
-              onCheckedChange={handlePublishChange}
-            />
-            <label
-              htmlFor={`publish-${product.id}`}
-              className="text-sm text-gray-600"
-            >
-              Published
-            </label>
-          </div>
+          {isAdmin && (
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id={`publish-${product.id}`}
+                checked={product.product_status === 'published'}
+                onCheckedChange={handlePublishChange}
+              />
+              <label
+                htmlFor={`publish-${product.id}`}
+                className="text-sm text-gray-600"
+              >
+                Published
+              </label>
+            </div>
+          )}
         </div>
         <div className="space-x-2">
           <Button
