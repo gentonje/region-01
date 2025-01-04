@@ -6,13 +6,16 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useProductImages } from "@/hooks/useProductImages";
+import { useState } from "react";
+import { ProductImageSection } from "@/components/ProductImageSection";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { uploadImages } = useProductImages();
+  const [isLoading, setIsLoading] = useState(false);
+  const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages, existingImages, handleDeleteImage } = useProductImages(id);
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product, isLoading: isLoadingProduct } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -31,23 +34,40 @@ const EditProduct = () => {
   });
 
   const handleSubmit = async (formData: any) => {
-    const { title, description, price, category } = formData;
-
+    setIsLoading(true);
     try {
-      await supabase
+      let newStoragePath = product?.storage_path;
+
+      if (mainImage) {
+        const { mainImagePath } = await uploadImages(mainImage, additionalImages);
+        newStoragePath = mainImagePath;
+      }
+
+      const { error: updateError } = await supabase
         .from("products")
-        .update({ title, description, price, category })
+        .update({
+          title: formData.title,
+          description: formData.description,
+          price: formData.price,
+          category: formData.category,
+          available_quantity: formData.available_quantity,
+          storage_path: newStoragePath,
+        })
         .eq("id", id);
+
+      if (updateError) throw updateError;
 
       toast.success("Product updated successfully");
       navigate("/modify-products");
     } catch (error) {
+      console.error("Error updating product:", error);
       toast.error("Failed to update product");
-      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isLoading) {
+  if (isLoadingProduct) {
     return (
       <div className="min-h-screen p-4 bg-gray-50">
         <Navigation />
@@ -74,9 +94,29 @@ const EditProduct = () => {
           </Button>
         </div>
 
-        <ProductForm 
+        <ProductImageSection
+          mainImage={mainImage}
+          setMainImage={setMainImage}
+          additionalImages={additionalImages}
+          setAdditionalImages={setAdditionalImages}
+          mainImageUrl={product?.storage_path}
+          additionalImageUrls={existingImages.map(img => ({ url: img.publicUrl, id: img.id }))}
+          onDeleteExisting={handleDeleteImage}
+          isLoading={isLoading}
+        />
+
+        <ProductForm
+          formData={{
+            title: product?.title || "",
+            description: product?.description || "",
+            price: String(product?.price || ""),
+            category: product?.category || "Other",
+            available_quantity: String(product?.available_quantity || "0"),
+          }}
+          setFormData={() => {}}
+          isLoading={isLoading}
+          submitButtonText="Update Product"
           onSubmit={handleSubmit}
-          initialData={product}
         />
       </div>
     </div>

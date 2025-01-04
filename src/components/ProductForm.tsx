@@ -19,6 +19,8 @@ interface ProductFormProps {
   setFormData: (data: ProductFormData) => void;
   isLoading: boolean;
   submitButtonText: string;
+  onSubmit: (formData: ProductFormData) => Promise<void>;
+  initialData?: ProductFormData;
 }
 
 export const ProductForm = ({
@@ -26,9 +28,15 @@ export const ProductForm = ({
   setFormData,
   isLoading,
   submitButtonText,
+  onSubmit,
 }: ProductFormProps) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit(formData);
+  };
+
   return (
-    <>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="title" className="text-gray-900 font-medium">Title</Label>
         <Input
@@ -118,6 +126,6 @@ export const ProductForm = ({
           submitButtonText
         )}
       </Button>
-    </>
+    </form>
   );
 };

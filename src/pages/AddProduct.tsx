@@ -5,35 +5,34 @@ import { ProductForm } from "@/components/ProductForm";
 import { toast } from "sonner";
 import { useProductImages } from "@/hooks/useProductImages";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { ProductImageSection } from "@/components/ProductImageSection";
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const { uploadImages } = useProductImages();
+  const [isLoading, setIsLoading] = useState(false);
+  const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
 
   const handleSubmit = async (formData: any) => {
-    const { title, description, price, category, mainImage, additionalImages } = formData;
-
-    if (!title || !description || !price || !category || !mainImage) {
-      toast.error("Please fill in all required fields.");
+    if (!mainImage) {
+      toast.error("Please upload a main product image");
       return;
     }
 
+    setIsLoading(true);
     try {
-      const { data: uploadData, error: uploadError } = await uploadImages(mainImage, additionalImages);
-      if (uploadError) throw uploadError;
+      const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
 
       const { error: insertError } = await supabase
         .from("products")
-        .insert([
-          {
-            title,
-            description,
-            price,
-            category,
-            main_image: uploadData.mainImageUrl,
-            additional_images: uploadData.additionalImageUrls,
-          },
-        ]);
+        .insert({
+          title: formData.title,
+          description: formData.description,
+          price: formData.price,
+          category: formData.category,
+          available_quantity: formData.available_quantity,
+          storage_path: mainImagePath,
+        });
 
       if (insertError) throw insertError;
 
@@ -42,6 +41,8 @@ const AddProduct = () => {
     } catch (error) {
       console.error("Error adding product:", error);
       toast.error("Failed to add product.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -61,7 +62,29 @@ const AddProduct = () => {
           </Button>
         </div>
 
-        <ProductForm onSubmit={handleSubmit} />
+        <ProductImageSection
+          mainImage={mainImage}
+          setMainImage={setMainImage}
+          additionalImages={additionalImages}
+          setAdditionalImages={setAdditionalImages}
+          additionalImageUrls={[]}
+          onDeleteExisting={() => {}}
+          isLoading={isLoading}
+        />
+
+        <ProductForm
+          formData={{
+            title: "",
+            description: "",
+            price: "",
+            category: "Other",
+            available_quantity: "0",
+          }}
+          setFormData={() => {}}
+          isLoading={isLoading}
+          submitButtonText="Add Product"
+          onSubmit={handleSubmit}
+        />
       </div>
     </div>
   );

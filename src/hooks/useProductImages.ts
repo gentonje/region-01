@@ -2,11 +2,45 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export const useProductImages = (productId: string) => {
+export const useProductImages = (productId?: string) => {
   const [existingImages, setExistingImages] = useState<any[]>([]);
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<(File | null)[]>([null, null, null, null]);
   const { toast } = useToast();
+
+  const uploadImages = async (mainImage: File | null, additionalImages: (File | null)[]) => {
+    if (!mainImage) throw new Error("Main image is required");
+
+    const uploadFile = async (file: File, isMain: boolean, order: number) => {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      return fileName;
+    };
+
+    try {
+      const mainImagePath = await uploadFile(mainImage, true, 0);
+      const additionalImagePaths = await Promise.all(
+        additionalImages
+          .filter((file): file is File => file !== null)
+          .map((file, index) => uploadFile(file, false, index + 1))
+      );
+
+      return {
+        mainImagePath,
+        additionalImagePaths,
+      };
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      throw error;
+    }
+  };
 
   const fetchImages = async () => {
     try {
@@ -116,5 +150,6 @@ export const useProductImages = (productId: string) => {
     additionalImages,
     setAdditionalImages,
     handleDeleteImage,
+    uploadImages,
   };
 };
