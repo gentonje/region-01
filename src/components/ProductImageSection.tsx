@@ -1,4 +1,5 @@
 import { ProductImageUpload } from "./ProductImageUpload";
+import { PRODUCT_CONSTANTS } from "@/constants/product";
 
 interface ProductImageSectionProps {
   mainImage: File | null;
@@ -24,16 +25,16 @@ export const ProductImageSection = ({
   return (
     <div className="space-y-4">
       <ProductImageUpload
-        label="Main Product Image"
+        label={PRODUCT_CONSTANTS.MAIN_IMAGE}
         onChange={setMainImage}
         existingImageUrl={mainImageUrl}
         isLoading={isLoading}
       />
 
-      {[0, 1, 2, 3].map((index) => (
+      {Array.from({ length: PRODUCT_CONSTANTS.MAX_ADDITIONAL_IMAGES }).map((_, index) => (
         <ProductImageUpload
           key={index}
-          label={`Additional Image ${index + 1}`}
+          label={`${PRODUCT_CONSTANTS.ADDITIONAL_IMAGE} ${index + 1}`}
           onChange={(file) => {
             setAdditionalImages(prev => {
               const newImages = [...prev];

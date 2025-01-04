@@ -3,6 +3,7 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { ImagePreview } from "./ImagePreview";
 import { Loader2, Upload } from "lucide-react";
+import { PRODUCT_CONSTANTS } from "@/constants/product";
 
 interface ProductImageUploadProps {
   label: string;
@@ -43,7 +44,7 @@ export const ProductImageUpload = ({
   const handleDelete = () => {
     setPreviewUrl(null);
     onChange(null);
-    setInputKey(Date.now().toString()); // Reset input
+    setInputKey(Date.now().toString());
     if (existingImageUrl && onDeleteExisting) {
       onDeleteExisting();
     }
@@ -72,12 +73,12 @@ export const ProductImageUpload = ({
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Uploading...
+              {PRODUCT_CONSTANTS.UPLOADING}
             </>
           ) : (
             <>
               <Upload className="mr-2 h-4 w-4" />
-              Choose Image
+              {PRODUCT_CONSTANTS.CHOOSE_IMAGE}
             </>
           )}
         </Button>

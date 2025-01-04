@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
+import { PRODUCT_COLORS, PRODUCT_CONSTANTS } from "@/constants/product";
 
 interface ProductCardProps {
   product: Product;
@@ -17,9 +18,7 @@ const StarRating = ({ rating }: { rating: number }) => {
         <Star
           key={star}
           size={16}
-          className={`${
-            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
+          className={star <= rating ? PRODUCT_COLORS.starActive : PRODUCT_COLORS.starInactive}
         />
       ))}
     </div>
@@ -33,11 +32,8 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
-  // First try to find the main image
   const mainImage = product.product_images?.find(img => img.is_main);
-  // If no main image is found, fall back to the first image
   const imageToUse = mainImage || product.product_images?.[0];
-  // Get the image URL using the selected image or fall back to the product's storage path
   const imageUrl = imageToUse 
     ? getProductImageUrl({ ...product, product_images: [imageToUse] }) 
     : getProductImageUrl(product);
@@ -69,7 +65,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           </span>
         </div>
         <div className="px-4 pt-2">
-          <CardTitle className="text-sm font-medium truncate text-gray-800">
+          <CardTitle className={`text-sm font-medium truncate ${PRODUCT_COLORS.title}`}>
             {product.title}
           </CardTitle>
         </div>
@@ -77,18 +73,20 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </p>
         <div className="h-[42px] overflow-hidden">
-          <p className="text-xs text-gray-600 line-clamp-2 px-4">{product.description}</p>
+          <p className={`text-xs line-clamp-2 px-4 ${PRODUCT_COLORS.description}`}>
+            {product.description}
+          </p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-0 -mt-4">
         <span 
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
             ${product.in_stock 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
+              ? `${PRODUCT_COLORS.inStock.bg} ${PRODUCT_COLORS.inStock.text}` 
+              : `${PRODUCT_COLORS.outOfStock.bg} ${PRODUCT_COLORS.outOfStock.text}`
             } transition-colors`}
         >
-          {product.in_stock ? 'In Stock' : 'Out of Stock'}
+          {product.in_stock ? PRODUCT_CONSTANTS.STOCK_STATUS.IN_STOCK : PRODUCT_CONSTANTS.STOCK_STATUS.OUT_OF_STOCK}
         </span>
       </CardFooter>
     </Card>
