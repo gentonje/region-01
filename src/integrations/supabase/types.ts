@@ -41,6 +41,24 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: Database["public"]["Enums"]["product_category"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: Database["public"]["Enums"]["product_category"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: Database["public"]["Enums"]["product_category"]
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           buyer_id: string

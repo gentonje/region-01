@@ -54,7 +54,7 @@ export const ProductFormField = ({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            {type === "textarea" ? (
+            {name === "description" ? (
               <Textarea
                 {...field}
                 placeholder={placeholder}
@@ -64,7 +64,7 @@ export const ProductFormField = ({
                   setFormData({ ...formData, [name]: e.target.value });
                 }}
               />
-            ) : type === "select" ? (
+            ) : name === "category" ? (
               isCategoriesLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
