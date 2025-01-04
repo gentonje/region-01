@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Settings, Users, LogOut } from "lucide-react";
+import { Settings, Users, LogOut, UserCog } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,6 +19,7 @@ interface UserMenuProps {
 
 export const UserMenu = ({ userName, onLogout }: UserMenuProps) => {
   const menuItems = [
+    { icon: UserCog, label: "Edit Profile", path: "/edit-profile" },
     { icon: Settings, label: "Add Product", path: "/add-product" },
     { icon: Settings, label: "Modify Products", path: "/modify-products" },
     { icon: Users, label: "Manage Users", path: "/admin/users" },

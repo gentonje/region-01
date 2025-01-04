@@ -13,6 +13,7 @@ import EditProduct from "./pages/EditProduct";
 import ModifyProducts from "./pages/ModifyProducts";
 import AdminUsers from "./pages/AdminUsers";
 import Cart from "./pages/Cart";
+import EditProfile from "./pages/EditProfile";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -79,6 +80,14 @@ function App() {
                   element={
                     <PrivateRoute>
                       <Cart />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/edit-profile"
+                  element={
+                    <PrivateRoute>
+                      <EditProfile />
                     </PrivateRoute>
                   }
                 />
