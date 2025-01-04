@@ -148,27 +148,13 @@ const EditProduct = () => {
     );
   }
 
-  if (isLoadingProduct) {
+  if (isLoadingProduct || !product) {
     return (
       <div className={styles.container}>
         <Navigation />
         <div className={styles.mainContent}>
           <div className={styles.formContainer}>
             <p>Loading...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className={styles.container}>
-        <Navigation />
-        <div className={styles.mainContent}>
-          <div className={styles.formContainer}>
-            <p>Product not found</p>
-            <Button onClick={() => navigate("/modify-products")}>Go Back</Button>
           </div>
         </div>
       </div>
@@ -197,7 +183,7 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={product.mainImageUrl}
+            mainImageUrl={product?.mainImageUrl}
             additionalImageUrls={product.product_images?.map((img) => ({
               url: img.publicUrl || '',
               id: img.id
