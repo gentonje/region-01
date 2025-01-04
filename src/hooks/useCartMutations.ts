@@ -19,21 +19,7 @@ export function useCartMutations() {
     },
   });
 
-  const clearCartMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("cart_items")
-        .delete(); // Delete all items without any condition
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast.success("Cart cleared successfully");
-    },
-  });
-
   return {
     deleteItemMutation,
-    clearCartMutation,
   };
 }

@@ -28,7 +28,7 @@ export default function Cart() {
   const navigate = useNavigate();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("stripe");
   const [shippingAddress, setShippingAddress] = useState<string>("");
-  const { deleteItemMutation, clearCartMutation } = useCartMutations();
+  const { deleteItemMutation } = useCartMutations();
 
   // Get current user's ID
   const { data: session } = useQuery({
@@ -181,28 +181,13 @@ export default function Cart() {
       <div className="container mx-auto px-4 py-8 mt-16">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Shopping Cart</h1>
-          <div className="flex gap-4">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/")}
-            >
-              <ShoppingBag className="mr-2 h-4 w-4" />
-              Continue Shopping
-            </Button>
-            {cartItems?.length > 0 && (
-              <Button
-                variant="destructive"
-                onClick={() => clearCartMutation.mutate()}
-                disabled={clearCartMutation.isPending}
-              >
-                {clearCartMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Clear Cart"
-                )}
-              </Button>
-            )}
-          </div>
+          <Button
+            variant="outline"
+            onClick={() => navigate("/")}
+          >
+            <ShoppingBag className="mr-2 h-4 w-4" />
+            Continue Shopping
+          </Button>
         </div>
         
         {!cartItems?.length ? (
