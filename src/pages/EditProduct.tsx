@@ -4,12 +4,12 @@ import { Navigation } from "@/components/Navigation";
 import { ProductForm } from "@/components/ProductForm";
 import { toast } from "sonner";
 import { useProductImages } from "@/hooks/useProductImages";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { ProductCategory } from "@/types/product";
+import { useProductData } from "@/hooks/useProductData";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -17,66 +17,7 @@ const EditProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
-  const [mainImageUrl, setMainImageUrl] = useState<string>();
-  const [additionalImageUrls, setAdditionalImageUrls] = useState<{ url: string; id: string; }[]>([]);
-  
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    price: "",
-    category: "Other" as ProductCategory,
-    available_quantity: "0",
-  });
-
-  const fetchProduct = useCallback(async () => {
-    if (!id) return;
-    
-    try {
-      const { data: product, error: productError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (productError) throw productError;
-
-      const { data: images, error: imagesError } = await supabase
-        .from("product_images")
-        .select("*")
-        .eq("product_id", id)
-        .order("display_order");
-
-      if (imagesError) throw imagesError;
-
-      if (product) {
-        setFormData({
-          title: product.title || "",
-          description: product.description || "",
-          price: product.price?.toString() || "",
-          category: product.category || "Other",
-          available_quantity: product.available_quantity?.toString() || "0",
-        });
-
-        // Process images
-        const mainImg = images.find(img => img.is_main);
-        if (mainImg) {
-          const mainImgUrl = `${supabase.storageUrl}/object/public/images/${mainImg.storage_path}`;
-          setMainImageUrl(mainImgUrl);
-        }
-
-        const additionalImgs = images
-          .filter(img => !img.is_main)
-          .map(img => ({
-            url: `${supabase.storageUrl}/object/public/images/${img.storage_path}`,
-            id: img.id
-          }));
-        setAdditionalImageUrls(additionalImgs);
-      }
-    } catch (error: any) {
-      console.error("Error fetching product:", error);
-      toast.error(error.message || "Failed to fetch product");
-    }
-  }, [id]);
+  const { formData, setFormData, mainImageUrl, additionalImageUrls, fetchProduct } = useProductData(id);
 
   useEffect(() => {
     fetchProduct();
@@ -91,7 +32,6 @@ const EditProduct = () => {
 
       if (error) throw error;
       
-      // Refresh product data
       await fetchProduct();
       toast.success("Image deleted successfully");
     } catch (error: any) {
@@ -117,7 +57,6 @@ const EditProduct = () => {
         additionalImagePaths = uploadResult.additionalImagePaths;
       }
 
-      // Update product
       const updateData: any = {
         title: data.title,
         description: data.description,
@@ -137,7 +76,6 @@ const EditProduct = () => {
 
       if (productError) throw productError;
 
-      // Handle new images if any were uploaded
       if (mainImagePath) {
         const { error: mainImageError } = await supabase
           .from("product_images")
