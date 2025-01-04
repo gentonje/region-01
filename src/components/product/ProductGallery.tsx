@@ -55,7 +55,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100">
         {isLoading && <Skeleton className="absolute inset-0" />}
         {mainImageError ? (
@@ -94,7 +94,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
                 <img
                   src={thumbnailUrls[image.storage_path]}
                   alt={`${title} ${index + 1}`}
-                  className="w-full h-full object-cover relative z-10 mt-2"
+                  className="w-full h-full object-cover relative z-10 mt-3"
                   loading="lazy"
                   onError={() => handleThumbnailError(image.storage_path)}
                 />
