@@ -39,9 +39,9 @@ export const ProductFilters = ({
   const [maxPrice, setMaxPrice] = useState<string>("1000");
   const [sort, setSort] = useState<string>("none");
 
-  const handlePriceRangeChange = () => {
-    const min = parseFloat(minPrice) || 0;
-    const max = parseFloat(maxPrice) || 1000;
+  const handlePriceRangeChange = (newMinPrice: string, newMaxPrice: string) => {
+    const min = parseFloat(newMinPrice) || 0;
+    const max = parseFloat(newMaxPrice) || 1000;
     onPriceRangeChange?.(min, max);
   };
 
@@ -98,7 +98,7 @@ export const ProductFilters = ({
                     value={minPrice}
                     onChange={(e) => {
                       setMinPrice(e.target.value);
-                      handlePriceRangeChange();
+                      handlePriceRangeChange(e.target.value, maxPrice);
                     }}
                     className="h-8 text-xs"
                   />
@@ -111,7 +111,7 @@ export const ProductFilters = ({
                     value={maxPrice}
                     onChange={(e) => {
                       setMaxPrice(e.target.value);
-                      handlePriceRangeChange();
+                      handlePriceRangeChange(minPrice, e.target.value);
                     }}
                     className="h-8 text-xs"
                   />
