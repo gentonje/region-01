@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu, Smartphone, Tablet, Monitor } from "lucide-react";
+import { Settings, DollarSign, Moon, Sun, Users, LogOut, Menu, Smartphone, Tablet, Monitor, ShoppingCart } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { CurrencySelector } from "./CurrencySelector";
@@ -14,6 +14,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "./ui/badge";
 
 interface NavigationProps {
   onCurrencyChange?: (currency: SupportedCurrency) => void;
@@ -24,6 +26,21 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [currency, setCurrency] = useState<SupportedCurrency>("USD");
+
+  const { data: cartItemsCount = 0 } = useQuery({
+    queryKey: ["cartItems", "count"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 0;
+
+      const { count } = await supabase
+        .from("cart_items")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
+
+      return count || 0;
+    },
+  });
 
   useEffect(() => {
     const getUser = async () => {
@@ -79,6 +96,20 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
               {onCurrencyChange && (
                 <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
               )}
+
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  {cartItemsCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    >
+                      {cartItemsCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
               
               <Button
                 variant="ghost"
