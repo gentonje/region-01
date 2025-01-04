@@ -17,7 +17,7 @@ const Confetti = ({ isActive = true }: ConfettiProps) => {
   return (
     <Particles
       id="tsparticles"
-      init={particlesInit}
+      particlesInit={particlesInit}
       options={{
         fullScreen: {
           enable: true,
