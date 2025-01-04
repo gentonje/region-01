@@ -6,8 +6,9 @@ import { ProductGallery } from "./product/ProductGallery";
 import { ProductReviews } from "./product/ProductReviews";
 import { Product } from "@/types/product";
 import { Skeleton } from "./ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ProductDetailProps {
   product: Product;
@@ -35,6 +36,42 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
     },
     enabled: !!product.category,
   });
+
+  const addToCartMutation = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('You must be logged in to add items to cart');
+
+      const { error } = await supabase
+        .from('cart_items')
+        .insert({
+          user_id: user.id,
+          product_id: product.id,
+          quantity: 1,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Added to cart successfully');
+    },
+    onError: (error) => {
+      console.error('Error adding to cart:', error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to add to cart');
+      }
+    },
+  });
+
+  const handleAddToCart = () => {
+    if (!product.in_stock) {
+      toast.error('This product is out of stock');
+      return;
+    }
+    addToCartMutation.mutate();
+  };
 
   return (
     <div className="space-y-6">
@@ -83,7 +120,12 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
           <p className="text-2xl font-bold text-gray-900">
             {product.currency} {product.price?.toFixed(2)}
           </p>
-          <Button>Add to Cart</Button>
+          <Button 
+            onClick={handleAddToCart}
+            disabled={!product.in_stock || addToCartMutation.isPending}
+          >
+            {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
+          </Button>
         </CardFooter>
       </Card>
 
@@ -96,11 +138,9 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
                 key={similarProduct.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => {
-                  // Update the current product
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                   onBack();
                   setTimeout(() => {
-                    // Small delay to ensure smooth transition
                     onBack();
                   }, 100);
                 }}
