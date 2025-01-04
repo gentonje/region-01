@@ -12,6 +12,7 @@ import AddProduct from "./pages/AddProduct";
 import EditProduct from "./pages/EditProduct";
 import ModifyProducts from "./pages/ModifyProducts";
 import AdminUsers from "./pages/AdminUsers";
+import Cart from "./pages/Cart";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -70,6 +71,14 @@ function App() {
                   element={
                     <PrivateRoute>
                       <AdminUsers />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/cart"
+                  element={
+                    <PrivateRoute>
+                      <Cart />
                     </PrivateRoute>
                   }
                 />

@@ -46,6 +46,8 @@ export type Database = {
           buyer_id: string
           created_at: string
           id: string
+          payment_method: string | null
+          payment_status: string | null
           product_id: string
           quantity: number
           seller_id: string
@@ -57,6 +59,8 @@ export type Database = {
           buyer_id: string
           created_at?: string
           id?: string
+          payment_method?: string | null
+          payment_status?: string | null
           product_id: string
           quantity: number
           seller_id: string
@@ -68,6 +72,8 @@ export type Database = {
           buyer_id?: string
           created_at?: string
           id?: string
+          payment_method?: string | null
+          payment_status?: string | null
           product_id?: string
           quantity?: number
           seller_id?: string

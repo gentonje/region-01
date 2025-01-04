@@ -1,40 +1,50 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-export const CartIndicator = () => {
-  const { data: cartItemsCount = 0 } = useQuery({
-    queryKey: ["cartItems", "count"],
+export function CartIndicator() {
+  const navigate = useNavigate();
+
+  const { data: cartCount } = useQuery({
+    queryKey: ["cartCount"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return 0;
-
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from("cart_items")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", user.id);
+        .select("*", { count: "exact", head: true });
 
+      if (error) throw error;
       return count || 0;
     },
     refetchInterval: 5000, // Refetch every 5 seconds
   });
 
   return (
-    <Link to="/cart" className="relative">
-      <Button variant="ghost" size="icon" className="relative">
-        <ShoppingCart className="h-5 w-5" />
-        {cartItemsCount > 0 && (
-          <Badge 
-            variant="destructive" 
-            className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-          >
-            {cartItemsCount}
-          </Badge>
-        )}
-      </Button>
-    </Link>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          onClick={() => navigate("/cart")}
+        >
+          <ShoppingCart className="h-5 w-5" />
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Cart ({cartCount} items)</p>
+      </TooltipContent>
+    </Tooltip>
   );
-};
+}
