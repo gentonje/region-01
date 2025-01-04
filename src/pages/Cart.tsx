@@ -122,7 +122,7 @@ export default function Cart() {
           <Card className="p-6">
             <p className="text-center text-muted-foreground">Your cart is empty</p>
             <Button
-              className="mt-4 mx-auto block w-full sm:w-auto px-4 py-2"
+              className="mt-4 mx-auto block w-full sm:w-auto px-4 py-2 flex items-center justify-center"
               onClick={() => navigate("/")}
             >
               <ShoppingBag className="mr-2 h-4 w-4" />
