@@ -33,9 +33,14 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
-  // Find the main image or default to the first image if no main image is set
-  const mainImage = product.product_images?.find(img => img.is_main) || product.product_images?.[0];
-  const imageUrl = mainImage ? getProductImageUrl({ ...product, product_images: [mainImage] }) : getProductImageUrl(product);
+  // First try to find the main image
+  const mainImage = product.product_images?.find(img => img.is_main);
+  // If no main image is found, fall back to the first image
+  const imageToUse = mainImage || product.product_images?.[0];
+  // Get the image URL using the selected image or fall back to the product's storage path
+  const imageUrl = imageToUse 
+    ? getProductImageUrl({ ...product, product_images: [imageToUse] }) 
+    : getProductImageUrl(product);
 
   return (
     <Card 
@@ -72,7 +77,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </p>
         <div className="h-[42px] overflow-hidden">
-          <p className="text-xs text-gray-600 line-clamp-2">{product.description}</p>
+          <p className="text-xs text-gray-600 line-clamp-2 px-4">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-0 -mt-4">
