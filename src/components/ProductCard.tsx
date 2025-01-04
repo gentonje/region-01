@@ -90,8 +90,8 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
             {product.category}
           </span>
         </div>
-        <div className="px-4 pt-2">
-          <CardTitle className="text-sm font-medium truncate text-gray-800">
+        <div className="px-4 pt-1">
+          <CardTitle className="text-sm font-medium truncate text-gray-800 min-w-[100px] text-center max-w-[90%] mx-auto">
             {product.title}
           </CardTitle>
         </div>
