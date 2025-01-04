@@ -174,7 +174,7 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
         </form>
       )}
 
-      <ScrollArea className="h-[300px] rounded-md border p-4">
+      <div className="space-y-4">
         {isLoadingReviews ? (
           <div>Loading reviews...</div>
         ) : (
@@ -230,7 +230,7 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
             ))}
           </div>
         )}
-      </ScrollArea>
+      </div>
     </div>
   );
 };

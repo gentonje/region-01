@@ -36,16 +36,37 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
           </span>
         </div>
 
-        <ProductGallery
-          images={product.product_images || []}
-          selectedImage={selectedImage}
-          onImageSelect={setSelectedImage}
-          title={product.title || ''}
-        />
+        <div className="space-y-4">
+          <div className="aspect-[16/9] relative rounded-lg overflow-hidden">
+            <img
+              src={supabase.storage.from('images').getPublicUrl(selectedImage).data.publicUrl}
+              alt={product.title || ''}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {(product.product_images || []).map((image, index) => (
+              <div
+                key={index}
+                className={`w-20 h-20 rounded-md overflow-hidden cursor-pointer ${
+                  selectedImage === image.storage_path ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setSelectedImage(image.storage_path)}
+              >
+                <img
+                  src={supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl}
+                  alt={`${product.title || ''} ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
         
-        <ScrollArea className="h-[200px] rounded-md border p-4">
+        <div className="rounded-md border p-4">
           <p className="text-sm text-muted-foreground">{product.description}</p>
-        </ScrollArea>
+        </div>
 
         <ProductReviews productId={product.id} sellerId={product.seller_id || ''} />
       </CardContent>
