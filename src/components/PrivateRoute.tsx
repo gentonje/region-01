@@ -51,6 +51,13 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/user-type" replace />;
   }
 
+  // If user is trying to access Add Product and they're not a seller,
+  // redirect them to onboarding
+  if (location.pathname === "/add-product" && 
+      profile?.user_type !== 'seller') {
+    return <Navigate to="/onboarding" replace />;
+  }
+
   // Only redirect to onboarding if user is a seller and hasn't completed it
   if (profile?.user_type === 'seller' && 
       !profile?.onboarding_completed && 
