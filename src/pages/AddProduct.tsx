@@ -9,11 +9,14 @@ import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -22,9 +25,14 @@ const AddProduct = () => {
     available_quantity: "0",
   });
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (data: any) => {
     if (!mainImage) {
       toast.error("Please upload a main product image");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("You must be logged in to add a product");
       return;
     }
 
@@ -38,13 +46,14 @@ const AddProduct = () => {
       const { data: productData, error: productError } = await supabase
         .from("products")
         .insert({
-          title: formData.title,
-          description: formData.description,
-          price: Number(formData.price),
-          category: formData.category,
-          available_quantity: Number(formData.available_quantity),
+          title: data.title,
+          description: data.description,
+          price: Number(data.price),
+          category: data.category,
+          available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
-          shipping_info: formData.shipping_info,
+          shipping_info: data.shipping_info,
+          user_id: user.id // Add the user_id here
         })
         .select()
         .single();
