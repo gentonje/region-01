@@ -59,8 +59,10 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
             {product.category}
           </span>
         </div>
-        <div className="h-[28px] overflow-hidden flex items-center px-0 mx-1">
-          <CardTitle className="text-sm font-medium truncate">{product.title}</CardTitle>
+        <div className="px-3">
+          <CardTitle className="text-sm font-medium truncate">
+            {product.title}
+          </CardTitle>
         </div>
         <p className="text-base font-semibold text-vivo-orange mx-1">
           {selectedCurrency} {convertedPrice.toFixed(2)}
