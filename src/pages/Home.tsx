@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -6,10 +6,16 @@ import { ProductList } from "@/components/ProductList";
 import { Navigation, BottomNavigation } from '@/components/Navigation';
 import { useInView } from "react-intersection-observer";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { ProductFilters } from "@/components/ProductFilters";
+import ProductDetail from "@/components/ProductDetail";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Home() {
   const { ref, inView } = useInView();
   const [selectedCurrency, setSelectedCurrency] = React.useState<SupportedCurrency>("SSP");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const {
     data,
@@ -18,17 +24,27 @@ export default function Home() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["home-products"],
+    queryKey: ["home-products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
 
-      const { data: products, error } = await supabase
+      let query = supabase
         .from("products")
-        .select("*, product_images(*)")
+        .select("*, product_images(*), profiles(*)")
         .eq('product_status', 'published')
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
+
+      if (searchQuery) {
+        query = query.ilike("title", `%${searchQuery}%`);
+      }
+
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
+      }
+
+      const { data: products, error } = await query;
 
       if (error) throw error;
       return products as Product[];
@@ -60,27 +76,67 @@ export default function Home() {
   };
 
   const handleProductClick = (product: Product) => {
-    // Product detail view will be handled by the ProductList component
+    setSelectedProduct(product);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     setSelectedCurrency(currency);
   };
 
+  const handleBack = () => {
+    setSelectedProduct(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation onCurrencyChange={handleCurrencyChange} />
+        <div className="container mx-auto px-4 mt-20">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation onCurrencyChange={handleCurrencyChange} />
       <div className="container mx-auto px-4">
         <div className="mt-20">
-          <ProductList
-            products={allProducts}
-            getProductImageUrl={getProductImageUrl}
-            onProductClick={handleProductClick}
-            isLoading={isLoading}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-          />
+          {selectedProduct ? (
+            <ProductDetail 
+              product={selectedProduct}
+              getProductImageUrl={getProductImageUrl}
+              onBack={handleBack}
+            />
+          ) : (
+            <>
+              <ProductFilters
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+              <ProductList
+                products={allProducts}
+                getProductImageUrl={getProductImageUrl}
+                onProductClick={handleProductClick}
+                isLoading={isLoading}
+                isFetchingNextPage={isFetchingNextPage}
+                observerRef={ref}
+                selectedCurrency={selectedCurrency}
+              />
+            </>
+          )}
         </div>
       </div>
       <BottomNavigation />
