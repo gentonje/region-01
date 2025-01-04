@@ -20,7 +20,6 @@ export default function Cart() {
   const [shippingAddress, setShippingAddress] = useState<string>("");
   const { deleteItemMutation } = useCartMutations();
 
-  // Get current user's session
   const { data: session } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -118,13 +117,6 @@ export default function Cart() {
       <div className="container mx-auto px-4 py-8 mt-16">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Shopping Cart</h1>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-          >
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            Continue Shopping
-          </Button>
         </div>
         
         {!cartItems?.length ? (
@@ -134,6 +126,7 @@ export default function Cart() {
               className="mt-4 mx-auto block"
               onClick={() => navigate("/")}
             >
+              <ShoppingBag className="mr-2 h-4 w-4" />
               Continue Shopping
             </Button>
           </Card>
