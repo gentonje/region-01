@@ -8,10 +8,11 @@ export const createProduct = async (
   const { error } = await supabase.from("products").insert({
     title: formData.title,
     description: formData.description,
-    price: formData.price,
+    price: Number(formData.price),
     category: formData.category,
-    available_quantity: formData.available_quantity,
+    available_quantity: Number(formData.available_quantity),
     storage_path: storagePath,
+    shipping_info: formData.shipping_info,
   });
 
   if (error) throw error;
@@ -22,12 +23,13 @@ export const updateProduct = async (
   formData: ProductFormData,
   storagePath?: string
 ) => {
-  const updateData: Partial<ProductFormData> & { storage_path?: string } = {
+  const updateData: any = {
     title: formData.title,
     description: formData.description,
-    price: formData.price,
+    price: Number(formData.price),
     category: formData.category,
-    available_quantity: formData.available_quantity,
+    available_quantity: Number(formData.available_quantity),
+    shipping_info: formData.shipping_info,
   };
 
   if (storagePath) {

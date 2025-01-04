@@ -5,24 +5,37 @@ export type ProductCategory = Database["public"]["Enums"]["product_category"];
 export interface ProductFormData {
   title: string;
   description: string;
-  price: string;
+  price: number;
   category: ProductCategory;
-  available_quantity: string;
+  available_quantity: number;
+  shipping_info?: string;
 }
 
-export interface Product extends Omit<ProductFormData, 'price' | 'available_quantity'> {
+export interface Product {
   id: string;
-  user_id?: string;
-  seller_id?: string;
-  shop_id?: string;
-  price: number;
-  available_quantity: number;
+  title: string | null;
+  description: string | null;
+  price: number | null;
+  category: ProductCategory | null;
+  user_id?: string | null;
+  seller_id?: string | null;
+  shop_id?: string | null;
+  available_quantity: number | null;
   storage_path: string;
   created_at: string;
-  in_stock?: boolean;
-  views?: number;
-  likes?: number;
-  average_rating?: number;
-  product_status?: string;
-  shipping_info?: string;
+  in_stock?: boolean | null;
+  views?: number | null;
+  likes?: number | null;
+  average_rating?: number | null;
+  product_status?: string | null;
+  shipping_info?: string | null;
+  currency: string | null;
+  product_images: {
+    id: string;
+    product_id: string;
+    storage_path: string;
+    is_main: boolean | null;
+    display_order: number;
+    created_at: string;
+  }[];
 }

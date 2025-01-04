@@ -1,19 +1,7 @@
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { Star } from "lucide-react";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  description: string;
-  storage_path: string;
-  currency: string;
-  average_rating: number;
-  category: string;
-  in_stock: boolean;
-  product_images: { storage_path: string; is_main: boolean }[];
-}
+import { Product } from "@/types/product";
 
 interface ProductCardProps {
   product: Product;
@@ -40,7 +28,7 @@ const StarRating = ({ rating }: { rating: number }) => {
 
 const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }: ProductCardProps) => {
   const convertedPrice = convertCurrency(
-    product.price,
+    product.price || 0,
     (product.currency || "SSP") as SupportedCurrency,
     selectedCurrency
   );
@@ -60,7 +48,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
         >
           <img
             src={getProductImageUrl(product)}
-            alt={product.title}
+            alt={product.title || ""}
             className="w-full h-full object-cover rounded-md mt-2"
             loading="lazy"
           />
