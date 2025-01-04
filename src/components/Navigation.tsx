@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Moon, Sun, DollarSign } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { BottomNav } from "./navigation/BottomNav";
-import { AppLogo } from "./navigation/AppLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,6 +62,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
           if (profileError) {
             console.error("Error fetching profile:", profileError);
+            // Don't throw here, just show a toast and continue with email
             toast.error("Could not fetch profile details. Using email instead.");
             setUserName(user.email || "");
             return;
@@ -71,6 +71,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           setUserName(profile?.full_name || user.email || "");
         } catch (error) {
           console.error("Error in profile fetch:", error);
+          // Use email as fallback if profile fetch fails
           toast.error("Network error while fetching profile. Using email instead.");
           setUserName(user.email || "");
         }
@@ -86,6 +87,17 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
     getUser();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast.success("Logged out successfully");
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast.error("Failed to log out. Please try again.");
+    }
+  };
+
   const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
     setCurrency(newCurrency);
     onCurrencyChange?.(newCurrency);
@@ -96,7 +108,10 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            <AppLogo />
+            <Link to="/" className="text-lg font-bold backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg transition-all hover:bg-white/20" style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}>
+              <span style={{ color: '#F97316' }}>السوق</span>
+              <span style={{ color: '#0EA5E9' }}> الحر</span>
+            </Link>
 
             <div className="flex items-center gap-2">
               {onCurrencyChange && (
@@ -175,16 +190,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
               <UserMenu 
                 userName={userName} 
-                onLogout={async () => {
-                  try {
-                    await supabase.auth.signOut();
-                    toast.success("Logged out successfully");
-                    navigate("/login");
-                  } catch (error) {
-                    console.error("Error logging out:", error);
-                    toast.error("Failed to log out. Please try again.");
-                  }
-                }}
+                onLogout={handleLogout}
                 isLoading={isLoading}
               />
             </div>
