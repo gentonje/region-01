@@ -32,7 +32,7 @@ export default function AllProducts() {
 
       let query = supabase
         .from("products")
-        .select("*, product_images(*)")
+        .select("*, product_images(*), profiles!products_user_id_fkey(username, full_name)")
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
@@ -46,7 +46,11 @@ export default function AllProducts() {
 
       const { data: products, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
+
       return products as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
