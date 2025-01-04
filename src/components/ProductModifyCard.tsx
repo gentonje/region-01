@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface ProductModifyCardProps {
   product: {
@@ -26,6 +27,7 @@ interface ProductModifyCardProps {
 export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
   const navigate = useNavigate();
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // Query to check if the current user is an admin
   const { data: isAdmin } = useQuery({
@@ -48,6 +50,7 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
   });
   
   const handlePublishChange = async (checked: boolean) => {
+    setIsPublishing(true);
     try {
       const { error } = await supabase
         .from('products')
@@ -60,6 +63,8 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
     } catch (error) {
       console.error('Error updating product status:', error);
       toast.error('Failed to update product status');
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -76,13 +81,19 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
         <div className="flex items-center space-x-4">
           <span className="text-lg font-bold">${product.price}</span>
           {isAdmin && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 relative">
               <Checkbox
                 id={`publish-${product.id}`}
                 checked={product.product_status === 'published'}
                 onCheckedChange={handlePublishChange}
                 className="cursor-pointer"
+                disabled={isPublishing}
               />
+              {isPublishing && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                </div>
+              )}
               <label
                 htmlFor={`publish-${product.id}`}
                 className="text-sm text-gray-600 cursor-pointer"
