@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes as RouterRoutes, Route } from 'react-router-dom';
+import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import Index from './pages/Index';
 import Login from './pages/Login';
@@ -9,6 +9,39 @@ import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { data: isAdmin, isLoading } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+      
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+      
+      return data;
+    }
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 export const Routes = () => {
   return (
@@ -50,7 +83,9 @@ export const Routes = () => {
         path="/admin/users"
         element={
           <PrivateRoute>
-            <AdminUsers />
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
           </PrivateRoute>
         }
       />

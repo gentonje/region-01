@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UserMenuProps {
   userName: string;
@@ -19,12 +21,35 @@ interface UserMenuProps {
 }
 
 export const UserMenu = ({ userName, onLogout, isLoading, error }: UserMenuProps) => {
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data, error } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+      
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+      
+      return data;
+    }
+  });
+
   const menuItems = [
     { icon: UserCog, label: "Edit Profile", path: "/edit-profile" },
     { icon: Settings, label: "Add Product", path: "/add-product" },
     { icon: Settings, label: "Modify Products", path: "/modify-products" },
-    { icon: Users, label: "Manage Users", path: "/admin/users" },
   ];
+
+  // Only add the Manage Users option if the user is an admin
+  if (isAdmin) {
+    menuItems.push({ icon: Users, label: "Manage Users", path: "/admin/users" });
+  }
 
   return (
     <Sheet>
