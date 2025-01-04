@@ -9,6 +9,7 @@ import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
+import Onboarding from './pages/Onboarding';
 
 export const Routes = () => {
   return (
@@ -19,6 +20,14 @@ export const Routes = () => {
         element={
           <PrivateRoute>
             <Index />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/onboarding"
+        element={
+          <PrivateRoute>
+            <Onboarding />
           </PrivateRoute>
         }
       />

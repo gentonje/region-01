@@ -59,6 +59,27 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          step: Database["public"]["Enums"]["onboarding_step"]
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          step: Database["public"]["Enums"]["onboarding_step"]
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          step?: Database["public"]["Enums"]["onboarding_step"]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           buyer_id: string
@@ -231,6 +252,7 @@ export type Database = {
           full_name: string | null
           id: string
           is_active: boolean | null
+          onboarding_completed: boolean | null
           phone_number: string | null
           shop_description: string | null
           shop_name: string | null
@@ -244,6 +266,7 @@ export type Database = {
           full_name?: string | null
           id: string
           is_active?: boolean | null
+          onboarding_completed?: boolean | null
           phone_number?: string | null
           shop_description?: string | null
           shop_name?: string | null
@@ -257,6 +280,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_active?: boolean | null
+          onboarding_completed?: boolean | null
           phone_number?: string | null
           shop_description?: string | null
           shop_name?: string | null
@@ -402,6 +426,7 @@ export type Database = {
       }
     }
     Enums: {
+      onboarding_step: "profile_complete" | "shop_created" | "first_product"
       product_category:
         | "Electronics"
         | "Clothing"
