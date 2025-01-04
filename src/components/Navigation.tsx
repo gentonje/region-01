@@ -4,7 +4,6 @@ import { Button } from "./ui/button";
 import { Moon, Sun, DollarSign } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
-import { CurrencySelector } from "./CurrencySelector";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
@@ -32,36 +31,50 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getUser = async () => {
       try {
+        setIsLoading(true);
         const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
         if (userError) {
           console.error("Error fetching user:", userError);
           return;
         }
 
-        if (user) {
-          try {
-            const { data: profile, error: profileError } = await supabase
-              .from("profiles")
-              .select("full_name")
-              .eq("id", user.id)
-              .single();
+        if (!user) {
+          setUserName("");
+          return;
+        }
 
-            if (profileError) {
-              console.error("Error fetching profile:", profileError);
-              return;
-            }
+        try {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("full_name")
+            .eq("id", user.id)
+            .maybeSingle();
 
-            setUserName(profile?.full_name || user.email || "");
-          } catch (error) {
-            console.error("Error in profile fetch:", error);
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+            // Don't throw here, just show a toast and continue with email
+            toast.error("Could not fetch profile details");
+            setUserName(user.email || "");
+            return;
           }
+
+          setUserName(profile?.full_name || user.email || "");
+        } catch (error) {
+          console.error("Error in profile fetch:", error);
+          // Use email as fallback if profile fetch fails
+          setUserName(user.email || "");
         }
       } catch (error) {
         console.error("Error in user fetch:", error);
+        toast.error("Could not fetch user details");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -145,7 +158,11 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 <span className="sr-only">Toggle theme</span>
               </Button>
 
-              <UserMenu userName={userName} onLogout={handleLogout} />
+              <UserMenu 
+                userName={userName} 
+                onLogout={handleLogout}
+                isLoading={isLoading}
+              />
             </div>
           </div>
         </div>

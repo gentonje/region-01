@@ -9,15 +9,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface UserMenuProps {
   userName: string;
   onLogout: () => Promise<void>;
+  isLoading?: boolean;
 }
 
-export const UserMenu = ({ userName, onLogout }: UserMenuProps) => {
+export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
   const menuItems = [
     { icon: UserCog, label: "Edit Profile", path: "/edit-profile" },
     { icon: Settings, label: "Add Product", path: "/add-product" },
@@ -35,11 +35,13 @@ export const UserMenu = ({ userName, onLogout }: UserMenuProps) => {
       <SheetContent>
         <SheetHeader>
           <SheetTitle className="text-left">Menu</SheetTitle>
-          {userName && (
+          {isLoading ? (
+            <Skeleton className="h-4 w-[200px]" />
+          ) : userName ? (
             <p className="text-sm text-muted-foreground text-left">
               Logged in as {userName}
             </p>
-          )}
+          ) : null}
         </SheetHeader>
         <div className="mt-6 flex flex-col gap-4">
           {menuItems.map((item) => (
