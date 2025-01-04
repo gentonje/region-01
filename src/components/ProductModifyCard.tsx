@@ -81,10 +81,11 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
                 id={`publish-${product.id}`}
                 checked={product.product_status === 'published'}
                 onCheckedChange={handlePublishChange}
+                className="cursor-pointer"
               />
               <label
                 htmlFor={`publish-${product.id}`}
-                className="text-sm text-gray-600"
+                className="text-sm text-gray-600 cursor-pointer"
               >
                 Published
               </label>
