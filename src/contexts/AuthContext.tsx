@@ -7,21 +7,37 @@ interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  isAdmin: boolean;  // Added this property
 }
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
+  isAdmin: false,  // Added default value
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);  // Added state
 
   useEffect(() => {
     let mounted = true;
+
+    const checkAdminStatus = async (userId: string) => {
+      try {
+        const { data, error } = await supabase.rpc('is_admin', {
+          user_id: userId
+        });
+        if (!error && mounted) {
+          setIsAdmin(data);
+        }
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+      }
+    };
 
     const initSession = async () => {
       try {
@@ -34,6 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (mounted) {
             setSession(null);
             setUser(null);
+            setIsAdmin(false);
           }
           return;
         }
@@ -43,10 +60,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log('Found valid session');
             setSession(currentSession);
             setUser(currentSession.user);
+            await checkAdminStatus(currentSession.user.id);
           } else {
             console.log('No valid session found');
             setSession(null);
             setUser(null);
+            setIsAdmin(false);
           }
         }
       } catch (error) {
@@ -70,11 +89,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.log('User signed out');
           setSession(null);
           setUser(null);
+          setIsAdmin(false);
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           console.log('Session updated');
           if (currentSession) {
             setSession(currentSession);
             setUser(currentSession.user);
+            await checkAdminStatus(currentSession.user.id);
           }
         }
         setLoading(false);
@@ -89,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, user, loading }}>
+    <AuthContext.Provider value={{ session, user, loading, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
