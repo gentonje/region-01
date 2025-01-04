@@ -61,6 +61,9 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
 
       if (error) throw error;
 
+      // Update the product status in the UI through a page refresh
+      window.location.reload();
+      
       toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
     } catch (error) {
       console.error('Error updating product status:', error);
