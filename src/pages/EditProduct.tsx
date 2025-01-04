@@ -10,7 +10,7 @@ import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { updateProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory, Product } from "@/types/product";
+import { ProductCategory, Product, ProductImage } from "@/types/product";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -33,7 +33,9 @@ const EditProduct = () => {
               id,
               storage_path,
               is_main,
-              display_order
+              display_order,
+              created_at,
+              product_id
             )
           `)
           .eq("id", id)
@@ -49,7 +51,7 @@ const EditProduct = () => {
         // Get public URLs for all images
         if (productData.product_images) {
           const imagesWithUrls = await Promise.all(
-            productData.product_images.map(async (image: any) => {
+            productData.product_images.map(async (image: ProductImage) => {
               const { data } = supabase.storage
                 .from('images')
                 .getPublicUrl(image.storage_path);
@@ -195,9 +197,9 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={product?.mainImageUrl}
-            additionalImageUrls={product?.product_images?.map((img: any) => ({
-              url: img.publicUrl,
+            mainImageUrl={product.mainImageUrl}
+            additionalImageUrls={product.product_images?.map((img) => ({
+              url: img.publicUrl || '',
               id: img.id
             })) || []}
             onDeleteExisting={handleDeleteImage}

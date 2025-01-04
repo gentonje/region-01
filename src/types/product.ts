@@ -11,6 +11,16 @@ export interface ProductFormData {
   shipping_info?: string;
 }
 
+export interface ProductImage {
+  id: string;
+  product_id: string;
+  storage_path: string;
+  is_main: boolean | null;
+  display_order: number;
+  created_at: string;
+  publicUrl?: string;
+}
+
 export interface Product {
   id: string;
   title: string | null;
@@ -30,13 +40,6 @@ export interface Product {
   product_status?: string | null;
   shipping_info?: string | null;
   currency: string | null;
-  mainImageUrl?: string; // Added this property
-  product_images: {
-    id: string;
-    product_id: string;
-    storage_path: string;
-    is_main: boolean | null;
-    display_order: number;
-    created_at: string;
-  }[];
+  mainImageUrl?: string;
+  product_images: ProductImage[];
 }
