@@ -17,7 +17,7 @@ export interface ProductImage {
   storage_path: string;
   is_main: boolean | null;
   display_order: number;
-  created_at: string;
+  created_at?: string;
   publicUrl?: string;
 }
 

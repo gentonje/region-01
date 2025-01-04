@@ -51,7 +51,9 @@ const ModifyProducts = () => {
             id,
             storage_path,
             is_main,
-            display_order
+            display_order,
+            product_id,
+            created_at
           )
         `)
         .eq("user_id", user.id)
@@ -65,8 +67,13 @@ const ModifyProducts = () => {
         query = query.eq('category', selectedCategory);
       }
 
-      const { count } = await query.count();
-      const total = count || 0;
+      // First get the count
+      const { count: totalCount } = await supabase
+        .from("products")
+        .select('*', { count: 'exact', head: true })
+        .eq("user_id", user.id);
+
+      const total = totalCount || 0;
       console.log("Total products found:", total);
 
       const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE);
@@ -91,11 +98,11 @@ const ModifyProducts = () => {
 
         console.log("Fetched products:", data);
 
-        if (append) {
-          setProducts(prev => [...prev, ...(data || [])]);
+        if (append && data) {
+          setProducts(prev => [...prev, ...data as Product[]]);
           setHasMore((currentPage * ITEMS_PER_PAGE) < total);
-        } else {
-          setProducts(data || []);
+        } else if (data) {
+          setProducts(data as Product[]);
         }
       } else {
         setProducts([]);
