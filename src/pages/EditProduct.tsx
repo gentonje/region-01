@@ -1,156 +1,145 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
-import { ProductForm } from "@/components/ProductForm";
-import { toast } from "sonner";
-import { useProductImages } from "@/hooks/useProductImages";
-import { useState, useEffect } from "react";
-import { ProductImageSection } from "@/components/ProductImageSection";
+import { EditProductForm } from "@/components/product/edit/EditProductForm";
+import { EditProductHeader } from "@/components/product/edit/EditProductHeader";
 import { productPageStyles as styles } from "@/styles/productStyles";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { useProductData } from "@/hooks/useProductData";
+import { Product } from "@/types/product";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
-  const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
-  const { user } = useAuth();
-  const { formData, setFormData, mainImageUrl, additionalImageUrls, fetchProduct } = useProductData(id);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [fetchProduct]);
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      if (!id) throw new Error("Product ID is required");
 
-  const handleDeleteImage = async (imageId: string) => {
-    try {
-      const { error } = await supabase
-        .from("product_images")
-        .delete()
-        .eq("id", imageId);
+      const { data: product, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_images (
+            id,
+            storage_path,
+            is_main,
+            display_order,
+            created_at
+          )
+        `)
+        .eq("id", id)
+        .single();
 
-      if (error) throw error;
-      
-      await fetchProduct();
-      toast.success("Image deleted successfully");
-    } catch (error: any) {
-      console.error("Error deleting image:", error);
-      toast.error(error.message || "Failed to delete image");
-    }
-  };
-
-  const handleSubmit = async (data: any) => {
-    if (!user?.id) {
-      toast.error("You must be logged in to edit a product");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      let mainImagePath = null;
-      let additionalImagePaths: string[] = [];
-
-      if (mainImage || additionalImages.some(img => img !== null)) {
-        const uploadResult = await uploadImages(mainImage, additionalImages);
-        mainImagePath = uploadResult.mainImagePath;
-        additionalImagePaths = uploadResult.additionalImagePaths;
+      if (error) {
+        console.error("Error fetching product:", error);
+        throw error;
       }
 
-      const updateData: any = {
-        title: data.title,
-        description: data.description,
-        price: Number(data.price),
-        category: data.category,
-        available_quantity: Number(data.available_quantity),
+      if (!product) {
+        throw new Error("Product not found");
+      }
+
+      // Add publicUrl to each image
+      const productWithUrls = {
+        ...product,
+        product_images: product.product_images.map((image) => ({
+          ...image,
+          publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
+        }))
       };
 
-      if (mainImagePath) {
-        updateData.storage_path = mainImagePath;
-      }
+      return productWithUrls as Product;
+    },
+    retry: 1
+  });
 
-      const { error: productError } = await supabase
+  const handleSubmit = async (formData: any) => {
+    try {
+      if (!id) throw new Error("Product ID is required");
+
+      const { error: updateError } = await supabase
         .from("products")
-        .update(updateData)
+        .update({
+          title: formData.title,
+          description: formData.description,
+          price: Number(formData.price),
+          category: formData.category,
+          available_quantity: Number(formData.available_quantity),
+          storage_path: formData.mainImagePath || product?.storage_path,
+        })
         .eq("id", id);
 
-      if (productError) throw productError;
+      if (updateError) throw updateError;
 
-      if (mainImagePath) {
-        const { error: mainImageError } = await supabase
-          .from("product_images")
-          .insert({
-            product_id: id,
-            storage_path: mainImagePath,
-            is_main: true,
-            display_order: 0
-          });
-
-        if (mainImageError) throw mainImageError;
-      }
-
-      if (additionalImagePaths.length > 0) {
-        const additionalImagesData = additionalImagePaths.map((path, index) => ({
+      // If new additional images were uploaded, insert them
+      if (formData.additionalImagePaths?.length > 0) {
+        const imageInserts = formData.additionalImagePaths.map((path: string, index: number) => ({
           product_id: id,
           storage_path: path,
           is_main: false,
-          display_order: index + 1
+          display_order: index + 1,
         }));
 
-        const { error: additionalImagesError } = await supabase
+        const { error: imagesError } = await supabase
           .from("product_images")
-          .insert(additionalImagesData);
+          .insert(imageInserts);
 
-        if (additionalImagesError) throw additionalImagesError;
+        if (imagesError) throw imagesError;
       }
 
       toast.success("Product updated successfully!");
-      navigate("/");
+      navigate("/modify-products");
     } catch (error: any) {
       console.error("Error updating product:", error);
       toast.error(error.message || "Failed to update product");
-    } finally {
-      setIsLoading(false);
+      throw error;
     }
   };
+
+  if (error) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <div className={styles.mainContent}>
+          <div className="text-center text-red-500">
+            {error instanceof Error ? error.message : "An error occurred"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || !product) {
+    return (
+      <div className={styles.container}>
+        <Navigation />
+        <div className={styles.mainContent}>
+          <div className={styles.formContainer}>
+            <Skeleton className="h-8 w-48 mb-6" />
+            <div className="space-y-6">
+              <Skeleton className="h-[400px]" />
+              <Skeleton className="h-[200px]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
       <Navigation />
-      
       <div className={styles.mainContent}>
         <div className={styles.formContainer}>
-          <div className={styles.headerContainer}>
-            <h1 className={styles.title}>Edit Product</h1>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/")}
-              className={styles.cancelButton}
-            >
-              Cancel
-            </Button>
-          </div>
-
-          <div className="space-y-6">
-            <ProductImageSection
-              mainImage={mainImage}
-              setMainImage={setMainImage}
-              additionalImages={additionalImages}
-              setAdditionalImages={setAdditionalImages}
-              mainImageUrl={mainImageUrl}
-              additionalImageUrls={additionalImageUrls}
-              onDeleteExisting={handleDeleteImage}
-              isLoading={isLoading}
-            />
-
-            <ProductForm
-              formData={formData}
-              setFormData={setFormData}
-              isLoading={isLoading}
-              submitButtonText="Update Product"
-              onSubmit={handleSubmit}
-            />
-          </div>
+          <EditProductHeader title="Edit Product" />
+          <EditProductForm
+            product={product}
+            onSubmit={handleSubmit}
+            isLoading={isLoading}
+          />
         </div>
       </div>
     </div>
