@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { useState } from "react";
 
 interface ProductFiltersProps {
@@ -36,12 +35,14 @@ export const ProductFilters = ({
   onSortChange,
 }: ProductFiltersProps) => {
   const isMobile = useIsMobile();
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [minPrice, setMinPrice] = useState<string>("0");
+  const [maxPrice, setMaxPrice] = useState<string>("1000");
   const [sort, setSort] = useState<string>("none");
 
-  const handlePriceRangeChange = (value: number[]) => {
-    setPriceRange([value[0], value[1]]);
-    onPriceRangeChange?.(value[0], value[1]);
+  const handlePriceRangeChange = () => {
+    const min = parseFloat(minPrice) || 0;
+    const max = parseFloat(maxPrice) || 1000;
+    onPriceRangeChange?.(min, max);
   };
 
   const handleSortChange = (value: string) => {
@@ -85,25 +86,42 @@ export const ProductFilters = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80" align="start">
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <h4 className="font-medium leading-none">Price Range</h4>
-              <p className="text-sm text-muted-foreground">
-                Between ${priceRange[0]} and ${priceRange[1]}
-              </p>
+          <div className="grid gap-3 text-sm">
+            <div className="space-y-1.5">
+              <h4 className="font-medium leading-none text-sm">Price Range</h4>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <Label className="text-xs">Min Price ($)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={minPrice}
+                    onChange={(e) => {
+                      setMinPrice(e.target.value);
+                      handlePriceRangeChange();
+                    }}
+                    className="h-8 text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Max Price ($)</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={maxPrice}
+                    onChange={(e) => {
+                      setMaxPrice(e.target.value);
+                      handlePriceRangeChange();
+                    }}
+                    className="h-8 text-xs"
+                  />
+                </div>
+              </div>
             </div>
-            <Slider
-              min={0}
-              max={1000}
-              step={10}
-              value={[priceRange[0], priceRange[1]]}
-              onValueChange={handlePriceRangeChange}
-              className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
-            />
-            <div className="space-y-2">
-              <Label>Sort by price</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Sort by price</Label>
               <Select value={sort} onValueChange={handleSortChange}>
-                <SelectTrigger>
+                <SelectTrigger className="h-8 text-xs">
                   <SelectValue placeholder="Sort order" />
                 </SelectTrigger>
                 <SelectContent>
