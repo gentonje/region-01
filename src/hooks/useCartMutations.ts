@@ -15,10 +15,7 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast({
-        title: "Success",
-        description: "Item removed from cart",
-      });
+      toast.success("Item removed from cart");
     },
   });
 
@@ -27,15 +24,12 @@ export function useCartMutations() {
       const { error } = await supabase
         .from("cart_items")
         .delete()
-        .is("id", "is not", null); // Delete all items where id is not null (i.e., all items)
+        .neq("id", null); // Delete all items
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast({
-        title: "Success",
-        description: "Cart cleared successfully",
-      });
+      toast.success("Cart cleared successfully");
     },
   });
 
