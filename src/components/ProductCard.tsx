@@ -86,7 +86,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           <span className="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
             {product.category}
           </span>
-          <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap">
+          <span className="absolute top-3 right-3 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap">
             {selectedCurrency} {convertedPrice.toFixed(2)}
           </span>
         </div>
