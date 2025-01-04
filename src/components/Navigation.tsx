@@ -31,7 +31,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
-  const [currency, setCurrency] = useState<SupportedCurrency>("USD");
+  const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
 
   useEffect(() => {
     const getUser = async () => {
@@ -92,11 +92,11 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleCurrencyChange("USD")}>
-                            USD
-                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleCurrencyChange("SSP")}>
                             SSP
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("USD")}>
+                            USD
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleCurrencyChange("KES")}>
                             KES
