@@ -117,6 +117,7 @@ export default function Home() {
               product={selectedProduct}
               getProductImageUrl={getProductImageUrl}
               onBack={handleBack}
+              selectedCurrency={selectedCurrency}
             />
           ) : (
             <>

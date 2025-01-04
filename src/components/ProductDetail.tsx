@@ -9,14 +9,21 @@ import { Skeleton } from "./ui/skeleton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
 
 interface ProductDetailProps {
   product: Product;
   getProductImageUrl: (product: Product) => string;
   onBack: () => void;
+  selectedCurrency?: SupportedCurrency;
 }
 
-const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailProps) => {
+const ProductDetail = ({ 
+  product, 
+  onBack, 
+  getProductImageUrl,
+  selectedCurrency = "SSP" 
+}: ProductDetailProps) => {
   const [selectedImage, setSelectedImage] = useState<string>(
     product.product_images?.find(img => !img.is_main)?.storage_path || product.product_images?.[0]?.storage_path || ''
   );
@@ -76,6 +83,13 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
     addToCartMutation.mutate();
   };
 
+  // Convert product price to selected currency
+  const convertedPrice = convertCurrency(
+    product.price || 0,
+    (product.currency || "SSP") as SupportedCurrency,
+    selectedCurrency
+  );
+
   return (
     <div className="space-y-6 pb-20">
       <Card className="w-full max-w-2xl mx-auto">
@@ -121,7 +135,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
 
         <CardFooter className="flex justify-between items-center">
           <p className="text-2xl font-bold text-gray-900">
-            {product.currency} {product.price?.toFixed(2)}
+            {selectedCurrency} {convertedPrice.toFixed(2)}
           </p>
           <Button 
             onClick={handleAddToCart}
@@ -136,35 +150,43 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
         <div className="w-full max-w-2xl mx-auto">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Products</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {similarProducts.map((similarProduct) => (
-              <Card 
-                key={similarProduct.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  onBack();
-                  setTimeout(() => {
+            {similarProducts.map((similarProduct) => {
+              const convertedSimilarPrice = convertCurrency(
+                similarProduct.price || 0,
+                (similarProduct.currency || "SSP") as SupportedCurrency,
+                selectedCurrency
+              );
+              
+              return (
+                <Card 
+                  key={similarProduct.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                     onBack();
-                  }, 100);
-                }}
-              >
-                <CardContent className="p-2">
-                  <div className="aspect-square w-full relative mb-2">
-                    <img
-                      src={getProductImageUrl(similarProduct)}
-                      alt={similarProduct.title || ""}
-                      className="w-full h-full object-cover rounded-md"
-                    />
-                  </div>
-                  <h3 className="text-sm font-medium text-gray-900 truncate">
-                    {similarProduct.title}
-                  </h3>
-                  <p className="text-sm font-medium text-gray-900">
-                    {similarProduct.currency} {similarProduct.price?.toFixed(2)}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+                    setTimeout(() => {
+                      onBack();
+                    }, 100);
+                  }}
+                >
+                  <CardContent className="p-2">
+                    <div className="aspect-square w-full relative mb-2">
+                      <img
+                        src={getProductImageUrl(similarProduct)}
+                        alt={similarProduct.title || ""}
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    </div>
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                      {similarProduct.title}
+                    </h3>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedCurrency} {convertedSimilarPrice.toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
