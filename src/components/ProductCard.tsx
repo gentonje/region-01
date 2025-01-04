@@ -91,15 +91,15 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           <span className="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
             {product.category}
           </span>
+          <span className="absolute bottom-2 left-2 text-sm px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium">
+            {selectedCurrency} {convertedPrice.toFixed(2)}
+          </span>
         </div>
         <div className="px-4 pt-2">
           <CardTitle className="text-sm font-medium truncate text-gray-800">
             {product.title}
           </CardTitle>
         </div>
-        <p className="text-base font-semibold text-orange-500 pl-4 pr-4">
-          {selectedCurrency} {convertedPrice.toFixed(2)}
-        </p>
         <div className="h-[42px] overflow-hidden">
           <p className="text-xs text-gray-600 line-clamp-2 px-4">{product.description}</p>
         </div>
