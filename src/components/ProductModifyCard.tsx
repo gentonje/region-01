@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 interface ProductModifyCardProps {
@@ -27,6 +27,7 @@ interface ProductModifyCardProps {
 
 export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
   const [isPublishing, setIsPublishing] = useState(false);
 
@@ -49,29 +50,53 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       return data;
     }
   });
-  
-  const handlePublishChange = async () => {
-    setIsPublishing(true);
-    const newStatus = product.product_status === 'published' ? 'draft' : 'published';
-    
-    try {
+
+  // Mutation for updating product status
+  const updateStatusMutation = useMutation({
+    mutationFn: async (newStatus: string) => {
       const { error } = await supabase
         .from('products')
         .update({ product_status: newStatus })
         .eq('id', product.id);
 
       if (error) throw error;
+      return newStatus;
+    },
+    onMutate: async (newStatus) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['products'] });
 
-      // Update the product status in the UI through a page refresh
-      window.location.reload();
-      
-      toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
-    } catch (error) {
-      console.error('Error updating product status:', error);
+      // Snapshot the previous value
+      const previousProducts = queryClient.getQueryData(['products']);
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(['products'], (old: any) => {
+        return old?.map((p: any) =>
+          p.id === product.id ? { ...p, product_status: newStatus } : p
+        );
+      });
+
+      return { previousProducts };
+    },
+    onError: (err, newStatus, context) => {
+      // If the mutation fails, use the context returned from onMutate to roll back
+      queryClient.setQueryData(['products'], context?.previousProducts);
       toast.error('Failed to update product status');
-    } finally {
+    },
+    onSuccess: (newStatus) => {
+      toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure we have the correct data
+      queryClient.invalidateQueries({ queryKey: ['products'] });
       setIsPublishing(false);
-    }
+    },
+  });
+  
+  const handlePublishChange = async () => {
+    setIsPublishing(true);
+    const newStatus = product.product_status === 'published' ? 'draft' : 'published';
+    updateStatusMutation.mutate(newStatus);
   };
 
   return (
