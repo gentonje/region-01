@@ -49,17 +49,19 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
     }
   });
   
-  const handlePublishChange = async (checked: boolean) => {
+  const handlePublishChange = async () => {
     setIsPublishing(true);
+    const newStatus = product.product_status === 'published' ? 'draft' : 'published';
+    
     try {
       const { error } = await supabase
         .from('products')
-        .update({ product_status: checked ? 'published' : 'draft' })
+        .update({ product_status: newStatus })
         .eq('id', product.id);
 
       if (error) throw error;
 
-      toast.success(`Product ${checked ? 'published' : 'unpublished'} successfully`);
+      toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
     } catch (error) {
       console.error('Error updating product status:', error);
       toast.error('Failed to update product status');
