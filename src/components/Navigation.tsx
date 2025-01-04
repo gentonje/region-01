@@ -72,7 +72,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="text-2xl font-calligraphy font-bold">
               <span className="text-vivo-orange">Vivo</span>
-              <span className="text-navy-blue dark:text-white">Shop</span>
+              <span className="text-navy-blue">Shop</span>
             </Link>
 
             <div className="flex items-center gap-4">
@@ -99,6 +99,11 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 <SheetContent>
                   <SheetHeader>
                     <SheetTitle className="text-left">Menu</SheetTitle>
+                    {userName && (
+                      <p className="text-sm text-muted-foreground text-left">
+                        Logged in as {userName}
+                      </p>
+                    )}
                   </SheetHeader>
                   <div className="mt-6 flex flex-col gap-4">
                     {menuItems.map((item) => (
@@ -114,7 +119,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                     <div className="h-px bg-border my-2" />
                     <button
                       onClick={handleLogout}
-                      className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors text-red-600 dark:text-red-400"
+                      className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors text-red-600"
                     >
                       <LogOut className="mr-3 h-4 w-4" />
                       Log Out
@@ -126,13 +131,6 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           </div>
         </div>
       </div>
-      {userName && (
-        <div className="pt-16 pb-1 px-4 max-w-7xl mx-auto">
-          <span className="text-sm text-gray-600 dark:text-gray-300">
-            Logged in as {userName}
-          </span>
-        </div>
-      )}
     </div>
   );
 };
