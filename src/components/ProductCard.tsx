@@ -65,8 +65,8 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
         <p className="text-base font-semibold text-vivo-orange mx-1">
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </p>
-        <div className="h-[28px] overflow-hidden mx-1">
-          <p className="text-xs text-muted-foreground line-clamp-2">{product.description}</p>
+        <div className="h-[28px] overflow-hidden mx-3 my-2">
+          <p className="text-xs text-muted-foreground line-clamp-2 px-2 py-1">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex flex-col space-y-1 pt-0">
