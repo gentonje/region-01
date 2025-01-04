@@ -120,7 +120,7 @@ export default function Cart() {
         
         {!cartItems?.length ? (
           <Card className="p-6">
-            <p className="text-center text-muted-foreground">Your cart is empty</p>
+            <p className="text-center text-foreground font-medium">Your cart is empty</p>
             <Button
               className="mt-4 mx-auto block w-full sm:w-auto px-4 py-2 flex items-center justify-center"
               onClick={() => navigate("/")}
