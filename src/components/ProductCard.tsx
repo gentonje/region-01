@@ -4,6 +4,8 @@ import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   product: Product;
@@ -12,25 +14,24 @@ interface ProductCardProps {
   selectedCurrency: SupportedCurrency;
 }
 
-const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={16}
-          className={`${
-            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
-        />
-      ))}
-    </div>
-  );
-};
-
 const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }: ProductCardProps) => {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+
+  const { data: owner } = useQuery({
+    queryKey: ['profile', product.user_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, full_name')
+        .eq('id', product.user_id)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!product.user_id
+  });
 
   const convertedPrice = convertCurrency(
     product.price || 0,
@@ -83,7 +84,9 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
             </div>
           )}
           <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm rounded-full px-2 py-1">
-            <StarRating rating={product.average_rating || 0} />
+            <span className="text-sm text-gray-700">
+              {owner?.username || owner?.full_name || 'Unknown Seller'}
+            </span>
           </div>
           <span className="absolute top-3 left-3 text-xs px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium">
             {product.category}
