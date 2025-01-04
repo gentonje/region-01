@@ -71,7 +71,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           <p className="text-xs text-gray-600 line-clamp-2">{product.description}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center pt-0 -mt-2">
+      <CardFooter className="flex justify-center pt-0 -mt-4">
         <span 
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
             ${product.in_stock 
