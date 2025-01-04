@@ -30,6 +30,7 @@ export interface Product {
   product_status?: string | null;
   shipping_info?: string | null;
   currency: string | null;
+  mainImageUrl?: string; // Added this property
   product_images: {
     id: string;
     product_id: string;

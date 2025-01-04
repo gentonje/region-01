@@ -10,7 +10,7 @@ import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { updateProduct } from "@/services/productService";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory } from "@/types/product";
+import { ProductCategory, Product } from "@/types/product";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -18,8 +18,7 @@ const EditProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages, existingImages, handleDeleteImage } = useProductImages(id);
 
-  // Enhanced error handling in the query
-  const { data: product, isLoading: isLoadingProduct, error: productError } = useQuery({
+  const { data: product, isLoading: isLoadingProduct, error: productError } = useQuery<Product>({
     queryKey: ["product", id],
     queryFn: async () => {
       console.log("Fetching product with ID:", id);
@@ -71,7 +70,7 @@ const EditProduct = () => {
           productData.mainImageUrl = mainImageData.publicUrl;
         }
 
-        return productData;
+        return productData as Product;
       } catch (error) {
         console.error("Error in queryFn:", error);
         throw error;
@@ -196,8 +195,8 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={product.mainImageUrl}
-            additionalImageUrls={product.product_images?.map((img: any) => ({
+            mainImageUrl={product?.mainImageUrl}
+            additionalImageUrls={product?.product_images?.map((img: any) => ({
               url: img.publicUrl,
               id: img.id
             })) || []}
