@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import Confetti from "@/components/Confetti";
 import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageUpload } from "@/components/ProductImageUpload";
@@ -15,7 +14,6 @@ type ProductCategory = Database["public"]["Enums"]["product_category"];
 const AddProduct = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showConfetti, setShowConfetti] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [mainImage, setMainImage] = useState<File | null>(null);
   const [additionalImages, setAdditionalImages] = useState<(File | null)[]>([null, null, null, null]);
@@ -86,7 +84,6 @@ const AddProduct = () => {
         }
       }
 
-      setShowConfetti(true);
       toast({
         title: "Success",
         description: "Product added successfully!",
@@ -152,7 +149,6 @@ const AddProduct = () => {
           />
         </form>
       </div>
-      <Confetti isActive={showConfetti} />
       <BottomNavigation />
     </div>
   );

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import Confetti from "@/components/Confetti";
 import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/ProductForm";
 import { uploadImage } from "@/utils/uploadImage";
@@ -17,7 +16,6 @@ const EditProduct = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [showConfetti, setShowConfetti] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -118,7 +116,6 @@ const EditProduct = () => {
         }
       }
 
-      setShowConfetti(true);
       toast({
         title: "Success",
         description: "Product updated successfully!",
@@ -174,7 +171,6 @@ const EditProduct = () => {
           />
         </form>
       </div>
-      <Confetti isActive={showConfetti} />
       <BottomNavigation />
     </div>
   );
