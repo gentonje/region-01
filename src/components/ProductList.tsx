@@ -17,10 +17,11 @@ interface ProductListProps {
 
 const ProductSkeleton = () => (
   <Card className="w-full h-[380px] m-1">
-    <Skeleton className="h-60 w-full" />
     <div className="p-4 space-y-3">
+      <Skeleton className="h-60 w-full rounded-md" />
       <Skeleton className="h-4 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-1/4" />
     </div>
   </Card>
 );
@@ -34,6 +35,18 @@ export const ProductList = ({
   observerRef,
   selectedCurrency,
 }: ProductListProps) => {
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
+        {Array(12)
+          .fill(0)
+          .map((_, index) => (
+            <ProductSkeleton key={`skeleton-${index}`} />
+          ))}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 mt-2">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 pb-20">
@@ -48,13 +61,11 @@ export const ProductList = ({
           </div>
         ))}
 
-        {(isFetchingNextPage || isLoading) &&
+        {isFetchingNextPage &&
           Array(4)
             .fill(0)
             .map((_, index) => (
-              <div key={`skeleton-${index}`}>
-                <ProductSkeleton />
-              </div>
+              <ProductSkeleton key={`skeleton-loading-more-${index}`} />
             ))}
 
         <div ref={observerRef} style={{ height: "10px" }} />

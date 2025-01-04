@@ -58,13 +58,13 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
     <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            <Link to="/" className="text-2xl font-calligraphy font-bold">
+          <div className="flex justify-between items-center h-14">
+            <Link to="/" className="text-lg font-calligraphy font-bold">
               <span className="text-vivo-orange">Vivo</span>
               <span className="text-navy-blue">Shop</span>
             </Link>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               {onCurrencyChange && (
                 <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
               )}
@@ -76,8 +76,8 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 size="icon"
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
               >
-                <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
                 <span className="sr-only">Toggle theme</span>
               </Button>
 
