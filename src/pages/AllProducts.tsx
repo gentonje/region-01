@@ -32,7 +32,14 @@ export default function AllProducts() {
 
       let query = supabase
         .from("products")
-        .select("*, product_images(*), profiles!products_user_id_fkey(username, full_name)")
+        .select(`
+          *,
+          product_images(*),
+          profiles!products_user_id_fkey (
+            username,
+            full_name
+          )
+        `)
         .eq('product_status', 'published')
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
