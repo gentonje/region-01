@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import Index from './pages/Index';
+import Home from './pages/Home';
 import Login from './pages/Login';
 import AddProduct from './pages/AddProduct';
 import EditProduct from './pages/EditProduct';
@@ -46,15 +47,9 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 export const Routes = () => {
   return (
     <RouterRoutes>
+      <Route path="/" element={<Home />} />
+      <Route path="/products" element={<Index />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/"
-        element={
-          <PrivateRoute>
-            <Index />
-          </PrivateRoute>
-        }
-      />
       <Route
         path="/add-product"
         element={
@@ -80,16 +75,6 @@ export const Routes = () => {
         }
       />
       <Route
-        path="/admin/users"
-        element={
-          <PrivateRoute>
-            <AdminRoute>
-              <AdminUsers />
-            </AdminRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
         path="/cart"
         element={
           <PrivateRoute>
@@ -102,6 +87,16 @@ export const Routes = () => {
         element={
           <PrivateRoute>
             <EditProfile />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <PrivateRoute>
+            <AdminRoute>
+              <AdminUsers />
+            </AdminRoute>
           </PrivateRoute>
         }
       />
