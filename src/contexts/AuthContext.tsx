@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        if (event === 'SIGNED_OUT') {
           console.log('User signed out');
           setSession(null);
           setUser(null);
@@ -83,7 +83,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Cleanup function
     return () => {
-      console.log('Cleaning up auth subscription');
       mounted = false;
       subscription.unsubscribe();
     };
