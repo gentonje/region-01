@@ -13,12 +13,12 @@ export interface ProductFormData {
 
 export interface ProductImage {
   id: string;
-  product_id: string;
   storage_path: string;
   is_main: boolean | null;
   display_order: number;
   created_at?: string;
   publicUrl?: string;
+  product_id?: string; // Made optional since it's not always present in responses
 }
 
 export interface Product {
