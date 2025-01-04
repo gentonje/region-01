@@ -184,7 +184,7 @@ const EditProduct = () => {
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
             mainImageUrl={product?.mainImageUrl}
-            additionalImageUrls={product.product_images?.map((img) => ({
+            additionalImageUrls={product?.product_images?.map((img) => ({
               url: img.publicUrl || '',
               id: img.id
             })) || []}
