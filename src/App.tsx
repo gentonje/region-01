@@ -1,100 +1,20 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { PrivateRoute } from "@/components/PrivateRoute";
-import { LazyMotion, domAnimation } from "framer-motion";
-import Index from "./pages/Index";
-import Login from "./pages/Login";
-import AddProduct from "./pages/AddProduct";
-import EditProduct from "./pages/EditProduct";
-import ModifyProducts from "./pages/ModifyProducts";
-import AdminUsers from "./pages/AdminUsers";
-import Cart from "./pages/Cart";
-import EditProfile from "./pages/EditProfile";
+import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from './components/ui/toaster';
+import { Routes } from './Routes';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5000,
-      retry: 1,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <LazyMotion features={domAnimation}>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route
-                  path="/"
-                  element={
-                    <PrivateRoute>
-                      <Index />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/add-product"
-                  element={
-                    <PrivateRoute>
-                      <AddProduct />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/edit-product/:id"
-                  element={
-                    <PrivateRoute>
-                      <EditProduct />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/modify-products"
-                  element={
-                    <PrivateRoute>
-                      <ModifyProducts />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/admin/users"
-                  element={
-                    <PrivateRoute>
-                      <AdminUsers />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/cart"
-                  element={
-                    <PrivateRoute>
-                      <Cart />
-                    </PrivateRoute>
-                  }
-                />
-                <Route
-                  path="/edit-profile"
-                  element={
-                    <PrivateRoute>
-                      <EditProfile />
-                    </PrivateRoute>
-                  }
-                />
-              </Routes>
-            </BrowserRouter>
-          </LazyMotion>
-        </TooltipProvider>
+        <BrowserRouter>
+          <Routes />
+          <Toaster />
+        </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
   );
