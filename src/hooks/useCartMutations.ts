@@ -24,7 +24,7 @@ export function useCartMutations() {
       const { error } = await supabase
         .from("cart_items")
         .delete()
-        .neq("id", null); // Delete all items
+        .neq("id", ""); // Delete all items by using a non-empty string comparison
       if (error) throw error;
     },
     onSuccess: () => {
