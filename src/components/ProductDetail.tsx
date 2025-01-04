@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter } from "./ui/card";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ProductGallery } from "./product/ProductGallery";
 import { ProductReviews } from "./product/ProductReviews";
 import { ProductInfo } from "./product/ProductInfo";
