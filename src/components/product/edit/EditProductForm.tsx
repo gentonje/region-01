@@ -38,7 +38,12 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
       if (mainImage || additionalImages.some(img => img !== null)) {
         console.log("Uploading new images...");
         const uploadResult = await uploadImages(mainImage, additionalImages);
-        mainImagePath = uploadResult.mainImagePath;
+        
+        // Only update mainImagePath if a new main image was uploaded
+        if (uploadResult.mainImagePath) {
+          mainImagePath = uploadResult.mainImagePath;
+        }
+        
         additionalImagePaths = uploadResult.additionalImagePaths;
         console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
       }

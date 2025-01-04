@@ -47,37 +47,50 @@ export const useProductImages = (productId?: string) => {
   const uploadImages = async (mainImage: File | null, additionalImages: (File | null)[]) => {
     try {
       console.log("Starting image upload process...");
-      if (!mainImage) throw new Error("Main image is required");
+      
+      // Initialize arrays to store paths
+      let mainImagePath: string | null = null;
+      const additionalImagePaths: string[] = [];
 
-      const uploadFile = async (file: File) => {
+      // Upload main image if provided
+      if (mainImage) {
+        console.log("Uploading main image...");
+        const fileExt = mainImage.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('images')
+          .upload(fileName, mainImage);
+
+        if (uploadError) {
+          console.error("Upload error:", uploadError);
+          throw new Error(`Failed to upload main image: ${uploadError.message}`);
+        }
+
+        mainImagePath = fileName;
+        console.log("Main image uploaded successfully:", fileName);
+      }
+
+      // Upload additional images
+      console.log("Processing additional images...");
+      for (const file of additionalImages.filter((f): f is File => f !== null)) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
         
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('images')
           .upload(fileName, file);
 
         if (uploadError) {
           console.error("Upload error:", uploadError);
-          throw new Error(`Failed to upload image: ${uploadError.message}`);
+          continue; // Skip this file if upload fails, but continue with others
         }
 
-        console.log("File uploaded successfully:", fileName);
-        return fileName;
-      };
-
-      console.log("Uploading main image...");
-      const mainImagePath = await uploadFile(mainImage);
-      
-      console.log("Processing additional images...");
-      const additionalImagePaths = await Promise.all(
-        additionalImages
-          .filter((file): file is File => file !== null)
-          .map(file => uploadFile(file))
-      );
+        additionalImagePaths.push(fileName);
+      }
 
       return {
-        mainImagePath,
+        mainImagePath: mainImagePath || undefined,
         additionalImagePaths,
       };
     } catch (error: any) {
