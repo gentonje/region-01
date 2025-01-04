@@ -2,9 +2,10 @@ import { ProductModifyCard } from "@/components/ProductModifyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
+import { Product } from "@/types/product";
 
 interface ModifyProductsListProps {
-  products: any[];
+  products: Product[];
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
@@ -43,6 +44,9 @@ export const ModifyProductsList = ({
       onLoadMore();
     }
   }, [inView, hasMore, isMobile, isLoading, onLoadMore]);
+
+  // Debug log for products
+  console.log("ModifyProductsList - Products:", products);
 
   const renderSkeletons = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

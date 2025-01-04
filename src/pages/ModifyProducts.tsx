@@ -7,13 +7,14 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { ModifyProductsList } from "@/components/ModifyProductsList";
 import { ModifyProductsPagination } from "@/components/ModifyProductsPagination";
 import { ProductFilters } from "@/components/ProductFilters";
+import { Product } from "@/types/product";
 
 const ITEMS_PER_PAGE = 15;
 
 const ModifyProducts = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,9 +41,19 @@ const ModifyProducts = () => {
         return;
       }
 
+      console.log("Fetching products for user:", user.id);
+
       let query = supabase
         .from("products")
-        .select("*", { count: 'exact' })
+        .select(`
+          *,
+          product_images (
+            id,
+            storage_path,
+            is_main,
+            display_order
+          )
+        `)
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -54,26 +65,31 @@ const ModifyProducts = () => {
         query = query.eq('category', selectedCategory);
       }
 
-      const { count: totalCount } = await query;
-      const total = totalCount || 0;
+      const { count } = await query.count();
+      const total = count || 0;
+      console.log("Total products found:", total);
+
       const calculatedTotalPages = Math.ceil(total / ITEMS_PER_PAGE);
       
-      // Adjust currentPage if it exceeds the total pages
       if (currentPage > calculatedTotalPages && calculatedTotalPages > 0) {
         setCurrentPage(calculatedTotalPages);
-        return; // Exit and let the useEffect trigger a new fetch with the corrected page
+        return;
       }
 
       setTotalPages(calculatedTotalPages);
 
       const start = (currentPage - 1) * ITEMS_PER_PAGE;
-      const end = Math.min(start + ITEMS_PER_PAGE - 1, total - 1);
+      const end = start + ITEMS_PER_PAGE - 1;
 
-      // Only fetch if we have valid range
       if (start <= end) {
         const { data, error } = await query.range(start, end);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching products:", error);
+          throw error;
+        }
+
+        console.log("Fetched products:", data);
 
         if (append) {
           setProducts(prev => [...prev, ...(data || [])]);
@@ -82,7 +98,6 @@ const ModifyProducts = () => {
           setProducts(data || []);
         }
       } else {
-        // If range is invalid, reset products
         setProducts([]);
         setHasMore(false);
       }
@@ -100,6 +115,26 @@ const ModifyProducts = () => {
 
   const handleDelete = async (productId: string) => {
     try {
+      // First delete associated images from storage
+      const { data: productImages } = await supabase
+        .from('product_images')
+        .select('storage_path')
+        .eq('product_id', productId);
+
+      if (productImages) {
+        const imagePaths = productImages.map(img => img.storage_path);
+        if (imagePaths.length > 0) {
+          const { error: storageError } = await supabase.storage
+            .from('images')
+            .remove(imagePaths);
+
+          if (storageError) {
+            console.error("Error deleting images from storage:", storageError);
+          }
+        }
+      }
+
+      // Then delete the product
       const { error } = await supabase
         .from("products")
         .delete()
@@ -118,6 +153,7 @@ const ModifyProducts = () => {
         fetchProducts(false);
       }
     } catch (error: any) {
+      console.error("Error deleting product:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to delete product",
