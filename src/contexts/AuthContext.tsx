@@ -23,18 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    const handleAuthError = async () => {
-      console.log('Handling auth error - clearing session');
-      if (mounted) {
-        setSession(null);
-        setUser(null);
-        // Clear any potentially invalid tokens
-        localStorage.removeItem('supabase.auth.token');
-        await supabase.auth.signOut();
-        toast.error("Session expired. Please login again.");
-      }
-    };
-
     const initSession = async () => {
       try {
         console.log('Initializing session...');
@@ -43,7 +31,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Session initialization error:', error);
-          await handleAuthError();
+          if (mounted) {
+            setSession(null);
+            setUser(null);
+          }
           return;
         }
         
@@ -60,7 +51,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Session initialization error:', error);
-        await handleAuthError();
       } finally {
         if (mounted) {
           setLoading(false);
@@ -76,21 +66,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
           console.log('User signed out');
           setSession(null);
           setUser(null);
-          localStorage.removeItem('supabase.auth.token');
-        } else if (event === 'TOKEN_REFRESHED') {
-          console.log('Token refreshed');
+        } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          console.log('Session updated');
           if (currentSession) {
             setSession(currentSession);
             setUser(currentSession.user);
           }
-        } else if (currentSession) {
-          console.log('Session updated');
-          setSession(currentSession);
-          setUser(currentSession.user);
         }
         setLoading(false);
       }
