@@ -49,12 +49,12 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
 
   return (
     <Card 
-      className="w-full h-[380px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
+      className="w-full h-[323px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
       onClick={onClick}
     >
       <CardContent className="px-0 space-y-2 relative">
         <div 
-          className="h-60 w-full relative overflow-hidden rounded-t-lg"
+          className="h-52 w-full relative overflow-hidden rounded-t-lg"
           onClick={(e) => {
             e.stopPropagation();
             onClick?.();
