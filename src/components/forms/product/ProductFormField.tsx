@@ -5,17 +5,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { ProductFormData } from "./validation";
 import { ProductCategory } from "@/types/product";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductFormFieldProps {
   form: UseFormReturn<ProductFormData>;
   name: keyof ProductFormData;
   label: string;
   type?: string;
-  step?: string;
+  placeholder?: string;
   formData: ProductFormData;
   setFormData: (data: ProductFormData) => void;
 }
@@ -25,48 +29,69 @@ export const ProductFormField = ({
   name,
   label,
   type = "text",
-  step,
+  placeholder,
   formData,
   setFormData,
 }: ProductFormFieldProps) => {
+  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("name")
+        .order("name");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <FormField
       control={form.control}
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-gray-900 font-medium">{label}</FormLabel>
+          <FormLabel>{label}</FormLabel>
           <FormControl>
-            {name === "category" ? (
-              <select
+            {type === "textarea" ? (
+              <Textarea
                 {...field}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900"
+                placeholder={placeholder}
+                className="resize-none"
                 onChange={(e) => {
                   field.onChange(e);
-                  setFormData({ 
-                    ...formData, 
-                    [name]: e.target.value as ProductCategory 
-                  });
+                  setFormData({ ...formData, [name]: e.target.value });
                 }}
-              >
-                <option value="">Select a category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Home & Garden">Home & Garden</option>
-                <option value="Books">Books</option>
-                <option value="Sports & Outdoors">Sports & Outdoors</option>
-                <option value="Toys & Games">Toys & Games</option>
-                <option value="Health & Beauty">Health & Beauty</option>
-                <option value="Automotive">Automotive</option>
-                <option value="Food & Beverages">Food & Beverages</option>
-                <option value="Other">Other</option>
-              </select>
+              />
+            ) : type === "select" ? (
+              isCategoriesLoading ? (
+                <Skeleton className="h-10 w-full" />
+              ) : (
+                <select
+                  {...field}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900"
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setFormData({
+                      ...formData,
+                      [name]: e.target.value as ProductCategory,
+                    });
+                  }}
+                >
+                  <option value="">Select a category</option>
+                  {categories?.map((category) => (
+                    <option key={category.name} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              )
             ) : (
               <Input
                 {...field}
                 type={type}
-                step={step}
-                className="text-gray-900"
+                placeholder={placeholder}
                 onChange={(e) => {
                   field.onChange(e);
                   setFormData({ ...formData, [name]: e.target.value });
