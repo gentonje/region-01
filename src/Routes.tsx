@@ -9,11 +9,13 @@ import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
+import AllProducts from './pages/AllProducts';
 
 export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/login" element={<Login />} />
+      <Route path="/all_products" element={<AllProducts />} />
       <Route
         path="/"
         element={

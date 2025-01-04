@@ -11,7 +11,7 @@ import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Index() {
+export default function AllProducts() {
   const { ref, inView } = useInView();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -25,18 +25,15 @@ export default function Index() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["my_products", searchQuery, selectedCategory],
+    queryKey: ["all_products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
 
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
-        .eq('user_id', user.id)
+        .eq('product_status', 'published')
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
@@ -117,7 +114,7 @@ export default function Index() {
         <div className="mt-20">
           <BreadcrumbNav
             items={[
-              { label: "My Products", href: "/" }
+              { label: "All Products", href: "/all_products" }
             ]}
           />
           {selectedProduct ? (
