@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
+import { useCartMutations } from "@/hooks/useCartMutations";
 
 interface CartItem {
   id: string;
@@ -25,9 +26,9 @@ interface CartItem {
 export default function Cart() {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("stripe");
   const [shippingAddress, setShippingAddress] = useState<string>("");
+  const { deleteItemMutation, clearCartMutation } = useCartMutations();
 
   // Get current user's ID
   const { data: session } = useQuery({
@@ -83,40 +84,6 @@ export default function Cart() {
     },
   });
 
-  const deleteItemMutation = useMutation({
-    mutationFn: async (itemId: string) => {
-      const { error } = await supabase
-        .from("cart_items")
-        .delete()
-        .eq("id", itemId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast({
-        title: "Success",
-        description: "Item removed from cart",
-      });
-    },
-  });
-
-  const clearCartMutation = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("cart_items")
-        .delete()
-        .neq("id", "placeholder"); // Delete all items
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast({
-        title: "Success",
-        description: "Cart cleared successfully",
-      });
-    },
-  });
-
   const createOrderMutation = useMutation({
     mutationFn: async (paymentMethod: string) => {
       if (!cartItems?.length) throw new Error("Cart is empty");
@@ -148,8 +115,6 @@ export default function Cart() {
       return order;
     },
     onSuccess: async (order) => {
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      
       switch (selectedPaymentMethod) {
         case "stripe":
           const { data: sessionUrl, error } = await supabase.functions.invoke("create-checkout-session", {
