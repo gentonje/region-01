@@ -40,6 +40,5 @@ export interface Product {
   product_status?: string | null;
   shipping_info?: string | null;
   currency: string | null;
-  mainImageUrl?: string;
   product_images: ProductImage[];
 }
