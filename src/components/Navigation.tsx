@@ -71,7 +71,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
-            <Link to="/" className="text-lg font-bold" style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}>
+            <Link to="/" className="text-lg font-bold backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg transition-all hover:bg-white/20" style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}>
               <span style={{ color: '#F97316' }}>السوق</span>
               <span style={{ color: '#0EA5E9' }}> الحر</span>
             </Link>
@@ -86,6 +86,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all"
                           >
                             <DollarSign className="h-4 w-4" />
                           </Button>
@@ -119,6 +120,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                className="backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all"
               >
                 <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
                 <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
