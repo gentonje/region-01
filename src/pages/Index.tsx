@@ -25,18 +25,14 @@ export default function Index() {
     fetchNextPage,
     hasNextPage,
   } = useInfiniteQuery({
-    queryKey: ["my_products", searchQuery, selectedCategory],
+    queryKey: ["products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
 
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
-        .eq('user_id', user.id)
         .range(startRange, endRange)
         .order("created_at", { ascending: false });
 
@@ -117,7 +113,7 @@ export default function Index() {
         <div className="mt-20">
           <BreadcrumbNav
             items={[
-              { label: "My Products", href: "/" }
+              { label: "Products", href: "/" }
             ]}
           />
           {selectedProduct ? (
