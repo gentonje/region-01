@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,20 +12,28 @@ export const useProductImages = (productId?: string) => {
     if (!mainImage) throw new Error("Main image is required");
 
     const uploadFile = async (file: File, isMain: boolean, order: number) => {
+      console.log("Uploading file:", file.name);
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('images')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        throw new Error(`Failed to upload image: ${uploadError.message}`);
+      }
 
+      console.log("File uploaded successfully:", fileName);
       return fileName;
     };
 
     try {
+      console.log("Starting main image upload...");
       const mainImagePath = await uploadFile(mainImage, true, 0);
+      
+      console.log("Starting additional images upload...");
       const additionalImagePaths = await Promise.all(
         additionalImages
           .filter((file): file is File => file !== null)
@@ -36,9 +44,9 @@ export const useProductImages = (productId?: string) => {
         mainImagePath,
         additionalImagePaths,
       };
-    } catch (error) {
-      console.error('Error uploading images:', error);
-      throw error;
+    } catch (error: any) {
+      console.error('Error in uploadImages:', error);
+      throw new Error(`Failed to upload images: ${error.message}`);
     }
   };
 
@@ -72,32 +80,6 @@ export const useProductImages = (productId?: string) => {
     }
   };
 
-  const reorderImages = async () => {
-    try {
-      // Get all images for this product
-      const { data: images, error: fetchError } = await supabase
-        .from("product_images")
-        .select("*")
-        .eq("product_id", productId)
-        .order("display_order");
-
-      if (fetchError) throw fetchError;
-
-      // Update display order for each image
-      for (let i = 0; i < images.length; i++) {
-        const { error: updateError } = await supabase
-          .from("product_images")
-          .update({ display_order: i })
-          .eq("id", images[i].id);
-
-        if (updateError) throw updateError;
-      }
-    } catch (error: any) {
-      console.error('Error reordering images:', error);
-      throw error;
-    }
-  };
-
   const handleDeleteImage = async (imageId: string) => {
     try {
       const imageToDelete = existingImages.find(img => img.id === imageId);
@@ -117,9 +99,6 @@ export const useProductImages = (productId?: string) => {
 
       if (deleteDbError) throw deleteDbError;
 
-      // After deleting, reorder the remaining images
-      await reorderImages();
-      
       // Refresh the images list
       await fetchImages();
       
@@ -136,12 +115,6 @@ export const useProductImages = (productId?: string) => {
       });
     }
   };
-
-  useEffect(() => {
-    if (productId) {
-      fetchImages();
-    }
-  }, [productId]);
 
   return {
     existingImages,

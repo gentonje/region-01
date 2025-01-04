@@ -13,6 +13,13 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    price: "",
+    category: "Other",
+    available_quantity: "0",
+  });
 
   const handleSubmit = async (formData: any) => {
     if (!mainImage) {
@@ -22,13 +29,19 @@ const AddProduct = () => {
 
     setIsLoading(true);
     try {
-      const { mainImagePath } = await uploadImages(mainImage, additionalImages);
+      console.log("Uploading images...");
+      const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
+      console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
+
+      console.log("Creating product...");
       await createProduct(formData, mainImagePath);
+      console.log("Product created successfully");
+
       toast.success("Product added successfully!");
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding product:", error);
-      toast.error("Failed to add product.");
+      toast.error(error.message || "Failed to add product");
     } finally {
       setIsLoading(false);
     }
@@ -63,14 +76,8 @@ const AddProduct = () => {
             />
 
             <ProductForm
-              formData={{
-                title: "",
-                description: "",
-                price: "",
-                category: "Other",
-                available_quantity: "0",
-              }}
-              setFormData={() => {}}
+              formData={formData}
+              setFormData={setFormData}
               isLoading={isLoading}
               submitButtonText="Add Product"
               onSubmit={handleSubmit}

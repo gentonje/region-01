@@ -33,6 +33,7 @@ export const ProductImageUpload = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log("Selected file:", file.name);
       const url = URL.createObjectURL(file);
       setPreviewUrl(url);
       onChange(file);
