@@ -63,14 +63,22 @@ const EditProduct = () => {
           productData.product_images = imagesWithUrls;
         }
 
+        // Get the public URL for the main product image
+        if (productData.storage_path) {
+          const { data: mainImageData } = supabase.storage
+            .from('images')
+            .getPublicUrl(productData.storage_path);
+          productData.mainImageUrl = mainImageData.publicUrl;
+        }
+
         return productData;
       } catch (error) {
         console.error("Error in queryFn:", error);
         throw error;
       }
     },
-    retry: 2, // Retry failed requests up to 2 times
-    retryDelay: 1000, // Wait 1 second between retries
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const handleSubmit = async (formData: any) => {
@@ -188,7 +196,7 @@ const EditProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
-            mainImageUrl={product.storage_path}
+            mainImageUrl={product.mainImageUrl}
             additionalImageUrls={product.product_images?.map((img: any) => ({
               url: img.publicUrl,
               id: img.id
