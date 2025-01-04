@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface ProductModifyCardProps {
   product: {
@@ -10,6 +13,7 @@ interface ProductModifyCardProps {
     title: string;
     description: string;
     price: number;
+    product_status?: string;
     profiles?: {
       username?: string;
       full_name?: string;
@@ -21,6 +25,22 @@ interface ProductModifyCardProps {
 export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
   const navigate = useNavigate();
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
+  
+  const handlePublishChange = async (checked: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({ product_status: checked ? 'published' : 'draft' })
+        .eq('id', product.id);
+
+      if (error) throw error;
+
+      toast.success(`Product ${checked ? 'published' : 'unpublished'} successfully`);
+    } catch (error) {
+      console.error('Error updating product status:', error);
+      toast.error('Failed to update product status');
+    }
+  };
 
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
@@ -32,7 +52,22 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       </div>
       <p className="text-gray-600 mb-4">{product.description}</p>
       <div className="flex justify-between items-center">
-        <span className="text-lg font-bold">${product.price}</span>
+        <div className="flex items-center space-x-4">
+          <span className="text-lg font-bold">${product.price}</span>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id={`publish-${product.id}`}
+              checked={product.product_status === 'published'}
+              onCheckedChange={handlePublishChange}
+            />
+            <label
+              htmlFor={`publish-${product.id}`}
+              className="text-sm text-gray-600"
+            >
+              Published
+            </label>
+          </div>
+        </div>
         <div className="space-x-2">
           <Button
             variant="outline"
