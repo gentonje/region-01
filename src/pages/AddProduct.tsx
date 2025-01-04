@@ -4,9 +4,10 @@ import { Navigation } from "@/components/Navigation";
 import { ProductForm } from "@/components/ProductForm";
 import { toast } from "sonner";
 import { useProductImages } from "@/hooks/useProductImages";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
+import { createProduct } from "@/services/productService";
+import { productPageStyles as styles } from "@/styles/productStyles";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -21,21 +22,8 @@ const AddProduct = () => {
 
     setIsLoading(true);
     try {
-      const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
-
-      const { error: insertError } = await supabase
-        .from("products")
-        .insert({
-          title: formData.title,
-          description: formData.description,
-          price: formData.price,
-          category: formData.category,
-          available_quantity: formData.available_quantity,
-          storage_path: mainImagePath,
-        });
-
-      if (insertError) throw insertError;
-
+      const { mainImagePath } = await uploadImages(mainImage, additionalImages);
+      await createProduct(formData, mainImagePath);
       toast.success("Product added successfully!");
       navigate("/");
     } catch (error) {
@@ -47,17 +35,17 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={styles.container}>
       <Navigation />
       
-      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20 mt-20">
-        <div className="bg-white rounded-lg shadow-sm p-6 overflow-y-auto">
-          <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 pb-4 border-b">
-            <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
+      <div className={styles.mainContent}>
+        <div className={styles.formContainer}>
+          <div className={styles.headerContainer}>
+            <h1 className={styles.title}>Add New Product</h1>
             <Button 
               variant="outline" 
               onClick={() => navigate("/")}
-              className="hover:bg-gray-100"
+              className={styles.cancelButton}
             >
               Cancel
             </Button>

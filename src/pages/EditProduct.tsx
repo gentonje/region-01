@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProductImages } from "@/hooks/useProductImages";
 import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
+import { updateProduct } from "@/services/productService";
+import { productPageStyles as styles } from "@/styles/productStyles";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -34,29 +36,17 @@ const EditProduct = () => {
   });
 
   const handleSubmit = async (formData: any) => {
+    if (!id) return;
+    
     setIsLoading(true);
     try {
-      let newStoragePath = product?.storage_path;
-
+      let newStoragePath;
       if (mainImage) {
         const { mainImagePath } = await uploadImages(mainImage, additionalImages);
         newStoragePath = mainImagePath;
       }
 
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({
-          title: formData.title,
-          description: formData.description,
-          price: formData.price,
-          category: formData.category,
-          available_quantity: formData.available_quantity,
-          storage_path: newStoragePath,
-        })
-        .eq("id", id);
-
-      if (updateError) throw updateError;
-
+      await updateProduct(id, formData, newStoragePath);
       toast.success("Product updated successfully");
       navigate("/modify-products");
     } catch (error) {
@@ -69,55 +59,59 @@ const EditProduct = () => {
 
   if (isLoadingProduct) {
     return (
-      <div className="min-h-screen p-4 bg-gray-50">
+      <div className={styles.container}>
         <Navigation />
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-          <p>Loading...</p>
+        <div className={styles.mainContent}>
+          <div className={styles.formContainer}>
+            <p>Loading...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-4 bg-gray-50 text-gray-900 pb-20">
+    <div className={styles.container}>
       <Navigation />
       
-      <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => navigate("/")}
-            className="hover:bg-gray-100"
-          >
-            Cancel
-          </Button>
+      <div className={styles.mainContent}>
+        <div className={styles.formContainer}>
+          <div className={styles.headerContainer}>
+            <h1 className={styles.title}>Edit Product</h1>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/")}
+              className={styles.cancelButton}
+            >
+              Cancel
+            </Button>
+          </div>
+
+          <ProductImageSection
+            mainImage={mainImage}
+            setMainImage={setMainImage}
+            additionalImages={additionalImages}
+            setAdditionalImages={setAdditionalImages}
+            mainImageUrl={product?.storage_path}
+            additionalImageUrls={existingImages.map(img => ({ url: img.publicUrl, id: img.id }))}
+            onDeleteExisting={handleDeleteImage}
+            isLoading={isLoading}
+          />
+
+          <ProductForm
+            formData={{
+              title: product?.title || "",
+              description: product?.description || "",
+              price: String(product?.price || ""),
+              category: product?.category || "Other",
+              available_quantity: String(product?.available_quantity || "0"),
+            }}
+            setFormData={() => {}}
+            isLoading={isLoading}
+            submitButtonText="Update Product"
+            onSubmit={handleSubmit}
+          />
         </div>
-
-        <ProductImageSection
-          mainImage={mainImage}
-          setMainImage={setMainImage}
-          additionalImages={additionalImages}
-          setAdditionalImages={setAdditionalImages}
-          mainImageUrl={product?.storage_path}
-          additionalImageUrls={existingImages.map(img => ({ url: img.publicUrl, id: img.id }))}
-          onDeleteExisting={handleDeleteImage}
-          isLoading={isLoading}
-        />
-
-        <ProductForm
-          formData={{
-            title: product?.title || "",
-            description: product?.description || "",
-            price: String(product?.price || ""),
-            category: product?.category || "Other",
-            available_quantity: String(product?.available_quantity || "0"),
-          }}
-          setFormData={() => {}}
-          isLoading={isLoading}
-          submitButtonText="Update Product"
-          onSubmit={handleSubmit}
-        />
       </div>
     </div>
   );

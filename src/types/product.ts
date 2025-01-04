@@ -1,20 +1,28 @@
-export interface Product {
-  id: string;
+import { Database } from "@/integrations/supabase/types";
+
+export type ProductCategory = Database["public"]["Enums"]["product_category"];
+
+export interface ProductFormData {
   title: string;
-  price: number;
   description: string;
-  storage_path: string;
-  currency: string;
-  average_rating: number;
-  category: string;
-  in_stock: boolean;
-  product_images: { storage_path: string; is_main: boolean }[];
-  seller_id: string;
+  price: string;
+  category: ProductCategory;
+  available_quantity: string;
+}
+
+export interface Product extends Omit<ProductFormData, 'price' | 'available_quantity'> {
+  id: string;
   user_id?: string;
+  seller_id?: string;
   shop_id?: string;
-  available_quantity?: number;
+  price: number;
+  available_quantity: number;
+  storage_path: string;
+  created_at: string;
+  in_stock?: boolean;
   views?: number;
   likes?: number;
+  average_rating?: number;
   product_status?: string;
   shipping_info?: string;
 }
