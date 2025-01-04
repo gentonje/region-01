@@ -9,6 +9,7 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Index() {
   const { ref, inView } = useInView();
@@ -23,7 +24,7 @@ export default function Index() {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery<Product[]>({
+  } = useInfiniteQuery({
     queryKey: ["products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
@@ -85,6 +86,25 @@ export default function Index() {
   const handleBack = () => {
     setSelectedProduct(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation onCurrencyChange={handleCurrencyChange} />
+        <div className="container mx-auto px-4 mt-20">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {[...Array(8)].map((_, i) => (
+                <Skeleton key={i} className="h-48 w-full" />
+              ))}
+            </div>
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

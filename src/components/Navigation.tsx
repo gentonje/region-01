@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, DollarSign } from "lucide-react";
 import { useTheme } from "next-themes";
 import { supabase } from "@/integrations/supabase/client";
 import { CurrencySelector } from "./CurrencySelector";
@@ -10,6 +10,12 @@ import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { BottomNav } from "./navigation/BottomNav";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface NavigationProps {
   onCurrencyChange?: (currency: SupportedCurrency) => void;
@@ -66,7 +72,22 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
             <div className="flex items-center gap-2">
               {onCurrencyChange && (
-                <CurrencySelector value={currency} onValueChange={handleCurrencyChange} />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleCurrencyChange(currency === "USD" ? "SSP" : "USD")}
+                      >
+                        <DollarSign className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Toggle Currency ({currency})</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
 
               <CartIndicator />
