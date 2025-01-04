@@ -32,7 +32,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
 
         <Suspense fallback={<Skeleton className="h-6 w-24" />}>
           <div className="flex items-center justify-between">
-            <span className={`text-sm px-2 py-1 rounded-full ${
+            <span className={`text-sm font-medium px-2 py-1 rounded-full ${
               product.in_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
             }`}>
               {product.in_stock ? 'In Stock' : 'Out of Stock'}
@@ -51,7 +51,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
         
         <Suspense fallback={<Skeleton className="h-24 w-full" />}>
           <div className="rounded-md border p-4">
-            <p className="text-sm text-muted-foreground">{product.description}</p>
+            <p className="text-sm text-gray-800">{product.description}</p>
           </div>
         </Suspense>
 
@@ -61,7 +61,7 @@ const ProductDetail = ({ product, onBack, getProductImageUrl }: ProductDetailPro
       </CardContent>
 
       <CardFooter className="flex justify-between items-center">
-        <p className="text-2xl font-bold text-vivo-orange">
+        <p className="text-2xl font-bold text-gray-900">
           {product.currency} {product.price?.toFixed(2)}
         </p>
         <Button>Add to Cart</Button>
