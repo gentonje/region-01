@@ -33,6 +33,10 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
+  // Find the main image or default to the first image if no main image is set
+  const mainImage = product.product_images?.find(img => img.is_main) || product.product_images?.[0];
+  const imageUrl = mainImage ? getProductImageUrl({ ...product, product_images: [mainImage] }) : getProductImageUrl(product);
+
   return (
     <Card 
       className="w-full h-[380px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
@@ -47,7 +51,7 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
           }}
         >
           <img
-            src={getProductImageUrl(product)}
+            src={imageUrl}
             alt={product.title || ""}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
