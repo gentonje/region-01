@@ -34,12 +34,10 @@ const Confetti = ({ isActive = true }: ConfettiProps) => {
             type: ["circle", "square", "star"],
           },
           opacity: {
-            value: 0.8,
+            value: { min: 0.1, max: 0.8 },
             animation: {
               enable: true,
               speed: 0.2,
-              start: 0.8,  // Starting opacity value
-              end: 0.1,    // Ending opacity value
               sync: false,
             },
           },
