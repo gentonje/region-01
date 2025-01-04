@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Package, User, Settings, LogOut, Users } from "lucide-react";
+import { Package, User, Settings, LogOut, Users, Edit } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -56,6 +56,12 @@ export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
           <Link to="/products" className="cursor-pointer">
             <Package className="mr-2 h-4 w-4" />
             My Products
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/modify-products" className="cursor-pointer">
+            <Edit className="mr-2 h-4 w-4" />
+            Modify Products
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
