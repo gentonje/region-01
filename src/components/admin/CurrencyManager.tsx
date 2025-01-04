@@ -49,7 +49,7 @@ export const CurrencyManager = () => {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="w-full justify-start">
           <DollarSign className="mr-2 h-4 w-4" />
-          Manage Currencies
+          Currencies
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
