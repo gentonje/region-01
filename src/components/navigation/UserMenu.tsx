@@ -1,26 +1,24 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Settings, Users, LogOut, UserCog } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Package, User, Settings, LogOut, Users } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface UserMenuProps {
   userName: string;
-  onLogout: () => Promise<void>;
-  isLoading?: boolean;
-  error?: string | null;
+  onLogout: () => void;
+  isLoading: boolean;
 }
 
-export const UserMenu = ({ userName, onLogout, isLoading, error }: UserMenuProps) => {
+export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
   const { data: isAdmin } = useQuery({
     queryKey: ["isAdmin"],
     queryFn: async () => {
@@ -40,58 +38,46 @@ export const UserMenu = ({ userName, onLogout, isLoading, error }: UserMenuProps
     }
   });
 
-  const menuItems = [
-    { icon: UserCog, label: "Edit Profile", path: "/edit-profile" },
-    { icon: Settings, label: "Add Product", path: "/add-product" },
-    { icon: Settings, label: "Modify Products", path: "/modify-products" },
-  ];
-
-  // Only add the Manage Users option if the user is an admin
-  if (isAdmin) {
-    menuItems.push({ icon: Users, label: "Manage Users", path: "/admin/users" });
+  if (isLoading) {
+    return <Button variant="ghost" size="icon" disabled />;
   }
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Menu className="h-5 w-5" />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <User className="h-4 w-4" />
         </Button>
-      </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle className="text-left">Menu</SheetTitle>
-          {isLoading ? (
-            <Skeleton className="h-4 w-[200px]" />
-          ) : error ? (
-            <p className="text-sm text-destructive text-left">{error}</p>
-          ) : userName ? (
-            <p className="text-sm text-muted-foreground text-left">
-              Logged in as {userName}
-            </p>
-          ) : null}
-        </SheetHeader>
-        <div className="mt-6 flex flex-col gap-4">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors"
-            >
-              <item.icon className="mr-3 h-4 w-4" />
-              {item.label}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>{userName}</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/products" className="cursor-pointer">
+            <Package className="mr-2 h-4 w-4" />
+            My Products
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/edit-profile" className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            Edit Profile
+          </Link>
+        </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/users" className="cursor-pointer">
+              <Users className="mr-2 h-4 w-4" />
+              Manage Users
             </Link>
-          ))}
-          <div className="h-px bg-border my-2" />
-          <button
-            onClick={onLogout}
-            className="flex items-center px-4 py-2 text-sm rounded-md hover:bg-accent transition-colors text-red-600"
-          >
-            <LogOut className="mr-3 h-4 w-4" />
-            Log Out
-          </button>
-        </div>
-      </SheetContent>
-    </Sheet>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={onLogout} className="cursor-pointer">
+          <LogOut className="mr-2 h-4 w-4" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
