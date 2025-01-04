@@ -4,24 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { Loader2, ShoppingBag } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ShoppingBag } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { useCartMutations } from "@/hooks/useCartMutations";
-
-interface CartItem {
-  id: string;
-  product_id: string;
-  quantity: number;
-  product: {
-    title: string;
-    price: number;
-    currency: string;
-    user_id: string;
-  };
-}
+import { useOrderCreation } from "@/components/cart/OrderCreation";
+import { PaymentHandler } from "@/components/cart/PaymentHandler";
 
 export default function Cart() {
   const { toast } = useToast();
@@ -30,7 +20,7 @@ export default function Cart() {
   const [shippingAddress, setShippingAddress] = useState<string>("");
   const { deleteItemMutation } = useCartMutations();
 
-  // Get current user's ID
+  // Get current user's session
   const { data: session } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -80,77 +70,15 @@ export default function Cart() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return items as CartItem[];
+      return items;
     },
   });
 
-  const createOrderMutation = useMutation({
-    mutationFn: async (paymentMethod: string) => {
-      if (!cartItems?.length) throw new Error("Cart is empty");
-      if (!session?.user?.id) throw new Error("User not authenticated");
-      if (!shippingAddress) throw new Error("Shipping address is required");
-
-      // Calculate total amount
-      const totalAmount = cartItems.reduce(
-        (sum, item) => sum + (item.product.price * item.quantity),
-        0
-      );
-
-      // Create order
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          product_id: cartItems[0].product_id,
-          quantity: cartItems[0].quantity,
-          total_amount: totalAmount,
-          payment_method: paymentMethod,
-          shipping_address: shippingAddress,
-          buyer_id: session.user.id,
-          seller_id: cartItems[0].product.user_id,
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-      return order;
-    },
-    onSuccess: async (order) => {
-      switch (selectedPaymentMethod) {
-        case "stripe":
-          const { data: sessionUrl, error } = await supabase.functions.invoke("create-checkout-session", {
-            body: { orderId: order.id }
-          });
-          if (error) throw error;
-          window.location.href = sessionUrl.url;
-          break;
-        
-        case "paypal":
-          navigate(`/checkout/paypal/${order.id}`);
-          break;
-        
-        case "mpesa":
-          navigate(`/checkout/mpesa/${order.id}`);
-          break;
-        
-        case "mtn_momo":
-          navigate(`/checkout/mtn-momo/${order.id}`);
-          break;
-        
-        default:
-          toast({
-            title: "Error",
-            description: "Invalid payment method selected",
-            variant: "destructive",
-          });
-      }
-    },
-    onError: (error) => {
-      toast({
-        title: "Error creating order",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
+  const orderCreation = useOrderCreation({
+    cartItems,
+    shippingAddress,
+    userId: session?.user?.id || "",
+    paymentMethod: selectedPaymentMethod,
   });
 
   const handleCheckout = async () => {
@@ -172,7 +100,16 @@ export default function Cart() {
       return;
     }
 
-    createOrderMutation.mutate(selectedPaymentMethod);
+    try {
+      const order = await orderCreation.mutateAsync();
+      const { handlePayment } = PaymentHandler({ 
+        orderId: order.id, 
+        paymentMethod: selectedPaymentMethod 
+      });
+      await handlePayment();
+    } catch (error) {
+      // Error is already handled by the mutation
+    }
   };
 
   return (
@@ -230,7 +167,7 @@ export default function Cart() {
                 selectedPaymentMethod={selectedPaymentMethod}
                 onPaymentMethodChange={setSelectedPaymentMethod}
                 onCheckout={handleCheckout}
-                isLoading={createOrderMutation.isPending}
+                isLoading={orderCreation.isPending}
               />
             </Card>
           </div>
