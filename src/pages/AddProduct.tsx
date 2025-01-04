@@ -50,7 +50,7 @@ const AddProduct = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20">
+      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20 mt-20">
         <div className="bg-white rounded-lg shadow-sm p-6 overflow-y-auto">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-white z-10 pb-4 border-b">
             <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
