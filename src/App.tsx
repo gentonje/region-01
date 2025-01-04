@@ -26,10 +26,16 @@ const queryClient = new QueryClient({
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
-  const [isInitialLoad] = useState(true);
+  const [isInitialLoad] = useState(() => {
+    const hasLoaded = localStorage.getItem("hasLoadedApp");
+    if (!hasLoaded) {
+      localStorage.setItem("hasLoadedApp", "true");
+      return true;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    // Only show splash screen on initial app load
     if (!isInitialLoad) {
       setShowSplash(false);
     }
