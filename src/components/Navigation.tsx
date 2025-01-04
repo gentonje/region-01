@@ -11,6 +11,12 @@ import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { BottomNav } from "./navigation/BottomNav";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -75,16 +81,33 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleCurrencyChange(currency === "USD" ? "SSP" : "USD")}
-                      >
-                        <DollarSign className="h-4 w-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                          >
+                            <DollarSign className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("USD")}>
+                            USD
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("SSP")}>
+                            SSP
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("KES")}>
+                            KES
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCurrencyChange("UGX")}>
+                            UGX
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Toggle Currency ({currency})</p>
+                      <p>Select Currency ({currency})</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
