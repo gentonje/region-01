@@ -104,13 +104,17 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-background text-foreground pb-20">
+    <div className="min-h-screen p-4 bg-[#1A1F2C] text-gray-100 pb-20">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto bg-card rounded-lg shadow p-6">
+      <div className="max-w-2xl mx-auto bg-[#252B3B] rounded-lg shadow-lg p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Add New Product</h1>
-          <Button variant="outline" onClick={() => navigate("/")}>
+          <h1 className="text-2xl font-bold text-gray-100">Add New Product</h1>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/")}
+            className="hover:bg-[#2A3142] text-gray-100 border-gray-600"
+          >
             Cancel
           </Button>
         </div>
