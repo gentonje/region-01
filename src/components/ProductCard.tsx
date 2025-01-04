@@ -33,13 +33,32 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
+  // Log the product images data for debugging
+  console.log('Product Images:', {
+    productId: product.id,
+    allImages: product.product_images,
+    storagePath: product.storage_path
+  });
+
   // First try to find the main image from product_images
   const mainImage = product.product_images?.find(img => img.is_main === true);
+  
+  // Log the selected main image for debugging
+  console.log('Selected Main Image:', {
+    productId: product.id,
+    mainImage: mainImage
+  });
   
   // If no main image is found in product_images, use the product's storage_path
   const imageUrl = mainImage 
     ? getProductImageUrl({ ...product, product_images: [mainImage] })
     : product.storage_path;
+
+  // Log the final image URL for debugging
+  console.log('Final Image URL:', {
+    productId: product.id,
+    imageUrl: imageUrl
+  });
 
   return (
     <Card 
