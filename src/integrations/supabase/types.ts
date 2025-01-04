@@ -256,6 +256,7 @@ export type Database = {
           phone_number: string | null
           shop_description: string | null
           shop_name: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
         }
         Insert: {
@@ -270,6 +271,7 @@ export type Database = {
           phone_number?: string | null
           shop_description?: string | null
           shop_name?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
         }
         Update: {
@@ -284,6 +286,7 @@ export type Database = {
           phone_number?: string | null
           shop_description?: string | null
           shop_name?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
         }
         Relationships: []
@@ -449,6 +452,7 @@ export type Database = {
         | "Automotive"
         | "Food & Beverages"
         | "Other"
+      user_type: "buyer" | "seller"
     }
     CompositeTypes: {
       [_ in never]: never

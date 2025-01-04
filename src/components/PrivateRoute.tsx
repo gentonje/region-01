@@ -14,7 +14,7 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
       if (!session?.user?.id) return null;
       const { data, error } = await supabase
         .from("profiles")
-        .select("onboarding_completed")
+        .select("onboarding_completed, user_type")
         .eq("id", session.user.id)
         .single();
 
@@ -46,8 +46,14 @@ export const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Don't redirect to onboarding if already on onboarding page or if it's completed
-  if (!profile?.onboarding_completed && 
+  // Redirect to user type selection if not set
+  if (!profile?.user_type && location.pathname !== "/user-type") {
+    return <Navigate to="/user-type" replace />;
+  }
+
+  // Only redirect to onboarding if user is a seller and hasn't completed it
+  if (profile?.user_type === 'seller' && 
+      !profile?.onboarding_completed && 
       location.pathname !== "/onboarding" && 
       location.pathname !== "/login") {
     return <Navigate to="/onboarding" replace />;

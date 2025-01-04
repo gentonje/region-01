@@ -10,16 +10,18 @@ import AdminUsers from './pages/AdminUsers';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
 import Onboarding from './pages/Onboarding';
+import { UserTypeSelection } from './components/UserTypeSelection';
 
 export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Index />} />
       <Route
-        path="/"
+        path="/user-type"
         element={
           <PrivateRoute>
-            <Index />
+            <UserTypeSelection />
           </PrivateRoute>
         }
       />
