@@ -38,7 +38,8 @@ const Confetti = ({ isActive = true }: ConfettiProps) => {
             animation: {
               enable: true,
               speed: 0.2,
-              value: 0.1,  // Changed to use value which is the correct property in v3
+              start: 0.8,  // Starting opacity value
+              end: 0.1,    // Ending opacity value
               sync: false,
             },
           },
