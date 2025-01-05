@@ -1,4 +1,3 @@
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -15,48 +14,15 @@ interface ProductFiltersProps {
 }
 
 export const ProductFilters = ({
-  selectedCategory,
-  setSelectedCategory,
   onPriceRangeChange,
   onSortChange,
 }: ProductFiltersProps) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const categories = [
-    "all",
-    "Electronics",
-    "Clothing",
-    "Home & Garden",
-    "Books",
-    "Sports & Outdoors",
-    "Toys & Games",
-    "Health & Beauty",
-    "Automotive",
-    "Food & Beverages",
-    "Other",
-  ];
-
   const FilterContent = () => (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="category">Category</Label>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger id="category" className="mt-1">
-            <SelectValue placeholder="Select category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category.charAt(0).toUpperCase() + category.slice(1)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       {onSortChange && (
         <div>
-          <Label htmlFor="sort">Sort By</Label>
           <Select onValueChange={(value) => {
             if (value === 'price_asc' && onPriceRangeChange) {
               onPriceRangeChange(0, 1000);
