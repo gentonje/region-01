@@ -52,7 +52,7 @@ const AddProduct = () => {
           category: data.category,
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
-          user_id: user.id // Add the user_id here
+          user_id: user.id
         })
         .select()
         .single();
@@ -99,17 +99,17 @@ const AddProduct = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div className="min-h-screen bg-background dark:bg-gray-900">
       <Navigation />
       
-      <div className={styles.mainContent}>
-        <div className={styles.formContainer}>
-          <div className={styles.headerContainer}>
-            <h1 className={styles.title}>Add New Product</h1>
+      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20 mt-20">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 overflow-y-auto">
+          <div className="flex justify-between items-center mb-6 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:font-bold">Add New Product</h1>
             <Button 
               variant="outline" 
               onClick={() => navigate("/")}
-              className={styles.cancelButton}
+              className="hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
             >
               Cancel
             </Button>
