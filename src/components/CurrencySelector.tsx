@@ -16,8 +16,11 @@ interface CurrencySelectorProps {
 export const CurrencySelector = ({ value, onValueChange }: CurrencySelectorProps) => {
   return (
     <Select value={value} onValueChange={(val) => onValueChange(val as SupportedCurrency)}>
-      <SelectTrigger className="w-[42px] px-2">
-        <DollarSign className="h-4 w-4" />
+      <SelectTrigger className="w-[80px] px-2">
+        <div className="flex items-center gap-2">
+          <DollarSign className="h-4 w-4" />
+          <span>{value}</span>
+        </div>
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="SSP">SSP</SelectItem>

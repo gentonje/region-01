@@ -91,8 +91,12 @@ export const ProductFilters = ({
   return isMobile ? (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="fixed bottom-20 right-4 z-50 rounded-full shadow-lg">
-          <SlidersHorizontal className="h-4 w-4" />
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="fixed bottom-20 right-4 z-50 rounded-full shadow-lg h-12 w-12"
+        >
+          <SlidersHorizontal className="h-6 w-6" />
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[80vh]">
@@ -102,7 +106,7 @@ export const ProductFilters = ({
             Apply filters to refine your search
           </SheetDescription>
         </SheetHeader>
-        <div className="mt-4">
+        <div className="mt-4 pb-20">
           <FilterContent />
         </div>
       </SheetContent>
