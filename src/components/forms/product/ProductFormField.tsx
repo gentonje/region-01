@@ -54,13 +54,13 @@ export const ProductFormField = ({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className="text-foreground dark:text-gray-200">{label}</FormLabel>
           <FormControl>
             {name === "description" ? (
               <Textarea
                 {...field}
                 placeholder={placeholder}
-                className="resize-none"
+                className="resize-none bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
                 onChange={(e) => {
                   field.onChange(e);
                   setFormData({ ...formData, [name]: e.target.value });
@@ -72,7 +72,7 @@ export const ProductFormField = ({
               ) : (
                 <select
                   {...field}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-gray-900"
+                  className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-background dark:bg-gray-800 px-3 py-2 text-sm text-foreground dark:text-gray-200 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   onChange={(e) => {
                     field.onChange(e);
                     setFormData({
@@ -95,6 +95,7 @@ export const ProductFormField = ({
                 type={type}
                 step={step}
                 placeholder={placeholder}
+                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
                 onChange={(e) => {
                   field.onChange(e);
                   setFormData({ ...formData, [name]: e.target.value });
@@ -102,7 +103,7 @@ export const ProductFormField = ({
               />
             )}
           </FormControl>
-          <FormMessage />
+          <FormMessage className="text-red-500 dark:text-red-400" />
         </FormItem>
       )}
     />
