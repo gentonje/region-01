@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Package, User, Settings, LogOut, Users, Edit } from "lucide-react";
+import { Package, User, Settings, LogOut, Users, Edit, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CurrencyManager } from "../admin/CurrencyManager";
@@ -53,6 +53,12 @@ export const UserMenu = ({ userName, onLogout, isLoading }: UserMenuProps) => {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>{userName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to="/add-product" className="cursor-pointer">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Product
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/products" className="cursor-pointer">
             <Package className="mr-2 h-4 w-4" />
