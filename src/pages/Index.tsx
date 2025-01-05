@@ -10,6 +10,7 @@ import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const { ref, inView } = useInView();
@@ -19,6 +20,7 @@ export default function Index() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
+  const { session } = useAuth();
 
   const {
     data,
@@ -35,9 +37,7 @@ export default function Index() {
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
-        .eq('product_status', 'published')
-        .gte('price', priceRange.min)
-        .lte('price', priceRange.max)
+        .eq('user_id', session?.user.id)
         .range(startRange, endRange);
 
       if (searchQuery) {
@@ -46,6 +46,14 @@ export default function Index() {
 
       if (selectedCategory !== "all") {
         query = query.eq("category", selectedCategory);
+      }
+
+      // Apply price range filter
+      if (priceRange.min > 0) {
+        query = query.gte('price', priceRange.min);
+      }
+      if (priceRange.max < 1000) {
+        query = query.lte('price', priceRange.max);
       }
 
       // Apply sorting if specified
@@ -134,7 +142,7 @@ export default function Index() {
         <div className="mt-20">
           <BreadcrumbNav
             items={[
-              { label: "Products", href: "/" }
+              { label: "My Products", href: "/" }
             ]}
           />
           {selectedProduct ? (
