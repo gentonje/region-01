@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Package, User, Settings, LogOut, Users, Edit, Plus, LogIn, Heart } from "lucide-react";
+import { Package, User, Settings, LogOut, Users, Edit, Plus, LogIn, Heart, Shield } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CurrencyManager } from "../admin/CurrencyManager";
@@ -33,6 +33,26 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
       
       if (error) {
         console.error('Error checking admin status:', error);
+        return false;
+      }
+      
+      return data;
+    },
+    enabled: isAuthenticated
+  });
+
+  const { data: isSuperAdmin } = useQuery({
+    queryKey: ["isSuperAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data, error } = await supabase.rpc('is_super_admin', {
+        user_id: user.id
+      });
+      
+      if (error) {
+        console.error('Error checking super admin status:', error);
         return false;
       }
       
@@ -99,6 +119,14 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
                   <CurrencyManager />
                 </DropdownMenuItem>
               </>
+            )}
+            {isSuperAdmin && (
+              <DropdownMenuItem asChild>
+                <Link to="/admin/manage" className="cursor-pointer">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Manage Admins
+                </Link>
+              </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} className="cursor-pointer">

@@ -8,6 +8,7 @@ import AddProduct from './pages/AddProduct';
 import EditProduct from './pages/EditProduct';
 import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
+import AdminManagement from './pages/AdminManagement';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
 import Wishlist from './pages/Wishlist';
@@ -41,6 +42,38 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useAuth();
+  const { data: isSuperAdmin, isLoading } = useQuery({
+    queryKey: ["isSuperAdmin"],
+    queryFn: async () => {
+      if (!session?.user) return false;
+      
+      const { data, error } = await supabase.rpc('is_super_admin', {
+        user_id: session.user.id
+      });
+      
+      if (error) {
+        console.error('Error checking super admin status:', error);
+        return false;
+      }
+      
+      return data;
+    },
+    enabled: !!session?.user
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isSuperAdmin) {
     return <Navigate to="/" replace />;
   }
 
@@ -126,6 +159,16 @@ export const Routes = () => {
             <AdminRoute>
               <AdminUsers />
             </AdminRoute>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/manage"
+        element={
+          <PrivateRoute>
+            <SuperAdminRoute>
+              <AdminManagement />
+            </SuperAdminRoute>
           </PrivateRoute>
         }
       />
