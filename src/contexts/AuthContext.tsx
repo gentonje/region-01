@@ -22,20 +22,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    let refreshTimeout: NodeJS.Timeout | null = null;
 
     const initSession = async () => {
       try {
         console.log('Initializing session...');
-        
+        setLoading(true);
+
         // Get the current session
         const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Session initialization error:', sessionError);
-          if (mounted) {
-            setSession(null);
-            setUser(null);
-          }
+          handleAuthError(sessionError);
           return;
         }
 
@@ -46,46 +45,82 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             if (refreshError) {
               console.error('Session refresh error:', refreshError);
-              if (mounted) {
-                setSession(null);
-                setUser(null);
-                toast.error("Session expired. Please log in again.");
-              }
+              handleAuthError(refreshError);
               return;
             }
 
             if (mounted && refreshedSession) {
               console.log('Session refreshed successfully');
-              setSession(refreshedSession);
-              setUser(refreshedSession.user);
+              updateSessionState(refreshedSession);
+              scheduleNextRefresh(refreshedSession);
             }
-          } catch (refreshError) {
-            console.error('Session refresh failed:', refreshError);
-            if (mounted) {
-              setSession(null);
-              setUser(null);
-              toast.error("Session refresh failed. Please log in again.");
-            }
+          } catch (error) {
+            console.error('Session refresh failed:', error);
+            handleAuthError(error);
           }
         } else {
           console.log('No valid session found');
-          if (mounted) {
-            setSession(null);
-            setUser(null);
-          }
+          clearSessionState();
         }
       } catch (error) {
         console.error('Session initialization error:', error);
-        if (mounted) {
-          setSession(null);
-          setUser(null);
-          toast.error("Session error. Please try logging in again.");
-        }
+        handleAuthError(error);
       } finally {
         if (mounted) {
           setLoading(false);
         }
       }
+    };
+
+    const handleAuthError = (error: any) => {
+      if (mounted) {
+        clearSessionState();
+        const errorMessage = error.message || "Authentication error occurred";
+        toast.error(errorMessage);
+        console.error('Auth error:', error);
+      }
+    };
+
+    const clearSessionState = () => {
+      if (mounted) {
+        setSession(null);
+        setUser(null);
+        if (refreshTimeout) {
+          clearTimeout(refreshTimeout);
+          refreshTimeout = null;
+        }
+      }
+    };
+
+    const updateSessionState = (newSession: Session) => {
+      if (mounted) {
+        setSession(newSession);
+        setUser(newSession.user);
+      }
+    };
+
+    const scheduleNextRefresh = (currentSession: Session) => {
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout);
+      }
+
+      // Calculate next refresh time (5 minutes before token expires)
+      const expiresIn = currentSession.expires_in || 3600;
+      const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
+
+      refreshTimeout = setTimeout(async () => {
+        try {
+          const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+          if (error) {
+            handleAuthError(error);
+          } else if (refreshedSession && mounted) {
+            updateSessionState(refreshedSession);
+            scheduleNextRefresh(refreshedSession);
+          }
+        } catch (error) {
+          handleAuthError(error);
+        }
+      }, refreshTime);
     };
 
     // Initialize the session
@@ -98,14 +133,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (mounted) {
         if (event === 'SIGNED_OUT') {
           console.log('User signed out');
-          setSession(null);
-          setUser(null);
+          clearSessionState();
           toast.info("You have been signed out.");
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           console.log('Session updated');
           if (currentSession) {
-            setSession(currentSession);
-            setUser(currentSession.user);
+            updateSessionState(currentSession);
+            scheduleNextRefresh(currentSession);
           }
         } else if (event === 'USER_UPDATED') {
           console.log('User updated');
@@ -117,38 +151,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     });
 
-    // Set up periodic session refresh
-    const refreshInterval = setInterval(async () => {
-      if (session) {
-        try {
-          const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
-          if (error) {
-            console.error('Periodic session refresh error:', error);
-            if (mounted) {
-              setSession(null);
-              setUser(null);
-              toast.error("Session expired. Please log in again.");
-            }
-          } else if (mounted && refreshedSession) {
-            setSession(refreshedSession);
-            setUser(refreshedSession.user);
-          }
-        } catch (error) {
-          console.error('Periodic session refresh failed:', error);
-          if (mounted) {
-            setSession(null);
-            setUser(null);
-            toast.error("Session refresh failed. Please log in again.");
-          }
-        }
-      }
-    }, 4 * 60 * 1000); // Refresh every 4 minutes
-
     // Cleanup function
     return () => {
       mounted = false;
+      if (refreshTimeout) {
+        clearTimeout(refreshTimeout);
+      }
       subscription.unsubscribe();
-      clearInterval(refreshInterval);
     };
   }, []);
 
