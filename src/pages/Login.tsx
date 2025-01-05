@@ -44,6 +44,12 @@ const Login = () => {
         navigate('/', { replace: true });
       } else if (event === 'PASSWORD_RECOVERY') {
         toast.info("Password recovery email sent.");
+      } else if (event === 'USER_UPDATED') {
+        toast.success("Account updated successfully!");
+      } else if (event === 'SIGNED_OUT') {
+        toast.info("You have been signed out.");
+      } else if (event === 'USER_DELETED') {
+        toast.info("Account deleted successfully.");
       }
     });
 
@@ -75,12 +81,21 @@ const Login = () => {
             style: {
               button: { background: '#F97316', color: 'white' },
               anchor: { color: '#0EA5E9' },
+              message: { color: '#EF4444' },
             }
           }}
           theme="light"
           providers={[]}
           view={mode === 'login' ? 'sign_in' : 'sign_up'}
           redirectTo={window.location.origin}
+          onError={(error) => {
+            console.error('Auth error:', error);
+            if (error.message.includes('invalid_credentials')) {
+              toast.error("Invalid email or password. Please try again.");
+            } else {
+              toast.error(error.message);
+            }
+          }}
         />
       </div>
     </div>
