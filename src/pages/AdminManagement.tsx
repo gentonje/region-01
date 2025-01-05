@@ -77,52 +77,115 @@ const AdminManagement = () => {
     );
   });
 
+  // Sort profiles: admins first, then other users
+  const sortedProfiles = filteredProfiles?.sort((a, b) => {
+    if (a.user_type === 'admin' && b.user_type !== 'admin') return -1;
+    if (a.user_type !== 'admin' && b.user_type === 'admin') return 1;
+    return 0;
+  });
+
   if (isLoading) {
     return <div className="container mx-auto p-4">Loading...</div>;
   }
+
+  // Separate admins and regular users
+  const adminProfiles = sortedProfiles?.filter(profile => profile.user_type === 'admin');
+  const regularProfiles = sortedProfiles?.filter(profile => profile.user_type !== 'admin');
 
   return (
     <div className="container mx-auto p-4 space-y-4">
       <h1 className="text-2xl font-bold mb-4 mt-10">Admin Management</h1>
       <ProductFilters onSearchChange={setSearchQuery} />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProfiles?.map((profile) => (
-          <Card key={profile.id} className="overflow-hidden">
-            <CardContent className="p-4 space-y-3">
-              <div className="space-y-1">
-                <div className="font-medium">Name</div>
-                <div className="text-sm text-muted-foreground">
-                  {profile.full_name || 'N/A'}
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="font-medium">Email</div>
-                <div className="text-sm text-muted-foreground">
-                  {profile.contact_email || 'N/A'}
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <div className="font-medium">Role</div>
-                <div className="text-sm text-muted-foreground">
-                  {profile.user_type || 'user'}
-                </div>
-              </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full mt-2"
-                onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                disabled={isUpdating || profile.user_type === 'super_admin'}
-              >
-                {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      
+      {/* Admin Section */}
+      {adminProfiles && adminProfiles.length > 0 && (
+        <>
+          <h2 className="text-xl font-semibold mt-6 mb-2">Administrators</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {adminProfiles.map((profile) => (
+              <Card key={profile.id} className="overflow-hidden">
+                <CardContent className="p-4 space-y-3">
+                  <div className="space-y-1">
+                    <div className="font-medium">Name</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.full_name || 'N/A'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="font-medium">Email</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.contact_email || 'N/A'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="font-medium">Role</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.user_type || 'user'}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
+                    disabled={isUpdating || profile.user_type === 'super_admin'}
+                  >
+                    {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Regular Users Section */}
+      {regularProfiles && regularProfiles.length > 0 && (
+        <>
+          <h2 className="text-xl font-semibold mt-6 mb-2">Users</h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {regularProfiles.map((profile) => (
+              <Card key={profile.id} className="overflow-hidden">
+                <CardContent className="p-4 space-y-3">
+                  <div className="space-y-1">
+                    <div className="font-medium">Name</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.full_name || 'N/A'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="font-medium">Email</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.contact_email || 'N/A'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="font-medium">Role</div>
+                    <div className="text-sm text-muted-foreground">
+                      {profile.user_type || 'user'}
+                    </div>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
+                    disabled={isUpdating || profile.user_type === 'super_admin'}
+                  >
+                    {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
