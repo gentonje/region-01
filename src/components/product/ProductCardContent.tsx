@@ -14,13 +14,13 @@ export const ProductCardContent = ({ product }: ProductCardContentProps) => {
             {product.title}
           </CardTitle>
         </div>
+        <div className="h-[42px] overflow-hidden">
+          <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
+        </div>
         <div className="text-center">
           <span className="text-xs text-gray-600 dark:text-gray-300">
             {product.category}
           </span>
-        </div>
-        <div className="h-[42px] overflow-hidden">
-          <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center">
