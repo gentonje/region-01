@@ -43,26 +43,39 @@ const ProductCard = ({
 
   const recordViewMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase
-        .from('product_views')
-        .insert({
-          product_id: product.id,
-          viewer_id: user?.id || null,
-          ip_address: null
-        });
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error } = await supabase
+          .from('product_views')
+          .insert({
+            product_id: product.id,
+            viewer_id: user?.id || null,
+            ip_address: null
+          })
+          .single();
 
-      if (error) {
-        // Ignore unique constraint violations (duplicate daily views)
+        if (error) {
+          // Ignore unique constraint violations (duplicate daily views)
+          if (error.code === '23505') {
+            return;
+          }
+          throw error;
+        }
+      } catch (error: any) {
+        // Handle network errors or other issues
         if (error.code === '23505') {
           return; // Silently ignore duplicate views
+        }
+        if (error.message === 'Failed to fetch') {
+          console.warn('Network error while recording view:', error);
+          return; // Silently ignore network errors
         }
         throw error;
       }
     },
     onError: (error: any) => {
-      // Only show error toast for non-duplicate view errors
-      if (error.code !== '23505') {
+      // Only show error toast for non-duplicate view errors and non-network errors
+      if (error.code !== '23505' && error.message !== 'Failed to fetch') {
         console.error('Error recording view:', error);
         toast.error('Failed to record product view');
       }
@@ -70,7 +83,9 @@ const ProductCard = ({
   });
 
   useEffect(() => {
-    recordViewMutation.mutate();
+    if (product.id) {
+      recordViewMutation.mutate();
+    }
   }, [product.id]);
 
   const convertedPrice = convertCurrency(
