@@ -1,5 +1,5 @@
 import { Card, CardContent, CardFooter } from "./ui/card";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { ProductGallery } from "./product/ProductGallery";
 import { ProductReviews } from "./product/ProductReviews";
 import { ProductInfo } from "./product/ProductInfo";
@@ -30,8 +30,21 @@ const ProductDetail = ({
     product.product_images?.[0]?.storage_path || 
     ''
   );
+  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const updatePrice = async () => {
+      const converted = await convertCurrency(
+        product.price || 0,
+        (product.currency || "SSP") as SupportedCurrency,
+        selectedCurrency
+      );
+      setConvertedPrice(converted);
+    };
+    updatePrice();
+  }, [product.price, product.currency, selectedCurrency]);
 
   const { data: similarProducts } = useQuery({
     queryKey: ['similar-products', product.id, product.category],
@@ -85,12 +98,6 @@ const ProductDetail = ({
     }
     addToCartMutation.mutate();
   };
-
-  const convertedPrice = convertCurrency(
-    product.price || 0,
-    (product.currency || "SSP") as SupportedCurrency,
-    selectedCurrency
-  );
 
   return (
     <div className="space-y-6 pb-20">

@@ -1,22 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Auth, AuthChangeEvent, Session } from "@supabase/auth-ui-react";
+import { Auth } from "@supabase/auth-ui-react";
 import { Logo } from "@/components/navigation/Logo";
 import { toast } from "sonner";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [authView, setAuthView] = useState<'sign_in' | 'sign_up'>('sign_in');
   const navigate = useNavigate();
   const { session } = useAuth();
 
-  const handleAuthChange = (event: AuthChangeEvent, session: Session | null) => {
-    if (event === 'SIGNED_IN' && session) {
-      toast.success('Successfully signed in!');
-      navigate('/');
-    }
-  };
+  if (session) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background">
@@ -31,7 +30,6 @@ const Login = () => {
             view={authView}
             appearance={{ theme: ThemeSupa }}
             providers={['google']}
-            onAuthStateChange={handleAuthChange}
             redirectTo={window.location.origin}
           />
         </div>
