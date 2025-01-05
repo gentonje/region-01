@@ -27,20 +27,20 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
 
     if (error) {
       console.error('Error fetching currency rates:', error);
-      return ratesCache || {};
+      return ratesCache || { SSP: 1 };
     }
 
     const rates = data.reduce((acc: Record<string, number>, curr: CurrencyRate) => ({
       ...acc,
       [curr.code]: curr.rate
-    }), {});
+    }), { SSP: 1 });
 
     ratesCache = rates;
     lastFetchTime = currentTime;
     return rates;
   } catch (error) {
     console.error('Error in getCurrencyRates:', error);
-    return ratesCache || {};
+    return ratesCache || { SSP: 1 };
   }
 };
 
@@ -49,17 +49,22 @@ export const convertCurrency = async (
   fromCurrency: SupportedCurrency,
   toCurrency: SupportedCurrency
 ): Promise<number> => {
-  const rates = await getCurrencyRates();
+  try {
+    const rates = await getCurrencyRates();
 
-  if (!rates[fromCurrency] || !rates[toCurrency]) {
-    console.error('Invalid currency code');
+    if (!rates[fromCurrency] || !rates[toCurrency]) {
+      console.error('Invalid currency code');
+      return amount;
+    }
+
+    // Convert to base currency (SSP) first
+    const amountInSSP = amount / rates[fromCurrency];
+    // Convert from SSP to target currency
+    return Number((amountInSSP * rates[toCurrency]).toFixed(2));
+  } catch (error) {
+    console.error('Error converting currency:', error);
     return amount;
   }
-
-  // Convert to base currency (SSP) first
-  const amountInSSP = amount / rates[fromCurrency];
-  // Convert from SSP to target currency
-  return amountInSSP * rates[toCurrency];
 };
 
 // Initialize rates cache

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductCardImage } from "./product/ProductCardImage";
 import { ProductCardContent } from "./product/ProductCardContent";
+import { useEffect, useState } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -151,11 +152,19 @@ const ProductCard = ({
     }
   });
 
-  const convertedPrice = convertCurrency(
-    product.price || 0,
-    (product.currency || "SSP") as SupportedCurrency,
-    selectedCurrency
-  );
+  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
+
+  useEffect(() => {
+    const updatePrice = async () => {
+      const converted = await convertCurrency(
+        product.price || 0,
+        (product.currency || "SSP") as SupportedCurrency,
+        selectedCurrency
+      );
+      setConvertedPrice(converted);
+    };
+    updatePrice();
+  }, [product.price, product.currency, selectedCurrency]);
 
   const getImageUrl = () => {
     const mainImage = product.product_images?.find(img => img.is_main === true);

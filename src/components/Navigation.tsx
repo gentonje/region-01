@@ -120,3 +120,6 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
     </>
   );
 };
+
+// Export BottomNav as BottomNavigation for backward compatibility
+export const BottomNavigation = BottomNav;
