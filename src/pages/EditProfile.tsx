@@ -114,7 +114,7 @@ export default function EditProfile() {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 pb-20">
+    <div className="container max-w-2xl mx-auto p-4 pb-20 mt-10">
       <div className="flex items-center gap-2 mb-6">
         <UserCog className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Edit Profile</h1>
