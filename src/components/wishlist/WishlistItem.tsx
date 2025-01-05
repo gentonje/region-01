@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ImageLoader } from "@/components/ImageLoader";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 import { Share2, ShoppingCart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,11 +33,18 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
-      toast.success("Item removed from wishlist");
+      toast({
+        title: "Success",
+        description: "Item removed from wishlist",
+      });
     },
     onError: (error) => {
       console.error("Error removing from wishlist:", error);
-      toast.error("Failed to remove item from wishlist");
+      toast({
+        title: "Error",
+        description: "Failed to remove item from wishlist",
+        variant: "destructive",
+      });
     },
   });
 
@@ -58,14 +65,25 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast.success("Added to cart successfully");
+      toast({
+        title: "Success",
+        description: "Added to cart successfully",
+      });
     },
     onError: (error) => {
       console.error("Error adding to cart:", error);
       if (error instanceof Error) {
-        toast.error(error.message);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
       } else {
-        toast.error("Failed to add to cart");
+        toast({
+          title: "Error",
+          description: "Failed to add to cart",
+          variant: "destructive",
+        });
       }
     },
   });
@@ -78,10 +96,17 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
         text: product.description || "I found this interesting product",
         url: window.location.origin + "/products/" + product.id,
       });
-      toast.success("Product shared successfully");
+      toast({
+        title: "Success",
+        description: "Product shared successfully",
+      });
     } catch (error) {
       if (error instanceof Error && error.name !== "AbortError") {
-        toast.error("Failed to share product");
+        toast({
+          title: "Error",
+          description: "Failed to share product",
+          variant: "destructive",
+        });
       }
     } finally {
       setIsSharing(false);

@@ -3,14 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { WishlistItem } from "@/components/wishlist/WishlistItem";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Wishlist = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const toast = useToast();
+  const { toast } = useToast();
 
   const { data: wishlistItems, isLoading } = useQuery({
     queryKey: ["wishlist-items"],
