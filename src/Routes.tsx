@@ -13,16 +13,17 @@ import EditProfile from './pages/EditProfile';
 import Wishlist from './pages/Wishlist';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { session } = useAuth();
   const { data: isAdmin, isLoading } = useQuery({
     queryKey: ["isAdmin"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
+      if (!session?.user) return false;
       
       const { data, error } = await supabase.rpc('is_admin', {
-        user_id: user.id
+        user_id: session.user.id
       });
       
       if (error) {
@@ -31,7 +32,8 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
       }
       
       return data;
-    }
+    },
+    enabled: !!session?.user
   });
 
   if (isLoading) {
@@ -46,11 +48,29 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 export const Routes = () => {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <RouterRoutes>
       <Route path="/" element={<Home />} />
-      <Route path="/products" element={<Index />} />
-      <Route path="/login" element={<Login />} />
+      <Route 
+        path="/products" 
+        element={
+          <PrivateRoute>
+            <Index />
+          </PrivateRoute>
+        } 
+      />
+      <Route 
+        path="/login" 
+        element={
+          session ? <Navigate to="/" replace /> : <Login />
+        } 
+      />
       <Route
         path="/add-product"
         element={
