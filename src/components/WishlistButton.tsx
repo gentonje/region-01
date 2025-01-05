@@ -24,7 +24,7 @@ export const WishlistButton = ({ productId, className }: WishlistButtonProps) =>
         .from("wishlists")
         .select("id")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       return wishlist;
     }
@@ -40,7 +40,7 @@ export const WishlistButton = ({ productId, className }: WishlistButtonProps) =>
         .select("id")
         .eq("wishlist_id", wishlist.id)
         .eq("product_id", productId)
-        .single();
+        .maybeSingle();
 
       return !!data;
     },

@@ -50,8 +50,11 @@ const ProductCard = ({
           viewer_id: user?.id || null,
           ip_address: null // We can't get IP address from client side
         });
-      if (error && error.code !== '23505') { // Ignore unique constraint violations
-        console.error('Error recording view:', error);
+      if (error) {
+        // Ignore unique constraint violations (duplicate daily views)
+        if (error.code !== '23505') {
+          console.error('Error recording view:', error);
+        }
       }
     }
   });
