@@ -18,7 +18,7 @@ export const ProductCardContent = ({ product }: ProductCardContentProps) => {
           <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 px-4">{product.description}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center pt-0 -mt-4">
+      <CardFooter className="flex justify-center -mt-4">
         <span 
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
             ${product.in_stock 
