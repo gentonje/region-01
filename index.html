@@ -11,6 +11,23 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Configure allowed origins for postMessage
+      window.ALLOWED_ORIGINS = [
+        'https://gptengineer.app',
+        'https://confetti-08.lovable.app',
+        window.location.origin
+      ];
+      
+      // Override postMessage to handle origins
+      const originalPostMessage = window.postMessage;
+      window.postMessage = function(message, targetOrigin, transfer) {
+        if (targetOrigin === 'https://gptengineer.app') {
+          targetOrigin = window.location.origin;
+        }
+        return originalPostMessage.call(this, message, targetOrigin, transfer);
+      };
+    </script>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
