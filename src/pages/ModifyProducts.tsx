@@ -41,7 +41,7 @@ export default function ModifyProducts() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">My Products</h1>
+      <h1 className="text-2xl font-bold mb-6 mt-8">My Products</h1>
       <ProductListingSection
         products={allProducts}
         searchQuery={searchQuery}
