@@ -75,7 +75,7 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
     };
 
     getUser();
-  }, [session]); // Add session as a dependency to re-run when auth state changes
+  }, [session]);
 
   const handleLogout = async () => {
     try {
@@ -89,6 +89,7 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
   };
 
   const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
+    console.log("Currency changed to:", newCurrency); // Debug log
     setCurrency(newCurrency);
     if (onCurrencyChange) {
       onCurrencyChange(newCurrency);
