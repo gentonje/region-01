@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Currency {
   id: string;
@@ -26,6 +27,7 @@ export const CurrencyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editingRates, setEditingRates] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   const { data: currencies, isLoading } = useQuery({
     queryKey: ['currencies'],
@@ -103,28 +105,27 @@ export const CurrencyManager = () => {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[425px]'}`}>
           <DialogHeader>
             <DialogTitle>Currency Management</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-[400px] rounded-md border">
+          <ScrollArea className="h-[60vh] rounded-md border">
             <div className="p-4">
-              <table className="w-full">
-                <thead className="sticky top-0 bg-background">
-                  <tr className="border-b">
-                    <th className="p-2 text-left">Code</th>
-                    <th className="p-2 text-left">Name</th>
-                    <th className="p-2 text-left">Rate</th>
-                    <th className="p-2 text-left">Status</th>
-                    <th className="p-2 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <div className="min-w-full table">
+                <div className="sticky top-0 bg-background border-b">
+                  <div className="grid grid-cols-5 gap-2 p-2 text-sm font-medium">
+                    <div className="col-span-1">Code</div>
+                    <div className={`${isMobile ? 'hidden' : 'col-span-1'}`}>Name</div>
+                    <div className="col-span-2">Rate</div>
+                    <div className={`${isMobile ? 'hidden' : 'col-span-1'}`}>Status</div>
+                  </div>
+                </div>
+                <div className="divide-y">
                   {currencies?.map((currency) => (
-                    <tr key={currency.id} className="border-b">
-                      <td className="p-2">{currency.code}</td>
-                      <td className="p-2">{currency.name}</td>
-                      <td className="p-2">
+                    <div key={currency.id} className="grid grid-cols-5 gap-2 p-2 items-center text-sm">
+                      <div className="col-span-1">{currency.code}</div>
+                      <div className={`${isMobile ? 'hidden' : 'col-span-1'}`}>{currency.name}</div>
+                      <div className="col-span-2 flex items-center gap-2">
                         <Input
                           type="number"
                           value={editingRates[currency.id] ?? currency.rate}
@@ -132,17 +133,6 @@ export const CurrencyManager = () => {
                           className="w-24 h-8"
                           step="0.01"
                         />
-                      </td>
-                      <td className="p-2">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          currency.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {currency.status}
-                        </span>
-                      </td>
-                      <td className="p-2">
                         <Button
                           variant="ghost"
                           size="sm"
@@ -151,11 +141,20 @@ export const CurrencyManager = () => {
                         >
                           <Save className="h-4 w-4" />
                         </Button>
-                      </td>
-                    </tr>
+                      </div>
+                      <div className={`${isMobile ? 'hidden' : 'col-span-1'}`}>
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          currency.status === 'active' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' 
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                        }`}>
+                          {currency.status}
+                        </span>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </table>
+                </div>
+              </div>
             </div>
           </ScrollArea>
         </DialogContent>
