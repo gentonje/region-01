@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -9,13 +9,36 @@ import { SupportedCurrency } from "@/utils/currencyConverter";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from 'react-router-dom';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 export default function Home() {
   const { ref, inView } = useInView();
+  const navigate = useNavigate();
   const [selectedCurrency, setSelectedCurrency] = React.useState<SupportedCurrency>("SSP");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const PRODUCTS_PER_PAGE = 8; // Limit for non-authenticated users
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
 
   const {
     data,
@@ -26,8 +49,8 @@ export default function Home() {
   } = useInfiniteQuery({
     queryKey: ["home-products", searchQuery, selectedCategory],
     queryFn: async ({ pageParam = 0 }) => {
-      const startRange = Number(pageParam) * 10;
-      const endRange = startRange + 9;
+      const startRange = Number(pageParam) * (session ? 10 : PRODUCTS_PER_PAGE);
+      const endRange = startRange + (session ? 9 : PRODUCTS_PER_PAGE - 1);
 
       let query = supabase
         .from("products")
@@ -50,17 +73,21 @@ export default function Home() {
       return products as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || lastPage.length < 10) return undefined;
+      if (!lastPage || lastPage.length < (session ? 10 : PRODUCTS_PER_PAGE)) return undefined;
       return allPages.length;
     },
     initialPageParam: 0,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
+      if (!session && data?.pages.flat().length === PRODUCTS_PER_PAGE) {
+        setShowLoginPrompt(true);
+      } else {
+        fetchNextPage();
+      }
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, session, data]);
 
   const allProducts = data?.pages.flat() || [];
 
@@ -76,6 +103,10 @@ export default function Home() {
   };
 
   const handleProductClick = (product: Product) => {
+    if (!session) {
+      setShowLoginPrompt(true);
+      return;
+    }
     setSelectedProduct(product);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -86,6 +117,11 @@ export default function Home() {
 
   const handleBack = () => {
     setSelectedProduct(null);
+  };
+
+  const handleLoginPromptAction = () => {
+    navigate('/login');
+    setShowLoginPrompt(false);
   };
 
   if (isLoading) {
@@ -141,6 +177,25 @@ export default function Home() {
         </div>
       </div>
       <BottomNavigation />
+
+      <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign in to continue</AlertDialogTitle>
+            <AlertDialogDescription>
+              Create an account or sign in to view more products and interact with our marketplace.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowLoginPrompt(false)}>
+              Maybe later
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleLoginPromptAction}>
+              Sign in
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
