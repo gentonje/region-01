@@ -64,6 +64,9 @@ export const CurrencyManager = () => {
   });
 
   const handleRateChange = (currencyId: string, value: string) => {
+    // Prevent negative values
+    if (value.startsWith('-')) return;
+    
     setEditingRates(prev => ({
       ...prev,
       [currencyId]: value,
@@ -72,8 +75,8 @@ export const CurrencyManager = () => {
 
   const handleSaveRate = async (currency: Currency) => {
     const newRate = parseFloat(editingRates[currency.id] || String(currency.rate));
-    if (isNaN(newRate)) {
-      toast.error('Please enter a valid number');
+    if (isNaN(newRate) || newRate <= 0) {
+      toast.error('Please enter a valid positive number');
       return;
     }
     await updateRateMutation.mutateAsync({ id: currency.id, rate: newRate });
@@ -105,7 +108,11 @@ export const CurrencyManager = () => {
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[425px]'}`}>
+        <DialogContent 
+          className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[425px]'}`}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader>
             <DialogTitle>Currency Management</DialogTitle>
           </DialogHeader>
@@ -132,11 +139,16 @@ export const CurrencyManager = () => {
                           onChange={(e) => handleRateChange(currency.id, e.target.value)}
                           className="w-24 h-8"
                           step="0.01"
+                          min="0"
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleSaveRate(currency)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSaveRate(currency);
+                          }}
                           disabled={!editingRates[currency.id]}
                         >
                           <Save className="h-4 w-4" />
