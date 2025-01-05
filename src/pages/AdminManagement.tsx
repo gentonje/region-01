@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProductFilters } from "@/components/ProductFilters";
 
 interface Profile {
   id: string;
@@ -14,6 +15,7 @@ interface Profile {
 
 const AdminManagement = () => {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const { data: profiles, isLoading, refetch } = useQuery({
     queryKey: ["admin-profiles"],
@@ -67,15 +69,24 @@ const AdminManagement = () => {
     }
   };
 
+  const filteredProfiles = profiles?.filter((profile) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      profile.full_name?.toLowerCase().includes(searchLower) ||
+      profile.contact_email?.toLowerCase().includes(searchLower)
+    );
+  });
+
   if (isLoading) {
     return <div className="container mx-auto p-4">Loading...</div>;
   }
 
   return (
     <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Admin Management</h1>
+      <h1 className="text-2xl font-bold mb-4 mt-10">Admin Management</h1>
+      <ProductFilters onSearchChange={setSearchQuery} />
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {profiles?.map((profile) => (
+        {filteredProfiles?.map((profile) => (
           <Card key={profile.id} className="overflow-hidden">
             <CardContent className="p-4 space-y-3">
               <div className="space-y-1">
