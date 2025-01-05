@@ -26,22 +26,17 @@ const ProductCard = ({
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username, full_name')
-          .eq('id', product.user_id)
-          .maybeSingle();
-        
-        if (error) {
-          console.error('Error fetching profile:', error);
-          return null;
-        }
-        return data;
-      } catch (error) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('username, full_name')
+        .eq('id', product.user_id)
+        .maybeSingle();
+      
+      if (error) {
         console.error('Error fetching profile:', error);
         return null;
       }
+      return data;
     },
     enabled: !!product.user_id
   });
