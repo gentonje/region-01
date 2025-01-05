@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductFilters } from "@/components/ProductFilters";
+import { Star } from "lucide-react";
 
 interface Profile {
   id: string;
@@ -106,14 +107,10 @@ const AdminManagement = () => {
               <Card key={profile.id} className="overflow-hidden">
                 <CardContent className="p-4 space-y-3">
                   <div className="space-y-1">
-                    <div className="font-medium">Name</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium flex items-center gap-2">
                       {profile.full_name || 'N/A'}
+                      <Star className="h-4 w-4 text-blue-500 fill-blue-500" />
                     </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="font-medium">Email</div>
                     <div className="text-sm text-muted-foreground">
                       {profile.contact_email || 'N/A'}
                     </div>
@@ -151,14 +148,9 @@ const AdminManagement = () => {
               <Card key={profile.id} className="overflow-hidden">
                 <CardContent className="p-4 space-y-3">
                   <div className="space-y-1">
-                    <div className="font-medium">Name</div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="font-medium">
                       {profile.full_name || 'N/A'}
                     </div>
-                  </div>
-                  
-                  <div className="space-y-1">
-                    <div className="font-medium">Email</div>
                     <div className="text-sm text-muted-foreground">
                       {profile.contact_email || 'N/A'}
                     </div>
