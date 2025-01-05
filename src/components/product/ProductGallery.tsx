@@ -47,7 +47,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
           priority={true}
         />
       </div>
-      <div className="flex gap-4 overflow-x-auto pb-4 px-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="flex gap-4 overflow-x-auto pb-4 px-2 pt-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {images.map((image, index) => (
           <div
             key={index}
