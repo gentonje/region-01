@@ -100,7 +100,7 @@ const ProductCard = ({
           </CardTitle>
         </div>
         <div className="h-[42px] overflow-hidden">
-          <p className="text-xs text-gray-600 line-clamp-2 px-4">{product.description}</p>
+          <p className="text-xs text-gray-500 line-clamp-2 px-4">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-0 -mt-4">

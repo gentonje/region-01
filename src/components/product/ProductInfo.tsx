@@ -1,6 +1,5 @@
-import { Suspense } from "react";
-import { Skeleton } from "../ui/skeleton";
-import { ProductHeader } from "./ProductHeader";
+import { Button } from "../ui/button";
+import { ChevronLeft, Star } from "lucide-react";
 
 interface ProductInfoProps {
   title: string;
@@ -20,31 +19,41 @@ export const ProductInfo = ({
   onBack
 }: ProductInfoProps) => {
   return (
-    <div className="space-y-6">
-      <Suspense fallback={<Skeleton className="h-8 w-3/4" />}>
-        <ProductHeader
-          title={title}
-          category={category}
-          averageRating={averageRating}
-          onBack={onBack}
-        />
-      </Suspense>
-
-      <Suspense fallback={<Skeleton className="h-6 w-24" />}>
-        <div className="flex items-center justify-between">
-          <span className={`text-sm font-medium px-2 py-1 rounded-full ${
-            inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
-            {inStock ? 'In Stock' : 'Out of Stock'}
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex items-center gap-2"
+          onClick={onBack}
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back
+        </Button>
+        <div className="flex items-center gap-2">
+          <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+          <span className="text-sm font-medium text-gray-600">
+            {averageRating.toFixed(1)}
           </span>
         </div>
-      </Suspense>
+      </div>
 
-      <Suspense fallback={<Skeleton className="h-24 w-full" />}>
-        <div className="rounded-md border p-4">
-          <p className="text-sm text-gray-800">{description}</p>
-        </div>
-      </Suspense>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+        <p className="text-sm font-medium text-gray-500">{category}</p>
+      </div>
+
+      <div className="rounded-md border p-4 bg-gray-50/50">
+        <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <span className={`text-sm font-medium px-2 py-1 rounded-full ${
+          inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {inStock ? 'In Stock' : 'Out of Stock'}
+        </span>
+      </div>
     </div>
   );
 };
