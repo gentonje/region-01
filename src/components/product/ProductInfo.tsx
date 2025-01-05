@@ -19,7 +19,7 @@ export const ProductInfo = ({
   onBack
 }: ProductInfoProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
@@ -38,9 +38,9 @@ export const ProductInfo = ({
         </div>
       </div>
 
-      <div>
+      <div className="-mt-2">
         <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-        <p className="text-sm font-medium text-gray-500">{category}</p>
+        <p className="text-sm font-medium text-gray-800">{category}</p>
       </div>
 
       <div className="rounded-md border p-4 bg-gray-50/50">
