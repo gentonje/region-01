@@ -1,9 +1,9 @@
-import { Link } from "react-router-dom";
-import { Users } from "lucide-react";
 import { useDeviceInfo } from "@/hooks/useDeviceInfo";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const BottomNav = () => {
   const deviceInfo = useDeviceInfo();
+  const { session } = useAuth();
   const DeviceIcon = deviceInfo.Icon;
 
   return (
@@ -13,13 +13,13 @@ export const BottomNav = () => {
           <DeviceIcon className="w-4 h-4 mr-2" />
           <span className="text-sm">{deviceInfo.text}</span>
         </div>
-        <Link 
-          to="/admin/users" 
-          className="flex items-center justify-center hover:bg-accent/50 transition-colors"
-        >
-          <Users className="w-4 h-4 mr-2" />
-          <span className="text-sm">Users</span>
-        </Link>
+        <div className="flex items-center justify-center">
+          {session ? (
+            <span className="text-sm">Member</span>
+          ) : (
+            <span className="text-sm text-muted-foreground">Visitor</span>
+          )}
+        </div>
       </div>
     </div>
   );
