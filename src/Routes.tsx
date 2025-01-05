@@ -1,13 +1,13 @@
 import { Routes as RouterRoutes, Route } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
-import { Home } from "@/pages/Home";
-import { AddProduct } from "@/pages/AddProduct";
-import { ModifyProducts } from "@/pages/ModifyProducts";
-import { Login } from "@/pages/Login";
-import { EditProfile } from "@/pages/EditProfile";
-import { Cart } from "@/pages/Cart";
-import { EditProduct } from "@/pages/EditProduct";
-import { AdminUsers } from "@/pages/AdminUsers";
+import Home from "@/pages/Home";
+import AddProduct from "@/pages/AddProduct";
+import ModifyProducts from "@/pages/ModifyProducts";
+import Login from "@/pages/Login";
+import EditProfile from "@/pages/EditProfile";
+import Cart from "@/pages/Cart";
+import EditProduct from "@/pages/EditProduct";
+import AdminUsers from "@/pages/AdminUsers";
 import { WishlistPage } from "@/pages/Wishlist";
 import { PrivateRoute } from "@/components/PrivateRoute";
 
