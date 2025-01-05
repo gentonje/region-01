@@ -1,28 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { SupportedCurrency } from "@/utils/currencyConverter";
 import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { Logo } from "./navigation/Logo";
-import { CurrencySelector } from "./CurrencySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 
 interface NavigationProps {
-  onCurrencyChange?: (currency: SupportedCurrency) => void;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
 }
 
-export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange }: NavigationProps) => {
+export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps) => {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [userName, setUserName] = useState("");
-  const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,14 +84,6 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
     }
   };
 
-  const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
-    console.log("Currency changed to:", newCurrency);
-    setCurrency(newCurrency);
-    if (onCurrencyChange) {
-      onCurrencyChange(newCurrency);
-    }
-  };
-
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
@@ -116,17 +104,8 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
             )}
 
             <div className="flex items-center gap-2">
-              {session && (
-                <CurrencySelector 
-                  value={currency}
-                  onValueChange={handleCurrencyChange}
-                />
-              )}
-
               {session && <CartIndicator />}
-              
               <ThemeToggle />
-
               <UserMenu 
                 userName={userName} 
                 onLogout={handleLogout}
@@ -141,5 +120,3 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
     </>
   );
 };
-
-export { BottomNav as BottomNavigation };
