@@ -47,11 +47,6 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
   if (isLoading) return null;
   if (error) return null;
 
-  // Ensure USD is always available
-  const availableCurrencies = currencies?.length ? currencies : [
-    { code: "USD", name: "US Dollar", symbol: "$", rate: 1, status: 'active' as const }
-  ];
-
   return (
     <Select value={value} onValueChange={(val) => onValueChange(val as SupportedCurrency)}>
       <SelectTrigger className="w-[80px] px-2 h-8">
@@ -61,7 +56,7 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
         </div>
       </SelectTrigger>
       <SelectContent>
-        {availableCurrencies.map((currency) => (
+        {currencies?.map((currency) => (
           <SelectItem key={currency.code} value={currency.code}>
             {currency.code} ({currency.symbol || currency.code})
           </SelectItem>
