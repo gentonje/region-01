@@ -19,6 +19,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const MAX_RETRIES = 3;
 
   useEffect(() => {
     let mounted = true;
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Initializing session...');
         setLoading(true);
+        setRetryCount(0);
 
         const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
         
@@ -56,41 +59,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const refreshSession = async (currentSession: Session) => {
       try {
+        if (retryCount >= MAX_RETRIES) {
+          console.log('Max retries reached, signing out...');
+          await handleSignOut();
+          return;
+        }
+
         const { data: { session: refreshedSession }, error: refreshError } = 
           await supabase.auth.refreshSession();
 
         if (refreshError) {
           console.error('Session refresh error:', refreshError);
-          if (refreshError.message.includes('refresh_token_not_found')) {
-            await supabase.auth.signOut();
-            clearSessionState();
-            toast.error('Your session has expired. Please sign in again.');
+          if (refreshError.message?.includes('refresh_token_not_found')) {
+            await handleSignOut();
             return;
           }
+          
+          setRetryCount(prev => prev + 1);
           handleAuthError(refreshError);
           return;
         }
 
         if (mounted && refreshedSession) {
           console.log('Session refreshed successfully');
+          setRetryCount(0);
           updateSessionState(refreshedSession);
           scheduleNextRefresh(refreshedSession);
         }
       } catch (error) {
         console.error('Session refresh failed:', error);
+        setRetryCount(prev => prev + 1);
         handleAuthError(error);
+      }
+    };
+
+    const handleSignOut = async () => {
+      try {
+        await supabase.auth.signOut();
+        clearSessionState();
+        toast.error('Your session has expired. Please sign in again.');
+      } catch (error) {
+        console.error('Sign out error:', error);
+        clearSessionState();
       }
     };
 
     const handleAuthError = (error: any) => {
       if (mounted) {
-        clearSessionState();
         const errorMessage = error.message || "Authentication error occurred";
         console.error('Auth error:', error);
         
         if (error.message?.includes('session_not_found') || 
-            error.message?.includes('refresh_token_not_found')) {
-          toast.error('Session expired. Please sign in again.');
+            error.message?.includes('refresh_token_not_found') ||
+            error.message?.includes('Failed to fetch')) {
+          handleSignOut();
+        } else if (retryCount < MAX_RETRIES) {
+          toast.error(`${errorMessage} - Retrying... (${retryCount + 1}/${MAX_RETRIES})`);
+          setTimeout(initSession, 1000 * (retryCount + 1));
         } else {
           toast.error(errorMessage);
         }
@@ -120,7 +145,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         clearTimeout(refreshTimeout);
       }
 
-      // Calculate next refresh time (5 minutes before token expires)
       const expiresIn = currentSession.expires_in || 3600;
       const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
 
@@ -144,6 +168,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           console.log('Session updated');
           if (currentSession) {
+            setRetryCount(0);
             updateSessionState(currentSession);
             scheduleNextRefresh(currentSession);
           }
@@ -165,7 +190,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       subscription.unsubscribe();
     };
-  }, []);
+  }, [retryCount]);
 
   return (
     <AuthContext.Provider value={{ session, user, loading }}>
