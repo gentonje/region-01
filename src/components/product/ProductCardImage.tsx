@@ -1,9 +1,9 @@
-import { Product } from "@/types/product";
-import { CardHeader } from "../ui/card";
-import { Button } from "../ui/button";
 import { Heart } from "lucide-react";
-import { Session } from "@supabase/supabase-js";
+import { Button } from "../ui/button";
+import { ImageLoader } from "../ImageLoader";
+import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { Session } from "@supabase/supabase-js";
 
 interface ProductCardImageProps {
   product: Product;
@@ -24,7 +24,7 @@ export const ProductCardImage = ({
   imageUrl,
   selectedCurrency,
   convertedPrice,
-  showStatus = false,
+  showStatus,
   session,
   isAdmin,
   isInWishlist,
@@ -33,49 +33,52 @@ export const ProductCardImage = ({
   onClick,
 }: ProductCardImageProps) => {
   return (
-    <CardHeader className="relative p-0 pb-0 space-y-0 overflow-hidden group h-[200px]" onClick={onClick}>
-      <div className="absolute inset-0 bg-black/20 transition-opacity opacity-0 group-hover:opacity-100 z-10" />
-      <img
+    <div 
+      className="h-52 w-full relative overflow-hidden rounded-t-lg"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.();
+      }}
+    >
+      <ImageLoader
         src={imageUrl}
-        alt={product.title}
-        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+        alt={product.title || ""}
+        className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+        width={400}
+        height={208}
+        priority={false}
       />
-      {session && (
+      <span className="absolute top-3 right-3 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap z-50 border border-neutral-100/50">
+        {selectedCurrency} {convertedPrice.toFixed(2)}
+      </span>
+      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
+        {product.category}
+      </span>
+      {showStatus && (
+        <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
+          product.product_status === 'published' 
+            ? 'bg-green-100/80 text-green-800' 
+            : 'bg-yellow-100/80 text-yellow-800'
+        }`}>
+          {product.product_status === 'published' ? 'Published' : 'Unpublished'}
+        </span>
+      )}
+      {session && !isAdmin && (
         <Button
           variant="ghost"
           size="icon"
-          className={`absolute top-2 right-2 z-20 transition-opacity ${
-            isInWishlist ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          }`}
+          className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
           }}
           disabled={isPending}
         >
-          <Heart
-            className={`h-5 w-5 ${
-              isInWishlist ? "fill-red-500 stroke-red-500" : "fill-none stroke-white"
-            }`}
+          <Heart 
+            className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
           />
         </Button>
       )}
-      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
-        <p className="text-white font-semibold">
-          {selectedCurrency} {convertedPrice.toFixed(2)}
-        </p>
-        {showStatus && (
-          <span 
-            className={`text-xs px-3 py-1.5 rounded-full font-medium mt-1 inline-block
-              ${product.in_stock 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
-                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-              } transition-colors`}
-          >
-            {product.in_stock ? 'In Stock' : 'Out of Stock'}
-          </span>
-        )}
-      </div>
-    </CardHeader>
+    </div>
   );
 };
