@@ -53,9 +53,6 @@ export const ProductCardImage = ({
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </span>
       </div>
-      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
-        {product.category}
-      </span>
       {showStatus && (
         <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
           product.product_status === 'published' 
