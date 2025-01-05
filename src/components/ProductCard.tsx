@@ -20,9 +20,12 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
         .from('profiles')
         .select('username, full_name')
         .eq('id', product.user_id)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return null;
+      }
       return data;
     },
     enabled: !!product.user_id

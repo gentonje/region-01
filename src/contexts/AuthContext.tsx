@@ -51,6 +51,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       } catch (error) {
         console.error('Session initialization error:', error);
+        if (mounted) {
+          setSession(null);
+          setUser(null);
+          toast.error("Session error. Please try logging in again.");
+        }
       } finally {
         if (mounted) {
           setLoading(false);
@@ -66,14 +71,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT') {
-          console.log('User signed out');
+        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+          console.log('User signed out or deleted');
           setSession(null);
           setUser(null);
+          toast.info("You have been signed out.");
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
           console.log('Session updated');
           if (currentSession) {
             setSession(currentSession);
+            setUser(currentSession.user);
+          }
+        } else if (event === 'USER_UPDATED') {
+          console.log('User updated');
+          if (currentSession?.user) {
             setUser(currentSession.user);
           }
         }
