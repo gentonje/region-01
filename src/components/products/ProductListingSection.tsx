@@ -16,6 +16,7 @@ interface ProductListingSectionProps {
   onPriceRangeChange: (min: number, max: number) => void;
   onSortChange: (sort: string) => void;
   getProductImageUrl: (product: Product) => string;
+  showStatus?: boolean;
 }
 
 export const ProductListingSection = ({
@@ -31,6 +32,7 @@ export const ProductListingSection = ({
   onPriceRangeChange,
   onSortChange,
   getProductImageUrl,
+  showStatus = false,
 }: ProductListingSectionProps) => {
   return (
     <>
@@ -49,7 +51,7 @@ export const ProductListingSection = ({
         isFetchingNextPage={isFetchingNextPage}
         observerRef={observerRef}
         selectedCurrency={selectedCurrency}
-        showStatus={false}
+        showStatus={showStatus}
       />
     </>
   );
