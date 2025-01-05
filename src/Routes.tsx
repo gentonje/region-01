@@ -48,7 +48,11 @@ export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/" element={<Home />} />
-      <Route path="/products" element={<Index />} />
+      <Route path="/products" element={
+        <PrivateRoute>
+          <Index />
+        </PrivateRoute>
+      } />
       <Route path="/login" element={<Login />} />
       <Route
         path="/add-product"
@@ -100,6 +104,8 @@ export const Routes = () => {
           </PrivateRoute>
         }
       />
+      {/* Catch all other routes and redirect to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </RouterRoutes>
   );
 };
