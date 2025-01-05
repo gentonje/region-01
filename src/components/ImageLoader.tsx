@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 interface ImageLoaderProps {
   src: string;
@@ -21,6 +22,7 @@ export const ImageLoader = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState<string>("");
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsLoading(true);
@@ -41,13 +43,18 @@ export const ImageLoader = ({
     img.onerror = () => {
       setError(true);
       setIsLoading(false);
+      toast({
+        title: "Error loading image",
+        description: "Failed to load image. Please try again later.",
+        variant: "destructive",
+      });
     };
 
     return () => {
       img.onload = null;
       img.onerror = null;
     };
-  }, [src, priority]);
+  }, [src, priority, toast]);
 
   if (error) {
     return (

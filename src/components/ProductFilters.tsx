@@ -1,27 +1,16 @@
 import { Input } from "@/components/ui/input";
-import { Filter } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { SlidersHorizontal } from "lucide-react";
+import { useMediaQuery } from "@/hooks/useDeviceInfo";
 
 interface ProductFiltersProps {
   searchQuery: string;
-  setSearchQuery: (value: string) => void;
+  setSearchQuery: (query: string) => void;
   selectedCategory: string;
-  setSelectedCategory: (value: string) => void;
+  setSelectedCategory: (category: string) => void;
   onPriceRangeChange?: (min: number, max: number) => void;
   onSortChange?: (sort: string) => void;
 }
@@ -34,106 +23,93 @@ export const ProductFilters = ({
   onPriceRangeChange,
   onSortChange,
 }: ProductFiltersProps) => {
-  const isMobile = useIsMobile();
-  const [minPrice, setMinPrice] = useState<string>("0");
-  const [maxPrice, setMaxPrice] = useState<string>("1000");
-  const [sort, setSort] = useState<string>("none");
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const handlePriceRangeChange = (newMinPrice: string, newMaxPrice: string) => {
-    const min = parseFloat(newMinPrice) || 0;
-    const max = parseFloat(newMaxPrice) || 1000;
-    onPriceRangeChange?.(min, max);
-  };
+  const categories = [
+    "all",
+    "Electronics",
+    "Clothing",
+    "Home & Garden",
+    "Books",
+    "Sports & Outdoors",
+    "Toys & Games",
+    "Health & Beauty",
+    "Automotive",
+    "Food & Beverages",
+    "Other",
+  ];
 
-  const handleSortChange = (value: string) => {
-    setSort(value);
-    onSortChange?.(value);
-  };
+  const FilterContent = () => (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="search">Search Products</Label>
+        <Input
+          id="search"
+          type="text"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mt-1"
+        />
+      </div>
 
-  return (
-    <div className="flex gap-4 items-center">
-      <Input
-        placeholder="Search products..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="max-w-sm"
-      />
-      
-      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-        <SelectTrigger className={isMobile ? "w-[48px]" : "w-[180px]"}>
-          {isMobile ? <Filter className="h-4 w-4" /> : <SelectValue placeholder="Category" />}
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          <SelectItem value="Electronics">Electronics</SelectItem>
-          <SelectItem value="Clothing">Clothing</SelectItem>
-          <SelectItem value="Home & Garden">Home & Garden</SelectItem>
-          <SelectItem value="Books">Books</SelectItem>
-          <SelectItem value="Sports & Outdoors">Sports & Outdoors</SelectItem>
-          <SelectItem value="Toys & Games">Toys & Games</SelectItem>
-          <SelectItem value="Health & Beauty">Health & Beauty</SelectItem>
-          <SelectItem value="Automotive">Automotive</SelectItem>
-          <SelectItem value="Food & Beverages">Food & Beverages</SelectItem>
-          <SelectItem value="Other">Other</SelectItem>
-        </SelectContent>
-      </Select>
+      <div>
+        <Label htmlFor="category">Category</Label>
+        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+          <SelectTrigger id="category" className="mt-1">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category.charAt(0).toUpperCase() + category.slice(1)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline" size="icon" className="h-10 w-10">
-            <span className="sr-only">Price filter</span>
-            $
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80" align="start">
-          <div className="grid gap-3 text-sm">
-            <div className="space-y-1.5">
-              <h4 className="font-medium leading-none text-sm">Price Range</h4>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <Label className="text-xs">Min Price ($)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={minPrice}
-                    onChange={(e) => {
-                      setMinPrice(e.target.value);
-                      handlePriceRangeChange(e.target.value, maxPrice);
-                    }}
-                    className="h-8 text-xs"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-xs">Max Price ($)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={maxPrice}
-                    onChange={(e) => {
-                      setMaxPrice(e.target.value);
-                      handlePriceRangeChange(minPrice, e.target.value);
-                    }}
-                    className="h-8 text-xs"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs">Sort by price</Label>
-              <Select value={sort} onValueChange={handleSortChange}>
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue placeholder="Sort order" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No sorting</SelectItem>
-                  <SelectItem value="asc">Price: Low to High</SelectItem>
-                  <SelectItem value="desc">Price: High to Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
+      {onSortChange && (
+        <div>
+          <Label htmlFor="sort">Sort By</Label>
+          <Select onValueChange={onSortChange}>
+            <SelectTrigger id="sort" className="mt-1">
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+              <SelectItem value="price_asc">Price: Low to High</SelectItem>
+              <SelectItem value="price_desc">Price: High to Low</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+    </div>
+  );
+
+  return isMobile ? (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" size="icon" className="fixed bottom-20 right-4 z-50 rounded-full shadow-lg">
+          <SlidersHorizontal className="h-4 w-4" />
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="bottom" className="h-[80vh]">
+        <SheetHeader>
+          <SheetTitle>Filters</SheetTitle>
+          <SheetDescription>
+            Apply filters to refine your search
+          </SheetDescription>
+        </SheetHeader>
+        <div className="mt-4">
+          <FilterContent />
+        </div>
+      </SheetContent>
+    </Sheet>
+  ) : (
+    <div className="sticky top-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 py-4 border-b">
+      <FilterContent />
     </div>
   );
 };
