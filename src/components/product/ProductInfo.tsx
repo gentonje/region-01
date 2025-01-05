@@ -20,7 +20,7 @@ export const ProductInfo = ({
 }: ProductInfoProps) => {
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mt-4">
         <Button
           variant="ghost"
           size="sm"
