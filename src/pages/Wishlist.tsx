@@ -22,29 +22,45 @@ const Wishlist = () => {
         return [];
       }
 
-      // First get the user's wishlist
-      const { data: wishlists, error: wishlistError } = await supabase
+      // First get or create the user's wishlist
+      const { data: wishlist, error: wishlistError } = await supabase
         .from("wishlists")
         .select("id")
         .eq("user_id", session.user.id)
-        .single();
+        .maybeSingle();
 
       if (wishlistError) {
-        // If no wishlist exists, create one
-        if (wishlistError.code === "PGRST116") {
-          const { data: newWishlist, error: createError } = await supabase
-            .from("wishlists")
-            .insert({
-              user_id: session.user.id,
-              name: "My Wishlist",
-            })
-            .select()
-            .single();
+        console.error("Error fetching wishlist:", wishlistError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch wishlist",
+          variant: "destructive",
+        });
+        return [];
+      }
 
-          if (createError) throw createError;
+      // If no wishlist exists, create one
+      if (!wishlist) {
+        const { data: newWishlist, error: createError } = await supabase
+          .from("wishlists")
+          .insert({
+            user_id: session.user.id,
+            name: "My Wishlist",
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error("Error creating wishlist:", createError);
+          toast({
+            title: "Error",
+            description: "Failed to create wishlist",
+            variant: "destructive",
+          });
           return [];
         }
-        throw wishlistError;
+
+        return [];
       }
 
       // Get wishlist items with product details
@@ -66,9 +82,18 @@ const Wishlist = () => {
             )
           )
         `)
-        .eq("wishlist_id", wishlists.id);
+        .eq("wishlist_id", wishlist.id);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        console.error("Error fetching wishlist items:", itemsError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch wishlist items",
+          variant: "destructive",
+        });
+        return [];
+      }
+
       return items;
     },
     enabled: !!session?.user,
@@ -78,10 +103,6 @@ const Wishlist = () => {
     navigate("/login");
     return null;
   }
-
-  const handleContinueShopping = () => {
-    navigate("/");
-  };
 
   if (isLoading) {
     return (
@@ -109,7 +130,7 @@ const Wishlist = () => {
         <h1 className="text-2xl font-bold">My Wishlist</h1>
         <Button
           variant="outline"
-          onClick={handleContinueShopping}
+          onClick={() => navigate("/")}
           className="flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -131,7 +152,7 @@ const Wishlist = () => {
           <p className="text-muted-foreground mb-4">
             Your wishlist is empty. Browse products to add items to your wishlist.
           </p>
-          <Button onClick={handleContinueShopping}>
+          <Button onClick={() => navigate("/")}>
             Start Shopping
           </Button>
         </div>
