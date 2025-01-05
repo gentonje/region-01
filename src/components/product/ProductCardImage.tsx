@@ -57,29 +57,31 @@ export const ProductCardImage = ({
         {product.category}
       </span>
       {showStatus && (
-        <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
-          product.product_status === 'published' 
-            ? 'bg-green-100/80 text-green-800' 
-            : 'bg-yellow-100/80 text-yellow-800'
-        }`}>
-          {product.product_status === 'published' ? 'Published' : 'Unpublished'}
-        </span>
-      )}
-      {session && !isAdmin && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist();
-          }}
-          disabled={isPending}
-        >
-          <Heart 
-            className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
-          />
-        </Button>
+        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+          <span className={`text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
+            product.product_status === 'published' 
+              ? 'bg-green-100/80 text-green-800' 
+              : 'bg-yellow-100/80 text-yellow-800'
+          }`}>
+            {product.product_status === 'published' ? 'Published' : 'Unpublished'}
+          </span>
+          {session && !isAdmin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist();
+              }}
+              disabled={isPending}
+            >
+              <Heart 
+                className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
+              />
+            </Button>
+          )}
+        </div>
       )}
     </div>
   );
