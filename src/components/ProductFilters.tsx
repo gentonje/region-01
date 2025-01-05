@@ -94,9 +94,9 @@ export const ProductFilters = ({
         <Button 
           variant="outline" 
           size="icon" 
-          className="fixed bottom-20 right-4 z-50 rounded-full shadow-lg h-12 w-12"
+          className="fixed top-20 right-4 z-50 rounded-full shadow-lg h-12 w-12 bg-background/80 backdrop-blur-sm border-primary/50 animate-pulse hover:animate-none hover:border-primary transition-all duration-300 ring-2 ring-primary/20 hover:ring-primary/40"
         >
-          <SlidersHorizontal className="h-6 w-6" />
+          <SlidersHorizontal className="h-6 w-6 text-primary" />
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="h-[80vh]">
