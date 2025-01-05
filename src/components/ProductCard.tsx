@@ -37,10 +37,18 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
     selectedCurrency
   );
 
-  const mainImage = product.product_images?.find(img => img.is_main === true);
-  const imageUrl = mainImage 
-    ? supabase.storage.from('images').getPublicUrl(mainImage.storage_path).data.publicUrl
-    : getProductImageUrl(product);
+  const getImageUrl = () => {
+    const mainImage = product.product_images?.find(img => img.is_main === true);
+    if (mainImage?.storage_path) {
+      const { data } = supabase.storage
+        .from('images')
+        .getPublicUrl(mainImage.storage_path);
+      return data.publicUrl;
+    }
+    return "/placeholder.svg";
+  };
+
+  const imageUrl = getImageUrl();
 
   return (
     <Card 
