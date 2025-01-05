@@ -1,9 +1,11 @@
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageLoader } from "./ImageLoader";
+import { WishlistButton } from "./WishlistButton";
+import { useEffect } from "react";
 
 interface ProductCardProps {
   product: Product;
@@ -13,12 +15,12 @@ interface ProductCardProps {
   showStatus?: boolean;
 }
 
-const ProductCard = ({ 
-  product, 
-  getProductImageUrl, 
-  onClick, 
+const ProductCard = ({
+  product,
+  getProductImageUrl,
+  onClick,
   selectedCurrency,
-  showStatus = false 
+  showStatus = false
 }: ProductCardProps) => {
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
@@ -37,6 +39,26 @@ const ProductCard = ({
     },
     enabled: !!product.user_id
   });
+
+  const recordViewMutation = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('product_views')
+        .insert({
+          product_id: product.id,
+          viewer_id: user?.id || null,
+          ip_address: null // We can't get IP address from client side
+        });
+      if (error && error.code !== '23505') { // Ignore unique constraint violations
+        console.error('Error recording view:', error);
+      }
+    }
+  });
+
+  useEffect(() => {
+    recordViewMutation.mutate();
+  }, [product.id]);
 
   const convertedPrice = convertCurrency(
     product.price || 0,
@@ -58,12 +80,12 @@ const ProductCard = ({
   const imageUrl = getImageUrl();
 
   return (
-    <Card 
+    <Card
       className="w-full h-[323px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
       onClick={onClick}
     >
       <CardContent className="px-0 space-y-2 relative">
-        <div 
+        <div
           className="h-52 w-full relative overflow-hidden rounded-t-lg"
           onClick={(e) => {
             e.stopPropagation();
@@ -78,16 +100,17 @@ const ProductCard = ({
             height={208}
             priority={false}
           />
-          <span className="absolute top-3 right-3 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap z-50 border border-neutral-100/50">
+          <span className="absolute top-3 left-3 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap z-50 border border-neutral-100/50">
             {selectedCurrency} {convertedPrice.toFixed(2)}
           </span>
+          <WishlistButton productId={product.id} />
           <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
             {product.category}
           </span>
           {showStatus && (
             <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
-              product.product_status === 'published' 
-                ? 'bg-green-100/80 text-green-800' 
+              product.product_status === 'published'
+                ? 'bg-green-100/80 text-green-800'
                 : 'bg-yellow-100/80 text-yellow-800'
             }`}>
               {product.product_status === 'published' ? 'Published' : 'Unpublished'}
@@ -104,10 +127,10 @@ const ProductCard = ({
         </div>
       </CardContent>
       <CardFooter className="flex justify-center pt-0 -mt-4">
-        <span 
+        <span
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
-            ${product.in_stock 
-              ? 'bg-green-100 text-green-800' 
+            ${product.in_stock
+              ? 'bg-green-100 text-green-800'
               : 'bg-red-100 text-red-800'
             } transition-colors`}
         >
