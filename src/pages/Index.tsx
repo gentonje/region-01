@@ -150,6 +150,7 @@ export default function Index() {
               product={selectedProduct}
               getProductImageUrl={getProductImageUrl}
               onBack={handleBack}
+              selectedCurrency={selectedCurrency}
             />
           ) : (
             <>
@@ -169,6 +170,7 @@ export default function Index() {
                 isFetchingNextPage={isFetchingNextPage}
                 observerRef={ref}
                 selectedCurrency={selectedCurrency}
+                showStatus={true}
               />
             </>
           )}
