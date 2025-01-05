@@ -15,7 +15,7 @@ import {
 interface Profile {
   id: string;
   user_type: string;
-  email?: string | null;
+  contact_email?: string | null;
   full_name?: string | null;
 }
 
@@ -33,7 +33,7 @@ const AdminManagement = () => {
             id,
             user_type,
             full_name,
-            email
+            contact_email
           `)
           .in('user_type', ['admin', 'user']);
 
@@ -90,7 +90,7 @@ const AdminManagement = () => {
           {profiles?.map((profile) => (
             <TableRow key={profile.id}>
               <TableCell>{profile.full_name || 'N/A'}</TableCell>
-              <TableCell>{profile.email || 'N/A'}</TableCell>
+              <TableCell>{profile.contact_email || 'N/A'}</TableCell>
               <TableCell>{profile.user_type}</TableCell>
               <TableCell>
                 <Button
