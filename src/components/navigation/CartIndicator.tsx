@@ -9,21 +9,33 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 export function CartIndicator() {
   const navigate = useNavigate();
 
-  const { data: cartCount } = useQuery({
+  const { data: cartCount, error } = useQuery({
     queryKey: ["cartCount"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("cart_items")
-        .select("*", { count: "exact", head: true });
+      try {
+        const { count, error } = await supabase
+          .from("cart_items")
+          .select("*", { count: "exact", head: true });
 
-      if (error) throw error;
-      return count || 0;
+        if (error) {
+          console.error("Error fetching cart count:", error);
+          throw error;
+        }
+        return count || 0;
+      } catch (err) {
+        console.error("Failed to fetch cart count:", err);
+        toast.error("Unable to load cart items. Please try again later.");
+        return 0;
+      }
     },
-    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchInterval: 5000,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   return (
@@ -45,7 +57,7 @@ export function CartIndicator() {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Cart ({cartCount} items)</p>
+          <p>Cart ({cartCount || 0} items)</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
