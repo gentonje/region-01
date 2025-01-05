@@ -65,13 +65,13 @@ export default function Home() {
           className="space-x-4"
         >
           <Button 
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/login?mode=login')}
             className="bg-[#F97316] hover:bg-orange-600 text-white px-8 py-2"
           >
             Login
           </Button>
           <Button 
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/login?mode=signup')}
             className="bg-[#0EA5E9] hover:bg-blue-600 text-white px-8 py-2"
           >
             Sign Up

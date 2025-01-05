@@ -1,6 +1,6 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 const Login = () => {
   const navigate = useNavigate();
   const mounted = useRef(true);
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode') || 'login';
 
   useEffect(() => {
     const checkSession = async () => {
@@ -54,14 +56,19 @@ const Login = () => {
       </Link>
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
-          <p className="mt-2 text-sm text-gray-600">Please sign in to your account</p>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            {mode === 'login' ? 'Welcome back' : 'Create your account'}
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            {mode === 'login' ? 'Please sign in to your account' : 'Please sign up for an account'}
+          </p>
         </div>
         <Auth
           supabaseClient={supabase}
           appearance={{ theme: ThemeSupa }}
           theme="light"
           providers={[]}
+          view={mode === 'login' ? 'sign_in' : 'sign_up'}
           redirectTo={window.location.origin}
         />
       </div>
