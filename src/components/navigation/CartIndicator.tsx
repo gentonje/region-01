@@ -17,6 +17,9 @@ export function CartIndicator() {
   const { data: cartCount, error } = useQuery({
     queryKey: ["cartCount"],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return 0;
+
       try {
         const { count, error } = await supabase
           .from("cart_items")
@@ -33,9 +36,10 @@ export function CartIndicator() {
         return 0;
       }
     },
-    refetchInterval: 5000,
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   return (
