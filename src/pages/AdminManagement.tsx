@@ -9,6 +9,16 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { User } from "@supabase/supabase-js";
 
+interface Profile {
+  id: string;
+  full_name: string | null;
+  username: string | null;
+  user_type: string | null;
+  auth_users?: {
+    email: string | null;
+  };
+}
+
 const AdminManagement = () => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
@@ -17,35 +27,47 @@ const AdminManagement = () => {
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-profiles"],
     queryFn: async () => {
-      // First get all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        // First get all profiles
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (profilesError) {
-        toast.error("Failed to fetch users");
-        throw profilesError;
-      }
-
-      // Then get the emails for these profiles
-      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-      
-      if (authError) {
-        toast.error("Failed to fetch user emails");
-        throw authError;
-      }
-
-      // Combine the data
-      const usersWithEmails = profiles.map(profile => ({
-        ...profile,
-        auth_users: {
-          email: (authData.users as User[]).find(user => user.id === profile.id)?.email
+        if (profilesError) {
+          toast.error("Failed to fetch user profiles");
+          throw profilesError;
         }
-      }));
 
-      return usersWithEmails;
+        if (!profiles) {
+          return [];
+        }
+
+        // Then get the emails for these profiles
+        const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
+        
+        if (authError) {
+          toast.error("Failed to fetch user emails");
+          throw authError;
+        }
+
+        // Combine the data
+        const usersWithEmails = profiles.map(profile => ({
+          ...profile,
+          auth_users: {
+            email: authUsers?.find(user => user.id === profile.id)?.email
+          }
+        }));
+
+        return usersWithEmails as Profile[];
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        toast.error("Failed to load users");
+        return [];
+      }
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Mutation to toggle admin status
