@@ -19,6 +19,13 @@ interface Profile {
   };
 }
 
+interface AuthResponse {
+  data: {
+    users: User[];
+  };
+  error: null | Error;
+}
+
 const AdminManagement = () => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
@@ -44,13 +51,8 @@ const AdminManagement = () => {
         }
 
         // Then get the emails for these profiles
-        const { data: { users: authUsers }, error: authError } = await supabase.auth.admin.listUsers();
+        const { data: { users: authUsers } } = await supabase.auth.admin.listUsers() as AuthResponse;
         
-        if (authError) {
-          toast.error("Failed to fetch user emails");
-          throw authError;
-        }
-
         // Combine the data
         const usersWithEmails = profiles.map(profile => ({
           ...profile,
