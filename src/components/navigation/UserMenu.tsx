@@ -69,12 +69,14 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
                 Modify Products
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/wishlist" className="cursor-pointer">
-                <Heart className="mr-2 h-4 w-4" />
-                Wishlist
-              </Link>
-            </DropdownMenuItem>
+            {!isAdmin && (
+              <DropdownMenuItem asChild>
+                <Link to="/wishlist" className="cursor-pointer">
+                  <Heart className="mr-2 h-4 w-4" />
+                  Wishlist
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem asChild>
               <Link to="/edit-profile" className="cursor-pointer">
                 <Settings className="mr-2 h-4 w-4" />
