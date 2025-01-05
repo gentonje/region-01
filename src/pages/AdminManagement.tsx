@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, UserCheck, UserX, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { User } from "@supabase/supabase-js";
 
 const AdminManagement = () => {
   const { session } = useAuth();
@@ -39,7 +40,7 @@ const AdminManagement = () => {
       const usersWithEmails = profiles.map(profile => ({
         ...profile,
         auth_users: {
-          email: authData.users.find(user => user.id === profile.id)?.email
+          email: (authData.users as User[]).find(user => user.id === profile.id)?.email
         }
       }));
 
