@@ -42,6 +42,8 @@ const Login = () => {
         console.log('User signed in on Login page, redirecting to home');
         toast.success("Successfully signed in!");
         navigate('/', { replace: true });
+      } else if (event === 'USER_DELETED') {
+        toast.error("Account has been deleted.");
       } else if (event === 'PASSWORD_RECOVERY') {
         toast.info("Password recovery email sent.");
       }

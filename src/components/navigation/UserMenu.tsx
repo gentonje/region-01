@@ -64,6 +64,12 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
+              <Link to="/products" className="cursor-pointer">
+                <Package className="mr-2 h-4 w-4" />
+                My Products
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/modify-products" className="cursor-pointer">
                 <Edit className="mr-2 h-4 w-4" />
                 Modify Products
