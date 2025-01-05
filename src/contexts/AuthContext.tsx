@@ -41,22 +41,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         // If we have a session, refresh it to ensure it's valid
         if (currentSession) {
-          const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-          
-          if (refreshError) {
-            console.error('Session refresh error:', refreshError);
+          try {
+            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+            
+            if (refreshError) {
+              console.error('Session refresh error:', refreshError);
+              if (mounted) {
+                setSession(null);
+                setUser(null);
+                toast.error("Session expired. Please log in again.");
+              }
+              return;
+            }
+
+            if (mounted && refreshedSession) {
+              console.log('Session refreshed successfully');
+              setSession(refreshedSession);
+              setUser(refreshedSession.user);
+            }
+          } catch (refreshError) {
+            console.error('Session refresh failed:', refreshError);
             if (mounted) {
               setSession(null);
               setUser(null);
-              toast.error("Session expired. Please log in again.");
+              toast.error("Session refresh failed. Please log in again.");
             }
-            return;
-          }
-
-          if (mounted && refreshedSession) {
-            console.log('Session refreshed successfully');
-            setSession(refreshedSession);
-            setUser(refreshedSession.user);
           }
         } else {
           console.log('No valid session found');
@@ -111,17 +120,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up periodic session refresh
     const refreshInterval = setInterval(async () => {
       if (session) {
-        const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
-        if (error) {
-          console.error('Periodic session refresh error:', error);
+        try {
+          const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
+          if (error) {
+            console.error('Periodic session refresh error:', error);
+            if (mounted) {
+              setSession(null);
+              setUser(null);
+              toast.error("Session expired. Please log in again.");
+            }
+          } else if (mounted && refreshedSession) {
+            setSession(refreshedSession);
+            setUser(refreshedSession.user);
+          }
+        } catch (error) {
+          console.error('Periodic session refresh failed:', error);
           if (mounted) {
             setSession(null);
             setUser(null);
-            toast.error("Session expired. Please log in again.");
+            toast.error("Session refresh failed. Please log in again.");
           }
-        } else if (mounted && refreshedSession) {
-          setSession(refreshedSession);
-          setUser(refreshedSession.user);
         }
       }
     }, 4 * 60 * 1000); // Refresh every 4 minutes
