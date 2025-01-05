@@ -7,9 +7,10 @@ import { useState } from "react";
 
 interface WishlistButtonProps {
   productId: string;
+  className?: string;
 }
 
-export const WishlistButton = ({ productId }: WishlistButtonProps) => {
+export const WishlistButton = ({ productId, className }: WishlistButtonProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -102,7 +103,8 @@ export const WishlistButton = ({ productId }: WishlistButtonProps) => {
     }
   });
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsLoading(true);
     try {
       await toggleWishlistMutation.mutateAsync();
@@ -115,7 +117,7 @@ export const WishlistButton = ({ productId }: WishlistButtonProps) => {
     <Button
       variant="ghost"
       size="icon"
-      className={`absolute top-3 right-12 z-50 bg-white/80 backdrop-blur-sm hover:bg-white/90 ${
+      className={`${className} bg-white/80 backdrop-blur-sm hover:bg-white/90 ${
         isInWishlist ? "text-red-500" : "text-gray-500"
       }`}
       onClick={handleClick}
