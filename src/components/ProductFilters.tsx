@@ -72,7 +72,14 @@ export const ProductFilters = ({
       {onSortChange && (
         <div>
           <Label htmlFor="sort">Sort By</Label>
-          <Select onValueChange={onSortChange}>
+          <Select onValueChange={(value) => {
+            if (value === 'price_asc' && onPriceRangeChange) {
+              onPriceRangeChange(0, 1000);
+            } else if (value === 'price_desc' && onPriceRangeChange) {
+              onPriceRangeChange(1000, 0);
+            }
+            onSortChange(value);
+          }}>
             <SelectTrigger id="sort" className="mt-1">
               <SelectValue placeholder="Sort by..." />
             </SelectTrigger>
@@ -94,7 +101,7 @@ export const ProductFilters = ({
         <Button 
           variant="outline" 
           size="icon" 
-          className="fixed top-20 right-4 z-50 rounded-full shadow-lg h-12 w-12 bg-background/80 backdrop-blur-sm border-primary/50 animate-pulse hover:animate-none hover:border-primary transition-all duration-300 ring-2 ring-primary/20 hover:ring-primary/40"
+          className="fixed top-20 right-4 z-50 rounded-full shadow-lg h-12 w-12 bg-background/80 backdrop-blur-sm border-primary/50 hover:border-primary transition-all duration-300 ring-2 ring-primary/20 hover:ring-primary/40"
         >
           <SlidersHorizontal className="h-6 w-6 text-primary" />
         </Button>
