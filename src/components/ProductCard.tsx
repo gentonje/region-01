@@ -26,19 +26,21 @@ const ProductCard = ({
   const { session } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: isAdmin } = useQuery({
-    queryKey: ['isAdmin', session?.user?.id],
+  const { data: userType } = useQuery({
+    queryKey: ['userType', session?.user?.id],
     queryFn: async () => {
-      if (!session?.user) return false;
+      if (!session?.user) return null;
       const { data: profile } = await supabase
         .from('profiles')
         .select('user_type')
         .eq('id', session.user.id)
         .single();
-      return profile?.user_type === 'admin';
+      return profile?.user_type;
     },
     enabled: !!session?.user
   });
+
+  const isAdmin = userType === 'admin';
 
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
@@ -180,7 +182,7 @@ const ProductCard = ({
         convertedPrice={convertedPrice}
         showStatus={showStatus}
         session={session}
-        isAdmin={isAdmin || false}
+        isAdmin={isAdmin}
         isInWishlist={isInWishlist}
         toggleWishlist={toggleWishlist.mutate}
         isPending={toggleWishlist.isPending}

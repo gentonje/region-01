@@ -34,16 +34,13 @@ export const ProductListingSection = ({
   getProductImageUrl,
   showStatus = false,
 }: ProductListingSectionProps) => {
+  const handleSearchChange = (search: string) => {
+    setSearchQuery(search);
+  };
+
   return (
     <>
-      <ProductFilters
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        onPriceRangeChange={onPriceRangeChange}
-        onSortChange={onSortChange}
-      />
+      <ProductFilters onSearchChange={handleSearchChange} />
       <ProductList
         products={products}
         getProductImageUrl={getProductImageUrl}

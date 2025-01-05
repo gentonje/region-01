@@ -21,6 +21,10 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
     return matchesSearch && matchesCategory;
   });
 
+  const handleSearchChange = (search: string) => {
+    setSearchQuery(search);
+  };
+
   return (
     <div className="mb-6 bg-white rounded-lg shadow-sm border border-gray-200">
       <div 
@@ -42,12 +46,7 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
       {isExpanded && (
         <div className="p-4 pt-0">
           <div className="py-4">
-            <ProductFilters
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-            />
+            <ProductFilters onSearchChange={handleSearchChange} />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map((product) => (
