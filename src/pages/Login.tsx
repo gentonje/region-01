@@ -1,9 +1,9 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ const Login = () => {
         
         if (error) {
           console.error('Error checking session on Login page:', error);
+          toast.error("Error checking session. Please try again.");
           return;
         }
 
@@ -28,6 +29,7 @@ const Login = () => {
         }
       } catch (error) {
         console.error('Error in Login page session check:', error);
+        toast.error("Session check failed. Please try again.");
       }
     };
 
@@ -38,7 +40,12 @@ const Login = () => {
       
       if (event === 'SIGNED_IN' && session && mounted.current) {
         console.log('User signed in on Login page, redirecting to home');
+        toast.success("Successfully signed in!");
         navigate('/', { replace: true });
+      } else if (event === 'USER_DELETED') {
+        toast.error("Account has been deleted.");
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast.info("Password recovery email sent.");
       }
     });
 
@@ -65,11 +72,21 @@ const Login = () => {
         </div>
         <Auth
           supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
+          appearance={{ 
+            theme: ThemeSupa,
+            style: {
+              button: { background: '#F97316', color: 'white' },
+              anchor: { color: '#0EA5E9' },
+            }
+          }}
           theme="light"
           providers={[]}
           view={mode === 'login' ? 'sign_in' : 'sign_up'}
           redirectTo={window.location.origin}
+          onError={(error) => {
+            console.error('Auth error:', error);
+            toast.error(error.message || "Authentication failed. Please try again.");
+          }}
         />
       </div>
     </div>
