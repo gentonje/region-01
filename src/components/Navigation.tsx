@@ -116,10 +116,12 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
             )}
 
             <div className="flex items-center gap-2">
-              <CurrencySelector 
-                value={currency}
-                onValueChange={handleCurrencyChange}
-              />
+              {session && (
+                <CurrencySelector 
+                  value={currency}
+                  onValueChange={handleCurrencyChange}
+                />
+              )}
 
               {session && <CartIndicator />}
               
