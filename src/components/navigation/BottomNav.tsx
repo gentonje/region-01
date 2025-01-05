@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Package, ShoppingCart, User } from "lucide-react";
+import { Home, User } from "lucide-react";
 
 interface BottomNavProps {
   isAuthenticated: boolean;
@@ -28,32 +28,10 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
           </Link>
 
           {isAuthenticated ? (
-            <>
-              <Link
-                to="/modify-products"
-                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-                  isActive("/modify-products") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
-                }`}
-              >
-                <Package className="h-5 w-5" />
-                <span className="text-xs mt-1">Products</span>
-              </Link>
-
-              <Link
-                to="/cart"
-                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-                  isActive("/cart") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
-                }`}
-              >
-                <ShoppingCart className="h-5 w-5" />
-                <span className="text-xs mt-1">Cart</span>
-              </Link>
-
-              <div className="flex flex-col items-center p-2 text-green-500">
-                <User className="h-5 w-5" />
-                <span className="text-xs mt-1">Member</span>
-              </div>
-            </>
+            <div className="flex flex-col items-center p-2 text-green-500">
+              <User className="h-5 w-5" />
+              <span className="text-xs mt-1">Member</span>
+            </div>
           ) : (
             <div className="flex flex-col items-center p-2 text-gray-500">
               <User className="h-5 w-5" />
