@@ -33,10 +33,10 @@ export function CartIndicator() {
           <Button
             variant="ghost"
             size="icon"
-            className="relative"
+            className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300"
             onClick={() => navigate("/cart")}
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-5 w-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 {cartCount}

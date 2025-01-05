@@ -48,18 +48,22 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <User className="h-4 w-4" />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300"
+        >
+          <User className="h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="backdrop-blur-sm bg-background/95">
         <DropdownMenuLabel>{isAuthenticated ? userName : "Visitor"}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {isAuthenticated ? (
           <>
             <DropdownMenuItem asChild>
-              <Link to="/add-product" className="cursor-pointer">
-                <Plus className="mr-2 h-4 w-4" />
+              <Link to="/add-product" className="cursor-pointer group">
+                <Plus className="mr-2 h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
                 Add Product
               </Link>
             </DropdownMenuItem>
@@ -104,8 +108,8 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
           </>
         ) : (
           <DropdownMenuItem asChild>
-            <Link to="/login" className="cursor-pointer">
-              <LogIn className="mr-2 h-4 w-4" />
+            <Link to="/login" className="cursor-pointer group">
+              <LogIn className="mr-2 h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
               Login
             </Link>
           </DropdownMenuItem>

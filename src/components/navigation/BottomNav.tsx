@@ -17,11 +17,13 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
         <Link
           to="/"
           className={cn(
-            "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
-            isActive("/") && "text-orange-500"
+            "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
+            "before:absolute before:inset-0 before:rounded-lg before:bg-white/5 before:opacity-0 hover:before:opacity-100",
+            "relative backdrop-blur-sm bg-white/10 hover:bg-white/20",
+            isActive("/") && "text-orange-500 bg-white/20"
           )}
         >
-          <Home className="w-5 h-5" />
+          <Home className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
           <span className="text-xs">Home</span>
         </Link>
 
@@ -29,11 +31,13 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
           <Link
             to="/wishlist"
             className={cn(
-              "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
-              isActive("/wishlist") && "text-orange-500"
+              "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
+              "before:absolute before:inset-0 before:rounded-lg before:bg-white/5 before:opacity-0 hover:before:opacity-100",
+              "relative backdrop-blur-sm bg-white/10 hover:bg-white/20",
+              isActive("/wishlist") && "text-orange-500 bg-white/20"
             )}
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
             <span className="text-xs">Wishlist</span>
           </Link>
         )}
