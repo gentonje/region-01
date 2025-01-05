@@ -10,12 +10,15 @@ import { CurrencySelector } from "./CurrencySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
+import { Input } from "./ui/input";
 
 interface NavigationProps {
   onCurrencyChange?: (currency: SupportedCurrency) => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
 }
 
-export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
+export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange }: NavigationProps) => {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [userName, setUserName] = useState("");
@@ -96,6 +99,18 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
             <Logo />
+
+            {onSearchChange && (
+              <div className="flex-1 max-w-md mx-4">
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            )}
 
             <div className="flex items-center gap-2">
               <CurrencySelector 

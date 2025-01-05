@@ -1,4 +1,3 @@
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -16,8 +15,6 @@ interface ProductFiltersProps {
 }
 
 export const ProductFilters = ({
-  searchQuery,
-  setSearchQuery,
   selectedCategory,
   setSelectedCategory,
   onPriceRangeChange,
@@ -41,18 +38,6 @@ export const ProductFilters = ({
 
   const FilterContent = () => (
     <div className="space-y-4">
-      <div>
-        <Label htmlFor="search">Search Products</Label>
-        <Input
-          id="search"
-          type="text"
-          placeholder="Search..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mt-1"
-        />
-      </div>
-
       <div>
         <Label htmlFor="category">Category</Label>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
