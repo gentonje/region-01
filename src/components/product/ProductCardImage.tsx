@@ -49,18 +49,18 @@ export const ProductCardImage = ({
         priority={false}
       />
       <div className="absolute top-3 w-full px-3 flex justify-end items-center">
-        <span className="text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-neutral-100/50">
+        <span className="text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-orange-500/50">
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </span>
       </div>
-      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
+      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-blue-500/50">
         {product.category}
       </span>
       {showStatus && (
         <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
           product.product_status === 'published' 
-            ? 'bg-green-100/80 text-green-800' 
-            : 'bg-yellow-100/80 text-yellow-800'
+            ? 'bg-green-100/80 text-green-800 border-green-500/50' 
+            : 'bg-yellow-100/80 text-yellow-800 border-yellow-500/50'
         }`}>
           {product.product_status === 'published' ? 'Published' : 'Unpublished'}
         </span>
@@ -69,7 +69,7 @@ export const ProductCardImage = ({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
+          className="absolute bottom-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white border border-neutral-200/50"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
