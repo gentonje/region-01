@@ -35,7 +35,7 @@ const ProductCard = ({
         .select('user_type')
         .eq('id', session.user.id)
         .single();
-      return profile?.user_type;
+      return profile?.user_type as 'buyer' | 'seller' | 'admin';
     },
     enabled: !!session?.user
   });
