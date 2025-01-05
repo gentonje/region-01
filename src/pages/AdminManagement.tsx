@@ -4,7 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, UserCheck, UserX } from "lucide-react";
+import { Shield, UserCheck, UserX, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,13 +12,18 @@ const AdminManagement = () => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
 
-  // Query to get all users with their profiles
+  // Query to get all users with their profiles and emails
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-profiles"],
     queryFn: async () => {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(`
+          *,
+          auth_users:id (
+            email
+          )
+        `)
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -85,6 +90,10 @@ const AdminManagement = () => {
                 <div>
                   <h3 className="font-medium">{user.full_name || "Unnamed User"}</h3>
                   <p className="text-sm text-muted-foreground">{user.username || "No username"}</p>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                    <Mail className="h-3 w-3" />
+                    <span>{(user.auth_users as any)?.email || "No email"}</span>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     Type: {user.user_type || "regular user"}
                   </p>
