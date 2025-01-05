@@ -34,6 +34,7 @@ const AdminManagement = () => {
             full_name,
             contact_email
           `)
+          .in('user_type', ['buyer', 'seller', 'admin'])
           .not('user_type', 'eq', 'super_admin');
 
         if (error) {
