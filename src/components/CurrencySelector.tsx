@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { DollarSign } from "lucide-react";
+import { Currency } from "lucide-react";
 
 interface CurrencySelectorProps {
   value: SupportedCurrency;
@@ -18,8 +18,8 @@ export const CurrencySelector = ({ value, onValueChange }: CurrencySelectorProps
     <Select value={value} onValueChange={(val) => onValueChange(val as SupportedCurrency)}>
       <SelectTrigger className="w-[80px] px-2">
         <div className="flex items-center gap-2">
-          <DollarSign className="h-4 w-4" />
-          <span>{value}</span>
+          <Currency className="h-4 w-4" />
+          <SelectValue>{value}</SelectValue>
         </div>
       </SelectTrigger>
       <SelectContent>

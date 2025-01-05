@@ -90,7 +90,9 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
 
   const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
     setCurrency(newCurrency);
-    onCurrencyChange?.(newCurrency);
+    if (onCurrencyChange) {
+      onCurrencyChange(newCurrency);
+    }
   };
 
   return (
