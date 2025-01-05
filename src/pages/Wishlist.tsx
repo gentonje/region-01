@@ -22,79 +22,94 @@ const Wishlist = () => {
         return [];
       }
 
-      // First get or create the user's wishlist
-      const { data: wishlist, error: wishlistError } = await supabase
-        .from("wishlists")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .maybeSingle();
-
-      if (wishlistError) {
-        console.error("Error fetching wishlist:", wishlistError);
-        toast({
-          title: "Error",
-          description: "Failed to fetch wishlist",
-          variant: "destructive",
-        });
-        return [];
-      }
-
-      // If no wishlist exists, create one
-      if (!wishlist) {
-        const { data: newWishlist, error: createError } = await supabase
+      try {
+        // First try to get the existing wishlist
+        const { data: existingWishlist, error: fetchError } = await supabase
           .from("wishlists")
-          .insert({
-            user_id: session.user.id,
-            name: "My Wishlist",
-          })
-          .select()
-          .single();
+          .select("id")
+          .eq("user_id", session.user.id)
+          .maybeSingle();
 
-        if (createError) {
-          console.error("Error creating wishlist:", createError);
+        let wishlistId;
+
+        if (fetchError) {
+          console.error("Error fetching wishlist:", fetchError);
           toast({
             title: "Error",
-            description: "Failed to create wishlist",
+            description: "Failed to fetch wishlist",
             variant: "destructive",
           });
           return [];
         }
 
-        return [];
-      }
+        // If no wishlist exists, create one
+        if (!existingWishlist) {
+          const { data: newWishlist, error: createError } = await supabase
+            .from("wishlists")
+            .insert({
+              user_id: session.user.id,
+              name: "My Wishlist",
+              visibility: "private"
+            })
+            .select("id")
+            .maybeSingle();
 
-      // Get wishlist items with product details
-      const { data: items, error: itemsError } = await supabase
-        .from("wishlist_items")
-        .select(`
-          id,
-          product_id,
-          products (
+          if (createError || !newWishlist) {
+            console.error("Error creating wishlist:", createError);
+            toast({
+              title: "Error",
+              description: "Failed to create wishlist",
+              variant: "destructive",
+            });
+            return [];
+          }
+
+          wishlistId = newWishlist.id;
+        } else {
+          wishlistId = existingWishlist.id;
+        }
+
+        // Get wishlist items with product details
+        const { data: items, error: itemsError } = await supabase
+          .from("wishlist_items")
+          .select(`
             id,
-            title,
-            description,
-            price,
-            currency,
-            in_stock,
-            product_images (
-              storage_path,
-              is_main
+            product_id,
+            products (
+              id,
+              title,
+              description,
+              price,
+              currency,
+              in_stock,
+              product_images (
+                storage_path,
+                is_main
+              )
             )
-          )
-        `)
-        .eq("wishlist_id", wishlist.id);
+          `)
+          .eq("wishlist_id", wishlistId);
 
-      if (itemsError) {
-        console.error("Error fetching wishlist items:", itemsError);
+        if (itemsError) {
+          console.error("Error fetching wishlist items:", itemsError);
+          toast({
+            title: "Error",
+            description: "Failed to fetch wishlist items",
+            variant: "destructive",
+          });
+          return [];
+        }
+
+        return items || [];
+      } catch (error) {
+        console.error("Unexpected error:", error);
         toast({
           title: "Error",
-          description: "Failed to fetch wishlist items",
+          description: "An unexpected error occurred",
           variant: "destructive",
         });
         return [];
       }
-
-      return items;
     },
     enabled: !!session?.user,
   });
