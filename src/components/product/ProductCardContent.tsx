@@ -8,7 +8,7 @@ interface ProductCardContentProps {
 export const ProductCardContent = ({ product }: ProductCardContentProps) => {
   return (
     <>
-      <CardContent className="px-4 space-y-2 relative">
+      <CardContent className="px-4 space-y-1 relative">
         <div className="pt-1">
           <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-center max-w-[90%] mx-auto">
             {product.title}
