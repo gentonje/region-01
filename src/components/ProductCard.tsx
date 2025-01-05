@@ -42,19 +42,24 @@ const ProductCard = ({
 
   const recordViewMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase
-        .from('product_views')
-        .insert({
-          product_id: product.id,
-          viewer_id: user?.id || null,
-          ip_address: null // We can't get IP address from client side
-        });
-      if (error) {
-        // Ignore unique constraint violations (duplicate daily views)
-        if (error.code !== '23505') {
-          console.error('Error recording view:', error);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { error } = await supabase
+          .from('product_views')
+          .insert({
+            product_id: product.id,
+            viewer_id: user?.id || null,
+            ip_address: null
+          });
+
+        if (error) {
+          // Ignore unique constraint violations (duplicate daily views)
+          if (error.code !== '23505') {
+            throw error;
+          }
         }
+      } catch (error) {
+        console.error('Error recording view:', error);
       }
     }
   });

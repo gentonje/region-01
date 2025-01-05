@@ -17,32 +17,44 @@ export const WishlistButton = ({ productId, className }: WishlistButtonProps) =>
   const { data: wishlist } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
 
-      const { data: wishlist } = await supabase
-        .from("wishlists")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
+        const { data: wishlist, error } = await supabase
+          .from("wishlists")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
 
-      return wishlist;
+        if (error) throw error;
+        return wishlist;
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        return null;
+      }
     }
   });
 
   const { data: isInWishlist } = useQuery({
     queryKey: ["wishlist", wishlist?.id, productId],
     queryFn: async () => {
-      if (!wishlist) return false;
+      try {
+        if (!wishlist) return false;
 
-      const { data } = await supabase
-        .from("wishlist_items")
-        .select("id")
-        .eq("wishlist_id", wishlist.id)
-        .eq("product_id", productId)
-        .maybeSingle();
+        const { data, error } = await supabase
+          .from("wishlist_items")
+          .select("id")
+          .eq("wishlist_id", wishlist.id)
+          .eq("product_id", productId)
+          .maybeSingle();
 
-      return !!data;
+        if (error) throw error;
+        return !!data;
+      } catch (error) {
+        console.error("Error checking wishlist item:", error);
+        return false;
+      }
     },
     enabled: !!wishlist
   });

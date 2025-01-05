@@ -16,14 +16,22 @@ export function CartIndicator() {
   const { data: cartCount } = useQuery({
     queryKey: ["cartCount"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("cart_items")
-        .select("*", { count: "exact", head: true });
+      try {
+        const { count, error } = await supabase
+          .from("cart_items")
+          .select("*", { count: "exact", head: true });
 
-      if (error) throw error;
-      return count || 0;
+        if (error) {
+          console.error("Error fetching cart count:", error);
+          return 0;
+        }
+        return count || 0;
+      } catch (error) {
+        console.error("Failed to fetch cart count:", error);
+        return 0;
+      }
     },
-    refetchInterval: 5000, // Refetch every 5 seconds
+    refetchInterval: 5000,
   });
 
   return (
