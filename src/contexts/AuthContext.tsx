@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log('Initializing session...');
         setLoading(true);
 
-        // Get the current session
         const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -38,26 +37,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        // If we have a session, refresh it to ensure it's valid
         if (currentSession) {
-          try {
-            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-            
-            if (refreshError) {
-              console.error('Session refresh error:', refreshError);
-              handleAuthError(refreshError);
-              return;
-            }
-
-            if (mounted && refreshedSession) {
-              console.log('Session refreshed successfully');
-              updateSessionState(refreshedSession);
-              scheduleNextRefresh(refreshedSession);
-            }
-          } catch (error) {
-            console.error('Session refresh failed:', error);
-            handleAuthError(error);
-          }
+          console.log('Found existing session, refreshing...');
+          await refreshSession(currentSession);
         } else {
           console.log('No valid session found');
           clearSessionState();
@@ -72,12 +54,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
 
+    const refreshSession = async (currentSession: Session) => {
+      try {
+        const { data: { session: refreshedSession }, error: refreshError } = 
+          await supabase.auth.refreshSession();
+
+        if (refreshError) {
+          console.error('Session refresh error:', refreshError);
+          if (refreshError.message.includes('refresh_token_not_found')) {
+            await supabase.auth.signOut();
+            clearSessionState();
+            toast.error('Your session has expired. Please sign in again.');
+            return;
+          }
+          handleAuthError(refreshError);
+          return;
+        }
+
+        if (mounted && refreshedSession) {
+          console.log('Session refreshed successfully');
+          updateSessionState(refreshedSession);
+          scheduleNextRefresh(refreshedSession);
+        }
+      } catch (error) {
+        console.error('Session refresh failed:', error);
+        handleAuthError(error);
+      }
+    };
+
     const handleAuthError = (error: any) => {
       if (mounted) {
         clearSessionState();
         const errorMessage = error.message || "Authentication error occurred";
-        toast.error(errorMessage);
         console.error('Auth error:', error);
+        
+        if (error.message?.includes('session_not_found') || 
+            error.message?.includes('refresh_token_not_found')) {
+          toast.error('Session expired. Please sign in again.');
+        } else {
+          toast.error(errorMessage);
+        }
       }
     };
 
@@ -108,18 +124,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const expiresIn = currentSession.expires_in || 3600;
       const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
 
-      refreshTimeout = setTimeout(async () => {
-        try {
-          const { data: { session: refreshedSession }, error } = await supabase.auth.refreshSession();
-          if (error) {
-            handleAuthError(error);
-          } else if (refreshedSession && mounted) {
-            updateSessionState(refreshedSession);
-            scheduleNextRefresh(refreshedSession);
-          }
-        } catch (error) {
-          handleAuthError(error);
-        }
+      refreshTimeout = setTimeout(() => {
+        refreshSession(currentSession);
       }, refreshTime);
     };
 
