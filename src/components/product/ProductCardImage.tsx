@@ -57,7 +57,7 @@ export const ProductCardImage = ({
         {product.category}
       </span>
       {showStatus && (
-        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+        <div className="absolute top-1/2 -translate-y-1/2 right-3 flex flex-col items-end gap-2">
           <span className={`text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
             product.product_status === 'published' 
               ? 'bg-green-100/80 text-green-800' 
