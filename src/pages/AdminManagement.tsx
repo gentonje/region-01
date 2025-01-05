@@ -12,26 +12,38 @@ const AdminManagement = () => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
 
-  // Query to get all users with their profiles and emails
+  // Query to get all users with their profiles
   const { data: users, isLoading } = useQuery({
     queryKey: ["users-with-profiles"],
     queryFn: async () => {
-      const { data: profiles, error } = await supabase
+      // First get all profiles
+      const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          auth_users:id (
-            email
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) {
+      if (profilesError) {
         toast.error("Failed to fetch users");
-        throw error;
+        throw profilesError;
       }
 
-      return profiles;
+      // Then get the emails for these profiles
+      const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
+      
+      if (authError) {
+        toast.error("Failed to fetch user emails");
+        throw authError;
+      }
+
+      // Combine the data
+      const usersWithEmails = profiles.map(profile => ({
+        ...profile,
+        auth_users: {
+          email: authData.users.find(user => user.id === profile.id)?.email
+        }
+      }));
+
+      return usersWithEmails;
     },
   });
 
@@ -92,7 +104,7 @@ const AdminManagement = () => {
                   <p className="text-sm text-muted-foreground">{user.username || "No username"}</p>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                     <Mail className="h-3 w-3" />
-                    <span>{(user.auth_users as any)?.email || "No email"}</span>
+                    <span>{user.auth_users?.email || "No email"}</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
                     Type: {user.user_type || "regular user"}
