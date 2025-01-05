@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+.dark .read-the-docs {
+  color: #bbb;
+}
+
+:is(.dark) {
+  --tw-text-opacity: 1;
+  color: rgb(229 231 235 / var(--tw-text-opacity));
+}
