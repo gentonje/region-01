@@ -71,8 +71,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.log('Auth state changed:', event);
       
       if (mounted) {
-        if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-          console.log('User signed out or deleted');
+        if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
           setSession(null);
           setUser(null);
           toast.info("You have been signed out.");
