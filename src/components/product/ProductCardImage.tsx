@@ -51,7 +51,7 @@ export const ProductCardImage = ({
       <span className="absolute top-3 right-3 text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap z-50 border border-neutral-100/50">
         {selectedCurrency} {convertedPrice.toFixed(2)}
       </span>
-      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-800 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
+      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-neutral-100/50">
         {product.category}
       </span>
       {showStatus && (

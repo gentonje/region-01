@@ -10,12 +10,12 @@ export const ProductCardContent = ({ product }: ProductCardContentProps) => {
     <>
       <CardContent className="px-4 space-y-1 relative">
         <div className="pt-1">
-          <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-center max-w-[90%] mx-auto">
+          <CardTitle className="text-sm font-medium truncate text-gray-900 dark:text-gray-50 min-w-[100px] text-center max-w-[90%] mx-auto">
             {product.title}
           </CardTitle>
         </div>
         <div className="h-[42px] overflow-hidden">
-          <p className="text-xs text-gray-500 dark:text-gray-300 line-clamp-2">{product.description}</p>
+          <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
       </CardContent>
       <CardFooter className="flex justify-center">
