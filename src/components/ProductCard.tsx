@@ -60,13 +60,16 @@ const ProductCard = ({
 
         if (error) {
           // Ignore unique constraint violations (duplicate daily views)
-          if (error.code !== '23505') {
-            console.error('Error recording view:', error);
+          if (error.code === '23505') {
+            console.log('Product view already recorded for today');
+            return;
           }
+          throw error;
         }
-      } catch (error) {
+      } catch (error: any) {
         // Only show error toast for non-duplicate view errors
         if (error.code !== '23505') {
+          console.error('Error recording view:', error);
           toast.error('Failed to record product view');
         }
       }
