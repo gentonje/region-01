@@ -1,12 +1,10 @@
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageLoader } from "./ImageLoader";
 import { WishlistButton } from "./WishlistButton";
-import { useEffect } from "react";
-import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -40,53 +38,6 @@ const ProductCard = ({
     },
     enabled: !!product.user_id
   });
-
-  const recordViewMutation = useMutation({
-    mutationFn: async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
-          .from('product_views')
-          .insert({
-            product_id: product.id,
-            viewer_id: user?.id || null,
-            ip_address: null
-          })
-          .single();
-
-        if (error) {
-          // Ignore unique constraint violations (duplicate daily views)
-          if (error.code === '23505') {
-            return;
-          }
-          throw error;
-        }
-      } catch (error: any) {
-        // Handle network errors or other issues
-        if (error.code === '23505') {
-          return; // Silently ignore duplicate views
-        }
-        if (error.message === 'Failed to fetch') {
-          console.warn('Network error while recording view:', error);
-          return; // Silently ignore network errors
-        }
-        throw error;
-      }
-    },
-    onError: (error: any) => {
-      // Only show error toast for non-duplicate view errors and non-network errors
-      if (error.code !== '23505' && error.message !== 'Failed to fetch') {
-        console.error('Error recording view:', error);
-        toast.error('Failed to record product view');
-      }
-    }
-  });
-
-  useEffect(() => {
-    if (product.id) {
-      recordViewMutation.mutate();
-    }
-  }, [product.id]);
 
   const convertedPrice = convertCurrency(
     product.price || 0,
