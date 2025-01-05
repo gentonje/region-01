@@ -21,8 +21,8 @@ export const ProductActions = ({
   isAddingToCart
 }: ProductActionsProps) => {
   return (
-    <div className="flex justify-between items-center">
-      <p className="text-2xl font-bold text-gray-900">
+    <div className="flex justify-between items-center w-full">
+      <p className="text-2xl font-bold text-gray-500">
         {selectedCurrency} {convertedPrice.toFixed(2)}
       </p>
       <Button 
