@@ -26,8 +26,7 @@ const AdminManagement = () => {
     queryKey: ["admin-profiles"],
     queryFn: async () => {
       try {
-        // Get all profiles that are either admin or user type
-        const { data: profiles, error: profileError } = await supabase
+        const { data: profiles, error } = await supabase
           .from("profiles")
           .select(`
             id,
@@ -35,11 +34,12 @@ const AdminManagement = () => {
             full_name,
             contact_email
           `)
-          .in('user_type', ['admin', 'user']);
+          .not('user_type', 'eq', 'super_admin');
 
-        if (profileError) {
+        if (error) {
+          console.error("Error fetching profiles:", error);
           toast.error("Failed to fetch profiles");
-          throw profileError;
+          throw error;
         }
 
         return profiles as Profile[];
@@ -71,7 +71,7 @@ const AdminManagement = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div className="container mx-auto p-4">Loading...</div>;
   }
 
   return (
