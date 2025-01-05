@@ -96,7 +96,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   };
 
   return (
-    <div className="md:hidden">
+    <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-between items-center h-14">
@@ -122,7 +122,8 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           </div>
         </div>
       </div>
-    </div>
+      <BottomNav />
+    </>
   );
 };
 
