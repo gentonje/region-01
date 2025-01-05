@@ -110,7 +110,7 @@ const AddProduct = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate("/")}
-                className="hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                className="bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 transition-colors"
               >
                 Cancel
               </Button>
