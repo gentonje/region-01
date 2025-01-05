@@ -49,7 +49,6 @@ export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/" element={<Home />} />
-      <Route path="/products" element={<Index />} />
       <Route path="/login" element={<Login />} />
       <Route
         path="/add-product"
