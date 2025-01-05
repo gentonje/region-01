@@ -204,6 +204,41 @@ export type Database = {
           },
         ]
       }
+      product_views: {
+        Row: {
+          id: string
+          ip_address: string | null
+          product_id: string
+          view_date: string
+          viewed_at: string
+          viewer_id: string | null
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          product_id: string
+          view_date?: string
+          viewed_at?: string
+          viewer_id?: string | null
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          product_id?: string
+          view_date?: string
+          viewed_at?: string
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           available_quantity: number | null
@@ -441,6 +476,72 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlist_items: {
+        Row: {
+          added_at: string
+          id: string
+          product_id: string
+          wishlist_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          product_id: string
+          wishlist_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          product_id?: string
+          wishlist_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wishlist_items_wishlist_id_fkey"
+            columns: ["wishlist_id"]
+            isOneToOne: false
+            referencedRelation: "wishlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          share_token: string | null
+          updated_at: string
+          user_id: string
+          visibility: Database["public"]["Enums"]["wishlist_visibility"]
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string
+          share_token?: string | null
+          updated_at?: string
+          user_id: string
+          visibility?: Database["public"]["Enums"]["wishlist_visibility"]
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          share_token?: string | null
+          updated_at?: string
+          user_id?: string
+          visibility?: Database["public"]["Enums"]["wishlist_visibility"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -493,6 +594,7 @@ export type Database = {
         | "Other"
       supported_currency_status: "active" | "inactive"
       user_type: "buyer" | "seller"
+      wishlist_visibility: "private" | "public" | "shared"
     }
     CompositeTypes: {
       [_ in never]: never
