@@ -181,7 +181,7 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
           <div className="space-y-4">
             {reviews?.map((review) => (
               <div key={review.id} className="border rounded-lg p-4 space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <div className="font-semibold">{review.profiles.full_name}</div>
                     <StarRating rating={review.rating} />
