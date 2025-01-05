@@ -1,163 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Product } from "@/types/product";
-import { ProductList } from "@/components/ProductList";
-import { Navigation, BottomNavigation } from '@/components/Navigation';
-import { useInView } from "react-intersection-observer";
-import { SupportedCurrency } from "@/utils/currencyConverter";
-import { ProductFilters } from "@/components/ProductFilters";
-import ProductDetail from "@/components/ProductDetail";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useNavigate } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
-import { useHomeProducts, useSession } from "@/hooks/useHomeProducts";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import React, { useEffect } from 'react';
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 export default function Home() {
-  const { ref, inView } = useInView();
+  const { session } = useAuth();
   const navigate = useNavigate();
-  const [selectedCurrency, setSelectedCurrency] = React.useState<SupportedCurrency>("SSP");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const PRODUCTS_PER_PAGE = 8;
-
-  const { data: session } = useSession();
-  
-  const {
-    data,
-    isLoading,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-  } = useHomeProducts(searchQuery, selectedCategory, session, PRODUCTS_PER_PAGE);
 
   useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      if (!session && data?.pages.flat().length === PRODUCTS_PER_PAGE) {
-        setShowLoginPrompt(true);
-      } else {
-        fetchNextPage();
-      }
+    if (session) {
+      navigate('/products');
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, session, data]);
+  }, [session, navigate]);
 
-  const allProducts = data?.pages.flat() || [];
-
-  const getProductImageUrl = (product: Product) => {
-    if (!product.product_images?.length) return "/placeholder.svg";
-    
-    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
-    if (!mainImage) return "/placeholder.svg";
-
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(mainImage.storage_path).data.publicUrl;
-  };
-
-  const handleProductClick = (product: Product) => {
-    if (!session) {
-      setShowLoginPrompt(true);
-      return;
-    }
-    setSelectedProduct(product);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleCurrencyChange = (currency: SupportedCurrency) => {
-    setSelectedCurrency(currency);
-  };
-
-  const handleBack = () => {
-    setSelectedProduct(null);
-  };
-
-  const handleLoginPromptAction = () => {
-    navigate('/login');
-    setShowLoginPrompt(false);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation onCurrencyChange={handleCurrencyChange} />
-        <div className="container mx-auto px-4 mt-20">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-48 w-full" />
-              ))}
-            </div>
-          </div>
-        </div>
-        <BottomNavigation />
-      </div>
-    );
+  if (session) {
+    return null; // Will redirect via useEffect
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation onCurrencyChange={handleCurrencyChange} />
-      <div className="container mx-auto px-4">
-        <div className="mt-20">
-          {selectedProduct ? (
-            <ProductDetail 
-              product={selectedProduct}
-              getProductImageUrl={getProductImageUrl}
-              onBack={handleBack}
-              selectedCurrency={selectedCurrency}
-            />
-          ) : (
-            <>
-              <ProductFilters
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-              />
-              <ProductList
-                products={allProducts}
-                getProductImageUrl={getProductImageUrl}
-                onProductClick={handleProductClick}
-                isLoading={isLoading}
-                isFetchingNextPage={isFetchingNextPage}
-                observerRef={ref}
-                selectedCurrency={selectedCurrency}
-              />
-            </>
-          )}
-        </div>
-      </div>
-      <BottomNavigation />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-blue-100">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center p-8 rounded-lg backdrop-blur-sm bg-white/30"
+      >
+        <motion.div
+          initial={{ scale: 0.5 }}
+          animate={{ scale: 1 }}
+          transition={{ 
+            type: "spring",
+            stiffness: 260,
+            damping: 20 
+          }}
+          className="text-5xl font-bold mb-8"
+        >
+          <span className="text-[#F97316]">السوق</span>
+          <span className="text-[#0EA5E9]"> الحر</span>
+        </motion.div>
 
-      <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Sign in to continue</AlertDialogTitle>
-            <AlertDialogDescription>
-              Create an account or sign in to view more products and interact with our marketplace.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowLoginPrompt(false)}>
-              Maybe later
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleLoginPromptAction}>
-              Sign in
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <motion.h1 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-3xl font-bold mb-6 bg-gradient-to-r from-[#F97316] to-[#0EA5E9] text-transparent bg-clip-text"
+        >
+          Welcome to Our Online Shopping Space
+        </motion.h1>
+
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-gray-700 mb-8 text-lg"
+        >
+          Please login or sign up to continue your shopping journey
+        </motion.p>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.7 }}
+          className="space-x-4"
+        >
+          <Button 
+            onClick={() => navigate('/login')}
+            className="bg-[#F97316] hover:bg-orange-600 text-white px-8 py-2"
+          >
+            Login
+          </Button>
+          <Button 
+            onClick={() => navigate('/login')}
+            className="bg-[#0EA5E9] hover:bg-blue-600 text-white px-8 py-2"
+          >
+            Sign Up
+          </Button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
