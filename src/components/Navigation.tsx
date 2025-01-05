@@ -89,7 +89,7 @@ export const Navigation = ({ onCurrencyChange, searchQuery = "", onSearchChange 
   };
 
   const handleCurrencyChange = (newCurrency: SupportedCurrency) => {
-    console.log("Currency changed to:", newCurrency); // Debug log
+    console.log("Currency changed to:", newCurrency);
     setCurrency(newCurrency);
     if (onCurrencyChange) {
       onCurrencyChange(newCurrency);
