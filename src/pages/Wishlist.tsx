@@ -30,8 +30,6 @@ const Wishlist = () => {
           .eq("user_id", session.user.id)
           .maybeSingle();
 
-        let wishlistId;
-
         if (fetchError) {
           console.error("Error fetching wishlist:", fetchError);
           toast({
@@ -42,6 +40,8 @@ const Wishlist = () => {
           return [];
         }
 
+        let wishlistId;
+
         // If no wishlist exists, create one
         if (!existingWishlist) {
           const { data: newWishlist, error: createError } = await supabase
@@ -49,7 +49,7 @@ const Wishlist = () => {
             .insert({
               user_id: session.user.id,
               name: "My Wishlist",
-              visibility: "private"
+              visibility: "private",
             })
             .select("id")
             .maybeSingle();
