@@ -1,15 +1,13 @@
 import React, { useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInView } from "react-intersection-observer";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { ProductList } from "@/components/ProductList";
-import { Navigation, BottomNavigation } from '@/components/Navigation';
-import { useInView } from "react-intersection-observer";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductListingSection } from "@/components/products/ProductListingSection";
+import { useProducts } from "@/hooks/useProducts";
 
 export default function Index() {
   const { ref, inView } = useInView();
@@ -26,52 +24,11 @@ export default function Index() {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCategory, priceRange, sortOrder],
-    queryFn: async ({ pageParam = 0 }) => {
-      const startRange = Number(pageParam) * 10;
-      const endRange = startRange + 9;
-
-      let query = supabase
-        .from("products")
-        .select("*, product_images(*)")
-        .range(startRange, endRange);
-
-      if (searchQuery) {
-        query = query.ilike("title", `%${searchQuery}%`);
-      }
-
-      if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
-      }
-
-      // Apply price range filter
-      if (priceRange.min > 0) {
-        query = query.gte('price', priceRange.min);
-      }
-      if (priceRange.max < 1000) {
-        query = query.lte('price', priceRange.max);
-      }
-
-      // Apply sorting if specified
-      if (sortOrder === "asc") {
-        query = query.order('price', { ascending: true });
-      } else if (sortOrder === "desc") {
-        query = query.order('price', { ascending: false });
-      } else {
-        query = query.order("created_at", { ascending: false });
-      }
-
-      const { data: products, error } = await query;
-
-      if (error) throw error;
-      return products as Product[];
-    },
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || lastPage.length < 10) return undefined;
-      return allPages.length;
-    },
-    initialPageParam: 0,
+  } = useProducts({
+    searchQuery,
+    selectedCategory,
+    priceRange,
+    sortOrder,
   });
 
   React.useEffect(() => {
@@ -97,10 +54,6 @@ export default function Index() {
     setSelectedProduct(product);
   };
 
-  const handleCurrencyChange = (currency: SupportedCurrency) => {
-    setSelectedCurrency(currency);
-  };
-
   const handleBack = () => {
     setSelectedProduct(null);
   };
@@ -115,65 +68,51 @@ export default function Index() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation onCurrencyChange={handleCurrencyChange} />
-        <div className="container mx-auto px-4 mt-20">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-              {[...Array(8)].map((_, i) => (
-                <Skeleton key={i} className="h-48 w-full" />
-              ))}
-            </div>
+      <div className="container mx-auto px-4 mt-20">
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+            {[...Array(8)].map((_, i) => (
+              <Skeleton key={i} className="h-48 w-full" />
+            ))}
           </div>
         </div>
-        <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation onCurrencyChange={handleCurrencyChange} />
-      <div className="container mx-auto px-4">
-        <div className="mt-20">
-          <BreadcrumbNav
-            items={[
-              { label: "All Products", href: "/" }
-            ]}
+    <div className="container mx-auto px-4">
+      <div className="mt-20">
+        <BreadcrumbNav
+          items={[
+            { label: "All Products", href: "/" }
+          ]}
+        />
+        {selectedProduct ? (
+          <ProductDetail 
+            product={selectedProduct}
+            getProductImageUrl={getProductImageUrl}
+            onBack={handleBack}
+            selectedCurrency={selectedCurrency}
           />
-          {selectedProduct ? (
-            <ProductDetail 
-              product={selectedProduct}
-              getProductImageUrl={getProductImageUrl}
-              onBack={handleBack}
-              selectedCurrency={selectedCurrency}
-            />
-          ) : (
-            <>
-              <ProductFilters
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-                onPriceRangeChange={handlePriceRangeChange}
-                onSortChange={handleSortChange}
-              />
-              <ProductList
-                products={allProducts}
-                getProductImageUrl={getProductImageUrl}
-                onProductClick={handleProductClick}
-                isLoading={isLoading}
-                isFetchingNextPage={isFetchingNextPage}
-                observerRef={ref}
-                selectedCurrency={selectedCurrency}
-                showStatus={false}
-              />
-            </>
-          )}
-        </div>
+        ) : (
+          <ProductListingSection
+            products={allProducts}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            onProductClick={handleProductClick}
+            isFetchingNextPage={isFetchingNextPage}
+            observerRef={ref}
+            selectedCurrency={selectedCurrency}
+            onPriceRangeChange={handlePriceRangeChange}
+            onSortChange={handleSortChange}
+            getProductImageUrl={getProductImageUrl}
+          />
+        )}
       </div>
-      <BottomNavigation />
     </div>
   );
 }
