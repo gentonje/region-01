@@ -26,6 +26,7 @@ interface Currency {
 export const CurrencyManager = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [editingRates, setEditingRates] = useState<Record<string, string>>({});
+  const [savingCurrencies, setSavingCurrencies] = useState<Record<string, boolean>>({});
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
 
@@ -47,6 +48,7 @@ export const CurrencyManager = () => {
 
   const updateRateMutation = useMutation({
     mutationFn: async ({ id, rate }: { id: string; rate: number }) => {
+      setSavingCurrencies(prev => ({ ...prev, [id]: true }));
       const { error } = await supabase
         .from('currencies')
         .update({ rate, updated_at: new Date().toISOString() })
@@ -54,12 +56,20 @@ export const CurrencyManager = () => {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success('Currency rate updated successfully');
+      setSavingCurrencies(prev => ({ ...prev, [id]: false }));
+      // Clear the editing state for this currency
+      setEditingRates(prev => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
     },
-    onError: () => {
+    onError: (_, { id }) => {
       toast.error('Failed to update currency rate');
+      setSavingCurrencies(prev => ({ ...prev, [id]: false }));
     },
   });
 
@@ -80,11 +90,6 @@ export const CurrencyManager = () => {
       return;
     }
     await updateRateMutation.mutateAsync({ id: currency.id, rate: newRate });
-    setEditingRates(prev => {
-      const updated = { ...prev };
-      delete updated[currency.id];
-      return updated;
-    });
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -149,9 +154,13 @@ export const CurrencyManager = () => {
                             e.stopPropagation();
                             handleSaveRate(currency);
                           }}
-                          disabled={!editingRates[currency.id]}
+                          disabled={!editingRates[currency.id] || savingCurrencies[currency.id]}
                         >
-                          <Save className="h-4 w-4" />
+                          {savingCurrencies[currency.id] ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                       <div className={`${isMobile ? 'hidden' : 'col-span-1'}`}>
