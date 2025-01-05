@@ -15,16 +15,16 @@ export const ProductSubmitButton = ({
   return (
     <Button 
       type="submit" 
-      className="w-full" 
+      className="w-full bg-primary dark:bg-gray-800 text-primary-foreground dark:text-gray-200 hover:bg-primary/90 dark:hover:bg-gray-700 disabled:bg-gray-300 dark:disabled:bg-gray-900 disabled:text-gray-500 dark:disabled:text-gray-600" 
       disabled={isLoading || !isValid}
     >
       {isLoading ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Processing...
+          <span className="dark:text-gray-300">Processing...</span>
         </>
       ) : (
-        submitButtonText
+        <span className="dark:text-gray-200">{submitButtonText}</span>
       )}
     </Button>
   );
