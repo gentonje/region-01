@@ -43,7 +43,7 @@ export const ProductInfo = ({
         <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{category}</p>
       </div>
 
-      <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 bg-gray-50/50 dark:bg-gray-800/50">
+      <div className="rounded-md border border-gray-200 dark:border-gray-700 p-4 bg-gray-50/50 dark:bg-gray-800/50 mt-2">
         <p className="text-sm text-gray-500 dark:text-gray-300 leading-relaxed">{description}</p>
       </div>
 
