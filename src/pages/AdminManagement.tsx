@@ -26,6 +26,7 @@ const AdminManagement = () => {
     queryKey: ["admin-profiles"],
     queryFn: async () => {
       try {
+        console.log("Fetching profiles...");
         const { data: profiles, error } = await supabase
           .from("profiles")
           .select(`
@@ -34,7 +35,8 @@ const AdminManagement = () => {
             full_name,
             contact_email
           `)
-          .in('user_type', ['buyer', 'seller', 'admin']);
+          .in('user_type', ['buyer', 'seller', 'admin'])
+          .neq('user_type', 'super_admin');
 
         if (error) {
           console.error("Error fetching profiles:", error);
@@ -42,6 +44,7 @@ const AdminManagement = () => {
           throw error;
         }
 
+        console.log("Fetched profiles:", profiles);
         return profiles as Profile[];
       } catch (error) {
         console.error("Error fetching profiles:", error);
