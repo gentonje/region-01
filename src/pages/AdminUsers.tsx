@@ -6,6 +6,7 @@ import { Database } from "@/integrations/supabase/types";
 import { UserStatsCard } from "@/components/admin/UserStatsCard";
 import { CategoryStatsCard } from "@/components/admin/CategoryStatsCard";
 import { TotalProductsCard } from "@/components/admin/TotalProductsCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ProductCategory = Database['public']['Enums']['product_category'];
 
@@ -23,6 +24,7 @@ interface CategoryStats {
 }
 
 const AdminUsers = () => {
+  const { session } = useAuth();
   const { data: users, isLoading: isUsersLoading } = useQuery({
     queryKey: ["users-stats"],
     queryFn: async () => {
@@ -150,7 +152,7 @@ const AdminUsers = () => {
           </>
         )}
       </main>
-      <BottomNavigation />
+      <BottomNavigation isAuthenticated={!!session} />
     </div>
   );
 };

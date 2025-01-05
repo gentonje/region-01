@@ -83,10 +83,6 @@ const Login = () => {
           providers={[]}
           view={mode === 'login' ? 'sign_in' : 'sign_up'}
           redirectTo={window.location.origin}
-          onError={(error) => {
-            console.error('Auth error:', error);
-            toast.error(error.message || "Authentication failed. Please try again.");
-          }}
         />
       </div>
     </div>
