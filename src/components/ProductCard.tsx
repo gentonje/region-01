@@ -181,7 +181,7 @@ const ProductCard = ({
 
   return (
     <Card 
-      className="w-full h-[323px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 backdrop-blur-sm border-neutral-200/80"
+      className="w-full h-[323px] hover:shadow-lg transition-all duration-300 cursor-pointer group bg-white/50 dark:bg-gray-800/90 backdrop-blur-sm border-neutral-200/80 dark:border-gray-700"
       onClick={onClick}
     >
       <ProductCardImage
