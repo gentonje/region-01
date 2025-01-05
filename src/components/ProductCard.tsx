@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ImageLoader } from "./ImageLoader";
 import { WishlistButton } from "./WishlistButton";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -25,17 +26,22 @@ const ProductCard = ({
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username, full_name')
-        .eq('id', product.user_id)
-        .maybeSingle();
-      
-      if (error) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, full_name')
+          .eq('id', product.user_id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return null;
+        }
+        return data;
+      } catch (error) {
         console.error('Error fetching profile:', error);
         return null;
       }
-      return data;
     },
     enabled: !!product.user_id
   });
@@ -55,11 +61,14 @@ const ProductCard = ({
         if (error) {
           // Ignore unique constraint violations (duplicate daily views)
           if (error.code !== '23505') {
-            throw error;
+            console.error('Error recording view:', error);
           }
         }
       } catch (error) {
-        console.error('Error recording view:', error);
+        // Only show error toast for non-duplicate view errors
+        if (error.code !== '23505') {
+          toast.error('Failed to record product view');
+        }
       }
     }
   });
