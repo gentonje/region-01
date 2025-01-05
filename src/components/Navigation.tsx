@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { Logo } from "./navigation/Logo";
-import { CurrencySelector } from "./navigation/CurrencySelector";
+import { CurrencySelector } from "./CurrencySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
@@ -99,8 +99,8 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
             <div className="flex items-center gap-2">
               <CurrencySelector 
-                onCurrencyChange={onCurrencyChange ? handleCurrencyChange : undefined}
-                currency={currency}
+                value={currency}
+                onValueChange={handleCurrencyChange}
               />
 
               {session && <CartIndicator />}
