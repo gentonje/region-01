@@ -3,14 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { WishlistItem } from "@/components/wishlist/WishlistItem";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 const Wishlist = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const { data: wishlistItems, isLoading } = useQuery({
     queryKey: ["wishlist-items"],
@@ -77,6 +79,10 @@ const Wishlist = () => {
     return null;
   }
 
+  const handleContinueShopping = () => {
+    navigate("/");
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-4 space-y-4">
@@ -92,7 +98,24 @@ const Wishlist = () => {
 
   return (
     <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">My Wishlist</h1>
+      <BreadcrumbNav
+        items={[
+          {
+            label: "Wishlist",
+          },
+        ]}
+      />
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">My Wishlist</h1>
+        <Button
+          variant="outline"
+          onClick={handleContinueShopping}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Continue Shopping
+        </Button>
+      </div>
       {wishlistItems && wishlistItems.length > 0 ? (
         <div className="space-y-4">
           {wishlistItems.map((item: any) => (
@@ -104,9 +127,14 @@ const Wishlist = () => {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground text-center py-8">
-          Your wishlist is empty. Browse products to add items to your wishlist.
-        </p>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground mb-4">
+            Your wishlist is empty. Browse products to add items to your wishlist.
+          </p>
+          <Button onClick={handleContinueShopping}>
+            Start Shopping
+          </Button>
+        </div>
       )}
     </div>
   );
