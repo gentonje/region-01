@@ -1,9 +1,13 @@
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageLoader } from "./ImageLoader";
+import { Button } from "./ui/button";
+import { Heart } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductCardProps {
   product: Product;
@@ -20,6 +24,9 @@ const ProductCard = ({
   selectedCurrency,
   showStatus = false 
 }: ProductCardProps) => {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
     queryFn: async () => {
@@ -36,6 +43,100 @@ const ProductCard = ({
       return data;
     },
     enabled: !!product.user_id
+  });
+
+  const { data: isInWishlist } = useQuery({
+    queryKey: ['wishlist', product.id],
+    queryFn: async () => {
+      if (!session?.user) return false;
+
+      const { data: wishlist } = await supabase
+        .from('wishlists')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (!wishlist) return false;
+
+      const { data: wishlistItem } = await supabase
+        .from('wishlist_items')
+        .select('id')
+        .eq('wishlist_id', wishlist.id)
+        .eq('product_id', product.id)
+        .maybeSingle();
+
+      return !!wishlistItem;
+    },
+    enabled: !!session?.user && !!product.id
+  });
+
+  const toggleWishlist = useMutation({
+    mutationFn: async () => {
+      if (!session?.user) {
+        throw new Error('Please login to add items to wishlist');
+      }
+
+      // Get or create wishlist
+      const { data: wishlist, error: wishlistError } = await supabase
+        .from('wishlists')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (wishlistError && wishlistError.code !== 'PGRST116') {
+        throw wishlistError;
+      }
+
+      let wishlistId;
+      if (!wishlist) {
+        const { data: newWishlist, error: createError } = await supabase
+          .from('wishlists')
+          .insert({
+            user_id: session.user.id,
+            name: 'My Wishlist'
+          })
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        wishlistId = newWishlist.id;
+      } else {
+        wishlistId = wishlist.id;
+      }
+
+      if (isInWishlist) {
+        // Remove from wishlist
+        const { error: removeError } = await supabase
+          .from('wishlist_items')
+          .delete()
+          .eq('wishlist_id', wishlistId)
+          .eq('product_id', product.id);
+
+        if (removeError) throw removeError;
+      } else {
+        // Add to wishlist
+        const { error: addError } = await supabase
+          .from('wishlist_items')
+          .insert({
+            wishlist_id: wishlistId,
+            product_id: product.id
+          });
+
+        if (addError) throw addError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+      toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+    },
+    onError: (error) => {
+      console.error('Error toggling wishlist:', error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('Failed to update wishlist');
+      }
+    }
   });
 
   const convertedPrice = convertCurrency(
@@ -92,6 +193,22 @@ const ProductCard = ({
             }`}>
               {product.product_status === 'published' ? 'Published' : 'Unpublished'}
             </span>
+          )}
+          {session && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist.mutate();
+              }}
+              disabled={toggleWishlist.isPending}
+            >
+              <Heart 
+                className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} 
+              />
+            </Button>
           )}
         </div>
         <div className="px-4 pt-1">

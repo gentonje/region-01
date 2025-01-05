@@ -1,6 +1,6 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, User } from "lucide-react";
+import { Home, Package, ShoppingCart, Heart } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BottomNavProps {
   isAuthenticated: boolean;
@@ -9,36 +9,55 @@ interface BottomNavProps {
 export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
   const location = useLocation();
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background/50 backdrop-blur-sm border-t border-border z-50">
-      <div className="max-w-md mx-auto px-4">
-        <div className="flex justify-around py-2">
-          <Link
-            to="/"
-            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-              isActive("/") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
-            }`}
-          >
-            <Home className="h-5 w-5" />
-            <span className="text-xs mt-1">Home</span>
-          </Link>
-
-          {isAuthenticated ? (
-            <div className="flex flex-col items-center p-2 text-green-500">
-              <User className="h-5 w-5" />
-              <span className="text-xs mt-1">Member</span>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center p-2 text-gray-500">
-              <User className="h-5 w-5" />
-              <span className="text-xs mt-1">Visitor</span>
-            </div>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 h-16 bg-background/50 backdrop-blur-sm border-t border-border">
+      <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
+        <Link
+          to="/"
+          className={cn(
+            "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
+            isActive("/") && "text-orange-500"
           )}
-        </div>
+        >
+          <Home className="w-5 h-5" />
+          <span className="text-xs">Home</span>
+        </Link>
+        {isAuthenticated && (
+          <>
+            <Link
+              to="/products"
+              className={cn(
+                "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
+                isActive("/products") && "text-orange-500"
+              )}
+            >
+              <Package className="w-5 h-5" />
+              <span className="text-xs">Products</span>
+            </Link>
+            <Link
+              to="/cart"
+              className={cn(
+                "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
+                isActive("/cart") && "text-orange-500"
+              )}
+            >
+              <ShoppingCart className="w-5 h-5" />
+              <span className="text-xs">Cart</span>
+            </Link>
+            <Link
+              to="/wishlist"
+              className={cn(
+                "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group",
+                isActive("/wishlist") && "text-orange-500"
+              )}
+            >
+              <Heart className="w-5 h-5" />
+              <span className="text-xs">Wishlist</span>
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
