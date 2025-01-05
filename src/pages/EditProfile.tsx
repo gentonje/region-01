@@ -3,31 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { toast } from "sonner";
 import { UserCog } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-  full_name: z.string().min(2).max(100),
-  contact_email: z.string().email().optional().nullable(),
-  phone_number: z.string().optional().nullable(),
-  address: z.string().min(5).max(200),
-  shop_name: z.string().optional().nullable(),
-  shop_description: z.string().optional().nullable(),
-});
+import { Form } from "@/components/ui/form";
+import { ProfileFormFields } from "@/components/forms/profile/ProfileFormFields";
+import { profileFormSchema, type ProfileFormData } from "@/components/forms/profile/validation";
 
 export default function EditProfile() {
   const navigate = useNavigate();
@@ -58,8 +40,8 @@ export default function EditProfile() {
     enabled: !!session?.user?.id,
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ProfileFormData>({
+    resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: "",
       full_name: "",
@@ -86,7 +68,7 @@ export default function EditProfile() {
   }, [profile, form]);
 
   const updateProfileMutation = useMutation({
-    mutationFn: async (values: z.infer<typeof formSchema>) => {
+    mutationFn: async (values: ProfileFormData) => {
       if (!session?.user?.id) throw new Error("No user ID found");
       const { error } = await supabase
         .from("profiles")
@@ -105,7 +87,7 @@ export default function EditProfile() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: ProfileFormData) => {
     updateProfileMutation.mutate(values);
   };
 
@@ -122,104 +104,8 @@ export default function EditProfile() {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="full_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="contact_email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contact Email</FormLabel>
-                <FormControl>
-                  <Input {...field} type="email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone_number"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone Number</FormLabel>
-                <FormControl>
-                  <Input {...field} type="tel" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Shipping Address</FormLabel>
-                <FormControl>
-                  <Textarea {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="shop_name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Shop Name (Optional)</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="shop_description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Shop Description (Optional)</FormLabel>
-                <FormControl>
-                  <Textarea {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
+          <ProfileFormFields form={form} />
+          
           <div className="flex gap-4">
             <Button
               type="button"
