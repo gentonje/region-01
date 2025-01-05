@@ -59,7 +59,10 @@ const AdminManagement = () => {
         should_be_admin: shouldBeAdmin
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating admin status:', error);
+        throw error;
+      }
 
       await refetch();
       toast.success(`User ${shouldBeAdmin ? 'promoted to' : 'demoted from'} admin successfully`);
@@ -92,12 +95,12 @@ const AdminManagement = () => {
             <TableRow key={profile.id}>
               <TableCell>{profile.full_name || 'N/A'}</TableCell>
               <TableCell>{profile.contact_email || 'N/A'}</TableCell>
-              <TableCell>{profile.user_type}</TableCell>
+              <TableCell>{profile.user_type || 'buyer'}</TableCell>
               <TableCell>
                 <Button
                   variant="outline"
                   onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                  disabled={isUpdating}
+                  disabled={isUpdating || profile.user_type === 'super_admin'}
                 >
                   {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
                 </Button>
