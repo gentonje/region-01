@@ -563,6 +563,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
+      manage_admin_user: {
+        Args: {
+          target_user_id: string
+          should_be_admin: boolean
+        }
+        Returns: undefined
+      }
       update_product_images: {
         Args: Record<PropertyKey, never>
         Returns: undefined
