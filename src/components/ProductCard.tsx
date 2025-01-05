@@ -39,8 +39,8 @@ const ProductCard = ({ product, getProductImageUrl, onClick, selectedCurrency }:
 
   const mainImage = product.product_images?.find(img => img.is_main === true);
   const imageUrl = mainImage 
-    ? getProductImageUrl({ ...product, product_images: [mainImage] })
-    : product.storage_path;
+    ? supabase.storage.from('images').getPublicUrl(mainImage.storage_path).data.publicUrl
+    : getProductImageUrl(product);
 
   return (
     <Card 
