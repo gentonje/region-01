@@ -34,9 +34,7 @@ const AdminManagement = () => {
             user_type,
             full_name,
             contact_email
-          `)
-          .in('user_type', ['buyer', 'seller', 'admin'])
-          .neq('user_type', 'super_admin');
+          `);
 
         if (error) {
           console.error("Error fetching profiles:", error);
