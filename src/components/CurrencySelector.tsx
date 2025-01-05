@@ -24,7 +24,7 @@ interface CurrencyData {
   status: 'active' | 'inactive';
 }
 
-export const CurrencySelector = ({ value, onValueChange }: CurrencySelectorProps) => {
+export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelectorProps) => {
   const { data: currencies, isLoading, error } = useQuery({
     queryKey: ['currencies'],
     queryFn: async () => {
