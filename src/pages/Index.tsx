@@ -10,7 +10,6 @@ import { ProductFilters } from "@/components/ProductFilters";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAuth } from "@/contexts/AuthContext";
 
 export default function Index() {
   const { ref, inView } = useInView();
@@ -20,7 +19,6 @@ export default function Index() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
-  const { session } = useAuth();
 
   const {
     data,
@@ -37,7 +35,6 @@ export default function Index() {
       let query = supabase
         .from("products")
         .select("*, product_images(*)")
-        .eq('user_id', session?.user.id)
         .range(startRange, endRange);
 
       if (searchQuery) {
@@ -142,7 +139,7 @@ export default function Index() {
         <div className="mt-20">
           <BreadcrumbNav
             items={[
-              { label: "My Products", href: "/" }
+              { label: "All Products", href: "/" }
             ]}
           />
           {selectedProduct ? (
@@ -170,7 +167,7 @@ export default function Index() {
                 isFetchingNextPage={isFetchingNextPage}
                 observerRef={ref}
                 selectedCurrency={selectedCurrency}
-                showStatus={true}
+                showStatus={false}
               />
             </>
           )}
