@@ -9,6 +9,7 @@ import { Logo } from "./navigation/Logo";
 import { CurrencySelector } from "./navigation/CurrencySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NavigationProps {
   onCurrencyChange?: (currency: SupportedCurrency) => void;
@@ -16,11 +17,11 @@ interface NavigationProps {
 
 export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const navigate = useNavigate();
+  const { session } = useAuth();
   const [userName, setUserName] = useState("");
   const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -33,17 +34,13 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
         if (userError) {
           console.error("Error fetching user:", userError);
           setError("Could not fetch user details");
-          setIsAuthenticated(false);
           return;
         }
 
         if (!user) {
           setUserName("");
-          setIsAuthenticated(false);
           return;
         }
-
-        setIsAuthenticated(true);
 
         try {
           const { data: profile, error: profileError } = await supabase
@@ -68,7 +65,6 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
       } catch (error) {
         console.error("Error in user fetch:", error);
         setError("Could not fetch user details");
-        setIsAuthenticated(false);
         toast.error("Network error. Please check your internet connection.");
       } finally {
         setIsLoading(false);
@@ -76,12 +72,11 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
     };
 
     getUser();
-  }, []);
+  }, [session]); // Add session as a dependency to re-run when auth state changes
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      setIsAuthenticated(false);
       toast.success("Logged out successfully");
       navigate("/login");
     } catch (error) {
@@ -108,7 +103,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 currency={currency}
               />
 
-              {isAuthenticated && <CartIndicator />}
+              {session && <CartIndicator />}
               
               <ThemeToggle />
 
@@ -116,13 +111,13 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 userName={userName} 
                 onLogout={handleLogout}
                 isLoading={isLoading}
-                isAuthenticated={isAuthenticated}
+                isAuthenticated={!!session}
               />
             </div>
           </div>
         </div>
       </div>
-      <BottomNav />
+      <BottomNav isAuthenticated={!!session} />
     </>
   );
 };

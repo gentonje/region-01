@@ -1,26 +1,67 @@
-import { useDeviceInfo } from "@/hooks/useDeviceInfo";
-import { useAuth } from "@/contexts/AuthContext";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Home, Package, ShoppingCart, User } from "lucide-react";
 
-export const BottomNav = () => {
-  const deviceInfo = useDeviceInfo();
-  const { session } = useAuth();
-  const DeviceIcon = deviceInfo.Icon;
+interface BottomNavProps {
+  isAuthenticated: boolean;
+}
+
+export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-t border-border md:hidden">
-      <div className="grid grid-cols-2 h-16">
-        <div className="flex items-center justify-center">
-          <DeviceIcon className="w-4 h-4 mr-2" />
-          <span className="text-sm">{deviceInfo.text}</span>
-        </div>
-        <div className="flex items-center justify-center">
-          {session ? (
-            <span className="text-sm">Member</span>
+    <nav className="fixed bottom-0 left-0 right-0 bg-background/50 backdrop-blur-sm border-t border-border z-50">
+      <div className="max-w-md mx-auto px-4">
+        <div className="flex justify-around py-2">
+          <Link
+            to="/"
+            className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              isActive("/") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
+            }`}
+          >
+            <Home className="h-5 w-5" />
+            <span className="text-xs mt-1">Home</span>
+          </Link>
+
+          {isAuthenticated ? (
+            <>
+              <Link
+                to="/my-products"
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  isActive("/my-products") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
+                }`}
+              >
+                <Package className="h-5 w-5" />
+                <span className="text-xs mt-1">My Products</span>
+              </Link>
+
+              <Link
+                to="/cart"
+                className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+                  isActive("/cart") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
+                }`}
+              >
+                <ShoppingCart className="h-5 w-5" />
+                <span className="text-xs mt-1">Cart</span>
+              </Link>
+
+              <div className="flex flex-col items-center p-2 text-green-500">
+                <User className="h-5 w-5" />
+                <span className="text-xs mt-1">Member</span>
+              </div>
+            </>
           ) : (
-            <span className="text-sm text-muted-foreground">Visitor</span>
+            <div className="flex flex-col items-center p-2 text-gray-500">
+              <User className="h-5 w-5" />
+              <span className="text-xs mt-1">Visitor</span>
+            </div>
           )}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
