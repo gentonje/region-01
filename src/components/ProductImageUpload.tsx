@@ -51,7 +51,7 @@ export const ProductImageUpload = ({
 
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label className="text-foreground dark:text-gray-200">{label}</Label>
       <div className="flex items-center gap-2">
         <input
           key={inputKey}
@@ -65,19 +65,19 @@ export const ProductImageUpload = ({
         <Button
           type="button"
           variant="outline"
-          className="bg-slate-100 hover:bg-slate-200"
+          className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 border-gray-300 dark:border-gray-600"
           onClick={() => document.getElementById(`file-${label}`)?.click()}
           disabled={isLoading}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Uploading...
+              <span className="dark:text-gray-200">Uploading...</span>
             </>
           ) : (
             <>
               <Upload className="mr-2 h-4 w-4" />
-              Choose Image
+              <span className="dark:text-gray-200">Choose Image</span>
             </>
           )}
         </Button>
