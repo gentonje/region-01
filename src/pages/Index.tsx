@@ -29,7 +29,7 @@ export default function Index() {
     selectedCategory,
     priceRange,
     sortOrder,
-    showOnlyPublished: true, // This ensures we only show published products
+    showOnlyPublished: true,
   });
 
   React.useEffect(() => {
