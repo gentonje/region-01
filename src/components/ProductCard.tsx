@@ -48,30 +48,28 @@ const ProductCard = ({
 
   const recordViewMutation = useMutation({
     mutationFn: async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
-          .from('product_views')
-          .insert({
-            product_id: product.id,
-            viewer_id: user?.id || null,
-            ip_address: null
-          });
+      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('product_views')
+        .insert({
+          product_id: product.id,
+          viewer_id: user?.id || null,
+          ip_address: null
+        });
 
-        if (error) {
-          // Ignore unique constraint violations (duplicate daily views)
-          if (error.code === '23505') {
-            console.log('Product view already recorded for today');
-            return;
-          }
-          throw error;
+      if (error) {
+        // Ignore unique constraint violations (duplicate daily views)
+        if (error.code === '23505') {
+          return; // Silently ignore duplicate views
         }
-      } catch (error: any) {
-        // Only show error toast for non-duplicate view errors
-        if (error.code !== '23505') {
-          console.error('Error recording view:', error);
-          toast.error('Failed to record product view');
-        }
+        throw error;
+      }
+    },
+    onError: (error: any) => {
+      // Only show error toast for non-duplicate view errors
+      if (error.code !== '23505') {
+        console.error('Error recording view:', error);
+        toast.error('Failed to record product view');
       }
     }
   });
