@@ -30,13 +30,13 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
           {isAuthenticated ? (
             <>
               <Link
-                to="/my-products"
+                to="/modify-products"
                 className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
-                  isActive("/my-products") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
+                  isActive("/modify-products") ? "text-orange-500" : "text-gray-500 hover:text-orange-500"
                 }`}
               >
                 <Package className="h-5 w-5" />
-                <span className="text-xs mt-1">My Products</span>
+                <span className="text-xs mt-1">Products</span>
               </Link>
 
               <Link
