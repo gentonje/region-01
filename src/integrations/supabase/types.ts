@@ -606,7 +606,7 @@ export type Database = {
         | "Food & Beverages"
         | "Other"
       supported_currency_status: "active" | "inactive"
-      user_type: "buyer" | "seller" | "admin" | "super_admin"
+      user_type: "buyer" | "seller" | "admin" | "super_admin" | "user"
       wishlist_visibility: "private" | "public" | "shared"
     }
     CompositeTypes: {

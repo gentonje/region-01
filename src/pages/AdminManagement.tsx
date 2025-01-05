@@ -95,7 +95,7 @@ const AdminManagement = () => {
             <TableRow key={profile.id}>
               <TableCell>{profile.full_name || 'N/A'}</TableCell>
               <TableCell>{profile.contact_email || 'N/A'}</TableCell>
-              <TableCell>{profile.user_type || 'buyer'}</TableCell>
+              <TableCell>{profile.user_type || 'user'}</TableCell>
               <TableCell>
                 <Button
                   variant="outline"
