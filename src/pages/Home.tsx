@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { Navigation, BottomNavigation } from '@/components/Navigation';
@@ -10,6 +8,8 @@ import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from 'react-router-dom';
+import { supabase } from "@/integrations/supabase/client";
+import { useHomeProducts, useSession } from "@/hooks/useHomeProducts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "sonner";
 
 export default function Home() {
   const { ref, inView } = useInView();
@@ -30,54 +29,17 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const PRODUCTS_PER_PAGE = 8; // Limit for non-authenticated users
+  const PRODUCTS_PER_PAGE = 8;
 
-  const { data: session } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      return session;
-    },
-  });
-
+  const { data: session } = useSession();
+  
   const {
     data,
     isLoading,
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["home-products", searchQuery, selectedCategory],
-    queryFn: async ({ pageParam = 0 }) => {
-      const startRange = Number(pageParam) * (session ? 10 : PRODUCTS_PER_PAGE);
-      const endRange = startRange + (session ? 9 : PRODUCTS_PER_PAGE - 1);
-
-      let query = supabase
-        .from("products")
-        .select("*, product_images(*), profiles(*)")
-        .eq('product_status', 'published')
-        .range(startRange, endRange)
-        .order("created_at", { ascending: false });
-
-      if (searchQuery) {
-        query = query.ilike("title", `%${searchQuery}%`);
-      }
-
-      if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
-      }
-
-      const { data: products, error } = await query;
-
-      if (error) throw error;
-      return products as Product[];
-    },
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || lastPage.length < (session ? 10 : PRODUCTS_PER_PAGE)) return undefined;
-      return allPages.length;
-    },
-    initialPageParam: 0,
-  });
+  } = useHomeProducts(searchQuery, selectedCategory, session, PRODUCTS_PER_PAGE);
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
