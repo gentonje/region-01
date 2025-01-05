@@ -48,9 +48,10 @@ export const Routes = () => {
   return (
     <RouterRoutes>
       <Route path="/" element={<Home />} />
-      <Route path="/products" element={
+      <Route path="/products" element={<Index />} />
+      <Route path="/my-products" element={
         <PrivateRoute>
-          <Index />
+          <ModifyProducts />
         </PrivateRoute>
       } />
       <Route path="/login" element={<Login />} />
@@ -104,7 +105,6 @@ export const Routes = () => {
           </PrivateRoute>
         }
       />
-      {/* Catch all other routes and redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </RouterRoutes>
   );

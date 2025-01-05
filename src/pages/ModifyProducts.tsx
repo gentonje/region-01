@@ -1,205 +1,62 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { useProducts } from "@/hooks/useProducts";
+import { ProductListingSection } from "@/components/products/ProductListingSection";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { Navigation, BottomNavigation } from "@/components/Navigation";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Input } from "@/components/ui/input";
 import { Product } from "@/types/product";
-import { UserProductGroup } from "@/components/UserProductGroup";
 
-interface GroupedProducts {
-  [key: string]: {
-    username: string;
-    products: Product[];
+export default function ModifyProducts() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCurrency] = useState<SupportedCurrency>("SSP");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [sortOrder, setSortOrder] = useState<string>("none");
+
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useProducts({
+    searchQuery,
+    selectedCategory,
+    priceRange,
+    sortOrder,
+    userOnly: true, // This ensures we only show user's products
+  });
+
+  const allProducts = data?.pages.flat() || [];
+
+  const getProductImageUrl = (product: Product) => {
+    if (!product.product_images?.length) return "/placeholder.svg";
+    
+    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
+    if (!mainImage) return "/placeholder.svg";
+
+    return supabase.storage
+      .from("images")
+      .getPublicUrl(mainImage.storage_path).data.publicUrl;
   };
-}
-
-const ModifyProducts = () => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const isMobile = useIsMobile();
-  const [usernameSearch, setUsernameSearch] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    checkAdminStatus();
-    fetchProducts();
-  }, []);
-
-  const checkAdminStatus = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: user.id
-      });
-
-      if (error) throw error;
-      setIsAdmin(!!data);
-    } catch (error) {
-      console.error("Error checking admin status:", error);
-      setIsAdmin(false);
-    }
-  };
-
-  const fetchProducts = async () => {
-    try {
-      setIsLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        navigate("/login");
-        return;
-      }
-
-      // Query to fetch products - for admin, fetch all products; for regular users, fetch only their products
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          product_images (
-            id,
-            storage_path,
-            is_main,
-            display_order,
-            product_id,
-            created_at
-          ),
-          profiles (
-            username,
-            full_name
-          )
-        `)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      setProducts(data as Product[]);
-    } catch (error: any) {
-      console.error("Error fetching products:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch products",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (productId: string) => {
-    try {
-      const { data: productImages } = await supabase
-        .from('product_images')
-        .select('storage_path')
-        .eq('product_id', productId);
-
-      if (productImages) {
-        const imagePaths = productImages.map(img => img.storage_path);
-        if (imagePaths.length > 0) {
-          const { error: storageError } = await supabase.storage
-            .from('images')
-            .remove(imagePaths);
-
-          if (storageError) {
-            console.error("Error deleting images from storage:", storageError);
-          }
-        }
-      }
-
-      const { error } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", productId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Product deleted successfully",
-      });
-      
-      fetchProducts();
-    } catch (error: any) {
-      console.error("Error deleting product:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to delete product",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Group products by user
-  const groupedProducts = products.reduce((acc: GroupedProducts, product) => {
-    const userId = product.user_id;
-    if (!acc[userId]) {
-      acc[userId] = {
-        username: product.profiles?.username || product.profiles?.full_name || 'Unknown User',
-        products: []
-      };
-    }
-    acc[userId].products.push(product);
-    return acc;
-  }, {});
-
-  // Filter groups based on username search
-  const filteredGroups = Object.entries(groupedProducts).filter(([_, { username }]) =>
-    username.toLowerCase().includes(usernameSearch.toLowerCase())
-  );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 pt-20">
-        <div className="space-y-6">
-          <h1 className="text-2xl font-bold">
-            {isAdmin ? "Modify All Products" : "Modify Products"}
-          </h1>
-          
-          <Input
-            placeholder="Search by username..."
-            value={usernameSearch}
-            onChange={(e) => setUsernameSearch(e.target.value)}
-            className="max-w-sm"
-          />
-
-          {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredGroups.map(([userId, { username, products }]) => (
-                <UserProductGroup
-                  key={userId}
-                  username={username}
-                  products={products}
-                  onDelete={handleDelete}
-                />
-              ))}
-              
-              {products.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-600">No products found</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <BottomNavigation />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">My Products</h1>
+      <ProductListingSection
+        products={allProducts}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        onProductClick={() => {}}
+        isFetchingNextPage={isFetchingNextPage}
+        observerRef={() => {}}
+        selectedCurrency={selectedCurrency}
+        onPriceRangeChange={(min, max) => setPriceRange({ min, max })}
+        onSortChange={setSortOrder}
+        getProductImageUrl={getProductImageUrl}
+        showStatus={true}
+      />
     </div>
   );
-};
-
-export default ModifyProducts;
+}

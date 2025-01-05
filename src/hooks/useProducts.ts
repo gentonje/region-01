@@ -7,16 +7,20 @@ interface UseProductsProps {
   selectedCategory: string;
   priceRange: { min: number; max: number };
   sortOrder: string;
+  showOnlyPublished?: boolean;
+  userOnly?: boolean;
 }
 
 export const useProducts = ({ 
   searchQuery, 
   selectedCategory, 
   priceRange, 
-  sortOrder 
+  sortOrder,
+  showOnlyPublished = false,
+  userOnly = false
 }: UseProductsProps) => {
   return useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCategory, priceRange, sortOrder],
+    queryKey: ["products", searchQuery, selectedCategory, priceRange, sortOrder, showOnlyPublished, userOnly],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
@@ -39,6 +43,17 @@ export const useProducts = ({
       }
       if (priceRange.max < 1000) {
         query = query.lte('price', priceRange.max);
+      }
+
+      if (showOnlyPublished) {
+        query = query.eq('product_status', 'published');
+      }
+
+      if (userOnly) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          query = query.eq('user_id', user.id);
+        }
       }
 
       if (sortOrder === "asc") {
