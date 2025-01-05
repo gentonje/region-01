@@ -23,7 +23,7 @@ export default function ModifyProducts() {
     selectedCategory,
     priceRange,
     sortOrder,
-    userOnly: true, // This ensures we only show user's products
+    userOnly: true,
   });
 
   const allProducts = data?.pages.flat() || [];
