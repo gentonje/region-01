@@ -33,6 +33,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const [currency, setCurrency] = useState<SupportedCurrency>("SSP");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -45,13 +46,17 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
         if (userError) {
           console.error("Error fetching user:", userError);
           setError("Could not fetch user details");
+          setIsAuthenticated(false);
           return;
         }
 
         if (!user) {
           setUserName("");
+          setIsAuthenticated(false);
           return;
         }
+
+        setIsAuthenticated(true);
 
         try {
           const { data: profile, error: profileError } = await supabase
@@ -62,7 +67,6 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
 
           if (profileError) {
             console.error("Error fetching profile:", profileError);
-            // Don't throw here, just show a toast and continue with email
             toast.error("Could not fetch profile details. Using email instead.");
             setUserName(user.email || "");
             return;
@@ -71,13 +75,13 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
           setUserName(profile?.full_name || user.email || "");
         } catch (error) {
           console.error("Error in profile fetch:", error);
-          // Use email as fallback if profile fetch fails
           toast.error("Network error while fetching profile. Using email instead.");
           setUserName(user.email || "");
         }
       } catch (error) {
         console.error("Error in user fetch:", error);
         setError("Could not fetch user details");
+        setIsAuthenticated(false);
         toast.error("Network error. Please check your internet connection.");
       } finally {
         setIsLoading(false);
@@ -90,6 +94,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
+      setIsAuthenticated(false);
       toast.success("Logged out successfully");
       navigate("/login");
     } catch (error) {
@@ -166,7 +171,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 </TooltipProvider>
               )}
 
-              <CartIndicator />
+              {isAuthenticated && <CartIndicator />}
               
               <TooltipProvider>
                 <Tooltip>
@@ -192,6 +197,7 @@ export const Navigation = ({ onCurrencyChange }: NavigationProps) => {
                 userName={userName} 
                 onLogout={handleLogout}
                 isLoading={isLoading}
+                isAuthenticated={isAuthenticated}
               />
             </div>
           </div>
