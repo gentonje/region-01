@@ -121,7 +121,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
         }
-      } else if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
+      } else if (session && (
+        event === 'SIGNED_IN' || 
+        event === 'TOKEN_REFRESHED' || 
+        event === 'USER_UPDATED' || 
+        event === 'PASSWORD_RECOVERY' || 
+        event === 'MFA_CHALLENGE_VERIFIED'
+      )) {
         console.log('Session updated');
         setState(prev => ({
           ...prev,
