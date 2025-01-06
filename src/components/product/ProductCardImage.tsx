@@ -22,8 +22,6 @@ interface ProductCardImageProps {
 export const ProductCardImage = ({
   product,
   imageUrl,
-  selectedCurrency,
-  convertedPrice,
   showStatus,
   session,
   isAdmin,
@@ -50,6 +48,15 @@ export const ProductCardImage = ({
       />
       <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-blue-500/50">
         {product.category}
+      </span>
+      <span 
+        className={`absolute top-3 right-3 text-xs px-2 py-0 rounded-full backdrop-blur-sm font-medium ${
+          product.in_stock 
+            ? 'bg-green-100/80 text-green-800 border border-green-500/50' 
+            : 'bg-red-100/80 text-red-800 border border-red-500/50'
+        }`}
+      >
+        {product.in_stock ? 'In Stock' : 'Out of Stock'}
       </span>
       {showStatus && (
         <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${

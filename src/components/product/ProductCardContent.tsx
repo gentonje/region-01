@@ -30,17 +30,6 @@ export const ProductCardContent = ({
           </span>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center absolute bottom-0 left-0 right-0 -mb-8">
-        <span 
-          className={`text-xs px-3 py-1.5 rounded-full font-medium 
-            ${product.in_stock 
-              ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' 
-              : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'
-            } transition-colors`}
-        >
-          {product.in_stock ? 'In Stock' : 'Out of Stock'}
-        </span>
-      </CardFooter>
     </>
   );
 };
