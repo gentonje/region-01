@@ -17,38 +17,11 @@ interface ProductModifyCardProps {
     };
   };
   onDelete: (productId: string) => Promise<void>;
+  isAdminOrSuper?: boolean;
 }
 
-export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps) => {
+export const ProductModifyCard = ({ product, onDelete, isAdminOrSuper }: ProductModifyCardProps) => {
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
-
-  const { data: isAdminOrSuper } = useQuery({
-    queryKey: ["isAdminOrSuper"],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
-      
-      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin', {
-        user_id: user.id
-      });
-      
-      if (adminError) {
-        console.error('Error checking admin status:', adminError);
-        return false;
-      }
-
-      const { data: isSuperAdmin, error: superError } = await supabase.rpc('is_super_admin', {
-        user_id: user.id
-      });
-      
-      if (superError) {
-        console.error('Error checking super admin status:', superError);
-        return false;
-      }
-      
-      return isAdmin || isSuperAdmin;
-    }
-  });
 
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">

@@ -3,6 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
 import { Product } from "@/types/product";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ModifyProductsListProps {
   products: Product[];
@@ -39,6 +41,35 @@ export const ModifyProductsList = ({
     threshold: 0,
   });
 
+  // Check if user is admin or super admin
+  const { data: isAdminOrSuper } = useQuery({
+    queryKey: ["isAdminOrSuper"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+      
+      if (adminError) {
+        console.error('Error checking admin status:', adminError);
+        return false;
+      }
+
+      const { data: isSuperAdmin, error: superError } = await supabase.rpc('is_super_admin', {
+        user_id: user.id
+      });
+      
+      if (superError) {
+        console.error('Error checking super admin status:', superError);
+        return false;
+      }
+      
+      return isAdmin || isSuperAdmin;
+    }
+  });
+
   useEffect(() => {
     if (isMobile && inView && hasMore && !isLoading) {
       onLoadMore();
@@ -69,6 +100,7 @@ export const ModifyProductsList = ({
             key={`product-${product.id}`}
             product={product}
             onDelete={onDelete}
+            isAdminOrSuper={isAdminOrSuper}
           />
         ))}
       </div>
