@@ -4,7 +4,7 @@ import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
 import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
-import { AuthError } from "@supabase/supabase-js";
+import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -110,12 +110,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     initSession();
 
     // Set up the auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
       console.log('Auth state changed:', event);
       
       if (!mounted) return;
 
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+      const signOutEvents = ['SIGNED_OUT', 'USER_DELETED'];
+      const sessionEvents = [
+        'SIGNED_IN',
+        'TOKEN_REFRESHED',
+        'USER_UPDATED',
+        'PASSWORD_RECOVERY',
+        'MFA_CHALLENGE_VERIFIED',
+        'INITIAL_SESSION'
+      ];
+
+      if (signOutEvents.includes(event)) {
         console.log('User signed out or deleted');
         setState(prev => ({
           ...prev,
@@ -127,14 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
         }
-      } else if (session && [
-        'SIGNED_IN',
-        'TOKEN_REFRESHED',
-        'USER_UPDATED',
-        'PASSWORD_RECOVERY',
-        'MFA_CHALLENGE_VERIFIED',
-        'INITIAL_SESSION'
-      ].includes(event)) {
+      } else if (session && sessionEvents.includes(event)) {
         console.log('Session updated');
         setState(prev => ({
           ...prev,
