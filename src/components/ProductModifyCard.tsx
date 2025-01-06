@@ -31,23 +31,34 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
   const [isPublishing, setIsPublishing] = useState(false);
 
-  // Query to check if the current user is an admin
-  const { data: isAdmin } = useQuery({
-    queryKey: ["isAdmin"],
+  // Query to check if the current user is an admin or super admin
+  const { data: isAdminOrSuper } = useQuery({
+    queryKey: ["isAdminOrSuper"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
       
-      const { data, error } = await supabase.rpc('is_admin', {
+      // Check for admin status
+      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin', {
         user_id: user.id
       });
       
-      if (error) {
-        console.error('Error checking admin status:', error);
+      if (adminError) {
+        console.error('Error checking admin status:', adminError);
+        return false;
+      }
+
+      // Check for super admin status
+      const { data: isSuperAdmin, error: superError } = await supabase.rpc('is_super_admin', {
+        user_id: user.id
+      });
+      
+      if (superError) {
+        console.error('Error checking super admin status:', superError);
         return false;
       }
       
-      return data;
+      return isAdmin || isSuperAdmin;
     }
   });
 
@@ -63,23 +74,16 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       return newStatus;
     },
     onMutate: async (newStatus) => {
-      // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['products'] });
-
-      // Snapshot the previous value
       const previousProducts = queryClient.getQueryData(['products']);
-
-      // Optimistically update to the new value
       queryClient.setQueryData(['products'], (old: any) => {
         return old?.map((p: any) =>
           p.id === product.id ? { ...p, product_status: newStatus } : p
         );
       });
-
       return { previousProducts };
     },
     onError: (err, newStatus, context) => {
-      // If the mutation fails, use the context returned from onMutate to roll back
       queryClient.setQueryData(['products'], context?.previousProducts);
       toast.error('Failed to update product status');
     },
@@ -87,7 +91,6 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
     },
     onSettled: () => {
-      // Always refetch after error or success to ensure we have the correct data
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setIsPublishing(false);
     },
@@ -111,7 +114,7 @@ export const ProductModifyCard = ({ product, onDelete }: ProductModifyCardProps)
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <span className="text-lg font-bold">${product.price}</span>
-          {isAdmin && (
+          {isAdminOrSuper && (
             <div className="flex items-center space-x-2 relative">
               <Switch
                 id={`publish-${product.id}`}
