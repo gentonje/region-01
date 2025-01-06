@@ -23,7 +23,7 @@ export const ProductCardContent = ({ product }: ProductCardContentProps) => {
           <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center gap-2 absolute bottom-0 left-0 right-0 -mb-8">
+      <CardFooter className="flex justify-center absolute bottom-0 left-0 right-0 -mb-8">
         <span 
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
             ${product.in_stock 
