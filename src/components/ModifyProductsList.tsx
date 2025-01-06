@@ -1,10 +1,19 @@
 import { ProductModifyCard } from "@/components/ProductModifyCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ModifyProductsListProps {
   products: Product[];
@@ -41,6 +50,9 @@ export const ModifyProductsList = ({
     threshold: 0,
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  
   // Check if user is admin or super admin
   const { data: isAdminOrSuper } = useQuery({
     queryKey: ["isAdminOrSuper"],
@@ -70,32 +82,77 @@ export const ModifyProductsList = ({
     }
   });
 
+  // Fetch categories
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("name")
+        .order("name");
+      
+      if (error) throw error;
+      return data.map(category => category.name);
+    }
+  });
+
   useEffect(() => {
     if (isMobile && inView && hasMore && !isLoading) {
       onLoadMore();
     }
   }, [inView, hasMore, isMobile, isLoading, onLoadMore]);
 
-  // Debug log for products
-  console.log("ModifyProductsList - Products:", products);
-
-  const renderSkeletons = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array(3).fill(null).map((_, index) => (
-        <ProductSkeleton key={`skeleton-${index}`} />
-      ))}
-    </div>
-  );
-
-  // Create a Set of unique product IDs to prevent duplicates
-  const uniqueProducts = Array.from(
-    new Map(products.map(product => [product.id, product])).values()
-  );
+  // Filter and sort products
+  const filteredAndSortedProducts = products
+    .filter(product => {
+      const matchesSearch = searchQuery.toLowerCase().trim() === "" ||
+        product.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.profiles?.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.profiles?.full_name?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      // Sort unpublished first
+      if (a.product_status === "draft" && b.product_status !== "draft") return -1;
+      if (a.product_status !== "draft" && b.product_status === "draft") return 1;
+      return 0;
+    });
 
   return (
     <>
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by product or username..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Select
+          value={selectedCategory}
+          onValueChange={setSelectedCategory}
+        >
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Select category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories?.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {uniqueProducts.map((product) => (
+        {filteredAndSortedProducts.map((product) => (
           <ProductModifyCard
             key={`product-${product.id}`}
             product={product}
@@ -107,7 +164,7 @@ export const ModifyProductsList = ({
 
       {isLoading && renderSkeletons()}
 
-      {!isLoading && uniqueProducts.length === 0 && (
+      {!isLoading && filteredAndSortedProducts.length === 0 && (
         <div className="text-center py-8">
           <p className="text-gray-600">No products found</p>
         </div>
