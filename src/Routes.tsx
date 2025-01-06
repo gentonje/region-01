@@ -1,6 +1,11 @@
 import React from 'react';
 import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
+import { AdminRoute } from '@/components/routes/AdminRoute';
+import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Page imports
 import Index from './pages/Index';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -12,73 +17,6 @@ import AdminManagement from './pages/AdminManagement';
 import Cart from './pages/Cart';
 import EditProfile from './pages/EditProfile';
 import Wishlist from './pages/Wishlist';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
-
-const AdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useAuth();
-  const { data: isAdmin, isLoading } = useQuery({
-    queryKey: ["isAdmin"],
-    queryFn: async () => {
-      if (!session?.user) return false;
-      
-      const { data, error } = await supabase.rpc('is_admin', {
-        user_id: session.user.id
-      });
-      
-      if (error) {
-        console.error('Error checking admin status:', error);
-        return false;
-      }
-      
-      return data;
-    },
-    enabled: !!session?.user
-  });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-const SuperAdminRoute = ({ children }: { children: React.ReactNode }) => {
-  const { session } = useAuth();
-  const { data: isSuperAdmin, isLoading } = useQuery({
-    queryKey: ["isSuperAdmin"],
-    queryFn: async () => {
-      if (!session?.user) return false;
-      
-      const { data, error } = await supabase.rpc('is_super_admin', {
-        user_id: session.user.id
-      });
-      
-      if (error) {
-        console.error('Error checking super admin status:', error);
-        return false;
-      }
-      
-      return data;
-    },
-    enabled: !!session?.user
-  });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isSuperAdmin) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-};
 
 export const Routes = () => {
   const { session, loading } = useAuth();
@@ -89,19 +27,20 @@ export const Routes = () => {
 
   return (
     <RouterRoutes>
+      {/* Public Routes */}
       <Route path="/" element={<Home />} />
+      <Route 
+        path="/login" 
+        element={session ? <Navigate to="/" replace /> : <Login />} 
+      />
+
+      {/* Protected Routes */}
       <Route 
         path="/products" 
         element={
           <PrivateRoute>
             <Index />
           </PrivateRoute>
-        } 
-      />
-      <Route 
-        path="/login" 
-        element={
-          session ? <Navigate to="/" replace /> : <Login />
         } 
       />
       <Route
@@ -129,16 +68,6 @@ export const Routes = () => {
         }
       />
       <Route
-        path="/admin/products"
-        element={
-          <PrivateRoute>
-            <AdminRoute>
-              <ModifyProducts userOnly={false} />
-            </AdminRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
         path="/cart"
         element={
           <PrivateRoute>
@@ -162,6 +91,18 @@ export const Routes = () => {
           </PrivateRoute>
         }
       />
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin/products"
+        element={
+          <PrivateRoute>
+            <AdminRoute>
+              <ModifyProducts userOnly={false} />
+            </AdminRoute>
+          </PrivateRoute>
+        }
+      />
       <Route
         path="/admin/users"
         element={
@@ -172,6 +113,8 @@ export const Routes = () => {
           </PrivateRoute>
         }
       />
+
+      {/* Super Admin Routes */}
       <Route
         path="/admin/manage"
         element={
@@ -182,6 +125,8 @@ export const Routes = () => {
           </PrivateRoute>
         }
       />
+
+      {/* Fallback Route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </RouterRoutes>
   );
