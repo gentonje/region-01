@@ -1,5 +1,5 @@
 import { Product } from "@/types/product";
-import { CardContent, CardFooter, CardTitle } from "../ui/card";
+import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface ProductCardContentProps {
@@ -25,8 +25,8 @@ export const ProductCardContent = ({
           <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
         <div className="pt-0 -mt-4 text-center">
-          <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-orange-500/50">
-            {selectedCurrency} {convertedPrice.toFixed(2)}
+          <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-bold whitespace-nowrap border border-orange-500/50">
+            {selectedCurrency} {convertedPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </span>
         </div>
       </CardContent>
