@@ -15,7 +15,7 @@ export const ProductCardContent = ({
 }: ProductCardContentProps) => {
   return (
     <>
-      <CardContent className="px-4 space-y-1 relative">
+      <CardContent className="px-1 space-y-1 relative">
         <div className="pt-1">
           <CardTitle className="text-sm font-medium truncate text-gray-900 dark:text-gray-50 min-w-[100px] text-center max-w-[90%] mx-auto">
             {product.title}
