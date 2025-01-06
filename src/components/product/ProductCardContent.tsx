@@ -30,7 +30,7 @@ export const ProductCardContent = ({
           </span>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center absolute bottom-0 left-0 right-0 -mb-6">
+      <CardFooter className="flex justify-center absolute bottom-0 left-0 right-0 mb-0">
         <span 
           className={`text-xs px-3 py-1.5 rounded-full font-medium 
             ${product.in_stock 
