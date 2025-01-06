@@ -21,7 +21,7 @@ export const ProductCardContent = ({
             {product.title}
           </CardTitle>
         </div>
-        <div className="h-[42px] overflow-hidden">
+        <div className="h-[36px] overflow-hidden">
           <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
         <div className="pt-0 -mt-4 text-center">
