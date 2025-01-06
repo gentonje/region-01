@@ -24,8 +24,8 @@ export const ProductCardContent = ({
         <div className="h-[42px] overflow-hidden">
           <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
-        <div className="pt-1 text-center">
-          <span className="text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-orange-500/50">
+        <div className="pt-0 text-center">
+          <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-orange-500/50">
             {selectedCurrency} {convertedPrice.toFixed(2)}
           </span>
         </div>
