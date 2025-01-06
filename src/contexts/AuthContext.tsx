@@ -4,6 +4,7 @@ import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
 import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
+import { AuthError } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -19,17 +20,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     retryCount: 0,
   });
 
-  const handleSessionRefreshError = useCallback(async () => {
-    console.log('Session refresh failed, signing out...');
-    await supabase.auth.signOut();
-    setState(prev => ({
-      ...prev,
-      session: null,
-      user: null,
-      loading: false,
-      retryCount: 0,
-    }));
-    toast.error('Your session has expired. Please sign in again.');
+  const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
+    console.log('Session refresh failed, signing out...', error);
+    try {
+      await supabase.auth.signOut();
+      setState(prev => ({
+        ...prev,
+        session: null,
+        user: null,
+        loading: false,
+        retryCount: 0,
+      }));
+      toast.error('Your session has expired. Please sign in again.');
+    } catch (signOutError) {
+      console.error('Error during sign out:', signOutError);
+      toast.error('An error occurred. Please refresh the page.');
+    }
   }, []);
 
   const initSession = useCallback(async () => {
@@ -41,8 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Session initialization error:', error);
-        if (error.message?.includes('refresh_token_not_found')) {
-          await handleSessionRefreshError();
+        if (error.message?.includes('refresh_token_not_found') || error.message?.includes('Failed to fetch')) {
+          await handleSessionRefreshError(error);
           return;
         }
         await AuthErrorHandler.handleError(
@@ -73,7 +79,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
         } catch (refreshError) {
           console.error('Session refresh error:', refreshError);
-          await handleSessionRefreshError();
+          await handleSessionRefreshError(refreshError as AuthError);
         }
       } else {
         console.log('No valid session found');
@@ -87,7 +93,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } catch (error) {
       console.error('Session initialization error:', error);
       await AuthErrorHandler.handleError(
-        error as any,
+        error as AuthError,
         initSession,
         state.retryCount
       );
@@ -121,13 +127,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
         }
-      } else if (session && (
-        event === 'SIGNED_IN' || 
-        event === 'TOKEN_REFRESHED' || 
-        event === 'USER_UPDATED' || 
-        event === 'PASSWORD_RECOVERY' || 
-        event === 'MFA_CHALLENGE_VERIFIED'
-      )) {
+      } else if (session && [
+        'SIGNED_IN',
+        'TOKEN_REFRESHED',
+        'USER_UPDATED',
+        'PASSWORD_RECOVERY',
+        'MFA_CHALLENGE_VERIFIED',
+        'INITIAL_SESSION'
+      ].includes(event)) {
         console.log('Session updated');
         setState(prev => ({
           ...prev,
