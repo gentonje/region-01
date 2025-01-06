@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Package, User, Settings, LogOut, Users, Edit, Plus, LogIn, Heart, Shield } from "lucide-react";
+import { User, Settings, LogOut, Users, Edit, Plus, LogIn, Heart, Shield, PenTool, UserCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -88,10 +88,18 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/modify-products" className="cursor-pointer">
-                <Edit className="mr-2 h-4 w-4" />
-                Modify Products
+                <PenTool className="mr-2 h-4 w-4" />
+                My Products
               </Link>
             </DropdownMenuItem>
+            {(isAdmin || isSuperAdmin) && (
+              <DropdownMenuItem asChild>
+                <Link to="/admin/products" className="cursor-pointer">
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  All Products
+                </Link>
+              </DropdownMenuItem>
+            )}
             {!isAdmin && (
               <DropdownMenuItem asChild>
                 <Link to="/wishlist" className="cursor-pointer">

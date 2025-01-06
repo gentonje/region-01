@@ -124,7 +124,17 @@ export const Routes = () => {
         path="/modify-products"
         element={
           <PrivateRoute>
-            <ModifyProducts />
+            <ModifyProducts userOnly={true} />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/products"
+        element={
+          <PrivateRoute>
+            <AdminRoute>
+              <ModifyProducts userOnly={false} />
+            </AdminRoute>
           </PrivateRoute>
         }
       />

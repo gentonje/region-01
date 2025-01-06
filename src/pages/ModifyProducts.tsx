@@ -5,7 +5,11 @@ import { SupportedCurrency } from "@/utils/currencyConverter";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 
-export default function ModifyProducts() {
+interface ModifyProductsProps {
+  userOnly?: boolean;
+}
+
+export default function ModifyProducts({ userOnly = true }: ModifyProductsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCurrency] = useState<SupportedCurrency>("SSP");
@@ -23,7 +27,7 @@ export default function ModifyProducts() {
     selectedCategory,
     priceRange,
     sortOrder,
-    userOnly: true, // This ensures we only show user's products
+    userOnly, // This will be used in the hook to filter products
   });
 
   const allProducts = data?.pages.flat() || [];
@@ -41,7 +45,9 @@ export default function ModifyProducts() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6 mt-8">My Products</h1>
+      <h1 className="text-2xl font-bold mb-6 mt-8">
+        {userOnly ? "My Products" : "All Products"}
+      </h1>
       <ProductListingSection
         products={allProducts}
         searchQuery={searchQuery}
