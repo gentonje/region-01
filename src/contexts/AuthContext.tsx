@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
 import { AuthErrorHandler } from "./auth/errorHandler";
+import { toast } from "sonner";
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -18,6 +19,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     retryCount: 0,
   });
 
+  const handleSessionRefreshError = useCallback(async () => {
+    console.log('Session refresh failed, signing out...');
+    await supabase.auth.signOut();
+    setState(prev => ({
+      ...prev,
+      session: null,
+      user: null,
+      loading: false,
+      retryCount: 0,
+    }));
+    toast.error('Your session has expired. Please sign in again.');
+  }, []);
+
   const initSession = useCallback(async () => {
     try {
       console.log('Initializing session...');
@@ -27,6 +41,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) {
         console.error('Session initialization error:', error);
+        if (error.message?.includes('refresh_token_not_found')) {
+          await handleSessionRefreshError();
+          return;
+        }
         await AuthErrorHandler.handleError(
           error,
           initSession,
@@ -37,18 +55,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (session) {
         console.log('Found existing session, refreshing...');
-        const refreshedSession = await SessionManager.refreshSession(
-          session,
-          state.retryCount
-        );
-        
-        if (refreshedSession) {
-          setState(prev => ({
-            ...prev,
-            session: refreshedSession,
-            user: refreshedSession.user,
-            retryCount: 0,
-          }));
+        try {
+          const refreshedSession = await SessionManager.refreshSession(
+            session,
+            state.retryCount
+          );
+          
+          if (refreshedSession) {
+            setState(prev => ({
+              ...prev,
+              session: refreshedSession,
+              user: refreshedSession.user,
+              retryCount: 0,
+            }));
+          } else {
+            await handleSessionRefreshError();
+          }
+        } catch (refreshError) {
+          console.error('Session refresh error:', refreshError);
+          await handleSessionRefreshError();
         }
       } else {
         console.log('No valid session found');
@@ -69,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setState(prev => ({ ...prev, loading: false }));
     }
-  }, [state.retryCount]);
+  }, [state.retryCount, handleSessionRefreshError]);
 
   useEffect(() => {
     let mounted = true;
@@ -84,14 +109,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (!mounted) return;
 
-      if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        console.log('User signed out or deleted');
         setState(prev => ({
           ...prev,
           session: null,
           user: null,
           loading: false,
         }));
+        
+        if (refreshTimeout) {
+          clearTimeout(refreshTimeout);
+        }
       } else if (session && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')) {
         console.log('Session updated');
         setState(prev => ({
@@ -106,9 +135,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           clearTimeout(refreshTimeout);
         }
 
-        refreshTimeout = SessionManager.scheduleNextRefresh(session, () => {
+        // Schedule next refresh
+        const expiresIn = session.expires_in || 3600;
+        const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
+        refreshTimeout = setTimeout(() => {
           SessionManager.refreshSession(session, state.retryCount);
-        });
+        }, refreshTime);
       }
     });
 
