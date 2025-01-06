@@ -48,7 +48,7 @@ export const ProductCardImage = ({
         height={208}
         priority={false}
       />
-      <div className="absolute top-3 w-full px-6 flex justify-end items-center">
+      <div className="absolute top-3 w-full px-3 flex justify-end items-center">
         <span className="text-sm px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-medium whitespace-nowrap border border-orange-500/50">
           {selectedCurrency} {convertedPrice.toFixed(2)}
         </span>
@@ -69,7 +69,7 @@ export const ProductCardImage = ({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-3 -left-1 -mt-4 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white border border-neutral-200/50"
+          className="absolute top-3 left-3 -mt-4 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white border border-neutral-200/50"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
