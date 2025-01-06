@@ -69,7 +69,7 @@ export const ProductCardImage = ({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-3 left-2 -mt-4 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white border border-neutral-200/50"
+          className="absolute top-3 -left-1 -mt-4 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white border border-neutral-200/50"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
