@@ -18,9 +18,9 @@ interface ProductListProps {
 
 const ProductSkeleton = () => (
   <div className="space-y-3">
-    <Skeleton className="h-[200px] w-full rounded-lg" />
-    <Skeleton className="h-4 w-2/3" />
-    <Skeleton className="h-4 w-1/2" />
+    <Skeleton className="h-[200px] w-full rounded-lg animate-[pulse_3s_ease-in-out_infinite]" />
+    <Skeleton className="h-4 w-2/3 animate-[pulse_3s_ease-in-out_infinite]" />
+    <Skeleton className="h-4 w-1/2 animate-[pulse_3s_ease-in-out_infinite]" />
   </div>
 );
 
