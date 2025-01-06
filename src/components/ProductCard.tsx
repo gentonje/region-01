@@ -197,7 +197,11 @@ const ProductCard = ({
         isPending={toggleWishlist.isPending}
         onClick={onClick}
       />
-      <ProductCardContent product={product} />
+      <ProductCardContent 
+        product={product}
+        selectedCurrency={selectedCurrency}
+        convertedPrice={convertedPrice}
+      />
     </Card>
   );
 };
