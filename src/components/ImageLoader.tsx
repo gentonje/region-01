@@ -68,7 +68,7 @@ export const ImageLoader = ({
     <>
       {isLoading && (
         <Skeleton 
-          className={`${className} animate-pulse`}
+          className={`${className} animate-[pulse_3s_ease-in-out_infinite]`}
           style={{ width, height }}
         />
       )}
