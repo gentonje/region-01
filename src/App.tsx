@@ -18,23 +18,21 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <BrowserRouter>
-            <AuthProvider>
-              <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
-                <Navigation />
-                <main className="flex-1">
-                  <Routes />
-                </main>
-                <Toaster />
-              </div>
-            </AuthProvider>
-          </BrowserRouter>
+          <AuthProvider>
+            <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
+              <Navigation />
+              <main className="flex-1">
+                <Routes />
+              </main>
+              <Toaster />
+            </div>
+          </AuthProvider>
         </ThemeProvider>
-      </QueryClientProvider>
-    </React.StrictMode>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
