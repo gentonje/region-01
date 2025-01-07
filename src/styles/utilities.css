@@ -1,0 +1,13 @@
+/* Glass morphism effects */
+.glass {
+  @apply bg-background/80 backdrop-blur-sm border border-border/50;
+}
+
+.glass-hover {
+  @apply hover:bg-background/90 transition-colors duration-200;
+}
+
+/* Consistent transitions */
+.theme-transition {
+  @apply transition-colors duration-200;
+}
