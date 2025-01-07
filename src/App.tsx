@@ -7,25 +7,34 @@ import { Toaster } from './components/ui/toaster';
 import { Routes } from './Routes';
 import { Navigation } from './components/Navigation';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <AuthProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <BrowserRouter>
-            <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
-              <Navigation />
-              <main className="flex-1">
-                <Routes />
-              </main>
-            </div>
-            <Toaster />
+            <AuthProvider>
+              <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
+                <Navigation />
+                <main className="flex-1">
+                  <Routes />
+                </main>
+                <Toaster />
+              </div>
+            </AuthProvider>
           </BrowserRouter>
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 
