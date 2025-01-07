@@ -18,17 +18,28 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background dark:bg-slate-900">
       <div className="w-full max-w-md space-y-8 px-4 mt-10">
         <div className="flex justify-center mt-10">
           <Logo />
         </div>
         
-        <div className="bg-card rounded-lg shadow-lg p-6 space-y-6">
+        <div className="bg-card dark:bg-slate-800 rounded-lg shadow-lg p-6 space-y-6">
           <Auth
             supabaseClient={supabase}
             view={authView}
-            appearance={{ theme: ThemeSupa }}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brandAccent: 'rgb(14, 165, 233)',
+                    inputBackground: 'rgb(30, 41, 59)',
+                    inputText: 'white',
+                  },
+                },
+              },
+            }}
             providers={[]}
             redirectTo={window.location.origin}
           />
