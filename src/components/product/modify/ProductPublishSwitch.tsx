@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ToggleLeft, ToggleRight } from "lucide-react";
 
 interface ProductPublishSwitchProps {
   productId: string;
@@ -53,28 +54,28 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
     updateStatusMutation.mutate(newStatus);
   };
 
+  const isPublished = initialStatus === 'published';
+
   return (
     <div className="flex items-center space-x-2 relative">
       <Switch
         id={`publish-${productId}`}
-        checked={initialStatus === 'published'}
+        checked={isPublished}
         onCheckedChange={handlePublishChange}
         disabled={isPublishing}
-        className="data-[state=checked]:bg-green-500"
+        className={`${isPublished ? 'bg-green-500' : 'bg-red-500'}`}
       />
-      <Label
-        htmlFor={`publish-${productId}`}
-        className="text-sm text-gray-600 min-w-[80px]"
-      >
-        {isPublishing ? (
-          <div className="flex items-center space-x-2">
-            <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-            <span>Updating...</span>
-          </div>
-        ) : (
-          initialStatus === 'published' ? 'Published' : 'Draft'
-        )}
-      </Label>
+      {isPublished ? (
+        <ToggleRight className="h-4 w-4 text-green-500" />
+      ) : (
+        <ToggleLeft className="h-4 w-4 text-red-500" />
+      )}
+      {isPublishing && (
+        <div className="flex items-center space-x-2">
+          <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+          <span className="text-sm text-gray-600">Updating...</span>
+        </div>
+      )}
     </div>
   );
 };

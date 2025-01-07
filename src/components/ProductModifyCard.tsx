@@ -27,17 +27,19 @@ export const ProductModifyCard = ({ product, onDelete, isAdminOrSuper }: Product
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
       <ProductModifyHeader title={product.title} ownerName={ownerName} />
       <p className="text-gray-600 mb-4">{product.description}</p>
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-4">
+      <div className="flex flex-col space-y-4">
+        <div className="flex justify-between items-center">
           <span className="text-lg font-bold">${product.price}</span>
-          {isAdminOrSuper && (
+          <ProductModifyActions productId={product.id} onDelete={onDelete} />
+        </div>
+        {isAdminOrSuper && (
+          <div className="flex justify-end">
             <ProductPublishSwitch 
               productId={product.id} 
               initialStatus={product.product_status || 'draft'} 
             />
-          )}
-        </div>
-        <ProductModifyActions productId={product.id} onDelete={onDelete} />
+          </div>
+        )}
       </div>
     </div>
   );
