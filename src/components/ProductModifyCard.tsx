@@ -1,8 +1,10 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductModifyHeader } from "./product/modify/ProductModifyHeader";
 import { ProductModifyActions } from "./product/modify/ProductModifyActions";
 import { ProductPublishSwitch } from "./product/modify/ProductPublishSwitch";
+import { Badge } from "./ui/badge";
 
 interface ProductModifyCardProps {
   product: {
@@ -17,11 +19,12 @@ interface ProductModifyCardProps {
     };
   };
   onDelete: (productId: string) => Promise<void>;
-  isAdminOrSuper?: boolean;
+  isAdmin?: boolean;
 }
 
-export const ProductModifyCard = ({ product, onDelete, isAdminOrSuper }: ProductModifyCardProps) => {
+export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyCardProps) => {
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
+  const status = product.product_status || 'draft';
 
   return (
     <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
@@ -29,14 +32,19 @@ export const ProductModifyCard = ({ product, onDelete, isAdminOrSuper }: Product
       <p className="text-gray-600 mb-4">{product.description}</p>
       <div className="flex flex-col space-y-4">
         <div className="flex justify-between items-center">
-          <span className="text-lg font-bold">${product.price}</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-bold">${product.price}</span>
+            <Badge variant={status === 'published' ? "success" : "secondary"}>
+              {status === 'published' ? 'Published' : 'Draft'}
+            </Badge>
+          </div>
           <ProductModifyActions productId={product.id} onDelete={onDelete} />
         </div>
-        {isAdminOrSuper && (
+        {isAdmin && (
           <div className="flex justify-end">
             <ProductPublishSwitch 
               productId={product.id} 
-              initialStatus={product.product_status || 'draft'} 
+              initialStatus={status} 
             />
           </div>
         )}

@@ -1,5 +1,7 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ProductFormData } from "@/types/product";
+import { toast } from "sonner";
 
 export const updateProduct = async (
   id: string,
@@ -50,3 +52,47 @@ export const updateProduct = async (
     }
   }
 };
+
+export const deleteProduct = async (productId: string) => {
+  try {
+    // Delete product images first
+    const { data: images, error: imagesError } = await supabase
+      .from('product_images')
+      .delete()
+      .eq('product_id', productId);
+
+    if (imagesError) throw imagesError;
+
+    // Then delete the product
+    const { error: productError } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', productId);
+
+    if (productError) throw productError;
+
+    toast.success('Product deleted successfully');
+  } catch (error: any) {
+    console.error('Error deleting product:', error);
+    toast.error(error.message || 'Failed to delete product');
+    throw error;
+  }
+};
+
+export const updateProductStatus = async (productId: string, status: 'draft' | 'published') => {
+  try {
+    const { error } = await supabase
+      .from('products')
+      .update({ product_status: status })
+      .eq('id', productId);
+
+    if (error) throw error;
+
+    toast.success(`Product ${status === 'published' ? 'published' : 'unpublished'} successfully`);
+  } catch (error: any) {
+    console.error('Error updating product status:', error);
+    toast.error(error.message || 'Failed to update product status');
+    throw error;
+  }
+};
+

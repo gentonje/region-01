@@ -1,9 +1,13 @@
+
 import React, { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { ProductListingSection } from "@/components/products/ProductListingSection";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
+import { deleteProduct } from "@/services/productService";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface ModifyProductsProps {
   userOnly?: boolean;
@@ -15,6 +19,22 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
   const [selectedCurrency] = useState<SupportedCurrency>("SSP");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
+  const queryClient = useQueryClient();
+
+  // Check if user is admin
+  const { data: isAdmin } = useQuery({
+    queryKey: ["isAdmin"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+      
+      const { data: isAdmin } = await supabase.rpc('is_admin', {
+        user_id: user.id
+      });
+      
+      return isAdmin;
+    }
+  });
 
   const {
     data,
@@ -27,8 +47,20 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
     selectedCategory,
     priceRange,
     sortOrder,
-    userOnly, // This will be used in the hook to filter products
+    userOnly: !isAdmin && userOnly, // Only filter by user if not admin and userOnly is true
   });
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      // Invalidate the products query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Product deleted successfully");
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      toast.error("Failed to delete product");
+    }
+  };
 
   const allProducts = data?.pages.flat() || [];
 
@@ -62,6 +94,8 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
         onSortChange={setSortOrder}
         getProductImageUrl={getProductImageUrl}
         showStatus={true}
+        onDelete={handleDeleteProduct}
+        isAdmin={isAdmin}
       />
     </div>
   );
