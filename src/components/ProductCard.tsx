@@ -36,11 +36,16 @@ const ProductCard = ({
     queryKey: ['userType', session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return null;
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('user_type')
         .eq('id', session.user.id)
         .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching user type:', error);
+        return null;
+      }
       return profile?.user_type;
     },
     enabled: !!session?.user
