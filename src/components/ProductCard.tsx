@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
@@ -16,6 +15,8 @@ interface ProductCardProps {
   onClick?: () => void;
   selectedCurrency: SupportedCurrency;
   showStatus?: boolean;
+  onDelete?: (productId: string) => Promise<void>;
+  isAdmin?: boolean;
 }
 
 const ProductCard = ({ 
@@ -23,7 +24,9 @@ const ProductCard = ({
   getProductImageUrl, 
   onClick, 
   selectedCurrency,
-  showStatus = false 
+  showStatus = false,
+  onDelete,
+  isAdmin 
 }: ProductCardProps) => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
