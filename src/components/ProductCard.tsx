@@ -40,8 +40,8 @@ const ProductCard = ({
         .from('profiles')
         .select('user_type')
         .eq('id', session.user.id)
-        .single();
-      return profile?.user_type as 'buyer' | 'seller' | 'admin';
+        .maybeSingle();
+      return profile?.user_type;
     },
     enabled: !!session?.user
   });
