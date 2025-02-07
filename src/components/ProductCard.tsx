@@ -68,19 +68,22 @@ const ProductCard = ({
       if (!session?.user) return false;
 
       try {
-        const { data: wishlist, error: wishlistError } = await supabase
+        // First, get the user's wishlist
+        const { data: wishlist, error } = await supabase
           .from('wishlists')
           .select('id')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
-        if (wishlistError) {
-          console.error('Wishlist error:', wishlistError);
+        if (error) {
+          console.error('Error fetching wishlist:', error);
           return false;
         }
 
+        // If no wishlist exists, return false
         if (!wishlist) return false;
 
+        // Check if product is in wishlist
         const { data: wishlistItem, error: itemError } = await supabase
           .from('wishlist_items')
           .select('id')
@@ -89,7 +92,7 @@ const ProductCard = ({
           .maybeSingle();
 
         if (itemError) {
-          console.error('Wishlist item error:', itemError);
+          console.error('Error fetching wishlist item:', itemError);
           return false;
         }
 
@@ -100,7 +103,7 @@ const ProductCard = ({
       }
     },
     enabled: !!session?.user && !!product.id,
-    retry: 1
+    retry: false
   });
 
   const toggleWishlist = useMutation({
@@ -109,23 +112,26 @@ const ProductCard = ({
         throw new Error('Please login to add items to wishlist');
       }
 
-      const { data: wishlist, error: wishlistError } = await supabase
+      // Get or create wishlist
+      const { data: existingWishlist, error: wishlistError } = await supabase
         .from('wishlists')
         .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      if (wishlistError && wishlistError.code !== 'PGRST116') {
-        throw wishlistError;
+      if (wishlistError) {
+        console.error('Error fetching wishlist:', wishlistError);
+        throw new Error('Failed to access wishlist');
       }
 
       let wishlistId;
-      if (!wishlist) {
+      if (!existingWishlist) {
         const { data: newWishlist, error: createError } = await supabase
           .from('wishlists')
           .insert({
             user_id: session.user.id,
-            name: 'My Wishlist'
+            name: 'My Wishlist',
+            visibility: 'private'
           })
           .select()
           .single();
@@ -133,7 +139,7 @@ const ProductCard = ({
         if (createError) throw createError;
         wishlistId = newWishlist.id;
       } else {
-        wishlistId = wishlist.id;
+        wishlistId = existingWishlist.id;
       }
 
       if (isInWishlist) {

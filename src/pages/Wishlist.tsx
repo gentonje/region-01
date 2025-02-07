@@ -15,7 +15,7 @@ const Wishlist = () => {
   const navigate = useNavigate();
 
   const { data: wishlistItems, isLoading } = useQuery({
-    queryKey: ["wishlist-items"],
+    queryKey: ["wishlist-items", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) {
         navigate("/login");
@@ -23,15 +23,15 @@ const Wishlist = () => {
       }
 
       try {
-        // First try to get the existing wishlist
-        const { data: existingWishlist, error: fetchError } = await supabase
+        // Get the user's wishlist
+        const { data: wishlist, error: wishlistError } = await supabase
           .from("wishlists")
           .select("id")
           .eq("user_id", session.user.id)
           .maybeSingle();
 
-        if (fetchError) {
-          console.error("Error fetching wishlist:", fetchError);
+        if (wishlistError) {
+          console.error("Error fetching wishlist:", wishlistError);
           toast({
             title: "Error",
             description: "Failed to fetch wishlist",
@@ -40,21 +40,20 @@ const Wishlist = () => {
           return [];
         }
 
-        let wishlistId;
-
         // If no wishlist exists, create one
-        if (!existingWishlist) {
+        let wishlistId;
+        if (!wishlist) {
           const { data: newWishlist, error: createError } = await supabase
             .from("wishlists")
             .insert({
               user_id: session.user.id,
               name: "My Wishlist",
-              visibility: "private",
+              visibility: "private"
             })
             .select("id")
-            .maybeSingle();
+            .single();
 
-          if (createError || !newWishlist) {
+          if (createError) {
             console.error("Error creating wishlist:", createError);
             toast({
               title: "Error",
@@ -63,10 +62,9 @@ const Wishlist = () => {
             });
             return [];
           }
-
           wishlistId = newWishlist.id;
         } else {
-          wishlistId = existingWishlist.id;
+          wishlistId = wishlist.id;
         }
 
         // Get wishlist items with product details
@@ -112,6 +110,7 @@ const Wishlist = () => {
       }
     },
     enabled: !!session?.user,
+    retry: 1
   });
 
   if (!session) {
