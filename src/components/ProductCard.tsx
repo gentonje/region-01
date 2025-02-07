@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
@@ -26,7 +27,7 @@ const ProductCard = ({
   selectedCurrency,
   showStatus = false,
   onDelete,
-  isAdmin 
+  isAdmin: isAdminProp 
 }: ProductCardProps) => {
   const { session } = useAuth();
   const queryClient = useQueryClient();
@@ -221,7 +222,7 @@ const ProductCard = ({
         convertedPrice={convertedPrice}
         showStatus={showStatus}
         session={session}
-        isAdmin={isAdmin}
+        isAdmin={isAdminProp || isAdmin}
         isInWishlist={isInWishlist}
         toggleWishlist={toggleWishlist.mutate}
         isPending={toggleWishlist.isPending}
