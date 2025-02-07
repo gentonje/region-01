@@ -28,12 +28,23 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
       
-      const { data: isAdmin } = await supabase.rpc('is_admin', {
-        user_id: user.id
-      });
-      
-      return isAdmin;
-    }
+      try {
+        const { data: profile, error } = await supabase.rpc('is_admin', {
+          user_id: user.id
+        });
+
+        if (error) {
+          console.error('Error checking admin status:', error);
+          return false;
+        }
+
+        return profile;
+      } catch (error) {
+        console.error('Error in admin check:', error);
+        return false;
+      }
+    },
+    retry: false
   });
 
   const {
