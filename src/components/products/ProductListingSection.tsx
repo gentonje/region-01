@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
@@ -17,6 +18,8 @@ interface ProductListingSectionProps {
   onSortChange: (sort: string) => void;
   getProductImageUrl: (product: Product) => string;
   showStatus?: boolean;
+  onDelete?: (productId: string) => Promise<void>;
+  isAdmin?: boolean;
 }
 
 export const ProductListingSection = ({
@@ -33,6 +36,8 @@ export const ProductListingSection = ({
   onSortChange,
   getProductImageUrl,
   showStatus = false,
+  onDelete,
+  isAdmin
 }: ProductListingSectionProps) => {
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
@@ -49,6 +54,8 @@ export const ProductListingSection = ({
         observerRef={observerRef}
         selectedCurrency={selectedCurrency}
         showStatus={showStatus}
+        onDelete={onDelete}
+        isAdmin={isAdmin}
       />
     </>
   );

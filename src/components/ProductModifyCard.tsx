@@ -34,7 +34,7 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold">${product.price}</span>
-            <Badge variant={status === 'published' ? "success" : "secondary"}>
+            <Badge variant={status === 'published' ? "default" : "secondary"}>
               {status === 'published' ? 'Published' : 'Draft'}
             </Badge>
           </div>
