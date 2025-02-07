@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
@@ -89,7 +88,6 @@ const ProductCard = ({
       if (!session?.user) return false;
 
       try {
-        // First, get the user's wishlist
         const { data: wishlist, error } = await supabase
           .from('wishlists')
           .select('id')
@@ -101,10 +99,8 @@ const ProductCard = ({
           return false;
         }
 
-        // If no wishlist exists, return false
         if (!wishlist) return false;
 
-        // Check if product is in wishlist
         const { data: wishlistItem, error: itemError } = await supabase
           .from('wishlist_items')
           .select('id')
@@ -133,7 +129,6 @@ const ProductCard = ({
         throw new Error('Please login to add items to wishlist');
       }
 
-      // Get or create wishlist
       const { data: existingWishlist, error: wishlistError } = await supabase
         .from('wishlists')
         .select('id')
@@ -240,7 +235,7 @@ const ProductCard = ({
         showStatus={showStatus}
         session={session}
         isAdmin={isAdminProp || isAdmin}
-        isInWishlist={isInWishlist}
+        isInWishlist={!!isInWishlist}
         toggleWishlist={toggleWishlist.mutate}
         isPending={toggleWishlist.isPending}
         onClick={onClick}
