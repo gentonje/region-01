@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -87,7 +88,7 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
   return (
     <>
       <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 py-1">
           <div className="flex justify-between items-center h-14">
             <Logo />
 
