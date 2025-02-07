@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -8,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { User, Settings, LogOut, Users, Edit, Plus, LogIn, Heart, Shield, PenTool, UserCheck } from "lucide-react";
+import { User, Settings, LogOut, Users, Shield, PenTool, Plus, LogIn, Heart, UserCheck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -81,8 +82,8 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
         {isAuthenticated ? (
           <>
             <DropdownMenuItem asChild>
-              <Link to="/add-product" className="cursor-pointer group">
-                <Plus className="mr-2 h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+              <Link to="/add-product" className="cursor-pointer">
+                <Plus className="mr-2 h-4 w-4" />
                 Add Product
               </Link>
             </DropdownMenuItem>
@@ -138,8 +139,8 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
           </>
         ) : (
           <DropdownMenuItem asChild>
-            <Link to="/login" className="cursor-pointer group">
-              <LogIn className="mr-2 h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+            <Link to="/login" className="cursor-pointer">
+              <LogIn className="mr-2 h-4 w-4" />
               Login
             </Link>
           </DropdownMenuItem>
