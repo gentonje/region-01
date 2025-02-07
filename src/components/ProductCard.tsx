@@ -62,29 +62,45 @@ const ProductCard = ({
     enabled: !!product.user_id
   });
 
-  const { data: isInWishlist } = useQuery({
-    queryKey: ['wishlist', product.id],
+  const { data: isInWishlist, error: wishlistError } = useQuery({
+    queryKey: ['wishlist', product.id, session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return false;
 
-      const { data: wishlist } = await supabase
-        .from('wishlists')
-        .select('id')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
+      try {
+        const { data: wishlist, error: wishlistError } = await supabase
+          .from('wishlists')
+          .select('id')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
 
-      if (!wishlist) return false;
+        if (wishlistError) {
+          console.error('Wishlist error:', wishlistError);
+          return false;
+        }
 
-      const { data: wishlistItem } = await supabase
-        .from('wishlist_items')
-        .select('id')
-        .eq('wishlist_id', wishlist.id)
-        .eq('product_id', product.id)
-        .maybeSingle();
+        if (!wishlist) return false;
 
-      return !!wishlistItem;
+        const { data: wishlistItem, error: itemError } = await supabase
+          .from('wishlist_items')
+          .select('id')
+          .eq('wishlist_id', wishlist.id)
+          .eq('product_id', product.id)
+          .maybeSingle();
+
+        if (itemError) {
+          console.error('Wishlist item error:', itemError);
+          return false;
+        }
+
+        return !!wishlistItem;
+      } catch (error) {
+        console.error('Wishlist query error:', error);
+        return false;
+      }
     },
-    enabled: !!session?.user && !!product.id
+    enabled: !!session?.user && !!product.id,
+    retry: 1
   });
 
   const toggleWishlist = useMutation({
@@ -179,6 +195,10 @@ const ProductCard = ({
   };
 
   const imageUrl = getImageUrl();
+
+  if (wishlistError) {
+    console.error('Wishlist error:', wishlistError);
+  }
 
   return (
     <Card 
