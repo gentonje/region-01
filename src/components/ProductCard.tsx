@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
