@@ -37,18 +37,23 @@ const ProductCard = ({
     queryFn: async () => {
       if (!session?.user) return null;
       
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', session.user.id)
-        .maybeSingle();
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', session.user.id)
+          .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching user type:', error);
+        if (error) {
+          console.error('Error fetching user type:', error);
+          return null;
+        }
+        
+        return profile?.user_type;
+      } catch (error) {
+        console.error('Unexpected error fetching user type:', error);
         return null;
       }
-      
-      return profile?.user_type;
     },
     enabled: !!session?.user
   });
@@ -58,17 +63,22 @@ const ProductCard = ({
   const { data: owner } = useQuery({
     queryKey: ['profile', product.user_id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username, full_name')
-        .eq('id', product.user_id)
-        .maybeSingle();
-      
-      if (error) {
-        console.error('Error fetching profile:', error);
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('username, full_name')
+          .eq('id', product.user_id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching profile:', error);
+          return null;
+        }
+        return data;
+      } catch (error) {
+        console.error('Unexpected error fetching owner profile:', error);
         return null;
       }
-      return data;
     },
     enabled: !!product.user_id
   });
