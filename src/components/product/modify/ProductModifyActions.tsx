@@ -18,12 +18,13 @@ export const ProductModifyActions = ({ productId, onDelete }: ProductModifyActio
         variant="outline"
         size="icon"
         onClick={() => navigate(`/edit-product/${productId}`)}
+        className="rounded-full"
       >
         <Edit className="h-4 w-4" />
       </Button>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive" size="icon">
+          <Button variant="destructive" size="icon" className="rounded-full">
             <Trash2 className="h-4 w-4" />
           </Button>
         </AlertDialogTrigger>
