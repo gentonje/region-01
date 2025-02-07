@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -14,6 +15,8 @@ interface ProductListProps {
   observerRef?: (node?: Element | null) => void;
   selectedCurrency: SupportedCurrency;
   showStatus?: boolean;
+  onDelete?: (productId: string) => Promise<void>;
+  isAdmin?: boolean;
 }
 
 const ProductSkeleton = () => (
@@ -32,7 +35,9 @@ export const ProductList = ({
   isFetchingNextPage,
   observerRef,
   selectedCurrency,
-  showStatus = false
+  showStatus = false,
+  onDelete,
+  isAdmin
 }: ProductListProps) => {
   const { ref, inView } = useInView({
     threshold: 0,
@@ -67,6 +72,8 @@ export const ProductList = ({
             onClick={() => onProductClick(product)}
             selectedCurrency={selectedCurrency}
             showStatus={showStatus}
+            onDelete={onDelete}
+            isAdmin={isAdmin}
           />
         </div>
       ))}
