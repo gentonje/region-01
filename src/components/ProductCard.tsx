@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
@@ -48,7 +49,7 @@ const ProductCard = ({
           return null;
         }
         
-        return profile?.user_type;
+        return profile?.user_type || null;
       } catch (error) {
         console.error('Unexpected error fetching user type:', error);
         return null;
