@@ -38,18 +38,17 @@ const ProductCard = ({
       if (!session?.user) return null;
       
       try {
-        const { data: profile, error } = await supabase
+        const { data: profiles, error } = await supabase
           .from('profiles')
           .select('user_type')
-          .eq('id', session.user.id)
-          .maybeSingle();
+          .eq('id', session.user.id);
 
         if (error) {
           console.error('Error fetching user type:', error);
           return null;
         }
-        
-        return profile?.user_type || null;
+
+        return profiles?.[0]?.user_type || null;
       } catch (error) {
         console.error('Unexpected error fetching user type:', error);
         return null;
@@ -64,17 +63,16 @@ const ProductCard = ({
     queryKey: ['profile', product.user_id],
     queryFn: async () => {
       try {
-        const { data, error } = await supabase
+        const { data: profiles, error } = await supabase
           .from('profiles')
           .select('username, full_name')
-          .eq('id', product.user_id)
-          .maybeSingle();
+          .eq('id', product.user_id);
         
         if (error) {
           console.error('Error fetching profile:', error);
           return null;
         }
-        return data;
+        return profiles?.[0] || null;
       } catch (error) {
         console.error('Unexpected error fetching owner profile:', error);
         return null;
@@ -93,28 +91,28 @@ const ProductCard = ({
           .from('wishlists')
           .select('id')
           .eq('user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
         if (error) {
+          if (error.code === 'PGRST116') return false;
           console.error('Error fetching wishlist:', error);
           return false;
         }
 
         if (!wishlist) return false;
 
-        const { data: wishlistItem, error: itemError } = await supabase
+        const { data: wishlistItems, error: itemError } = await supabase
           .from('wishlist_items')
           .select('id')
           .eq('wishlist_id', wishlist.id)
-          .eq('product_id', product.id)
-          .maybeSingle();
+          .eq('product_id', product.id);
 
         if (itemError) {
           console.error('Error fetching wishlist item:', itemError);
           return false;
         }
 
-        return !!wishlistItem;
+        return wishlistItems.length > 0;
       } catch (error) {
         console.error('Wishlist query error:', error);
         return false;
@@ -134,9 +132,9 @@ const ProductCard = ({
         .from('wishlists')
         .select('id')
         .eq('user_id', session.user.id)
-        .maybeSingle();
+        .single();
 
-      if (wishlistError) {
+      if (wishlistError && wishlistError.code !== 'PGRST116') {
         console.error('Error fetching wishlist:', wishlistError);
         throw new Error('Failed to access wishlist');
       }
@@ -251,3 +249,4 @@ const ProductCard = ({
 };
 
 export default ProductCard;
+
