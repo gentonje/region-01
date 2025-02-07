@@ -1,6 +1,7 @@
+
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 
 interface UseProductsProps {
   searchQuery: string;
@@ -35,7 +36,7 @@ export const useProducts = ({
       }
 
       if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
+        query = query.eq("category", selectedCategory as ProductCategory);
       }
 
       if (priceRange.min > 0) {

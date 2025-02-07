@@ -1,6 +1,7 @@
+
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 
 export const useSession = () => {
   return useQuery({
@@ -36,7 +37,7 @@ export const useHomeProducts = (
       }
 
       if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
+        query = query.eq("category", selectedCategory as ProductCategory);
       }
 
       const { data: products, error } = await query;
