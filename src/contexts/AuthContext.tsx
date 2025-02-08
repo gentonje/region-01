@@ -7,11 +7,7 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
-const AuthContext = createContext<AuthContextType>({
-  session: null,
-  user: null,
-  loading: true,
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<AuthState>({
@@ -171,12 +167,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [initSession]);
 
+  const value = {
+    session: state.session,
+    user: state.user,
+    loading: state.loading,
+  };
+
   return (
-    <AuthContext.Provider value={{
-      session: state.session,
-      user: state.user,
-      loading: state.loading,
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
