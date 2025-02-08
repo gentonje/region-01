@@ -106,7 +106,7 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
         getProductImageUrl={getProductImageUrl}
         showStatus={true}
         onDelete={handleDeleteProduct}
-        isAdmin={true} // Always show delete button in My Products page
+        isAdmin={true}
       />
     </div>
   );
