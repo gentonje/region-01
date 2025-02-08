@@ -26,24 +26,27 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
       return newStatus;
     },
     onMutate: async (newStatus) => {
-      await queryClient.cancelQueries({ queryKey: ['products'] });
-      const previousProducts = queryClient.getQueryData(['products']);
-      queryClient.setQueryData(['products'], (old: any) => {
-        return old?.map((p: any) =>
-          p.id === productId ? { ...p, product_status: newStatus } : p
-        );
+      await queryClient.cancelQueries({ queryKey: ['users-products'] });
+      const previousProducts = queryClient.getQueryData(['users-products']);
+      queryClient.setQueryData(['users-products'], (old: any) => {
+        return old?.map((user: any) => ({
+          ...user,
+          products: user.products.map((p: any) =>
+            p.id === productId ? { ...p, product_status: newStatus } : p
+          )
+        }));
       });
       return { previousProducts };
     },
     onError: (err, newStatus, context) => {
-      queryClient.setQueryData(['products'], context?.previousProducts);
+      queryClient.setQueryData(['users-products'], context?.previousProducts);
       toast.error('Failed to update product status');
     },
     onSuccess: (newStatus) => {
       toast.success(`Product ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`);
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['users-products'] });
       setIsPublishing(false);
     },
   });

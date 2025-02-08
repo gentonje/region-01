@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ChevronDown, ChevronRight, User } from "lucide-react";
 import { ProductModifyCard } from "@/components/ProductModifyCard";
@@ -54,6 +55,7 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
                 key={product.id}
                 product={product}
                 onDelete={onDelete}
+                isAdmin={true}
               />
             ))}
           </div>
