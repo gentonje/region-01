@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
@@ -13,11 +12,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
     session: null,
     user: null,
@@ -176,13 +171,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [initSession]);
 
   return (
-    <AuthContext.Provider 
-      value={{
-        session: state.session,
-        user: state.user,
-        loading: state.loading,
-      }}
-    >
+    <AuthContext.Provider value={{
+      session: state.session,
+      user: state.user,
+      loading: state.loading,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -40,12 +40,14 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           </div>
           <ProductModifyActions productId={product.id} onDelete={onDelete} />
         </div>
-        <div className="flex justify-end">
-          <ProductPublishSwitch 
-            productId={product.id} 
-            initialStatus={status} 
-          />
-        </div>
+        {isAdmin && (
+          <div className="flex justify-end">
+            <ProductPublishSwitch 
+              productId={product.id} 
+              initialStatus={status} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );
