@@ -6,20 +6,10 @@ import { ProductModifyActions } from "./product/modify/ProductModifyActions";
 import { ProductPublishSwitch } from "./product/modify/ProductPublishSwitch";
 import { Badge } from "./ui/badge";
 import { ImageLoader } from "./ImageLoader";
+import { Product } from "@/types/product";
 
 interface ProductModifyCardProps {
-  product: {
-    id: string;
-    title: string;
-    description: string;
-    price: number;
-    product_status?: string;
-    product_images?: { url: string }[];
-    profiles?: {
-      username?: string;
-      full_name?: string;
-    };
-  };
+  product: Product;
   onDelete: (productId: string) => Promise<void>;
   isAdmin?: boolean;
 }
@@ -27,7 +17,11 @@ interface ProductModifyCardProps {
 export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyCardProps) => {
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
   const status = product.product_status || 'draft';
-  const imageUrl = product.product_images?.[0]?.url || '/placeholder.svg';
+  
+  // Get the public URL for the first product image or use placeholder
+  const imageUrl = product.product_images?.[0]
+    ? supabase.storage.from('images').getPublicUrl(product.product_images[0].storage_path).data.publicUrl
+    : '/placeholder.svg';
 
   return (
     <div className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow">
@@ -35,14 +29,14 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
         <div className="w-20 h-20 flex-shrink-0">
           <ImageLoader
             src={imageUrl}
-            alt={product.title}
+            alt={product.title || ''}
             className="w-full h-full object-cover rounded"
             width={80}
             height={80}
           />
         </div>
         <div className="flex-1 min-w-0">
-          <ProductModifyHeader title={product.title} ownerName={ownerName} />
+          <ProductModifyHeader title={product.title || ''} ownerName={ownerName} />
           <p className="text-gray-600 text-sm truncate mb-2">{product.description}</p>
           <div className="flex items-center gap-2">
             <span className="text-lg font-bold">${product.price}</span>
