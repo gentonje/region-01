@@ -1,7 +1,5 @@
 
-"use client";
-
-import * as React from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
@@ -9,21 +7,21 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
-const AuthContext = React.createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = React.useState<AuthState>({
+  const [state, setState] = useState<AuthState>({
     session: null,
     user: null,
     loading: true,
     retryCount: 0,
   });
 
-  const handleSessionRefreshError = React.useCallback(async (error?: AuthError) => {
+  const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
     console.log('Session refresh failed, signing out...', error);
     try {
       await supabase.auth.signOut();
@@ -41,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const initSession = React.useCallback(async () => {
+  const initSession = useCallback(async () => {
     try {
       console.log('Initializing session...');
       setState(prev => ({ ...prev, loading: true }));
@@ -105,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.retryCount, handleSessionRefreshError]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     let refreshTimeout: NodeJS.Timeout | null = null;
 
@@ -173,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [initSession]);
 
-  const value = React.useMemo(() => ({
+  const value = useMemo(() => ({
     session: state.session,
     user: state.user,
     loading: state.loading,
@@ -187,7 +185,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = React.useContext(AuthContext);
+  const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
