@@ -1,13 +1,13 @@
 
 import React, { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
-import { ProductListingSection } from "@/components/products/ProductListingSection";
-import { SupportedCurrency } from "@/utils/currencyConverter";
-import { supabase } from "@/integrations/supabase/client";
+import { ModifyProductsList } from "@/components/ModifyProductsList";
+import { useDeviceInfo } from "@/hooks/useDeviceInfo";
 import { Product } from "@/types/product";
 import { deleteProduct } from "@/services/productService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ModifyProductsProps {
   userOnly?: boolean;
@@ -16,13 +16,13 @@ interface ModifyProductsProps {
 export default function ModifyProducts({ userOnly = true }: ModifyProductsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedCurrency] = useState<SupportedCurrency>("SSP");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
+  const { isMobile } = useDeviceInfo();
   const queryClient = useQueryClient();
 
   // Check if user is admin
-  const { data: isAdmin } = useQuery({
+  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
     queryKey: ["isAdmin"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -53,6 +53,7 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
+    error
   } = useProducts({
     searchQuery,
     selectedCategory,
@@ -64,7 +65,6 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
   const handleDeleteProduct = async (productId: string) => {
     try {
       await deleteProduct(productId);
-      // Invalidate the products query to refresh the list
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Product deleted successfully");
     } catch (error) {
@@ -73,40 +73,37 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
     }
   };
 
-  const allProducts = data?.pages.flat() || [];
-
-  const getProductImageUrl = (product: Product) => {
-    if (!product.product_images?.length) return "/placeholder.svg";
-    
-    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
-    if (!mainImage) return "/placeholder.svg";
-
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(mainImage.storage_path).data.publicUrl;
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center text-red-500">
+          Error loading products. Please try again later.
+        </div>
+      </div>
+    );
+  }
+
+  const allProducts = data?.pages.flat() || [];
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6 mt-8">
         {userOnly ? "My Products" : "All Products"}
       </h1>
-      <ProductListingSection
+      
+      <ModifyProductsList
         products={allProducts}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        onProductClick={() => {}}
-        isFetchingNextPage={isFetchingNextPage}
-        observerRef={() => {}}
-        selectedCurrency={selectedCurrency}
-        onPriceRangeChange={(min, max) => setPriceRange({ min, max })}
-        onSortChange={setSortOrder}
-        getProductImageUrl={getProductImageUrl}
-        showStatus={true}
+        isLoading={isLoading || isAdminLoading}
+        hasMore={!!hasNextPage}
+        onLoadMore={handleLoadMore}
         onDelete={handleDeleteProduct}
-        isAdmin={true} // Always show delete button in My Products page
+        isMobile={isMobile}
       />
     </div>
   );

@@ -15,6 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Slider
+} from "@/components/ui/slider";
 
 interface ModifyProductsListProps {
   products: Product[];
@@ -53,6 +56,8 @@ export const ModifyProductsList = ({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [sortOrder, setSortOrder] = useState<string>("none");
   
   // Check if user is admin
   const { data: isAdmin } = useQuery({
@@ -84,10 +89,10 @@ export const ModifyProductsList = ({
   });
 
   useEffect(() => {
-    if (isMobile && inView && hasMore && !isLoading) {
+    if (isMobile && inView && hasMore) {
       onLoadMore();
     }
-  }, [inView, hasMore, isMobile, isLoading, onLoadMore]);
+  }, [inView, hasMore, isMobile, onLoadMore]);
 
   // Filter and sort products
   const filteredAndSortedProducts = products
@@ -99,22 +104,21 @@ export const ModifyProductsList = ({
       
       const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
       
-      return matchesSearch && matchesCategory;
+      const matchesPriceRange = (!product.price || 
+        (product.price >= priceRange[0] && product.price <= priceRange[1]));
+      
+      return matchesSearch && matchesCategory && matchesPriceRange;
     })
     .sort((a, b) => {
-      // Sort unpublished first
+      if (sortOrder === "price_asc") return (a.price || 0) - (b.price || 0);
+      if (sortOrder === "price_desc") return (b.price || 0) - (a.price || 0);
+      if (sortOrder === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      if (sortOrder === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      // Sort unpublished first by default
       if (a.product_status === "draft" && b.product_status !== "draft") return -1;
       if (a.product_status !== "draft" && b.product_status === "draft") return 1;
       return 0;
     });
-
-  const renderSkeletons = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {Array(3).fill(null).map((_, index) => (
-        <ProductSkeleton key={`skeleton-${index}`} />
-      ))}
-    </div>
-  );
 
   return (
     <>
@@ -144,6 +148,39 @@ export const ModifyProductsList = ({
             ))}
           </SelectContent>
         </Select>
+        <Select
+          value={sortOrder}
+          onValueChange={setSortOrder}
+        >
+          <SelectTrigger className="w-full md:w-[200px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">Default</SelectItem>
+            <SelectItem value="price_asc">Price: Low to High</SelectItem>
+            <SelectItem value="price_desc">Price: High to Low</SelectItem>
+            <SelectItem value="newest">Newest First</SelectItem>
+            <SelectItem value="oldest">Oldest First</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-medium mb-2">Price Range</label>
+        <div className="px-2">
+          <Slider
+            defaultValue={[0, 1000]}
+            max={1000}
+            step={10}
+            value={priceRange}
+            onValueChange={setPriceRange}
+            className="my-4"
+          />
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>${priceRange[0]}</span>
+            <span>${priceRange[1]}</span>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -157,7 +194,13 @@ export const ModifyProductsList = ({
         ))}
       </div>
 
-      {isLoading && renderSkeletons()}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <ProductSkeleton key={`skeleton-${i}`} />
+          ))}
+        </div>
+      )}
 
       {!isLoading && filteredAndSortedProducts.length === 0 && (
         <div className="text-center py-8">
