@@ -62,6 +62,11 @@ export default function Index() {
     setSortOrder(sort);
   };
 
+  const handlePriceRangeChange = (min: number, max: number) => {
+    // Handle price range changes if needed
+    console.log('Price range changed:', { min, max });
+  };
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 mt-20">
@@ -103,6 +108,7 @@ export default function Index() {
             isFetchingNextPage={isFetchingNextPage}
             observerRef={ref}
             selectedCurrency={selectedCurrency}
+            onPriceRangeChange={handlePriceRangeChange}
             onSortChange={handleSortChange}
             getProductImageUrl={getProductImageUrl}
           />
