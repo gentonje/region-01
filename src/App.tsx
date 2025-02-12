@@ -20,8 +20,8 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
@@ -34,8 +34,8 @@ const App: React.FC = () => {
             </div>
           </AuthProvider>
         </ThemeProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 };
 
