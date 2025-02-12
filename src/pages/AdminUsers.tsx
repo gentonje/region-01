@@ -59,59 +59,7 @@ const AdminUsers = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      // Delete in reverse order of dependencies to handle foreign key constraints
-
-      // 1. First delete review replies as they depend on reviews
-      const { data: reviews } = await supabase
-        .from('reviews')
-        .select('id')
-        .eq('product_id', productId);
-
-      if (reviews && reviews.length > 0) {
-        const reviewIds = reviews.map(review => review.id);
-        await supabase
-          .from('review_replies')
-          .delete()
-          .in('review_id', reviewIds);
-      }
-
-      // 2. Delete reviews
-      await supabase
-        .from('reviews')
-        .delete()
-        .eq('product_id', productId);
-
-      // 3. Delete product views
-      await supabase
-        .from('product_views')
-        .delete()
-        .eq('product_id', productId);
-
-      // 4. Delete cart items
-      await supabase
-        .from('cart_items')
-        .delete()
-        .eq('product_id', productId);
-
-      // 5. Delete wishlist items
-      await supabase
-        .from('wishlist_items')
-        .delete()
-        .eq('product_id', productId);
-
-      // 6. Delete orders
-      await supabase
-        .from('orders')
-        .delete()
-        .eq('product_id', productId);
-
-      // 7. Delete product images
-      await supabase
-        .from('product_images')
-        .delete()
-        .eq('product_id', productId);
-
-      // 8. Finally delete the product
+      // Now we can directly delete the product and all related records will be automatically deleted
       const { error: productError } = await supabase
         .from('products')
         .delete()
