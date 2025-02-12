@@ -28,7 +28,7 @@ interface CategoryStats {
 
 const AdminUsers = () => {
   const { session } = useAuth();
-  const { data: users, isLoading: isUsersLoading } = useQuery({
+  const { data: users, isLoading: isUsersLoading, refetch } = useQuery({
     queryKey: ["users-products"],
     queryFn: async () => {
       // First get all profiles
@@ -61,17 +61,29 @@ const AdminUsers = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      const { error } = await supabase
+      // First delete all product images
+      const { error: imagesError } = await supabase
+        .from('product_images')
+        .delete()
+        .eq('product_id', productId);
+
+      if (imagesError) throw imagesError;
+
+      // Then delete the product
+      const { error: productError } = await supabase
         .from('products')
         .delete()
         .eq('id', productId);
 
-      if (error) throw error;
+      if (productError) throw productError;
+      
+      // Refetch the data to update the UI
+      await refetch();
       
       toast.success('Product deleted successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting product:', error);
-      toast.error('Failed to delete product');
+      toast.error(error.message || 'Failed to delete product');
     }
   };
 
