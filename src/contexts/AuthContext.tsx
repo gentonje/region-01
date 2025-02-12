@@ -7,7 +7,12 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
-const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
+// Create context with default value
+const AuthContext = React.createContext<AuthContextType>({
+  session: null,
+  user: null,
+  loading: true,
+});
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
@@ -182,7 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
