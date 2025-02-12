@@ -31,14 +31,12 @@ const AdminUsers = () => {
   const { data: users, isLoading: isUsersLoading, refetch } = useQuery({
     queryKey: ["users-products"],
     queryFn: async () => {
-      // First get all profiles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, username, is_active');
 
       if (profilesError) throw profilesError;
 
-      // Then for each profile, get their products with all product images
       const profilesWithProducts = await Promise.all(
         profiles.map(async (profile) => {
           const { data: products, error: productsError } = await supabase
@@ -61,7 +59,7 @@ const AdminUsers = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      // First delete all product images
+      // Delete product images first
       const { error: imagesError } = await supabase
         .from('product_images')
         .delete()
@@ -69,7 +67,67 @@ const AdminUsers = () => {
 
       if (imagesError) throw imagesError;
 
-      // Then delete the product
+      // Delete from cart items
+      const { error: cartError } = await supabase
+        .from('cart_items')
+        .delete()
+        .eq('product_id', productId);
+
+      if (cartError) throw cartError;
+
+      // Delete from wishlist items
+      const { error: wishlistError } = await supabase
+        .from('wishlist_items')
+        .delete()
+        .eq('product_id', productId);
+
+      if (wishlistError) throw wishlistError;
+
+      // Delete orders related to the product
+      const { error: ordersError } = await supabase
+        .from('orders')
+        .delete()
+        .eq('product_id', productId);
+
+      if (ordersError) throw ordersError;
+
+      // Delete product views
+      const { error: viewsError } = await supabase
+        .from('product_views')
+        .delete()
+        .eq('product_id', productId);
+
+      if (viewsError) throw viewsError;
+
+      // Delete reviews and their replies
+      const { data: reviews, error: reviewsFetchError } = await supabase
+        .from('reviews')
+        .select('id')
+        .eq('product_id', productId);
+
+      if (reviewsFetchError) throw reviewsFetchError;
+
+      if (reviews && reviews.length > 0) {
+        const reviewIds = reviews.map(review => review.id);
+
+        // Delete review replies
+        const { error: repliesError } = await supabase
+          .from('review_replies')
+          .delete()
+          .in('review_id', reviewIds);
+
+        if (repliesError) throw repliesError;
+
+        // Delete reviews
+        const { error: reviewsError } = await supabase
+          .from('reviews')
+          .delete()
+          .eq('product_id', productId);
+
+        if (reviewsError) throw reviewsError;
+      }
+
+      // Finally delete the product
       const { error: productError } = await supabase
         .from('products')
         .delete()
