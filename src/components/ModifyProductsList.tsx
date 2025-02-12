@@ -15,9 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Slider
-} from "@/components/ui/slider";
 
 interface ModifyProductsListProps {
   products: Product[];
@@ -54,7 +51,6 @@ export const ModifyProductsList = ({
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortOrder, setSortOrder] = useState<string>("none");
   
   // Check if user is admin
@@ -102,10 +98,7 @@ export const ModifyProductsList = ({
       
       const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
       
-      const matchesPriceRange = (!product.price || 
-        (product.price >= priceRange[0] && product.price <= priceRange[1]));
-      
-      return matchesSearch && matchesCategory && matchesPriceRange;
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       if (sortOrder === "price_asc") return (a.price || 0) - (b.price || 0);
@@ -160,24 +153,6 @@ export const ModifyProductsList = ({
             <SelectItem value="oldest">Oldest First</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-
-      <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">Price Range</label>
-        <div className="px-2">
-          <Slider
-            defaultValue={[0, 1000]}
-            max={1000}
-            step={10}
-            value={priceRange}
-            onValueChange={setPriceRange}
-            className="my-4"
-          />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
-          </div>
-        </div>
       </div>
 
       <div className="divide-y divide-gray-200 bg-white rounded-lg shadow">
