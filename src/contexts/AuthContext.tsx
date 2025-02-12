@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
