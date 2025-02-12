@@ -24,8 +24,8 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     : '/placeholder.svg';
 
   return (
-    <div className="flex items-center gap-6">
-      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm">
+    <div className="flex flex-col md:flex-row gap-4">
+      <div className="w-full md:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm">
         <ImageLoader
           src={imageUrl}
           alt={product.title || ''}
@@ -36,22 +36,24 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
       </div>
       <div className="flex-1 min-w-0">
         <ProductModifyHeader title={product.title || ''} ownerName={ownerName} />
-        <p className="text-gray-600 text-sm line-clamp-2 mb-3">{product.description}</p>
-        <div className="flex items-center gap-3">
-          <span className="text-lg font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
+        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-2 md:mb-3">
+          {product.description}
+        </p>
+        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+          <span className="text-base md:text-lg font-bold bg-primary/10 text-primary px-2 md:px-3 py-1 rounded-full">
             ${product.price}
           </span>
-          <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full">
+          <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full text-xs">
             {status === 'published' ? 'Published' : 'Draft'}
           </Badge>
           {product.category && (
-            <Badge variant="outline" className="rounded-full">
+            <Badge variant="outline" className="rounded-full text-xs">
               {product.category}
             </Badge>
           )}
         </div>
       </div>
-      <div className="flex flex-col items-end gap-3 ml-4">
+      <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-start gap-3 mt-2 md:mt-0">
         <ProductModifyActions productId={product.id} onDelete={onDelete} />
         {isAdmin && (
           <ProductPublishSwitch 
