@@ -7,7 +7,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from './components/ui/toaster';
 import { Routes } from './Routes';
 import { Navigation } from './components/Navigation';
-import { Toaster as SonnerToaster } from 'sonner';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,8 +19,8 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
@@ -30,12 +29,11 @@ function App() {
                 <Routes />
               </main>
               <Toaster />
-              <SonnerToaster position="bottom-right" />
             </div>
           </AuthProvider>
         </ThemeProvider>
-      </QueryClientProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
