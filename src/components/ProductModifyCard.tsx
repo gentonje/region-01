@@ -24,27 +24,34 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     : '/placeholder.svg';
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="w-20 h-20 flex-shrink-0">
+    <div className="flex items-center gap-6">
+      <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm">
         <ImageLoader
           src={imageUrl}
           alt={product.title || ''}
-          className="w-full h-full object-cover rounded"
-          width={80}
-          height={80}
+          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+          width={128}
+          height={128}
         />
       </div>
       <div className="flex-1 min-w-0">
         <ProductModifyHeader title={product.title || ''} ownerName={ownerName} />
-        <p className="text-gray-600 text-sm truncate mb-2">{product.description}</p>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold">${product.price}</span>
-          <Badge variant={status === 'published' ? "default" : "secondary"}>
+        <p className="text-gray-600 text-sm line-clamp-2 mb-3">{product.description}</p>
+        <div className="flex items-center gap-3">
+          <span className="text-lg font-bold bg-primary/10 text-primary px-3 py-1 rounded-full">
+            ${product.price}
+          </span>
+          <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full">
             {status === 'published' ? 'Published' : 'Draft'}
           </Badge>
+          {product.category && (
+            <Badge variant="outline" className="rounded-full">
+              {product.category}
+            </Badge>
+          )}
         </div>
       </div>
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col items-end gap-3 ml-4">
         <ProductModifyActions productId={product.id} onDelete={onDelete} />
         {isAdmin && (
           <ProductPublishSwitch 
