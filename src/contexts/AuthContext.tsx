@@ -1,3 +1,6 @@
+
+"use client";
+
 import * as React from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
@@ -12,11 +15,7 @@ const AuthContext = React.createContext<AuthContextType>({
   loading: true,
 });
 
-interface AuthProviderProps {
-  children: React.ReactNode;
-}
-
-const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = React.useState<AuthState>({
     session: null,
     user: null,
@@ -185,14 +184,12 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export { AuthProvider };
-
-export const useAuth = () => {
+export function useAuth() {
   const context = React.useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
+}
