@@ -86,16 +86,6 @@ export const Routes = () => {
 
       {/* Admin Routes */}
       <Route
-        path="/admin/products"
-        element={
-          <PrivateRoute>
-            <AdminRoute>
-              <ModifyProducts userOnly={false} />
-            </AdminRoute>
-          </PrivateRoute>
-        }
-      />
-      <Route
         path="/admin/users"
         element={
           <PrivateRoute>
@@ -123,5 +113,3 @@ export const Routes = () => {
     </RouterRoutes>
   );
 };
-
-<lov-delete file_path="src/pages/ModifyProducts.tsx" />
