@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
+import * as React from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
@@ -7,17 +7,17 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<AuthState>({
+  const [state, React.useState<AuthState>({
     session: null,
     user: null,
     loading: true,
     retryCount: 0,
   });
 
-  const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
+  const handleSessionRefreshError = React.useCallback(async (error?: AuthError) => {
     console.log('Session refresh failed, signing out...', error);
     try {
       await supabase.auth.signOut();
@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const initSession = useCallback(async () => {
+  const initSession = React.useCallback(async () => {
     try {
       console.log('Initializing session...');
       setState(prev => ({ ...prev, loading: true }));
@@ -99,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [state.retryCount, handleSessionRefreshError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
     let refreshTimeout: NodeJS.Timeout | null = null;
 
@@ -181,7 +181,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
