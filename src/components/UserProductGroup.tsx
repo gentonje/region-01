@@ -49,14 +49,15 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
           <div className="py-4">
             <ProductFilters onSearchChange={handleSearchChange} />
           </div>
-          <div className="space-y-4">
+          <div className="divide-y divide-gray-200">
             {filteredProducts.map((product) => (
-              <ProductModifyCard
-                key={product.id}
-                product={product}
-                onDelete={onDelete}
-                isAdmin={true}
-              />
+              <div key={product.id} className="py-4 first:pt-0 last:pb-0">
+                <ProductModifyCard
+                  product={product}
+                  onDelete={onDelete}
+                  isAdmin={true}
+                />
+              </div>
             ))}
           </div>
         </div>

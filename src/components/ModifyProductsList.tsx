@@ -28,17 +28,15 @@ interface ModifyProductsListProps {
 }
 
 const ProductSkeleton = () => (
-  <div className="bg-white rounded-lg shadow p-4 mb-4 hover:shadow-lg transition-shadow">
-    <div className="flex items-center gap-4">
-      <Skeleton className="h-20 w-20 rounded" />
-      <div className="flex-1">
-        <Skeleton className="h-6 w-3/4 mb-2" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-      <div className="flex gap-2">
-        <Skeleton className="h-8 w-8" />
-        <Skeleton className="h-8 w-8" />
-      </div>
+  <div className="flex items-center gap-4 py-4">
+    <Skeleton className="h-20 w-20 rounded" />
+    <div className="flex-1">
+      <Skeleton className="h-6 w-3/4 mb-2" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+    <div className="flex gap-2">
+      <Skeleton className="h-8 w-8" />
+      <Skeleton className="h-8 w-8" />
     </div>
   </div>
 );
@@ -182,21 +180,24 @@ export const ModifyProductsList = ({
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="divide-y divide-gray-200 bg-white rounded-lg shadow">
         {filteredAndSortedProducts.map((product) => (
-          <ProductModifyCard
-            key={`product-${product.id}`}
-            product={product}
-            onDelete={onDelete}
-            isAdmin={isAdmin}
-          />
+          <div key={`product-${product.id}`} className="p-4">
+            <ProductModifyCard
+              product={product}
+              onDelete={onDelete}
+              isAdmin={isAdmin}
+            />
+          </div>
         ))}
       </div>
 
       {isLoading && (
-        <div className="space-y-4">
+        <div className="divide-y divide-gray-200 bg-white rounded-lg shadow mt-4">
           {[1, 2, 3].map((i) => (
-            <ProductSkeleton key={`skeleton-${i}`} />
+            <div key={`skeleton-${i}`} className="p-4">
+              <ProductSkeleton />
+            </div>
           ))}
         </div>
       )}
