@@ -1,4 +1,6 @@
-import React, { useState, useCallback, useContext, useEffect } from 'react';
+'use client';
+
+import * as React from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
@@ -13,15 +15,19 @@ const AuthContext = React.createContext<AuthContextType>({
   loading: true,
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<AuthState>({
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider = React.memo(function AuthProvider({ children }: AuthProviderProps) {
+  const [state, setState] = React.useState<AuthState>({
     session: null,
     user: null,
     loading: true,
     retryCount: 0,
   });
 
-  const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
+  const handleSessionRefreshError = React.useCallback(async (error?: AuthError) => {
     console.log('Session refresh failed, signing out...', error);
     try {
       await supabase.auth.signOut();
@@ -39,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const initSession = useCallback(async () => {
+  const initSession = React.useCallback(async () => {
     try {
       console.log('Initializing session...');
       setState(prev => ({ ...prev, loading: true }));
@@ -103,7 +109,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [state.retryCount, handleSessionRefreshError]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let mounted = true;
     let refreshTimeout: NodeJS.Timeout | null = null;
 
@@ -171,21 +177,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [initSession]);
 
-  const value = {
+  const value = React.useMemo(() => ({
     session: state.session,
     user: state.user,
     loading: state.loading,
-  };
+  }), [state.session, state.user, state.loading]);
 
   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+});
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
