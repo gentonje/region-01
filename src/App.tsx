@@ -20,22 +20,24 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <React.StrictMode>
       <BrowserRouter>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
-            <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
-              <Navigation />
-              <main className="flex-1">
-                <Routes />
-              </main>
-            </div>
-            <SonnerToaster position="bottom-right" />
-            <Toaster />
-          </AuthProvider>
-        </ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <AuthProvider>
+              <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
+                <Navigation />
+                <main className="flex-1">
+                  <Routes />
+                </main>
+              </div>
+              <SonnerToaster position="bottom-right" />
+              <Toaster />
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
       </BrowserRouter>
-    </QueryClientProvider>
+    </React.StrictMode>
   );
 };
 
