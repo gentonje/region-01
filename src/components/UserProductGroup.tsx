@@ -27,25 +27,25 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
   };
 
   return (
-    <div className="mb-8 overflow-hidden rounded-xl backdrop-blur-xl bg-black/40 dark:bg-black/40 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
+    <div className="mb-8 overflow-hidden rounded-xl backdrop-blur-xl bg-white/30 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
       <div 
-        className="p-6 flex items-center justify-between cursor-pointer hover:bg-white/5 dark:hover:bg-white/5 transition-all duration-300"
+        className="p-6 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-all duration-300"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-3">
-          <div className="p-2 rounded-full bg-white/10 dark:bg-white/10">
-            <User className="h-6 w-6 text-white dark:text-white" />
+          <div className="p-2 rounded-full bg-primary/10">
+            <User className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white dark:text-white">{username}</h3>
-            <span className="text-sm text-white/60 dark:text-white/60">{products.length} products</span>
+            <h3 className="text-lg font-semibold text-gray-900">{username}</h3>
+            <span className="text-sm text-gray-500">{products.length} products</span>
           </div>
         </div>
-        <div className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/10 transition-colors">
+        <div className="p-2 rounded-full hover:bg-white/20 transition-colors">
           {isExpanded ? (
-            <ChevronDown className="h-5 w-5 text-white/70 dark:text-white/70" />
+            <ChevronDown className="h-5 w-5 text-gray-500" />
           ) : (
-            <ChevronRight className="h-5 w-5 text-white/70 dark:text-white/70" />
+            <ChevronRight className="h-5 w-5 text-gray-500" />
           )}
         </div>
       </div>
@@ -55,14 +55,14 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
           <div className="py-4">
             <ProductFilters 
               onSearchChange={handleSearchChange}
-              className="bg-white/10 dark:bg-white/10 backdrop-blur-sm border-white/20 rounded-lg shadow-sm" 
+              className="bg-white/50 backdrop-blur-sm border-white/30 rounded-lg shadow-sm" 
             />
           </div>
           <div className="space-y-4">
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className="p-4 rounded-lg backdrop-blur-sm bg-black/30 dark:bg-black/30 border border-white/20 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-black/40 dark:hover:bg-black/40"
+                className="p-4 rounded-lg backdrop-blur-sm bg-white/50 border border-white/30 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-white/60"
               >
                 <ProductModifyCard
                   product={product}
