@@ -4,14 +4,15 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-const container = document.getElementById('root');
+const rootElement = document.getElementById('root');
 
-if (!container) {
-  throw new Error('Root element not found');
+if (!rootElement) {
+  throw new Error('Failed to find the root element');
 }
 
-const root = createRoot(container);
+const root = createRoot(rootElement);
 
+// Enable React concurrent mode with proper initialization
 root.render(
   <React.StrictMode>
     <App />
