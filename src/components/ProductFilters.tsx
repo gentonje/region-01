@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -6,9 +7,10 @@ import { useSearchParams } from "react-router-dom";
 
 interface ProductFiltersProps {
   onSearchChange?: (search: string) => void;
+  className?: string;
 }
 
-export const ProductFilters = ({ onSearchChange }: ProductFiltersProps) => {
+export const ProductFilters = ({ onSearchChange, className }: ProductFiltersProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
 
@@ -27,7 +29,7 @@ export const ProductFilters = ({ onSearchChange }: ProductFiltersProps) => {
   }, [search, searchParams, setSearchParams, onSearchChange]);
 
   return (
-    <div className="flex items-center gap-2 w-full max-w-sm mx-auto px-4 py-2">
+    <div className={`flex items-center gap-2 w-full max-w-sm mx-auto px-4 py-2 ${className || ''}`}>
       <div className="relative flex-1">
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input
