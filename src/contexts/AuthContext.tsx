@@ -10,7 +10,7 @@ import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, React.useState<AuthState>({
+  const [state, setState] = React.useState<AuthState>({
     session: null,
     user: null,
     loading: true,
