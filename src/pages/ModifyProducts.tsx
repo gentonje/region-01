@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { ModifyProductsList } from "@/components/ModifyProductsList";
-import { useDeviceInfo } from "@/hooks/useDeviceInfo";
 import { Product } from "@/types/product";
 import { deleteProduct } from "@/services/productService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,7 +17,6 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
-  const { isMobile } = useDeviceInfo();
   const queryClient = useQueryClient();
 
   // Check if user is admin
@@ -59,7 +57,7 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
     selectedCategory,
     priceRange,
     sortOrder,
-    userOnly: !isAdmin && userOnly, // Only filter by user if not admin and userOnly is true
+    userOnly: !isAdmin && userOnly,
   });
 
   const handleDeleteProduct = async (productId: string) => {
@@ -103,7 +101,6 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
         hasMore={!!hasNextPage}
         onLoadMore={handleLoadMore}
         onDelete={handleDeleteProduct}
-        isMobile={isMobile}
       />
     </div>
   );

@@ -25,18 +25,19 @@ interface ModifyProductsListProps {
   hasMore: boolean;
   onLoadMore: () => void;
   onDelete: (productId: string) => Promise<void>;
-  isMobile: boolean;
 }
 
 const ProductSkeleton = () => (
-  <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow space-y-4">
-    <Skeleton className="h-6 w-3/4" />
-    <Skeleton className="h-4 w-full" />
-    <div className="flex justify-between items-center">
-      <Skeleton className="h-6 w-24" />
-      <div className="space-x-2">
-        <Skeleton className="h-8 w-8 inline-block" />
-        <Skeleton className="h-8 w-8 inline-block" />
+  <div className="bg-white rounded-lg shadow p-4 mb-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-4">
+      <Skeleton className="h-20 w-20 rounded" />
+      <div className="flex-1">
+        <Skeleton className="h-6 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
+      <div className="flex gap-2">
+        <Skeleton className="h-8 w-8" />
+        <Skeleton className="h-8 w-8" />
       </div>
     </div>
   </div>
@@ -48,7 +49,6 @@ export const ModifyProductsList = ({
   hasMore,
   onLoadMore,
   onDelete,
-  isMobile
 }: ModifyProductsListProps) => {
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
@@ -89,10 +89,10 @@ export const ModifyProductsList = ({
   });
 
   useEffect(() => {
-    if (isMobile && inView && hasMore) {
+    if (inView && hasMore) {
       onLoadMore();
     }
-  }, [inView, hasMore, isMobile, onLoadMore]);
+  }, [inView, hasMore, onLoadMore]);
 
   // Filter and sort products
   const filteredAndSortedProducts = products
@@ -114,7 +114,6 @@ export const ModifyProductsList = ({
       if (sortOrder === "price_desc") return (b.price || 0) - (a.price || 0);
       if (sortOrder === "newest") return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       if (sortOrder === "oldest") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      // Sort unpublished first by default
       if (a.product_status === "draft" && b.product_status !== "draft") return -1;
       if (a.product_status !== "draft" && b.product_status === "draft") return 1;
       return 0;
@@ -183,7 +182,7 @@ export const ModifyProductsList = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-4">
         {filteredAndSortedProducts.map((product) => (
           <ProductModifyCard
             key={`product-${product.id}`}
@@ -195,7 +194,7 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <ProductSkeleton key={`skeleton-${i}`} />
           ))}
@@ -208,11 +207,9 @@ export const ModifyProductsList = ({
         </div>
       )}
 
-      {isMobile && (
-        <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
-          {hasMore && <div className="loading">Loading more...</div>}
-        </div>
-      )}
+      <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+        {hasMore && <div className="loading">Loading more...</div>}
+      </div>
     </>
   );
 };
