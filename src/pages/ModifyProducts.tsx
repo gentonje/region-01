@@ -15,6 +15,7 @@ interface ModifyProductsProps {
 export default function ModifyProducts({ userOnly = true }: ModifyProductsProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
   const queryClient = useQueryClient();
 
@@ -54,6 +55,7 @@ export default function ModifyProducts({ userOnly = true }: ModifyProductsProps)
   } = useProducts({
     searchQuery,
     selectedCategory,
+    priceRange,
     sortOrder,
     userOnly: !isAdmin && userOnly,
   });

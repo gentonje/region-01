@@ -6,6 +6,7 @@ import { Product, ProductCategory } from "@/types/product";
 interface UseProductsProps {
   searchQuery: string;
   selectedCategory: string;
+  priceRange: { min: number; max: number };
   sortOrder: string;
   showOnlyPublished?: boolean;
   userOnly?: boolean;
@@ -14,12 +15,13 @@ interface UseProductsProps {
 export const useProducts = ({ 
   searchQuery, 
   selectedCategory, 
+  priceRange, 
   sortOrder,
   showOnlyPublished = false,
   userOnly = false
 }: UseProductsProps) => {
   return useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCategory, sortOrder, showOnlyPublished, userOnly],
+    queryKey: ["products", searchQuery, selectedCategory, priceRange, sortOrder, showOnlyPublished, userOnly],
     queryFn: async ({ pageParam = 0 }) => {
       const startRange = Number(pageParam) * 10;
       const endRange = startRange + 9;
@@ -35,6 +37,13 @@ export const useProducts = ({
 
       if (selectedCategory !== "all") {
         query = query.eq("category", selectedCategory as ProductCategory);
+      }
+
+      if (priceRange.min > 0) {
+        query = query.gte('price', priceRange.min);
+      }
+      if (priceRange.max < 1000) {
+        query = query.lte('price', priceRange.max);
       }
 
       if (showOnlyPublished) {

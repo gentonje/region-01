@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +15,7 @@ export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [sortOrder, setSortOrder] = useState<string>("none");
 
   const {
@@ -27,8 +27,9 @@ export default function Index() {
   } = useProducts({
     searchQuery,
     selectedCategory,
+    priceRange,
     sortOrder,
-    showOnlyPublished: true
+    showOnlyPublished: true,
   });
 
   React.useEffect(() => {
@@ -56,6 +57,10 @@ export default function Index() {
 
   const handleBack = () => {
     setSelectedProduct(null);
+  };
+
+  const handlePriceRangeChange = (min: number, max: number) => {
+    setPriceRange({ min, max });
   };
 
   const handleSortChange = (sort: string) => {
@@ -103,6 +108,7 @@ export default function Index() {
             isFetchingNextPage={isFetchingNextPage}
             observerRef={ref}
             selectedCurrency={selectedCurrency}
+            onPriceRangeChange={handlePriceRangeChange}
             onSortChange={handleSortChange}
             getProductImageUrl={getProductImageUrl}
           />
