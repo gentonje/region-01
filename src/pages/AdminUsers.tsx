@@ -59,83 +59,67 @@ const AdminUsers = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      // Delete product images first
-      const { error: imagesError } = await supabase
-        .from('product_images')
-        .delete()
-        .eq('product_id', productId);
+      // Delete in reverse order of dependencies to handle foreign key constraints
 
-      if (imagesError) throw imagesError;
-
-      // Delete from cart items
-      const { error: cartError } = await supabase
-        .from('cart_items')
-        .delete()
-        .eq('product_id', productId);
-
-      if (cartError) throw cartError;
-
-      // Delete from wishlist items
-      const { error: wishlistError } = await supabase
-        .from('wishlist_items')
-        .delete()
-        .eq('product_id', productId);
-
-      if (wishlistError) throw wishlistError;
-
-      // Delete orders related to the product
-      const { error: ordersError } = await supabase
-        .from('orders')
-        .delete()
-        .eq('product_id', productId);
-
-      if (ordersError) throw ordersError;
-
-      // Delete product views
-      const { error: viewsError } = await supabase
-        .from('product_views')
-        .delete()
-        .eq('product_id', productId);
-
-      if (viewsError) throw viewsError;
-
-      // Delete reviews and their replies
-      const { data: reviews, error: reviewsFetchError } = await supabase
+      // 1. First delete review replies as they depend on reviews
+      const { data: reviews } = await supabase
         .from('reviews')
         .select('id')
         .eq('product_id', productId);
 
-      if (reviewsFetchError) throw reviewsFetchError;
-
       if (reviews && reviews.length > 0) {
         const reviewIds = reviews.map(review => review.id);
-
-        // Delete review replies
-        const { error: repliesError } = await supabase
+        await supabase
           .from('review_replies')
           .delete()
           .in('review_id', reviewIds);
-
-        if (repliesError) throw repliesError;
-
-        // Delete reviews
-        const { error: reviewsError } = await supabase
-          .from('reviews')
-          .delete()
-          .eq('product_id', productId);
-
-        if (reviewsError) throw reviewsError;
       }
 
-      // Finally delete the product
+      // 2. Delete reviews
+      await supabase
+        .from('reviews')
+        .delete()
+        .eq('product_id', productId);
+
+      // 3. Delete product views
+      await supabase
+        .from('product_views')
+        .delete()
+        .eq('product_id', productId);
+
+      // 4. Delete cart items
+      await supabase
+        .from('cart_items')
+        .delete()
+        .eq('product_id', productId);
+
+      // 5. Delete wishlist items
+      await supabase
+        .from('wishlist_items')
+        .delete()
+        .eq('product_id', productId);
+
+      // 6. Delete orders
+      await supabase
+        .from('orders')
+        .delete()
+        .eq('product_id', productId);
+
+      // 7. Delete product images
+      await supabase
+        .from('product_images')
+        .delete()
+        .eq('product_id', productId);
+
+      // 8. Finally delete the product
       const { error: productError } = await supabase
         .from('products')
         .delete()
         .eq('id', productId);
 
       if (productError) throw productError;
-      
-      // Refetch the data to update the UI
+
+      // Immediate refetch to update UI
       await refetch();
       
       toast.success('Product deleted successfully');
