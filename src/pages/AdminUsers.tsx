@@ -10,7 +10,6 @@ import { TotalProductsCard } from "@/components/admin/TotalProductsCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProductGroup } from "@/components/UserProductGroup";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/toaster";
 
 type ProductCategory = Database['public']['Enums']['product_category'];
 
@@ -77,34 +76,31 @@ const AdminUsers = () => {
   };
 
   return (
-    <>
-      <div className="min-h-screen pb-16">
-        <Navigation />
-        <main className="container mx-auto px-4 pt-20">
-          <BreadcrumbNav items={[{ label: "Admin Users" }]} />
-          <h1 className="text-2xl font-bold mb-6">User Management</h1>
-          
-          {isUsersLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {users?.map((user) => (
-                <UserProductGroup
-                  key={user.id}
-                  username={user.username || 'Anonymous User'}
-                  products={user.products}
-                  onDelete={handleDeleteProduct}
-                />
-              ))}
-            </div>
-          )}
-        </main>
-        <BottomNavigation isAuthenticated={!!session} />
-      </div>
-      <Toaster />
-    </>
+    <div className="min-h-screen pb-16">
+      <Navigation />
+      <main className="container mx-auto px-4 pt-20">
+        <BreadcrumbNav items={[{ label: "Admin Users" }]} />
+        <h1 className="text-2xl font-bold mb-6">User Management</h1>
+        
+        {isUsersLoading ? (
+          <div className="flex justify-center items-center h-48">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {users?.map((user) => (
+              <UserProductGroup
+                key={user.id}
+                username={user.username || 'Anonymous User'}
+                products={user.products}
+                onDelete={handleDeleteProduct}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+      <BottomNavigation isAuthenticated={!!session} />
+    </div>
   );
 };
 
