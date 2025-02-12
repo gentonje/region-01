@@ -59,7 +59,6 @@ const AdminUsers = () => {
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      // Now we can directly delete the product and all related records will be automatically deleted
       const { error: productError } = await supabase
         .from('products')
         .delete()
@@ -67,7 +66,6 @@ const AdminUsers = () => {
 
       if (productError) throw productError;
 
-      // Immediate refetch to update UI
       await refetch();
       
       toast.success('Product deleted successfully');
@@ -78,28 +76,34 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-16 bg-background text-foreground">
       <Navigation />
-      <main className="container mx-auto px-4 pt-20">
-        <BreadcrumbNav items={[{ label: "Admin Users" }]} />
-        <h1 className="text-2xl font-bold mb-6">User Management</h1>
-        
-        {isUsersLoading ? (
-          <div className="flex justify-center items-center h-48">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {users?.map((user) => (
-              <UserProductGroup
-                key={user.id}
-                username={user.username || 'Anonymous User'}
-                products={user.products}
-                onDelete={handleDeleteProduct}
-              />
-            ))}
-          </div>
-        )}
+      <main className="container mx-auto px-4 pt-20 md:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <BreadcrumbNav items={[{ label: "Admin Users" }]} />
+          <h1 className="text-xl md:text-2xl font-bold mb-6 dark:text-gray-100">User Management</h1>
+          
+          {isUsersLoading ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {users?.map((user) => (
+                <div 
+                  key={user.id}
+                  className="rounded-lg overflow-hidden transition-all duration-200 hover:shadow-lg dark:hover:shadow-primary/5"
+                >
+                  <UserProductGroup
+                    username={user.username || 'Anonymous User'}
+                    products={user.products}
+                    onDelete={handleDeleteProduct}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
       <BottomNavigation isAuthenticated={!!session} />
     </div>

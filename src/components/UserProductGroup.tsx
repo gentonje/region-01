@@ -27,42 +27,44 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
   };
 
   return (
-    <div className="mb-8 overflow-hidden rounded-xl backdrop-blur-xl bg-white/30 border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]">
+    <div className="overflow-hidden rounded-xl bg-card text-card-foreground shadow-sm dark:shadow-none border border-border">
       <div 
-        className="p-6 flex items-center justify-between cursor-pointer hover:bg-white/10 transition-all duration-300"
+        className="p-4 md:p-6 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-all duration-300"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center space-x-3">
           <div className="p-2 rounded-full bg-primary/10">
-            <User className="h-6 w-6 text-primary" />
+            <User className="h-5 w-5 md:h-6 md:w-6 text-primary" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">{username}</h3>
-            <span className="text-sm text-gray-500">{products.length} products</span>
+            <h3 className="text-base md:text-lg font-semibold">{username}</h3>
+            <span className="text-xs md:text-sm text-muted-foreground">
+              {products.length} {products.length === 1 ? 'product' : 'products'}
+            </span>
           </div>
         </div>
-        <div className="p-2 rounded-full hover:bg-white/20 transition-colors">
+        <div className="p-1 md:p-2 rounded-full hover:bg-muted transition-colors">
           {isExpanded ? (
-            <ChevronDown className="h-5 w-5 text-gray-500" />
+            <ChevronDown className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           ) : (
-            <ChevronRight className="h-5 w-5 text-gray-500" />
+            <ChevronRight className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           )}
         </div>
       </div>
       
       {isExpanded && (
-        <div className="px-6 pb-6">
+        <div className="px-4 md:px-6 pb-6">
           <div className="py-4">
             <ProductFilters 
               onSearchChange={handleSearchChange}
-              className="bg-white/50 backdrop-blur-sm border-white/30 rounded-lg shadow-sm" 
+              className="bg-background/50 backdrop-blur-sm border-border rounded-lg shadow-sm" 
             />
           </div>
-          <div className="space-y-4">
+          <div className="grid gap-4">
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
-                className="p-4 rounded-lg backdrop-blur-sm bg-white/50 border border-white/30 shadow-sm transition-all duration-300 hover:shadow-md hover:bg-white/60"
+                className="p-4 rounded-lg bg-background/50 backdrop-blur-sm border border-border shadow-sm transition-all duration-300 hover:shadow-md hover:bg-background"
               >
                 <ProductModifyCard
                   product={product}
