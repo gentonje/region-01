@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -68,7 +69,7 @@ export const ImageLoader = ({
     <>
       {isLoading && (
         <Skeleton 
-          className={`${className} animate-[pulse_3s_ease-in-out_infinite]`}
+          className={className}
           style={{ width, height }}
         />
       )}
