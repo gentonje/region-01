@@ -1,13 +1,13 @@
 
-import React from 'react';
+import * as React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from 'next-themes';
-import { AuthProvider } from './contexts/AuthContext';
-import { Toaster } from './components/ui/toaster';
 import { Routes } from './Routes';
 import { Navigation } from './components/Navigation';
+import { Toaster } from './components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
+import { AuthProvider } from './contexts/AuthContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,7 +18,7 @@ const queryClient = new QueryClient({
   },
 });
 
-function App() {
+const App: React.FC = () => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
@@ -37,6 +37,6 @@ function App() {
       </QueryClientProvider>
     </BrowserRouter>
   );
-}
+};
 
 export default App;

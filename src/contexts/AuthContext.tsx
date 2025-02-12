@@ -1,4 +1,3 @@
-'use client';
 
 import * as React from 'react';
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +7,6 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
 
-// Create context with default value
 const AuthContext = React.createContext<AuthContextType>({
   session: null,
   user: null,
@@ -19,7 +17,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthProvider = React.memo(function AuthProvider({ children }: AuthProviderProps) {
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, setState] = React.useState<AuthState>({
     session: null,
     user: null,
@@ -188,7 +186,9 @@ export const AuthProvider = React.memo(function AuthProvider({ children }: AuthP
       {children}
     </AuthContext.Provider>
   );
-});
+};
+
+export { AuthProvider };
 
 export const useAuth = () => {
   const context = React.useContext(AuthContext);
