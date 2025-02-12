@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
@@ -11,7 +12,6 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import AddProduct from './pages/AddProduct';
 import EditProduct from './pages/EditProduct';
-import ModifyProducts from './pages/ModifyProducts';
 import AdminUsers from './pages/AdminUsers';
 import AdminManagement from './pages/AdminManagement';
 import Cart from './pages/Cart';
@@ -56,14 +56,6 @@ export const Routes = () => {
         element={
           <PrivateRoute>
             <EditProduct />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/modify-products"
-        element={
-          <PrivateRoute>
-            <ModifyProducts userOnly={true} />
           </PrivateRoute>
         }
       />
@@ -131,3 +123,5 @@ export const Routes = () => {
     </RouterRoutes>
   );
 };
+
+<lov-delete file_path="src/pages/ModifyProducts.tsx" />
