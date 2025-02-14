@@ -8,6 +8,26 @@ const urlsToCache = [
   '/placeholder.svg'
 ];
 
+// Cache first, then network strategy for images
+const cacheFirst = async (request) => {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  try {
+    const networkResponse = await fetch(request);
+    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+      return networkResponse;
+    }
+    const cache = await caches.open(CACHE_NAME);
+    cache.put(request, networkResponse.clone());
+    return networkResponse;
+  } catch (error) {
+    console.warn('Fetch failed:', error);
+    throw error;
+  }
+};
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -26,6 +46,15 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Special handling for image requests
+  if (event.request.destination === 'image' || 
+      event.request.url.includes('images') || 
+      event.request.url.includes('icons')) {
+    event.respondWith(cacheFirst(event.request));
+    return;
+  }
+
+  // Default fetch handling for other resources
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -67,4 +96,9 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+});
+
+// Handle immediate claiming of all clients
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
 });
