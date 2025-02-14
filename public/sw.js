@@ -1,9 +1,10 @@
+
 const CACHE_NAME = 'east-african-market-v1';
 const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icons/icon-512x512.png',
+  '/icons/fallback-icon.svg',
   '/placeholder.svg'
 ];
 
@@ -11,7 +12,15 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        return cache.addAll(urlsToCache);
+        // Cache what we can, ignore failures
+        return Promise.allSettled(
+          urlsToCache.map(url => 
+            cache.add(url).catch(err => {
+              console.warn(`Failed to cache ${url}:`, err);
+              return null;
+            })
+          )
+        );
       })
   );
 });
@@ -31,9 +40,16 @@ self.addEventListener('fetch', (event) => {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
-                cache.put(event.request, responseToCache);
+                cache.put(event.request, responseToCache)
+                  .catch(err => {
+                    console.warn('Failed to cache response:', err);
+                  });
               });
             return response;
+          })
+          .catch(error => {
+            console.warn('Fetch failed:', error);
+            throw error;
           });
       })
   );
