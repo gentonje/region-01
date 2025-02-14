@@ -12,6 +12,15 @@ interface ImageLoaderProps {
   priority?: boolean;
 }
 
+const preloadImage = (src: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => resolve();
+    img.onerror = () => reject();
+  });
+};
+
 export const ImageLoader = memo(({
   src,
   alt,
@@ -22,30 +31,27 @@ export const ImageLoader = memo(({
 }: ImageLoaderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string>("");
   const { toast } = useToast();
 
-  const loadImage = useCallback(() => {
+  const loadImage = useCallback(async () => {
     if (!src) return;
     
-    const img = new Image();
-    img.src = src;
-
-    if (priority) {
-      img.fetchPriority = "high";
-      img.loading = "eager";
-    } else {
-      img.loading = "lazy";
-    }
-
-    img.decoding = "async";
-
-    img.onload = () => {
-      setCurrentSrc(src);
+    try {
+      // Check if image is in cache
+      const cache = await caches.open('image-cache');
+      const cachedResponse = await cache.match(src);
+      
+      if (!cachedResponse) {
+        // If not in cache, preload and cache it
+        await preloadImage(src);
+        const response = await fetch(src);
+        const clonedResponse = response.clone();
+        await cache.put(src, clonedResponse);
+      }
+      
       setIsLoading(false);
-    };
-
-    img.onerror = () => {
+    } catch (err) {
+      console.error('Error loading image:', err);
       setError(true);
       setIsLoading(false);
       toast({
@@ -53,19 +59,13 @@ export const ImageLoader = memo(({
         description: "Failed to load image. Please try again later.",
         variant: "destructive",
       });
-    };
-
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [src, priority, toast]);
+    }
+  }, [src, toast]);
 
   useEffect(() => {
     setIsLoading(true);
     setError(false);
-    const cleanup = loadImage();
-    return cleanup;
+    loadImage();
   }, [loadImage]);
 
   if (error) {
@@ -80,21 +80,21 @@ export const ImageLoader = memo(({
     <>
       {isLoading && (
         <Skeleton 
-          className={className}
+          className={`${className} animate-none`}
           style={{ width, height }}
         />
       )}
-      {currentSrc && (
-        <img
-          src={currentSrc}
-          alt={alt}
-          className={`${className} ${isLoading ? 'hidden' : 'block'}`}
-          width={width}
-          height={height}
-          loading={priority ? "eager" : "lazy"}
-          decoding="async"
-        />
-      )}
+      <img
+        src={src}
+        alt={alt}
+        className={`${className} ${isLoading ? 'hidden' : 'block'}`}
+        width={width}
+        height={height}
+        loading={priority ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        onLoad={() => setIsLoading(false)}
+      />
     </>
   );
 });
