@@ -1,3 +1,4 @@
+
 import React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -34,7 +35,7 @@ export function BreadcrumbItem({
   )
 }
 
-// Separator component - this is the key change
+// Separator component - Fixed to use span instead of li
 export function BreadcrumbSeparator() {
   return (
     <span 

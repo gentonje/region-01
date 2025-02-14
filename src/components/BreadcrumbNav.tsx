@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Breadcrumb,
@@ -6,7 +7,6 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from './ui/breadcrumb';
-import { Link } from "react-router-dom";
 
 interface BreadcrumbNavProps {
   items: Array<{
@@ -26,8 +26,8 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
             ) : (
               <BreadcrumbPage>{item.label}</BreadcrumbPage>
             )}
+            {index < items.length - 1 && <BreadcrumbSeparator />}
           </BreadcrumbItem>
-          {index < items.length - 1 && <BreadcrumbSeparator />}
         </React.Fragment>
       ))}
     </Breadcrumb>
