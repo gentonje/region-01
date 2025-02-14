@@ -66,5 +66,7 @@ export const useProducts = ({
       return allPages.length;
     },
     initialPageParam: 0,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 10,   // Garbage collect after 10 minutes
   });
 };

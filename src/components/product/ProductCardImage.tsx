@@ -5,6 +5,7 @@ import { ImageLoader } from "../ImageLoader";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { Session } from "@supabase/supabase-js";
+import { memo } from "react";
 
 interface ProductCardImageProps {
   product: Product;
@@ -20,7 +21,7 @@ interface ProductCardImageProps {
   onClick?: () => void;
 }
 
-export const ProductCardImage = ({
+export const ProductCardImage = memo(({
   product,
   imageUrl,
   showStatus,
@@ -86,4 +87,6 @@ export const ProductCardImage = ({
       )}
     </div>
   );
-};
+});
+
+ProductCardImage.displayName = 'ProductCardImage';

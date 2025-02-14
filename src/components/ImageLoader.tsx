@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
@@ -12,7 +12,7 @@ interface ImageLoaderProps {
   priority?: boolean;
 }
 
-export const ImageLoader = ({
+export const ImageLoader = memo(({
   src,
   alt,
   className = "",
@@ -25,16 +25,20 @@ export const ImageLoader = ({
   const [currentSrc, setCurrentSrc] = useState<string>("");
   const { toast } = useToast();
 
-  useEffect(() => {
-    setIsLoading(true);
-    setError(false);
-
+  const loadImage = useCallback(() => {
+    if (!src) return;
+    
     const img = new Image();
     img.src = src;
 
     if (priority) {
       img.fetchPriority = "high";
+      img.loading = "eager";
+    } else {
+      img.loading = "lazy";
     }
+
+    img.decoding = "async";
 
     img.onload = () => {
       setCurrentSrc(src);
@@ -56,6 +60,13 @@ export const ImageLoader = ({
       img.onerror = null;
     };
   }, [src, priority, toast]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(false);
+    const cleanup = loadImage();
+    return cleanup;
+  }, [loadImage]);
 
   if (error) {
     return (
@@ -81,8 +92,11 @@ export const ImageLoader = ({
           width={width}
           height={height}
           loading={priority ? "eager" : "lazy"}
+          decoding="async"
         />
       )}
     </>
   );
-};
+});
+
+ImageLoader.displayName = 'ImageLoader';
