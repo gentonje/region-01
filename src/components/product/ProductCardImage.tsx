@@ -1,3 +1,4 @@
+
 import { Heart } from "lucide-react";
 import { Button } from "../ui/button";
 import { ImageLoader } from "../ImageLoader";
@@ -32,7 +33,7 @@ export const ProductCardImage = ({
 }: ProductCardImageProps) => {
   return (
     <div 
-      className="h-52 w-full relative overflow-hidden rounded-t-lg"
+      className="h-52 sm:h-52 w-full relative overflow-hidden rounded-t-lg aspect-[4/3] sm:aspect-auto"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
