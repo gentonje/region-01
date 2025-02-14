@@ -9,7 +9,6 @@ import { Toaster } from './components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 
-// Create QueryClient instance outside of component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -19,25 +18,25 @@ const queryClient = new QueryClient({
   },
 });
 
-export default function App() {
+function App() {
   return (
-    <React.Suspense fallback={<div>Loading...</div>}>
+    <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <AuthProvider>
-              <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
-                <Navigation />
-                <main className="flex-1">
-                  <Routes />
-                </main>
-              </div>
-              <SonnerToaster position="bottom-right" />
-              <Toaster />
-            </AuthProvider>
-          </BrowserRouter>
-        </QueryClientProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
+              <Navigation />
+              <main className="flex-1">
+                <Routes />
+              </main>
+            </div>
+            <SonnerToaster position="bottom-right" />
+            <Toaster />
+          </AuthProvider>
+        </BrowserRouter>
       </ThemeProvider>
-    </React.Suspense>
+    </QueryClientProvider>
   );
 }
+
+export default App;

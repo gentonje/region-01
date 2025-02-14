@@ -1,5 +1,5 @@
 
-import React from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
@@ -12,9 +12,8 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 
-// Enable React concurrent mode with proper initialization
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>
 );
