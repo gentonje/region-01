@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
     session: null,
     user: null,
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
 export function useAuth() {
   const context = useContext(AuthContext);
