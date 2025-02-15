@@ -11,10 +11,10 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
-      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
-      refetchOnWindowFocus: false, // Don't refetch on window focus
-      refetchOnReconnect: 'always', // Refetch when reconnecting to ensure data consistency
-      retry: 1, // Only retry failed requests once
+      gcTime: 1000 * 60 * 30, // Cache garbage collection time (formerly cacheTime)
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: 'always',
+      retry: 1,
       suspense: false,
     },
     mutations: {
