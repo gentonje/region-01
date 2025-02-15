@@ -1,42 +1,41 @@
 
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
-import { Routes } from './Routes';
-import { Navigation } from './components/Navigation';
-import { Toaster } from './components/ui/toaster';
-import { Toaster as SonnerToaster } from 'sonner';
-import { AuthProvider } from './contexts/AuthContext';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
+import { Routes } from "@/Routes";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
+// Create a client with optimized configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
+      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+      refetchOnWindowFocus: false, // Don't refetch on window focus
+      refetchOnReconnect: 'always', // Refetch when reconnecting to ensure data consistency
+      retry: 1, // Only retry failed requests once
+      suspense: false,
+    },
+    mutations: {
       retry: 1,
-      refetchOnWindowFocus: false,
+      networkMode: 'always',
     },
   },
 });
 
-function App() {
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <BrowserRouter>
-          <AuthProvider>
-            <div className="min-h-screen flex flex-col bg-background text-foreground theme-transition">
-              <Navigation />
-              <main className="flex-1">
-                <Routes />
-              </main>
-            </div>
-            <SonnerToaster position="bottom-right" />
-            <Toaster />
-          </AuthProvider>
-        </BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes />
+          <Toaster />
+          <SonnerToaster />
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;

@@ -1,3 +1,4 @@
+
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -10,36 +11,33 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
+import { generateQueryKey, optimizedSelect } from "@/utils/queryUtils";
 
 export function CartIndicator() {
   const navigate = useNavigate();
 
-  const { data: cartCount, error } = useQuery({
-    queryKey: ["cartCount"],
+  const { data: cartCount = 0, error } = useQuery({
+    queryKey: generateQueryKey("cart_items", { type: "count" }),
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return 0;
 
       try {
-        const { count, error } = await supabase
-          .from("cart_items")
-          .select("*", { count: "exact", head: true });
+        const query = optimizedSelect("cart_items", "id", {
+          filters: { user_id: session.user.id },
+        });
+        const { count, error } = await query;
 
-        if (error) {
-          console.error("Error fetching cart count:", error);
-          throw error;
-        }
+        if (error) throw error;
         return count || 0;
       } catch (err) {
         console.error("Failed to fetch cart count:", err);
-        toast.error("Unable to load cart items. Please try again later.");
+        toast.error("Unable to load cart items");
         return 0;
       }
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 1000 * 30, // 30 seconds
+    cacheTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return (
