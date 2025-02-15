@@ -38,13 +38,13 @@ export const optimizedSelect = <T>(
 export const generateQueryKey = (
   table: TableNames,
   params: Record<string, any> = {}
-): string[] => {
+): TableNames[] => {
   const baseKey = [table];
   Object.entries(params)
     .sort(([a], [b]) => a.localeCompare(b))
     .forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
-        baseKey.push(`${key}:${value}`);
+        baseKey.push(table); // Use the table name instead of string concatenation
       }
     });
   return baseKey;
