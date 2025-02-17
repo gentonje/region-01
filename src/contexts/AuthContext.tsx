@@ -153,11 +153,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // Schedule next refresh
-        const expiresIn = session.expires_in || 3600;
-        const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
-        refreshTimeout = setTimeout(() => {
+        refreshTimeout = SessionManager.scheduleNextRefresh(session, () => {
           SessionManager.refreshSession(session, state.retryCount);
-        }, refreshTime);
+        });
       }
     });
 
