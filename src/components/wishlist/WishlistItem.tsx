@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -174,9 +175,14 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
               <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                 {product.description}
               </p>
-              <p className="text-lg font-medium text-orange-500">
-                {product.currency} {product.price?.toFixed(2)}
-              </p>
+              <div className="flex flex-col gap-y-0">
+                <p className="text-lg font-medium text-orange-500">
+                  {product.currency} {product.price?.toFixed(2)}
+                </p>
+                <span className="text-sm text-gray-500">
+                  by {product.profiles?.username || product.profiles?.full_name || "Unknown Seller"}
+                </span>
+              </div>
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
               <Button
