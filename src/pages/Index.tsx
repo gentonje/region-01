@@ -28,7 +28,8 @@ export default function Index() {
     searchQuery,
     selectedCategory,
     sortOrder,
-    showOnlyPublished: true
+    showOnlyPublished: true,
+    userOnly: true  // Set to true to only show user's products
   });
 
   React.useEffect(() => {
@@ -87,7 +88,7 @@ export default function Index() {
       <div className="mt-20">
         <BreadcrumbNav
           items={[
-            { label: "All Products", href: "/" }
+            { label: "My Products", href: "/" }
           ]}
         />
         {selectedProduct ? (
