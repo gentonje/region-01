@@ -2,7 +2,7 @@
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Tooltip,
@@ -15,6 +15,7 @@ import { generateQueryKey, optimizedSelect } from "@/utils/queryUtils";
 
 export function CartIndicator() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: cartCount = 0, error } = useQuery({
     queryKey: generateQueryKey("cart_items", { type: "count" }),
@@ -52,7 +53,7 @@ export function CartIndicator() {
           >
             <ShoppingCart className="h-5 w-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
             {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center animate-in fade-in duration-200">
                 {cartCount}
               </span>
             )}
