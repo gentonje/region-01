@@ -8,6 +8,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { Share2, ShoppingCart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { generateQueryKey } from "@/utils/queryUtils";
 
 interface WishlistItemProps {
   item: {

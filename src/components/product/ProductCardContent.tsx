@@ -25,10 +25,17 @@ export const ProductCardContent = ({
         <div className="h-[32px] overflow-hidden">
           <p className="text-xs text-gray-700 dark:text-gray-200 line-clamp-2">{product.description}</p>
         </div>
-        <div className="pt-0 -mt-2 text-center">
-          <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-bold whitespace-nowrap border border-orange-500/50">
-            {selectedCurrency} {convertedPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </span>
+        <div className="pt-0 space-y-0">
+          <div className="text-center">
+            <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-bold whitespace-nowrap border border-orange-500/50">
+              {selectedCurrency} {convertedPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
+          </div>
+          <div className="text-center">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              by {product.profiles?.username || product.profiles?.full_name || "Unknown Seller"}
+            </span>
+          </div>
         </div>
       </CardContent>
     </>
