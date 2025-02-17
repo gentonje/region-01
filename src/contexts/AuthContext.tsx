@@ -98,8 +98,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!mounted) return;
 
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        console.log('User signed out or deleted');
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
         setState(prev => ({
           ...prev,
           session: null,
