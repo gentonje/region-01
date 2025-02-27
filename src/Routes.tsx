@@ -42,10 +42,17 @@ export const Routes = () => {
     <Suspense fallback={<PageLoader />}>
       <RouterRoutes>
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />
+        <Route 
+          path="/" 
+          element={session ? <Navigate to="/products" replace /> : <Navigate to="/login" replace />} 
+        />
         <Route 
           path="/login" 
-          element={session ? <Navigate to="/" replace /> : <Login />} 
+          element={session ? <Navigate to="/products" replace /> : <Login />} 
+        />
+        <Route
+          path="/home"
+          element={<Home />}
         />
 
         {/* Protected Routes */}
