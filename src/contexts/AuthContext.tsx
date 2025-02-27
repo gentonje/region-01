@@ -22,12 +22,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
-    console.log('Session refresh failed:', error);
+    console.error('Session refresh failed:', error);
     
     // Only sign out if it's a refresh token error
-    if (error?.message?.includes('refresh_token_not_found')) {
+    if (error?.message?.includes('refresh_token_not_found') || 
+        error?.code === 'refresh_token_not_found') {
       try {
-        await supabase.auth.signOut();
+        console.log('Signing out due to invalid refresh token');
+        await supabase.auth.signOut({ scope: 'local' });
         setState(prev => ({
           ...prev,
           session: null,
@@ -109,12 +111,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
+          refreshTimeout = null;
         }
         return;
       }
 
       if (session) {
-        console.log('Session updated');
+        console.log('Session updated with expires_in:', session.expires_in);
         setState(prev => ({
           ...prev,
           session,
@@ -125,21 +128,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
+          refreshTimeout = null;
         }
 
-        // Schedule next refresh
-        const expiresIn = session.expires_in || 3600;
-        const refreshTime = Math.max(0, (expiresIn - 60) * 1000); // Refresh 1 minute before expiry
-        refreshTimeout = setTimeout(async () => {
-          try {
-            const { data: { session: newSession }, error } = await supabase.auth.refreshSession();
-            if (error) throw error;
-            if (!newSession) throw new Error('No session returned after refresh');
-          } catch (error) {
-            console.error('Session refresh failed:', error);
-            await handleSessionRefreshError(error as AuthError);
+        // Schedule next refresh only if session has an expiry
+        if (session.expires_at) {
+          const expiresAt = new Date(session.expires_at * 1000);
+          const now = new Date();
+          const timeUntilExpiry = expiresAt.getTime() - now.getTime() - (60 * 1000); // 1 minute before expiry
+          
+          console.log(`Session expires at: ${expiresAt.toISOString()}, refresh scheduled in: ${timeUntilExpiry / 1000} seconds`);
+          
+          if (timeUntilExpiry > 0) {
+            refreshTimeout = setTimeout(async () => {
+              console.log('Attempting to refresh session...');
+              try {
+                const { data, error } = await supabase.auth.refreshSession();
+                if (error) {
+                  console.error('Failed to refresh session:', error);
+                  throw error;
+                }
+                
+                if (!data.session) {
+                  console.error('No session returned after refresh');
+                  throw new Error('No session returned after refresh');
+                }
+                
+                console.log('Session refreshed successfully');
+              } catch (error) {
+                console.error('Session refresh error:', error);
+                await handleSessionRefreshError(error as AuthError);
+              }
+            }, timeUntilExpiry);
+          } else {
+            console.warn('Session already expired or about to expire, initiating refresh immediately');
+            // Session already expired or about to expire, try to refresh immediately
+            supabase.auth.refreshSession().catch(error => {
+              console.error('Immediate session refresh failed:', error);
+              handleSessionRefreshError(error as AuthError);
+            });
           }
-        }, refreshTime);
+        } else {
+          console.log('Session has no expiry information');
+        }
       }
     });
 
