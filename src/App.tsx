@@ -1,5 +1,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
@@ -11,11 +12,10 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
-      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+      gcTime: 1000 * 60 * 30, // Cache persists for 30 minutes
       refetchOnWindowFocus: false, // Don't refetch on window focus
       refetchOnReconnect: 'always', // Refetch when reconnecting to ensure data consistency
       retry: 1, // Only retry failed requests once
-      suspense: false,
     },
     mutations: {
       retry: 1,
@@ -26,15 +26,17 @@ const queryClient = new QueryClient({
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <AuthProvider>
-          <Routes />
-          <Toaster />
-          <SonnerToaster />
-        </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthProvider>
+            <Routes />
+            <Toaster />
+            <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
+          </AuthProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </Suspense>
   );
 };
 

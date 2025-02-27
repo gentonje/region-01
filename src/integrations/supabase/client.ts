@@ -5,6 +5,7 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://izolcgjxobgendljwoan.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml6b2xjZ2p4b2JnZW5kbGp3b2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU2NTkyMjQsImV4cCI6MjA1MTIzNTIyNH0.8H5sf-ipUrrtTC08-9zCntiJTqET4-S4YVcmCXK3olg";
 
+// Optimized client configuration
 export const supabase = createClient<Database>(
   SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY,
@@ -21,6 +22,23 @@ export const supabase = createClient<Database>(
       headers: {
         'x-my-custom-header': 'my-app-name'
       }
+    },
+    realtime: {
+      params: {
+        eventsPerSecond: 10
+      }
     }
+  }
+);
+
+// Add request interceptor for analytics and error tracking
+supabase.rest.interceptors.response.use(
+  (response) => {
+    // You could add performance metrics here
+    return response;
+  },
+  (error) => {
+    console.error('Supabase request failed:', error);
+    return Promise.reject(error);
   }
 );

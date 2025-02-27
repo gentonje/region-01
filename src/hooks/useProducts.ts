@@ -1,7 +1,8 @@
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, ProductCategory } from "@/types/product";
+import { useMemo } from "react";
 
 interface UseProductsProps {
   searchQuery: string;
@@ -9,6 +10,7 @@ interface UseProductsProps {
   sortOrder: string;
   showOnlyPublished?: boolean;
   userOnly?: boolean;
+  limit?: number;
 }
 
 export const useProducts = ({ 
@@ -16,57 +18,93 @@ export const useProducts = ({
   selectedCategory, 
   sortOrder,
   showOnlyPublished = false,
-  userOnly = false
+  userOnly = false,
+  limit = 10
 }: UseProductsProps) => {
-  return useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCategory, sortOrder, showOnlyPublished, userOnly],
-    queryFn: async ({ pageParam = 0 }) => {
-      const startRange = Number(pageParam) * 10;
-      const endRange = startRange + 9;
+  const queryClient = useQueryClient();
 
-      let query = supabase
-        .from("products")
-        .select("*, product_images(*)")
-        .range(startRange, endRange);
+  // Memoize the queryKey to prevent unnecessary re-renders
+  const queryKey = useMemo(() => 
+    ["products", searchQuery, selectedCategory, sortOrder, showOnlyPublished, userOnly],
+    [searchQuery, selectedCategory, sortOrder, showOnlyPublished, userOnly]
+  );
 
-      if (searchQuery) {
-        query = query.ilike("title", `%${searchQuery}%`);
+  const fetchProducts = async ({ pageParam = 0 }) => {
+    const startRange = Number(pageParam) * limit;
+    const endRange = startRange + (limit - 1);
+
+    // Build query with optimized filters
+    let query = supabase
+      .from("products")
+      .select("*, product_images(*), profiles:user_id(username, full_name, avatar_url)")
+      .range(startRange, endRange);
+
+    // Apply filters only when needed
+    if (searchQuery) {
+      query = query.ilike("title", `%${searchQuery}%`);
+    }
+
+    if (selectedCategory !== "all") {
+      query = query.eq("category", selectedCategory as ProductCategory);
+    }
+
+    if (showOnlyPublished) {
+      query = query.eq('product_status', 'published');
+    }
+
+    if (userOnly) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        query = query.eq('user_id', user.id);
       }
+    }
 
-      if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory as ProductCategory);
-      }
+    // Optimize sorting
+    if (sortOrder === "asc") {
+      query = query.order('price', { ascending: true });
+    } else if (sortOrder === "desc") {
+      query = query.order('price', { ascending: false });
+    } else {
+      query = query.order("created_at", { ascending: false });
+    }
 
-      if (showOnlyPublished) {
-        query = query.eq('product_status', 'published');
-      }
+    const { data, error } = await query;
 
-      if (userOnly) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          query = query.eq('user_id', user.id);
-        }
-      }
+    if (error) {
+      console.error("Error fetching products:", error);
+      throw error;
+    }
 
-      if (sortOrder === "asc") {
-        query = query.order('price', { ascending: true });
-      } else if (sortOrder === "desc") {
-        query = query.order('price', { ascending: false });
-      } else {
-        query = query.order("created_at", { ascending: false });
-      }
+    return data as Product[];
+  };
 
-      const { data: products, error } = await query;
-
-      if (error) throw error;
-      return products as Product[];
-    },
+  const result = useInfiniteQuery({
+    queryKey,
+    queryFn: fetchProducts,
     getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage || lastPage.length < 10) return undefined;
-      return allPages.length;
+      return lastPage.length < limit ? undefined : allPages.length;
     },
     initialPageParam: 0,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     gcTime: 1000 * 60 * 10,   // Garbage collect after 10 minutes
   });
+
+  // Prefetch next page if we have data
+  const prefetchNextPage = async () => {
+    if (result.data && !result.isFetchingNextPage && result.hasNextPage) {
+      const nextPageParam = result.data.pages.length;
+      await queryClient.prefetchInfiniteQuery({
+        queryKey,
+        queryFn: fetchProducts,
+        pages: [...result.data.pages, []],
+        pageParams: [...result.data.pageParams, nextPageParam],
+        initialPageParam: 0,
+      });
+    }
+  };
+
+  return {
+    ...result,
+    prefetchNextPage,
+  };
 };

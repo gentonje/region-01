@@ -1,11 +1,14 @@
+
+/* Base styles */
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
-  padding-bottom: calc(2rem + 3.5rem); /* Added extra padding for bottom nav */
+  padding: 0;
   text-align: center;
+  overflow-x: hidden;
 }
 
+/* Animation optimization */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -34,6 +37,7 @@
   }
 }
 
+/* Layout spacing */
 .card {
   padding: 2em;
 }
@@ -46,7 +50,60 @@
   color: #bbb;
 }
 
+/* Dark mode text enhancements */
 :is(.dark) {
   --tw-text-opacity: 1;
   color: rgb(229 231 235 / var(--tw-text-opacity));
+}
+
+/* Responsive content margins for navigation */
+main, 
+.container {
+  margin-top: 4rem;
+  margin-bottom: 4rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Performance optimizations */
+img, 
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  contain: content;
+}
+
+.content-visibility-auto {
+  content-visibility: auto;
+}
+
+/* Optimized transitions */
+.transition-optimized {
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+/* Prevent layout shifts */
+.min-h-layout {
+  min-height: calc(100vh - 8rem);
+}
+
+/* Optimized mobile styles */
+@media (max-width: 768px) {
+  #root {
+    padding: 0;
+  }
+  
+  main, 
+  .container {
+    margin-top: 3.5rem;
+    margin-bottom: 4.5rem;
+  }
+}
+
+/* Fix for mobile bottom navigation */
+.pb-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);
 }
