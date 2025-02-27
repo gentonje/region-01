@@ -22,26 +22,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const handleSessionRefreshError = useCallback(async (error?: AuthError) => {
-    console.error('Session refresh failed:', error);
-    
-    // Only sign out if it's a refresh token error
-    if (error?.message?.includes('refresh_token_not_found') || 
-        error?.code === 'refresh_token_not_found') {
-      try {
-        console.log('Signing out due to invalid refresh token');
-        await supabase.auth.signOut({ scope: 'local' });
-        setState(prev => ({
-          ...prev,
-          session: null,
-          user: null,
-          loading: false,
-          retryCount: 0,
-        }));
-        toast.error('Your session has expired. Please sign in again.');
-      } catch (signOutError) {
-        console.error('Error during sign out:', signOutError);
-        toast.error('An error occurred. Please refresh the page.');
-      }
+    console.log('Session refresh failed, signing out...', error);
+    try {
+      await supabase.auth.signOut();
+      setState(prev => ({
+        ...prev,
+        session: null,
+        user: null,
+        loading: false,
+        retryCount: 0,
+      }));
+      toast.error('Your session has expired. Please sign in again.');
+    } catch (signOutError) {
+      console.error('Error during sign out:', signOutError);
+      toast.error('An error occurred. Please refresh the page.');
     }
   }, []);
 
@@ -54,19 +48,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Session initialization error:', error);
-        await handleSessionRefreshError(error);
+        if (error.message?.includes('refresh_token_not_found') || error.message?.includes('Failed to fetch')) {
+          await handleSessionRefreshError(error);
+          return;
+        }
+        await AuthErrorHandler.handleError(
+          error,
+          initSession,
+          state.retryCount
+        );
         return;
       }
 
       if (session) {
-        console.log('Found existing session');
-        setState(prev => ({
-          ...prev,
-          session,
-          user: session.user,
-          retryCount: 0,
-          loading: false,
-        }));
+        console.log('Found existing session, refreshing...');
+        try {
+          const refreshedSession = await SessionManager.refreshSession(
+            session,
+            state.retryCount
+          );
+          
+          if (refreshedSession) {
+            setState(prev => ({
+              ...prev,
+              session: refreshedSession,
+              user: refreshedSession.user,
+              retryCount: 0,
+            }));
+          } else {
+            await handleSessionRefreshError();
+          }
+        } catch (refreshError) {
+          console.error('Session refresh error:', refreshError);
+          await handleSessionRefreshError(refreshError as AuthError);
+        }
       } else {
         console.log('No valid session found');
         setState(prev => ({
@@ -74,7 +89,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           session: null,
           user: null,
           retryCount: 0,
-          loading: false,
         }));
       }
     } catch (error) {
@@ -84,8 +98,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         initSession,
         state.retryCount
       );
+    } finally {
+      setState(prev => ({ ...prev, loading: false }));
     }
-  }, [handleSessionRefreshError, state.retryCount]);
+  }, [state.retryCount, handleSessionRefreshError]);
 
   useEffect(() => {
     let mounted = true;
@@ -100,8 +116,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (!mounted) return;
 
-      if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
+      const signOutEvents = ['SIGNED_OUT', 'USER_DELETED'];
+      const sessionEvents = [
+        'SIGNED_IN',
+        'TOKEN_REFRESHED',
+        'USER_UPDATED',
+        'PASSWORD_RECOVERY',
+        'MFA_CHALLENGE_VERIFIED',
+        'INITIAL_SESSION'
+      ];
+
+      if (signOutEvents.includes(event)) {
+        console.log('User signed out or deleted');
         setState(prev => ({
           ...prev,
           session: null,
@@ -111,13 +137,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
-          refreshTimeout = null;
         }
-        return;
-      }
-
-      if (session) {
-        console.log('Session updated with expires_in:', session.expires_in);
+      } else if (session && sessionEvents.includes(event)) {
+        console.log('Session updated');
         setState(prev => ({
           ...prev,
           session,
@@ -128,49 +150,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
-          refreshTimeout = null;
         }
 
-        // Schedule next refresh only if session has an expiry
-        if (session.expires_at) {
-          const expiresAt = new Date(session.expires_at * 1000);
-          const now = new Date();
-          const timeUntilExpiry = expiresAt.getTime() - now.getTime() - (60 * 1000); // 1 minute before expiry
-          
-          console.log(`Session expires at: ${expiresAt.toISOString()}, refresh scheduled in: ${timeUntilExpiry / 1000} seconds`);
-          
-          if (timeUntilExpiry > 0) {
-            refreshTimeout = setTimeout(async () => {
-              console.log('Attempting to refresh session...');
-              try {
-                const { data, error } = await supabase.auth.refreshSession();
-                if (error) {
-                  console.error('Failed to refresh session:', error);
-                  throw error;
-                }
-                
-                if (!data.session) {
-                  console.error('No session returned after refresh');
-                  throw new Error('No session returned after refresh');
-                }
-                
-                console.log('Session refreshed successfully');
-              } catch (error) {
-                console.error('Session refresh error:', error);
-                await handleSessionRefreshError(error as AuthError);
-              }
-            }, timeUntilExpiry);
-          } else {
-            console.warn('Session already expired or about to expire, initiating refresh immediately');
-            // Session already expired or about to expire, try to refresh immediately
-            supabase.auth.refreshSession().catch(error => {
-              console.error('Immediate session refresh failed:', error);
-              handleSessionRefreshError(error as AuthError);
-            });
-          }
-        } else {
-          console.log('Session has no expiry information');
-        }
+        // Schedule next refresh
+        const expiresIn = session.expires_in || 3600;
+        const refreshTime = Math.max(0, (expiresIn - 300) * 1000); // 5 minutes before expiry
+        refreshTimeout = setTimeout(() => {
+          SessionManager.refreshSession(session, state.retryCount);
+        }, refreshTime);
       }
     });
 
@@ -182,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       subscription.unsubscribe();
     };
-  }, [initSession, handleSessionRefreshError]);
+  }, [initSession]);
 
   const value = useMemo(() => ({
     session: state.session,

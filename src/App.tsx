@@ -1,6 +1,5 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
@@ -12,10 +11,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
-      gcTime: 1000 * 60 * 30, // Cache garbage collection time (formerly cacheTime)
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: 'always',
-      retry: 1,
+      cacheTime: 1000 * 60 * 30, // Cache persists for 30 minutes
+      refetchOnWindowFocus: false, // Don't refetch on window focus
+      refetchOnReconnect: 'always', // Refetch when reconnecting to ensure data consistency
+      retry: 1, // Only retry failed requests once
+      suspense: false,
     },
     mutations: {
       retry: 1,
@@ -27,15 +27,13 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <ThemeProvider>
-          <AuthProvider>
-            <Routes />
-            <Toaster />
-            <SonnerToaster />
-          </AuthProvider>
-        </ThemeProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <Routes />
+          <Toaster />
+          <SonnerToaster />
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };

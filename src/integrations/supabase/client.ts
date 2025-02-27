@@ -12,12 +12,15 @@ export const supabase = createClient<Database>(
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true,
-      storageKey: 'supabase.auth.token',
-      storage: window.localStorage
+      detectSessionInUrl: true
     },
     db: {
       schema: 'public'
+    },
+    global: {
+      headers: {
+        'x-my-custom-header': 'my-app-name'
+      }
     }
   }
 );

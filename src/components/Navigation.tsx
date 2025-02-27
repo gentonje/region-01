@@ -87,9 +87,9 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border shadow-sm">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14">
             <div className="flex justify-center">
               <Logo />
             </div>
@@ -118,11 +118,8 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
             </div>
           </div>
         </div>
-      </header>
-      <BottomNav isAuthenticated={!!session} />
-      <div className="pt-16 pb-16">
-        {/* Main content will be rendered here */}
       </div>
+      <BottomNav isAuthenticated={!!session} />
     </>
   );
 };

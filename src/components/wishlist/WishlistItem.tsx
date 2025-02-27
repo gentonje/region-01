@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "@/hooks/use-toast";
 import { Share2, ShoppingCart, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { generateQueryKey } from "@/utils/queryUtils";
 
 interface WishlistItemProps {
   item: {
@@ -33,33 +31,20 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
 
       if (error) throw error;
     },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["wishlist-items"] });
-      const previousItems = queryClient.getQueryData(["wishlist-items"]);
-      
-      queryClient.setQueryData(["wishlist-items"], (old: any[]) =>
-        old?.filter(wishlistItem => wishlistItem.id !== item.id)
-      );
-
-      return { previousItems };
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+      toast({
+        title: "Success",
+        description: "Item removed from wishlist",
+      });
     },
-    onError: (error, _, context: any) => {
-      queryClient.setQueryData(["wishlist-items"], context.previousItems);
+    onError: (error) => {
       console.error("Error removing from wishlist:", error);
       toast({
         title: "Error",
         description: "Failed to remove item from wishlist",
         variant: "destructive",
       });
-    },
-    onSuccess: () => {
-      toast({
-        title: "Success",
-        description: "Item removed from wishlist",
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
     },
   });
 
@@ -78,24 +63,14 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
 
       if (error) throw error;
     },
-    onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: ["cartItems"] });
-      const previousCount = queryClient.getQueryData(
-        generateQueryKey("cart_items", { type: "count" })
-      );
-      
-      queryClient.setQueryData(
-        generateQueryKey("cart_items", { type: "count" }),
-        (old: number) => (old || 0) + 1
-      );
-
-      return { previousCount };
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      toast({
+        title: "Success",
+        description: "Added to cart successfully",
+      });
     },
-    onError: (error, _, context: any) => {
-      queryClient.setQueryData(
-        generateQueryKey("cart_items", { type: "count" }),
-        context.previousCount
-      );
+    onError: (error) => {
       console.error("Error adding to cart:", error);
       if (error instanceof Error) {
         toast({
@@ -110,13 +85,6 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
           variant: "destructive",
         });
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
-      toast({
-        title: "Success",
-        description: "Added to cart successfully",
-      });
     },
   });
 
@@ -175,14 +143,9 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
               <p className="text-sm text-muted-foreground line-clamp-2 mb-2">
                 {product.description}
               </p>
-              <div className="flex flex-col gap-y-0">
-                <p className="text-lg font-medium text-orange-500">
-                  {product.currency} {product.price?.toFixed(2)}
-                </p>
-                <span className="text-sm text-gray-500">
-                  by {product.profiles?.username || product.profiles?.full_name || "Unknown Seller"}
-                </span>
-              </div>
+              <p className="text-lg font-medium text-orange-500">
+                {product.currency} {product.price?.toFixed(2)}
+              </p>
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
               <Button
@@ -208,7 +171,6 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
                 size="sm"
                 onClick={() => removeFromWishlist.mutate()}
                 disabled={removeFromWishlist.isPending}
-                className="transition-all duration-200"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Remove
