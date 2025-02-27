@@ -5,7 +5,7 @@ export const Logo = () => {
   return (
     <Link 
       to="/" 
-      className="text-2xl font-bold backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg transition-all hover:bg-white/20" 
+      className="text-2xl font-bold backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg transition-all hover:bg-white/20 shadow-sm" 
       style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}
     >
       <span style={{ color: '#F97316' }}>السوق</span>

@@ -84,37 +84,35 @@ export default function Index() {
   }
 
   return (
-    <div className="container mx-auto px-4">
-      <div className="mt-20">
-        <BreadcrumbNav
-          items={[
-            { label: "My Products", href: "/" }
-          ]}
+    <div className="container mx-auto px-4 pt-20 pb-20">
+      <BreadcrumbNav
+        items={[
+          { label: "My Products", href: "/" }
+        ]}
+      />
+      {selectedProduct ? (
+        <ProductDetail 
+          product={selectedProduct}
+          getProductImageUrl={getProductImageUrl}
+          onBack={handleBack}
+          selectedCurrency={selectedCurrency}
         />
-        {selectedProduct ? (
-          <ProductDetail 
-            product={selectedProduct}
-            getProductImageUrl={getProductImageUrl}
-            onBack={handleBack}
-            selectedCurrency={selectedCurrency}
-          />
-        ) : (
-          <ProductListingSection
-            products={allProducts}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            onProductClick={handleProductClick}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-            onPriceRangeChange={handlePriceRangeChange}
-            onSortChange={handleSortChange}
-            getProductImageUrl={getProductImageUrl}
-          />
-        )}
-      </div>
+      ) : (
+        <ProductListingSection
+          products={allProducts}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          onProductClick={handleProductClick}
+          isFetchingNextPage={isFetchingNextPage}
+          observerRef={ref}
+          selectedCurrency={selectedCurrency}
+          onPriceRangeChange={handlePriceRangeChange}
+          onSortChange={handleSortChange}
+          getProductImageUrl={getProductImageUrl}
+        />
+      )}
     </div>
   );
 }
