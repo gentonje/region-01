@@ -138,12 +138,6 @@ export const Routes = () => {
           }
         />
 
-        {/* Redirect modify-products to my-products */}
-        <Route 
-          path="/modify-products" 
-          element={<Navigate to="/my-products" replace />} 
-        />
-
         {/* Fallback Route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </RouterRoutes>
