@@ -88,7 +88,7 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/modify-products" className="cursor-pointer">
+              <Link to="/my-products" className="cursor-pointer">
                 <PenTool className="mr-2 h-4 w-4" />
                 My Products
               </Link>

@@ -18,6 +18,7 @@ const AdminManagement = lazy(() => import('./pages/AdminManagement'));
 const Cart = lazy(() => import('./pages/Cart'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
+const MyProducts = lazy(() => import('./pages/MyProducts'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -63,6 +64,14 @@ export const Routes = () => {
               <Index />
             </PrivateRoute>
           } 
+        />
+        <Route
+          path="/my-products"
+          element={
+            <PrivateRoute>
+              <MyProducts />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/add-product"
@@ -127,6 +136,12 @@ export const Routes = () => {
               </SuperAdminRoute>
             </PrivateRoute>
           }
+        />
+
+        {/* Redirect modify-products to my-products */}
+        <Route 
+          path="/modify-products" 
+          element={<Navigate to="/my-products" replace />} 
         />
 
         {/* Fallback Route */}

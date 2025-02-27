@@ -10,15 +10,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ProductListingSection } from "@/components/products/ProductListingSection";
 import { useProducts } from "@/hooks/useProducts";
 import { Navigation } from "@/components/Navigation";
+import { toast } from "sonner";
 
-export default function Index() {
+export default function MyProducts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [sortOrder, setSortOrder] = useState<string>("none");
 
-  // Fetch products with optimized query - show all products, not just user's
+  // Fetch only the current user's products
   const {
     data,
     isLoading,
@@ -30,8 +31,8 @@ export default function Index() {
     searchQuery,
     selectedCategory,
     sortOrder,
-    showOnlyPublished: true,
-    userOnly: false // Show all products, not just the user's
+    showOnlyPublished: false, // Show all user's products regardless of status
+    userOnly: true // Only show current user's products
   });
 
   // Setup intersection observer for infinite loading
@@ -83,8 +84,6 @@ export default function Index() {
   // Event handlers
   const handleProductClick = useCallback((product: Product) => {
     setSelectedProduct(product);
-    // Track view
-    trackProductView(product.id).catch(console.error);
   }, []);
 
   const handleBack = useCallback(() => {
@@ -108,17 +107,25 @@ export default function Index() {
     // Implementation for price range filtering would go here
   }, []);
 
-  // Track product views
-  const trackProductView = async (productId: string) => {
+  // Delete product handler
+  const handleDeleteProduct = async (productId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
       
-      await supabase.from('product_views').insert({
-        product_id: productId,
-        viewer_id: user?.id || null,
-      });
+      if (error) throw error;
+      
+      toast.success("Product deleted successfully");
+      
+      // Remove the deleted product from the current view without full refresh
+      const updatedProducts = allProducts.filter(product => product.id !== productId);
+      // Force a refetch to update the list
+      window.location.reload();
     } catch (error) {
-      console.error('Error tracking product view:', error);
+      console.error('Error deleting product:', error);
+      toast.error("Failed to delete product");
     }
   };
 
@@ -144,7 +151,7 @@ export default function Index() {
       <div className="container mx-auto px-4 pt-20 pb-20">
         <BreadcrumbNav
           items={[
-            { label: "All Products", href: "/products" }
+            { label: "My Products", href: "/my-products" }
           ]}
         />
         {selectedProduct ? (
@@ -168,8 +175,10 @@ export default function Index() {
             onPriceRangeChange={handlePriceRangeChange}
             onSortChange={handleSortChange}
             getProductImageUrl={getProductImageUrl}
-            emptyMessage="No products found"
-            showStatus={false}
+            emptyMessage="You don't have any products yet"
+            showStatus={true}
+            onDelete={handleDeleteProduct}
+            isAdmin={true}
           />
         )}
       </div>
