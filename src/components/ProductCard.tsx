@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { Heart, Trash2, Edit, Eye } from "lucide-react";
+import { Heart, Trash2, Edit, Eye, ShoppingCart } from "lucide-react";
 import { Button } from "./ui/button";
 import { ImageLoader } from "./ImageLoader";
 import { Badge } from "./ui/badge";
@@ -35,6 +35,7 @@ const ProductCard = ({
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
+  const [isHovered, setIsHovered] = useState(false);
   const imageUrl = getProductImageUrl(product);
 
   // Get user type
@@ -149,6 +150,36 @@ const ProductCard = ({
     },
   });
 
+  // Add to cart mutation
+  const addToCart = useMutation({
+    mutationFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be logged in to add items to cart");
+
+      const { error } = await supabase
+        .from("cart_items")
+        .insert({
+          user_id: user.id,
+          product_id: product.id,
+          quantity: 1,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      toast.success("Added to cart successfully");
+    },
+    onError: (error) => {
+      console.error("Error adding to cart:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to add to cart");
+      }
+    },
+  });
+
   // Convert price effect
   useEffect(() => {
     const updatePrice = async () => {
@@ -168,6 +199,15 @@ const ProductCard = ({
     toggleWishlist.mutate();
   }, [toggleWishlist]);
 
+  const handleAddToCart = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product.in_stock) {
+      addToCart.mutate();
+    } else {
+      toast.error("This product is currently out of stock");
+    }
+  }, [addToCart, product.in_stock]);
+
   const handleDeleteClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDelete) {
@@ -181,97 +221,141 @@ const ProductCard = ({
 
   return (
     <Card 
-      className="w-full hover:shadow-lg transition-all duration-300 cursor-pointer overflow-hidden group bg-white/50 dark:bg-gray-800/90 backdrop-blur-sm border-neutral-200/80 dark:border-gray-700"
+      className="w-full rounded-xl overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Card Image */}
-      <div className="relative h-48 overflow-hidden" onClick={onClick}>
+      {/* Card Image with overlay */}
+      <div 
+        className="relative h-52 overflow-hidden cursor-pointer"
+        onClick={onClick}
+      >
+        <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''}`} />
+        
         <ImageLoader
           src={imageUrl}
           alt={product.title || ""}
-          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
           width={400}
-          height={200}
+          height={208}
           priority={false}
         />
         
-        {/* Category Badge */}
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs px-2 py-1 rounded-full bg-white/80 backdrop-blur-sm text-gray-900 font-medium min-w-[100px] text-center truncate max-w-[90%] border border-blue-500/50">
-          {product.category}
-        </span>
-        
-        {/* Stock Badge */}
-        <span 
-          className={`absolute top-3 right-3 text-xs px-2 py-0 rounded-full backdrop-blur-sm font-medium ${
-            product.in_stock 
-              ? 'bg-green-100/80 text-green-800 border border-green-500/50' 
-              : 'bg-red-100/80 text-red-800 border border-red-500/50'
-          }`}
-        >
-          {product.in_stock ? 'In Stock' : 'Out of Stock'}
-        </span>
-        
-        {/* Status Badge (conditional) */}
-        {showStatus && (
-          <span className={`absolute top-3 left-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm font-medium border border-neutral-100/50 ${
-            product.product_status === 'published' 
-              ? 'bg-green-100/80 text-green-800 border-green-500/50' 
-              : 'bg-yellow-100/80 text-yellow-800 border-yellow-500/50'
-          }`}>
-            {product.product_status === 'published' ? 'Published' : 'Draft'}
+        {/* Badge Container - Top Right */}
+        <div className="absolute top-3 right-3 z-20 flex flex-col gap-2 items-end">
+          {/* Stock Badge */}
+          <span 
+            className={`text-xs px-2 py-1 rounded-full font-medium backdrop-blur ${
+              product.in_stock 
+                ? 'bg-green-500/80 text-white' 
+                : 'bg-red-500/80 text-white'
+            }`}
+          >
+            {product.in_stock ? 'In Stock' : 'Out of Stock'}
           </span>
-        )}
+          
+          {/* Status Badge (conditional) */}
+          {showStatus && (
+            <span className={`text-xs px-2 py-1 rounded-full font-medium backdrop-blur ${
+              product.product_status === 'published' 
+                ? 'bg-emerald-500/80 text-white' 
+                : 'bg-amber-500/80 text-white'
+            }`}>
+              {product.product_status === 'published' ? 'Published' : 'Draft'}
+            </span>
+          )}
+        </div>
+
+        {/* Category Badge - Bottom */}
+        <div className="absolute bottom-3 left-3 right-3 z-20">
+          <div className="flex flex-wrap gap-2">
+            <span className="text-xs px-2 py-1 rounded-full bg-blue-500/90 text-white backdrop-blur-sm font-medium">
+              {product.category}
+            </span>
+          </div>
+        </div>
         
-        {/* Price Badge */}
-        <span className="absolute top-3 left-3 text-sm px-2 py-1 rounded-lg bg-white/90 backdrop-blur-sm text-orange-600 font-bold shadow-sm border border-orange-200">
-          {selectedCurrency} {convertedPrice.toFixed(2)}
-        </span>
+        {/* Price Tag - Top Left */}
+        <div className="absolute top-0 left-0 z-20">
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-1 rounded-br-lg font-bold shadow-lg">
+            {selectedCurrency} {convertedPrice.toFixed(2)}
+          </div>
+        </div>
       </div>
       
       {/* Card Content */}
-      <div className="p-3 space-y-2" onClick={onClick}>
-        <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">{product.title}</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{product.description}</p>
+      <div 
+        className="p-4 cursor-pointer"
+        onClick={onClick}
+      >
+        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg line-clamp-1 group-hover:text-orange-500 transition-colors">
+          {product.title}
+        </h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
+          {product.description}
+        </p>
       </div>
       
       {/* Card Actions */}
-      <div className="flex items-center justify-between px-3 pb-3">
+      <div className="px-4 pb-4 flex items-center justify-between">
+        {/* Left side actions */}
         {session && !isAdminProp && !isAdmin && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full"
-            onClick={handleToggleWishlist}
-            disabled={toggleWishlist.isPending}
-          >
-            <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`rounded-full transition-all ${isInWishlist ? 'text-red-500 hover:text-red-600' : 'hover:text-red-500'}`}
+              onClick={handleToggleWishlist}
+              disabled={toggleWishlist.isPending}
+            >
+              <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-red-500' : ''}`} />
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-full transition-all hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400"
+              onClick={handleAddToCart}
+              disabled={!product.in_stock || addToCart.isPending}
+            >
+              <ShoppingCart className="w-4 h-4 mr-1" />
+              <span className="text-xs">Add</span>
+            </Button>
+          </div>
         )}
         
+        {/* Right side admin actions */}
         {(isAdminProp || isAdmin || product.user_id === session?.user?.id) && (
-          <div className="flex gap-2">
+          <div className="flex gap-2 ml-auto">
             {onDelete && (
               <Button
-                variant="destructive"
+                variant="ghost"
                 size="sm"
-                className="rounded-full"
+                className="rounded-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                 onClick={handleDeleteClick}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
             )}
-            <Link to={`/edit-product/${product.id}`} onClick={(e) => e.stopPropagation()}>
+            
+            <Link 
+              to={`/edit-product/${product.id}`} 
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex"
+            >
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="rounded-full"
+                className="rounded-full hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
               >
                 <Edit className="w-4 h-4" />
               </Button>
             </Link>
+            
             <Button
-              variant="default"
+              variant="ghost"
               size="sm"
-              className="rounded-full"
+              className="rounded-full hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/30 dark:hover:text-purple-400"
               onClick={onClick}
             >
               <Eye className="w-4 h-4" />
@@ -279,6 +363,9 @@ const ProductCard = ({
           </div>
         )}
       </div>
+      
+      {/* Hover Overlay for Touch Devices */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" />
     </Card>
   );
 };

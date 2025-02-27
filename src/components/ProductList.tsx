@@ -21,10 +21,15 @@ interface ProductListProps {
 }
 
 const ProductSkeleton = memo(() => (
-  <div className="space-y-3">
+  <div className="space-y-3 rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4">
     <Skeleton className="h-[200px] w-full rounded-lg" />
-    <Skeleton className="h-4 w-2/3" />
-    <Skeleton className="h-4 w-1/2" />
+    <Skeleton className="h-6 w-2/3" />
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-3/4" />
+    <div className="flex justify-between mt-4">
+      <Skeleton className="h-8 w-20 rounded-full" />
+      <Skeleton className="h-8 w-20 rounded-full" />
+    </div>
   </div>
 ));
 
@@ -59,8 +64,8 @@ export const ProductList = ({
   // Render loading skeletons
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 mt-4">
-        {Array.from({ length: 6 }).map((_, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+        {Array.from({ length: 8 }).map((_, index) => (
           <ProductSkeleton key={index} />
         ))}
       </div>
@@ -70,19 +75,22 @@ export const ProductList = ({
   // Render empty state
   if (products.length === 0) {
     return (
-      <div className="text-center py-12 bg-muted/40 rounded-lg mt-4">
-        <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">{emptyMessage}</h3>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search or filters</p>
+      <div className="text-center py-16 rounded-xl mt-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 shadow-inner">
+        <div className="max-w-md mx-auto px-4">
+          <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300">{emptyMessage}</h3>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search or filters to find what you're looking for</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 mt-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
       {products.map((product, index) => (
         <div
           key={product.id}
           ref={index === products.length - 1 ? setLastElementRef : undefined}
+          className="transform transition-transform hover:-translate-y-1 duration-300"
         >
           <ProductCard
             product={product}
