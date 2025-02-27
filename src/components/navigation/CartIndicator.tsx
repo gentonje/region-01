@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { generateQueryKey, optimizedSelect } from "@/utils/queryUtils";
+import { generateQueryKey } from "@/utils/queryUtils";
 
 export function CartIndicator() {
   const navigate = useNavigate();
@@ -23,10 +23,10 @@ export function CartIndicator() {
       if (!session) return 0;
 
       try {
-        const query = optimizedSelect("cart_items", "id", {
-          filters: { user_id: session.user.id },
-        });
-        const { count, error } = await query;
+        const { count, error } = await supabase
+          .from("cart_items")
+          .select("id", { count: "exact" })
+          .eq("user_id", session.user.id);
 
         if (error) throw error;
         return count || 0;
@@ -37,7 +37,7 @@ export function CartIndicator() {
       }
     },
     staleTime: 1000 * 30, // 30 seconds
-    cacheTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 5, // 5 minutes
   });
 
   return (

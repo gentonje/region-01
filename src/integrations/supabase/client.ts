@@ -31,14 +31,8 @@ export const supabase = createClient<Database>(
   }
 );
 
-// Add request interceptor for analytics and error tracking
-supabase.rest.interceptors.response.use(
-  (response) => {
-    // You could add performance metrics here
-    return response;
-  },
-  (error) => {
-    console.error('Supabase request failed:', error);
-    return Promise.reject(error);
-  }
-);
+// Custom error handler for monitoring purposes
+export const handleSupabaseError = (error: any, context: string) => {
+  console.error(`Supabase ${context} error:`, error);
+  return error;
+};

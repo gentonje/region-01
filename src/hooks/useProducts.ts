@@ -96,8 +96,6 @@ export const useProducts = ({
       await queryClient.prefetchInfiniteQuery({
         queryKey,
         queryFn: fetchProducts,
-        pages: [...result.data.pages, []],
-        pageParams: [...result.data.pageParams, nextPageParam],
         initialPageParam: 0,
       });
     }

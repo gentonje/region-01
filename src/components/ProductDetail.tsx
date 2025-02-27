@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Suspense, useState, useEffect } from "react";
 import { ProductGallery } from "./product/ProductGallery";

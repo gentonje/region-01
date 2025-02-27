@@ -20,6 +20,7 @@ interface ProductListingSectionProps {
   showStatus?: boolean;
   onDelete?: (productId: string) => Promise<void>;
   isAdmin?: boolean;
+  emptyMessage?: string;
 }
 
 export const ProductListingSection = ({
@@ -37,7 +38,8 @@ export const ProductListingSection = ({
   getProductImageUrl,
   showStatus = false,
   onDelete,
-  isAdmin
+  isAdmin,
+  emptyMessage = "No products found"
 }: ProductListingSectionProps) => {
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
@@ -56,6 +58,7 @@ export const ProductListingSection = ({
         showStatus={showStatus}
         onDelete={onDelete}
         isAdmin={isAdmin}
+        emptyMessage={emptyMessage}
       />
     </>
   );
