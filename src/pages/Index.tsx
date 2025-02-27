@@ -122,6 +122,24 @@ export default function Index() {
     }
   };
 
+  // Delete product handler
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+      
+      if (error) throw error;
+      
+      // Refresh the products list
+      window.location.reload();
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
+    }
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -170,6 +188,8 @@ export default function Index() {
             getProductImageUrl={getProductImageUrl}
             emptyMessage="You don't have any products yet"
             showStatus={true}
+            onDelete={handleDeleteProduct}
+            isAdmin={true}
           />
         )}
       </div>
