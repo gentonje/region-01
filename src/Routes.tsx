@@ -14,6 +14,7 @@ const Login = lazy(() => import('./pages/Login'));
 const AddProduct = lazy(() => import('./pages/AddProduct'));
 const EditProduct = lazy(() => import('./pages/EditProduct'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminProducts = lazy(() => import('./pages/AdminProducts'));
 const AdminManagement = lazy(() => import('./pages/AdminManagement'));
 const Cart = lazy(() => import('./pages/Cart'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
@@ -121,6 +122,16 @@ export const Routes = () => {
             <PrivateRoute>
               <AdminRoute>
                 <AdminUsers />
+              </AdminRoute>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <PrivateRoute>
+              <AdminRoute>
+                <AdminProducts />
               </AdminRoute>
             </PrivateRoute>
           }
