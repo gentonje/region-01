@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster";
@@ -6,7 +5,8 @@ import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
+import { BottomNav } from '@/components/navigation/BottomNav';
 
 // Create a client with optimized configuration
 const queryClient = new QueryClient({
@@ -26,13 +26,24 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login';
+
+  // Placeholder for TopNav component
+  const TopNav = () => <div>Top Navigation Placeholder</div>;
+
+  // Replace with actual authentication logic
+  const isAuthenticated = true; 
+
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <ThemeProvider>
             <AuthProvider>
+              {!isLoginPage && <TopNav />}
               <Routes />
+              {!isLoginPage && <BottomNav isAuthenticated={isAuthenticated} />}
               <Toaster />
               <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
             </AuthProvider>
