@@ -6,6 +6,7 @@ import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { BrowserRouter } from 'react-router-dom';
 
 // Create a client with optimized configuration
 const queryClient = new QueryClient({
@@ -28,13 +29,15 @@ const App = () => {
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <AuthProvider>
-            <Routes />
-            <Toaster />
-            <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
-          </AuthProvider>
-        </ThemeProvider>
+        <BrowserRouter>
+          <ThemeProvider>
+            <AuthProvider>
+              <Routes />
+              <Toaster />
+              <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
+            </AuthProvider>
+          </ThemeProvider>
+        </BrowserRouter>
       </QueryClientProvider>
     </Suspense>
   );

@@ -5,7 +5,7 @@ import { AuthContextType, AuthState } from "./auth/types";
 import { SessionManager } from "./auth/sessionManager";
 import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
-import { AuthError, AuthChangeEvent } from "@supabase/supabase-js";
+import { AuthError } from "@supabase/supabase-js";
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -13,7 +13,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, setState] = useState<AuthState>({
     session: null,
     user: null,
@@ -104,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [state.retryCount, handleSessionRefreshError]);
 
   useEffect(() => {
+    console.log('Setting up auth state change listener');
     let mounted = true;
     let refreshTimeout: NodeJS.Timeout | null = null;
 
@@ -111,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initSession();
 
     // Set up the auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event);
       
       if (!mounted) return;
@@ -137,6 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
+          refreshTimeout = null;
         }
       } else if (session && sessionEvents.includes(event)) {
         console.log('Session updated');
@@ -150,6 +152,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (refreshTimeout) {
           clearTimeout(refreshTimeout);
+          refreshTimeout = null;
         }
 
         // Schedule next refresh
@@ -163,13 +166,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Cleanup function
     return () => {
+      console.log('Cleaning up auth state change listener');
       mounted = false;
       if (refreshTimeout) {
         clearTimeout(refreshTimeout);
+        refreshTimeout = null;
       }
       subscription.unsubscribe();
     };
-  }, [initSession]);
+  }, [initSession, state.retryCount]);
 
   const value = useMemo(() => ({
     session: state.session,
@@ -186,7 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
