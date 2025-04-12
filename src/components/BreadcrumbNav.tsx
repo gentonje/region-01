@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Breadcrumb,
@@ -19,16 +18,19 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
   return (
     <Breadcrumb>
       {items.map((item, index) => (
-        <React.Fragment key={index}>
-          <BreadcrumbItem>
-            {item.href ? (
+        <BreadcrumbItem key={index}>
+          {item.href ? (
+            <>
               <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-            ) : (
+              {index < items.length - 1 && <BreadcrumbSeparator />}
+            </>
+          ) : (
+            <>
               <BreadcrumbPage>{item.label}</BreadcrumbPage>
-            )}
-            {index < items.length - 1 && <BreadcrumbSeparator />}
-          </BreadcrumbItem>
-        </React.Fragment>
+              {index < items.length - 1 && <BreadcrumbSeparator />}
+            </>
+          )}
+        </BreadcrumbItem>
       ))}
     </Breadcrumb>
   );

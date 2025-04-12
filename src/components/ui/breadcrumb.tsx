@@ -1,4 +1,3 @@
-
 import React from 'react'
 import { cn } from '@/lib/utils'
 
@@ -35,7 +34,7 @@ export function BreadcrumbItem({
   )
 }
 
-// Separator component - Fixed to use span instead of li
+// Separator component
 export function BreadcrumbSeparator() {
   return (
     <span 
@@ -49,13 +48,15 @@ export function BreadcrumbSeparator() {
 
 // Link component
 export function BreadcrumbLink({
+  href,
   children,
   className,
   ...props
-}: React.ComponentProps<'a'>) {
+}: React.ComponentProps<'a'> & { href: string }) {
   return (
     <a
-      className={cn('text-muted-foreground hover:text-foreground', className)}
+      href={href}
+      className={cn('text-muted-foreground hover:text-foreground transition-colors', className)}
       {...props}
     >
       {children}
@@ -63,7 +64,7 @@ export function BreadcrumbLink({
   )
 }
 
-// Page component (for current page)
+// Page component for current page
 export function BreadcrumbPage({
   children,
   className,
@@ -71,7 +72,7 @@ export function BreadcrumbPage({
 }: React.ComponentProps<'span'>) {
   return (
     <span
-      className={cn('text-foreground', className)}
+      className={cn('font-medium text-foreground', className)}
       aria-current="page"
       {...props}
     >
