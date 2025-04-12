@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContextType, AuthState } from "./auth/types";
@@ -49,49 +48,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error('Session initialization error:', error);
-        if (error.message?.includes('refresh_token_not_found') || error.message?.includes('Failed to fetch')) {
-          await handleSessionRefreshError(error);
-          return;
-        }
-        await AuthErrorHandler.handleError(
-          error,
-          initSession,
-          state.retryCount
-        );
+        toast.error('Failed to initialize session. Please try again.');
+        setState(prev => ({ ...prev, loading: false }));
         return;
       }
 
-      if (session) {
-        console.log('Found existing session, refreshing...');
-        try {
-          const refreshedSession = await SessionManager.refreshSession(
-            session,
-            state.retryCount
-          );
-          
-          if (refreshedSession) {
-            setState(prev => ({
-              ...prev,
-              session: refreshedSession,
-              user: refreshedSession.user,
-              retryCount: 0,
-            }));
-          } else {
-            await handleSessionRefreshError();
-          }
-        } catch (refreshError) {
-          console.error('Session refresh error:', refreshError);
-          await handleSessionRefreshError(refreshError as AuthError);
-        }
-      } else {
-        console.log('No valid session found');
-        setState(prev => ({
-          ...prev,
-          session: null,
-          user: null,
-          retryCount: 0,
-        }));
+      if (!session) {
+        console.warn('No session found during initialization.');
+        setState(prev => ({ ...prev, loading: false }));
+        return;
       }
+
+      setState(prev => ({
+        ...prev,
+        session,
+        user: session.user,
+        loading: false,
+      }));
     } catch (error) {
       console.error('Session initialization error:', error);
       await AuthErrorHandler.handleError(

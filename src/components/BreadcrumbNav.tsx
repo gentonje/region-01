@@ -17,21 +17,23 @@ interface BreadcrumbNavProps {
 export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
   return (
     <Breadcrumb>
-      {items.map((item, index) => (
-        <BreadcrumbItem key={index}>
-          {item.href ? (
-            <>
-              <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-              {index < items.length - 1 && <BreadcrumbSeparator />}
-            </>
-          ) : (
-            <>
-              <BreadcrumbPage>{item.label}</BreadcrumbPage>
-              {index < items.length - 1 && <BreadcrumbSeparator />}
-            </>
-          )}
-        </BreadcrumbItem>
-      ))}
+      <ul>
+        {items.map((item, index) => (
+          <li key={index}>
+            {item.href ? (
+              <>
+                <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                {index < items.length - 1 && <BreadcrumbSeparator />}
+              </>
+            ) : (
+              <>
+                <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                {index < items.length - 1 && <BreadcrumbSeparator />}
+              </>
+            )}
+          </li>
+        ))}
+      </ul>
     </Breadcrumb>
   );
 }

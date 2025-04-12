@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -96,18 +95,6 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
               <Logo />
             </div>
 
-            {onSearchChange && (
-              <div className="flex-1 max-w-md mx-4">
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-            )}
-
             <div className="flex items-center gap-2">
               {session && (
                 <>
@@ -134,7 +121,7 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
           </div>
         </div>
       </div>
-      <BottomNav isAuthenticated={!!session} onLogout={handleLogout} />
+      <BottomNav isAuthenticated={!!session} />
     </>
   );
 };
