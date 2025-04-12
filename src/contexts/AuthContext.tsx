@@ -7,13 +7,14 @@ import { AuthErrorHandler } from "./auth/errorHandler";
 import { toast } from "sonner";
 import { AuthError } from "@supabase/supabase-js";
 
+// Create a context for authentication
 const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
     session: null,
     user: null,
