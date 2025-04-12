@@ -1,3 +1,4 @@
+
 import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { EditProductForm } from "@/components/product/edit/EditProductForm";
@@ -91,7 +92,7 @@ const EditProduct = () => {
       }
 
       toast.success("Product updated successfully!");
-      navigate("/modify-products");
+      navigate("/my-products"); // Updated to redirect to my-products instead of modify-products
     } catch (error: any) {
       console.error("Error updating product:", error);
       toast.error(error.message || "Failed to update product");

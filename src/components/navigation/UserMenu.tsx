@@ -95,7 +95,7 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
             </DropdownMenuItem>
             {(isAdmin || isSuperAdmin) && (
               <DropdownMenuItem asChild>
-                <Link to="/admin/products" className="cursor-pointer">
+                <Link to="/products" className="cursor-pointer">
                   <UserCheck className="mr-2 h-4 w-4" />
                   All Products
                 </Link>
