@@ -278,7 +278,7 @@ const ProductCard = ({
         {/* Price Tag - Top Left */}
         <div className="absolute top-0 left-0 z-20">
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-1 rounded-br-lg font-bold shadow-lg">
-            {selectedCurrency} {convertedPrice.toFixed(2)}
+            {selectedCurrency} {convertedPrice.toFixed(0)}
           </div>
         </div>
       </div>

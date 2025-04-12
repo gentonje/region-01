@@ -37,10 +37,15 @@ export const CurrencySelector = ({ onCurrencyChange, currency }: CurrencySelecto
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {["SSP", "USD", "KES", "UGX", "RWF", "ETB", "ERN", "DJF", "TZS"].map((code) => (
-                <DropdownMenuItem 
+              {['SSP', 'USD'].map((code) => (
+                <DropdownMenuItem
                   key={code}
-                  onClick={() => onCurrencyChange(code as SupportedCurrency)}
+                  onClick={() => onCurrencyChange?.(code as SupportedCurrency)}
+                  className={
+                    code === currency
+                      ? 'font-bold text-orange-500'
+                      : ''
+                  }
                 >
                   {code}
                 </DropdownMenuItem>
