@@ -15,6 +15,7 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
     <nav className="fixed bottom-0 left-0 right-0 z-50 h-14 bg-background/50 backdrop-blur-sm border-t border-border">
       <div className="grid h-full max-w-lg grid-cols-3 mx-auto">
         {isAuthenticated && (
+        
           <Link
             to="/wishlist"
             className={cn(
