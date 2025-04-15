@@ -17,7 +17,7 @@ interface BreadcrumbNavProps {
 export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
   return (
     <Breadcrumb>
-      <ul>
+      {/* <ul>
         {items.map((item, index) => (
           <li key={index}>
             {item.href ? (
@@ -33,7 +33,7 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
             )}
           </li>
         ))}
-      </ul>
+      </ul> */}
     </Breadcrumb>
   );
 }
