@@ -6,6 +6,7 @@ import { BottomNav } from '@/components/navigation/BottomNav';
 import { useAuth } from '@/contexts/AuthContext';
 import { CurrencySelector } from '@/components/navigation/CurrencySelector';
 import { SupportedCurrency } from '@/utils/currencyConverter';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type MainLayoutProps = {
   children?: React.ReactNode;
@@ -24,6 +25,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 }) => {
   const { session } = useAuth();
   const isAuthenticated = !!session;
+  const isMobile = useIsMobile();
 
   return (
     <div className="min-h-screen pb-16">
@@ -32,9 +34,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {children || <Outlet />}
       </div>
       <div className="fixed bottom-0 left-0 right-0 z-40">
-        <BottomNav isAuthenticated={isAuthenticated} />
+        <BottomNav 
+          isAuthenticated={isAuthenticated} 
+          selectedCurrency={selectedCurrency}
+          onCurrencyChange={onCurrencyChange}
+        />
       </div>
-      {onCurrencyChange && (
+      {!isMobile && onCurrencyChange && (
         <div className="fixed bottom-16 right-4 z-50">
           <CurrencySelector 
             currency={selectedCurrency} 

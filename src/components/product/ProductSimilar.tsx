@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -39,7 +40,7 @@ export const ProductSimilar = ({
   return (
     <div className="w-full max-w-2xl mx-auto">
       <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Products</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {products.map((similarProduct) => (
           <Card 
             key={similarProduct.id}
