@@ -37,22 +37,20 @@ const App = () => {
 
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
-      <React.StrictMode>
-        <BrowserRouter>
-          <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-              <AuthProvider>
-                <Routes 
-                  selectedCurrency={selectedCurrency}
-                  onCurrencyChange={handleCurrencyChange}
-                />
-                <Toaster />
-                <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
-              </AuthProvider>
-            </ThemeProvider>
-          </QueryClientProvider>
-        </BrowserRouter>
-      </React.StrictMode>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <AuthProvider>
+              <Routes 
+                selectedCurrency={selectedCurrency}
+                onCurrencyChange={handleCurrencyChange}
+              />
+              <Toaster />
+              <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
+            </AuthProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
     </Suspense>
   );
 };
