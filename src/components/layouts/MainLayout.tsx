@@ -29,7 +29,12 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
   return (
     <div className="min-h-screen pb-16">
-      <Navigation searchQuery={searchQuery} onSearchChange={onSearchChange} />
+      <Navigation 
+        searchQuery={searchQuery} 
+        onSearchChange={onSearchChange}
+        selectedCurrency={selectedCurrency}
+        onCurrencyChange={onCurrencyChange}
+      />
       <div className="container mx-auto px-4 pt-20 pb-20">
         {children || <Outlet />}
       </div>

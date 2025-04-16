@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,13 +12,21 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface NavigationProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  selectedCurrency?: SupportedCurrency;
+  onCurrencyChange?: (currency: SupportedCurrency) => void;
 }
 
-export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps) => {
+export const Navigation = ({ 
+  searchQuery = "", 
+  onSearchChange,
+  selectedCurrency = "SSP",
+  onCurrencyChange
+}: NavigationProps) => {
   const navigate = useNavigate();
   const { session } = useAuth();
   const [userName, setUserName] = useState("");
@@ -121,7 +130,11 @@ export const Navigation = ({ searchQuery = "", onSearchChange }: NavigationProps
           </div>
         </div>
       </div>
-      <BottomNav isAuthenticated={!!session} />
+      <BottomNav 
+        isAuthenticated={!!session} 
+        selectedCurrency={selectedCurrency}
+        onCurrencyChange={onCurrencyChange}
+      />
     </>
   );
 };

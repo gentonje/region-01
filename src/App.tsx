@@ -1,6 +1,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { BrowserRouter } from 'react-router-dom';
 import React from 'react';
+import { SupportedCurrency } from "@/utils/currencyConverter";
 
 // Create a client with optimized configuration
 const queryClient = new QueryClient({
@@ -27,6 +28,13 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
+
+  const handleCurrencyChange = (currency: SupportedCurrency) => {
+    console.log("Changing currency to:", currency);
+    setSelectedCurrency(currency);
+  };
+
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
       <React.StrictMode>
@@ -34,7 +42,10 @@ const App = () => {
           <QueryClientProvider client={queryClient}>
             <ThemeProvider>
               <AuthProvider>
-                <Routes />
+                <Routes 
+                  selectedCurrency={selectedCurrency}
+                  onCurrencyChange={handleCurrencyChange}
+                />
                 <Toaster />
                 <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
               </AuthProvider>
