@@ -1,3 +1,4 @@
+
 import { Product } from "@/types/product";
 import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -26,7 +27,7 @@ export const ProductCardContent = ({
         </div>
         <div className="pt-0 -mt-2 text-center">
           <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-bold whitespace-nowrap border border-orange-500/50">
-            {selectedCurrency} {convertedPrice.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+            {selectedCurrency} {convertedPrice.toLocaleString()}
           </span>
         </div>
       </CardContent>

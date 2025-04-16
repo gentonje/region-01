@@ -33,15 +33,21 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       <div className="container mx-auto px-4 pt-20 pb-20">
         {children || <Outlet />}
       </div>
-      <div className="fixed bottom-0 left-0 right-0 z-40">
-        <BottomNav 
-          isAuthenticated={isAuthenticated} 
-          selectedCurrency={selectedCurrency}
-          onCurrencyChange={onCurrencyChange}
-        />
-      </div>
+      
+      {/* Only show bottom nav on mobile */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-40">
+          <BottomNav 
+            isAuthenticated={isAuthenticated} 
+            selectedCurrency={selectedCurrency}
+            onCurrencyChange={onCurrencyChange}
+          />
+        </div>
+      )}
+      
+      {/* Show currency selector in bottom right corner on desktop */}
       {!isMobile && onCurrencyChange && (
-        <div className="fixed bottom-16 right-4 z-50">
+        <div className="fixed bottom-4 right-4 z-50">
           <CurrencySelector 
             currency={selectedCurrency} 
             onCurrencyChange={onCurrencyChange} 

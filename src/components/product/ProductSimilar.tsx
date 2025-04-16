@@ -63,7 +63,7 @@ export const ProductSimilar = ({
                 {similarProduct.title}
               </h3>
               <p className="text-sm font-medium text-gray-900">
-                {selectedCurrency} {(convertedPrices[similarProduct.id] || 0).toFixed(2)}
+                {selectedCurrency} {(convertedPrices[similarProduct.id] || 0).toLocaleString()}
               </p>
             </CardContent>
           </Card>
