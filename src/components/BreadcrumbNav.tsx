@@ -1,8 +1,11 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from './ui/breadcrumb';
@@ -15,25 +18,28 @@ interface BreadcrumbNavProps {
 }
 
 export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
+  if (!items || items.length === 0) {
+    return null;
+  }
+
   return (
-    <Breadcrumb>
-      {/* <ul>
+    <Breadcrumb className="mb-6">
+      <BreadcrumbList>
         {items.map((item, index) => (
-          <li key={index}>
-            {item.href ? (
-              <>
-                <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
-                {index < items.length - 1 && <BreadcrumbSeparator />}
-              </>
-            ) : (
-              <>
+          <React.Fragment key={index}>
+            <BreadcrumbItem>
+              {item.href ? (
+                <BreadcrumbLink asChild>
+                  <Link to={item.href}>{item.label}</Link>
+                </BreadcrumbLink>
+              ) : (
                 <BreadcrumbPage>{item.label}</BreadcrumbPage>
-                {index < items.length - 1 && <BreadcrumbSeparator />}
-              </>
-            )}
-          </li>
+              )}
+            </BreadcrumbItem>
+            {index < items.length - 1 && <BreadcrumbSeparator />}
+          </React.Fragment>
         ))}
-      </ul> */}
+      </BreadcrumbList>
     </Breadcrumb>
   );
 }

@@ -9,7 +9,6 @@ import ProductDetail from "@/components/ProductDetail";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductListingSection } from "@/components/products/ProductListingSection";
 import { useProducts } from "@/hooks/useProducts";
-import { Navigation } from "@/components/Navigation";
 
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -125,14 +124,12 @@ export default function Index() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 mt-20">
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-48 w-full" />
-            ))}
-          </div>
+      <div className="space-y-4">
+        <Skeleton className="h-12 w-full" />
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-48 w-full" />
+          ))}
         </div>
       </div>
     );
@@ -140,39 +137,36 @@ export default function Index() {
 
   return (
     <>
-      <Navigation searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-      <div className="container mx-auto px-4 pt-20 pb-20">
-        <BreadcrumbNav
-          items={[
-            { label: "All Products", href: "/products" }
-          ]}
+      <BreadcrumbNav
+        items={[
+          { label: "All Products", href: "/products" }
+        ]}
+      />
+      {selectedProduct ? (
+        <ProductDetail 
+          product={selectedProduct}
+          getProductImageUrl={getProductImageUrl}
+          onBack={handleBack}
+          selectedCurrency={selectedCurrency}
         />
-        {selectedProduct ? (
-          <ProductDetail 
-            product={selectedProduct}
-            getProductImageUrl={getProductImageUrl}
-            onBack={handleBack}
-            selectedCurrency={selectedCurrency}
-          />
-        ) : (
-          <ProductListingSection
-            products={allProducts}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={handleCategoryChange}
-            onProductClick={handleProductClick}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-            onPriceRangeChange={handlePriceRangeChange}
-            onSortChange={handleSortChange}
-            getProductImageUrl={getProductImageUrl}
-            emptyMessage="No products found"
-            showStatus={false}
-          />
-        )}
-      </div>
+      ) : (
+        <ProductListingSection
+          products={allProducts}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={handleCategoryChange}
+          onProductClick={handleProductClick}
+          isFetchingNextPage={isFetchingNextPage}
+          observerRef={ref}
+          selectedCurrency={selectedCurrency}
+          onPriceRangeChange={handlePriceRangeChange}
+          onSortChange={handleSortChange}
+          getProductImageUrl={getProductImageUrl}
+          emptyMessage="No products found"
+          showStatus={false}
+        />
+      )}
     </>
   );
 }
