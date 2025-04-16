@@ -34,10 +34,15 @@ const PageLoader = () => (
   </div>
 );
 
-export const Routes = () => {
+// Add interface for Routes component props
+interface RoutesProps {
+  selectedCurrency?: SupportedCurrency;
+  onCurrencyChange?: (currency: SupportedCurrency) => void;
+}
+
+export const Routes: React.FC<RoutesProps> = ({ selectedCurrency = "SSP", onCurrencyChange }) => {
   const { session, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
 
   if (loading) {
     return <PageLoader />;
@@ -65,7 +70,7 @@ export const Routes = () => {
               searchQuery={searchQuery} 
               onSearchChange={setSearchQuery}
               selectedCurrency={selectedCurrency}
-              onCurrencyChange={setSelectedCurrency} 
+              onCurrencyChange={onCurrencyChange} 
             />
           } 
         >
