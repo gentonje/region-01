@@ -28,17 +28,17 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <BrowserRouter>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
             <AuthProvider>
               <Routes />
               <Toaster />
               <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
             </AuthProvider>
-          </BrowserRouter>
-        </ThemeProvider>
-      </QueryClientProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </BrowserRouter>
     </Suspense>
   );
 };
