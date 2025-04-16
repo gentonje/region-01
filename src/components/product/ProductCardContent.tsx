@@ -27,7 +27,7 @@ export const ProductCardContent = ({
         </div>
         <div className="pt-0 -mt-2 text-center">
           <span className="text-xs px-2 py-0 rounded-full bg-white/80 backdrop-blur-sm text-orange-500 font-bold whitespace-nowrap border border-orange-500/50">
-            {selectedCurrency} {convertedPrice.toLocaleString()}
+            {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
           </span>
         </div>
       </CardContent>
