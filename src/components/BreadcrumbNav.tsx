@@ -5,7 +5,6 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from './ui/breadcrumb';
@@ -24,12 +23,12 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
 
   return (
     <Breadcrumb className="mb-6">
-      <BreadcrumbList>
+      <ol className="flex items-center gap-2">
         {items.map((item, index) => (
           <React.Fragment key={index}>
             <BreadcrumbItem>
               {item.href ? (
-                <BreadcrumbLink asChild>
+                <BreadcrumbLink href={item.href}>
                   <Link to={item.href}>{item.label}</Link>
                 </BreadcrumbLink>
               ) : (
@@ -39,7 +38,7 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
             {index < items.length - 1 && <BreadcrumbSeparator />}
           </React.Fragment>
         ))}
-      </BreadcrumbList>
+      </ol>
     </Breadcrumb>
   );
 }
