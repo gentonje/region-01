@@ -12,7 +12,8 @@ export const BottomNav = ({ isAuthenticated }: BottomNavProps) => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  if (!isAuthenticated) {
+  // Don't render BottomNav on login page or if not authenticated
+  if (!isAuthenticated || location.pathname === '/login') {
     return null;
   }
 
