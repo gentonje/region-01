@@ -1,7 +1,7 @@
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
-import { BottomNav } from '@/components/navigation/BottomNav';
 import { useAuth } from '@/contexts/AuthContext';
 import { CurrencySelector } from '@/components/navigation/CurrencySelector';
 import { SupportedCurrency } from '@/utils/currencyConverter';
@@ -38,17 +38,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {children || <Outlet />}
       </div>
       
-      {/* Only show bottom nav on mobile */}
-      {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 z-40">
-          <BottomNav 
-            isAuthenticated={isAuthenticated} 
-            selectedCurrency={selectedCurrency}
-            onCurrencyChange={onCurrencyChange}
-          />
-        </div>
-      )}
-      
+      {/* Removed BottomNav rendering on both mobile and desktop */}
+
       {/* Show currency selector in bottom right corner on desktop */}
       {!isMobile && onCurrencyChange && (
         <div className="fixed bottom-4 right-4 z-50">
@@ -61,4 +52,3 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     </div>
   );
 };
-
