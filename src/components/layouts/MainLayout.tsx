@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { CurrencySelector } from '@/components/navigation/CurrencySelector';
 import { SupportedCurrency } from '@/utils/currencyConverter';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BottomNav } from '@/components/navigation/BottomNav';
@@ -39,23 +37,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {children || <Outlet />}
       </div>
       
-      {/* Add BottomNav back with currency selector */}
+      {/* Add BottomNav back */}
       {isAuthenticated && (
         <BottomNav 
           isAuthenticated={isAuthenticated}
           selectedCurrency={selectedCurrency}
           onCurrencyChange={onCurrencyChange}
         />
-      )}
-
-      {/* Show currency selector in bottom right corner on desktop */}
-      {!isMobile && onCurrencyChange && (
-        <div className="fixed bottom-4 right-4 z-50">
-          <CurrencySelector 
-            currency={selectedCurrency} 
-            onCurrencyChange={onCurrencyChange} 
-          />
-        </div>
       )}
     </div>
   );
