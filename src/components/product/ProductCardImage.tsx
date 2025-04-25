@@ -32,7 +32,7 @@ export const ProductCardImage = memo(({
 }: ProductCardImageProps) => {
   return (
     <div 
-      className="h-36 sm:h-36 w-full relative overflow-hidden rounded-t-lg aspect-[4/3] sm:aspect-auto cursor-pointer"
+      className="h-52 sm:h-52 w-full relative overflow-hidden rounded-t-lg aspect-[4/3] sm:aspect-auto cursor-pointer"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
