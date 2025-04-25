@@ -1,4 +1,3 @@
-
 import React, { useCallback, memo } from "react";
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
@@ -53,7 +52,6 @@ export const ProductList = ({
     triggerOnce: false,
   });
 
-  // Create a memoized callback for the intersection observer
   const setLastElementRef = useCallback((node: Element | null) => {
     ref(node);
     if (inView && observerRef) {
@@ -61,10 +59,9 @@ export const ProductList = ({
     }
   }, [ref, inView, observerRef]);
 
-  // Render loading skeletons
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-1 mt-1">
         {Array.from({ length: 8 }).map((_, index) => (
           <ProductSkeleton key={index} />
         ))}
@@ -72,20 +69,19 @@ export const ProductList = ({
     );
   }
 
-  // Render empty state
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 rounded-xl mt-8 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 shadow-inner">
+      <div className="text-center py-4 rounded-xl mt-1 bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-900/50 shadow-inner">
         <div className="max-w-md mx-auto px-4">
           <h3 className="text-2xl font-bold text-gray-700 dark:text-gray-300">{emptyMessage}</h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search or filters to find what you're looking for</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Try adjusting your search or filters to find what you're looking for</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+    <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-1 mt-1">
       {products.map((product, index) => (
         <div
           key={product.id}
@@ -115,5 +111,4 @@ export const ProductList = ({
   );
 };
 
-// Optimize with memoization
 export default memo(ProductList);

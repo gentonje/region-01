@@ -26,18 +26,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-14">
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
         selectedCurrency={selectedCurrency}
         onCurrencyChange={onCurrencyChange}
       />
-      <div className="container mx-auto px-4 pt-20 pb-20">
+      <div className="container mx-auto px-4 pt-14 pb-16">
         {children || <Outlet />}
       </div>
       
-      {/* Add BottomNav back */}
       {isAuthenticated && (
         <BottomNav 
           isAuthenticated={isAuthenticated}

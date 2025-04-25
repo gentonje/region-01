@@ -22,8 +22,8 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
   }
 
   return (
-    <Breadcrumb className="mb-6">
-      <ol className="flex items-center gap-2">
+    <Breadcrumb className="mb-1">
+      <ol className="flex items-center gap-1">
         {items.map((item, index) => (
           <React.Fragment key={index}>
             <BreadcrumbItem>
