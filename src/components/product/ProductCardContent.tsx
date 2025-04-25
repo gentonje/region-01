@@ -37,4 +37,3 @@ export const ProductCardContent = memo(({
 });
 
 ProductCardContent.displayName = 'ProductCardContent';
-
