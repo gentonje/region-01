@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, memo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
@@ -109,17 +108,18 @@ const ProductCard = ({
         convertedPrice={convertedPrice}
       />
       
-      <ProductCardActions
-        session={session}
-        isAdmin={isAdminProp || isAdmin}
-        product={product}
-        onDelete={handleDeleteClick}
-        onAddToCart={handleAddToCart}
-        onClick={onClick}
-      />
+      <div className="p-4 flex-grow flex flex-col justify-between cursor-pointer h-[50%]">
+        <ProductCardActions
+          session={session}
+          isAdmin={isAdminProp || isAdmin}
+          product={product}
+          onDelete={handleDeleteClick}
+          onAddToCart={handleAddToCart}
+          onClick={onClick}
+        />
+      </div>
     </Card>
   );
 };
 
 export default memo(ProductCard);
-
