@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, memo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
@@ -221,11 +220,11 @@ const ProductCard = ({
 
   return (
     <Card 
-      className="w-full rounded-xl overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700"
+      className="w-full h-[500px] rounded-xl overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 flex flex-col"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Card Image with overlay */}
+      {/* Card Image with fixed height */}
       <div 
         className="relative h-52 overflow-hidden cursor-pointer"
         onClick={onClick}
@@ -283,17 +282,25 @@ const ProductCard = ({
         </div>
       </div>
       
-      {/* Card Content */}
+      {/* Card Content with fixed height and line-clamp */}
       <div 
-        className="p-4 cursor-pointer"
+        className="p-4 flex-grow flex flex-col justify-between cursor-pointer"
         onClick={onClick}
       >
-        <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg line-clamp-1 group-hover:text-orange-500 transition-colors">
-          {product.title}
-        </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mt-1">
-          {product.description}
-        </p>
+        <div>
+          <h3 className="font-bold text-gray-800 dark:text-gray-100 text-lg line-clamp-1 group-hover:text-orange-500 transition-colors mb-2">
+            {product.title}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 h-12">
+            {product.description}
+          </p>
+        </div>
+        
+        <div className="mt-4 text-center">
+          <span className="text-lg font-bold text-orange-500">
+            {selectedCurrency} {convertedPrice.toFixed(0)}
+          </span>
+        </div>
       </div>
       
       {/* Card Actions */}
@@ -370,5 +377,4 @@ const ProductCard = ({
   );
 };
 
-// Memoize the component to prevent unnecessary re-renders
 export default memo(ProductCard);
