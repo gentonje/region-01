@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Heart, DollarSign } from "lucide-react";
+import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -25,11 +25,11 @@ export const BottomNav = ({
     return null;
   }
 
-  // Mobile bottom nav showing only Wishlist and currency converter
+  // Mobile bottom nav showing only Wishlist
   if (isMobile) {
     return (
       <nav className="fixed bottom-0 left-0 right-0 z-50 h-14 bg-background/80 backdrop-blur-lg border-t border-border">
-        <div className="grid h-full max-w-lg grid-cols-2 mx-auto">
+        <div className="grid h-full max-w-lg grid-cols-1 mx-auto">
           <Link 
             to="/wishlist" 
             className={cn(
@@ -41,22 +41,6 @@ export const BottomNav = ({
             <Heart className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
             <span className="text-xs">Wishlist</span>
           </Link>
-
-          {onCurrencyChange && (
-            <button 
-              onClick={() => {
-                const newCurrency = selectedCurrency === "SSP" ? "USD" : "SSP";
-                onCurrencyChange(newCurrency);
-              }} 
-              className={cn(
-                "inline-flex flex-col items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
-                "relative backdrop-blur-sm bg-white/10 hover:bg-white/20"
-              )}
-            >
-              <DollarSign className="w-5 h-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
-              <span className="text-xs">{selectedCurrency}</span>
-            </button>
-          )}
         </div>
       </nav>
     );
