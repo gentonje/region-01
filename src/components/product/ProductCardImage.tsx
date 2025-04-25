@@ -3,15 +3,13 @@ import { Heart } from "lucide-react";
 import { Button } from "../ui/button";
 import { ImageLoader } from "../ImageLoader";
 import { Product } from "@/types/product";
-import { SupportedCurrency } from "@/utils/currencyConverter";
 import { Session } from "@supabase/supabase-js";
 import { memo } from "react";
+import { UseMutateFunction } from "@tanstack/react-query";
 
 interface ProductCardImageProps {
   product: Product;
   imageUrl: string;
-  selectedCurrency: SupportedCurrency;
-  convertedPrice: number;
   showStatus?: boolean;
   session: Session | null;
   isAdmin: boolean;
@@ -34,7 +32,7 @@ export const ProductCardImage = memo(({
 }: ProductCardImageProps) => {
   return (
     <div 
-      className="h-52 sm:h-52 w-full relative overflow-hidden rounded-t-lg aspect-[4/3] sm:aspect-auto"
+      className="h-52 sm:h-52 w-full relative overflow-hidden rounded-t-lg aspect-[4/3] sm:aspect-auto cursor-pointer"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
@@ -90,3 +88,4 @@ export const ProductCardImage = memo(({
 });
 
 ProductCardImage.displayName = 'ProductCardImage';
+

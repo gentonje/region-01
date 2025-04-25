@@ -85,11 +85,7 @@ const ProductCard = ({
   const handleDeleteClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDelete) {
-      try {
-        await onDelete(product.id);
-      } catch (error) {
-        console.error('Error deleting product:', error);
-      }
+      await onDelete(product.id);
     }
   }, [onDelete, product.id]);
 
@@ -126,3 +122,4 @@ const ProductCard = ({
 };
 
 export default memo(ProductCard);
+
