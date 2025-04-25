@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { CurrencySelector } from '@/components/navigation/CurrencySelector';
 import { SupportedCurrency } from '@/utils/currencyConverter';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { BottomNav } from '@/components/navigation/BottomNav';
 
 type MainLayoutProps = {
   children?: React.ReactNode;
@@ -38,7 +39,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         {children || <Outlet />}
       </div>
       
-      {/* Removed BottomNav rendering on both mobile and desktop */}
+      {/* Add BottomNav back with currency selector */}
+      {isAuthenticated && (
+        <BottomNav 
+          isAuthenticated={isAuthenticated}
+          selectedCurrency={selectedCurrency}
+          onCurrencyChange={onCurrencyChange}
+        />
+      )}
 
       {/* Show currency selector in bottom right corner on desktop */}
       {!isMobile && onCurrencyChange && (
