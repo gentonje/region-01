@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -23,12 +24,11 @@ const Wishlist = () => {
       }
 
       try {
-        // Get the user's wishlist
-        const { data: wishlist, error: wishlistError } = await supabase
+        // Get the user's wishlist - here we select all wishlists for the user instead of using maybeSingle
+        const { data: wishlists, error: wishlistError } = await supabase
           .from("wishlists")
           .select("id")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
+          .eq("user_id", session.user.id);
 
         if (wishlistError) {
           console.error("Error fetching wishlist:", wishlistError);
@@ -41,8 +41,7 @@ const Wishlist = () => {
         }
 
         // If no wishlist exists, create one
-        let wishlistId;
-        if (!wishlist) {
+        if (!wishlists || wishlists.length === 0) {
           const { data: newWishlist, error: createError } = await supabase
             .from("wishlists")
             .insert({
@@ -62,10 +61,13 @@ const Wishlist = () => {
             });
             return [];
           }
-          wishlistId = newWishlist.id;
-        } else {
-          wishlistId = wishlist.id;
+          
+          // Use the newly created wishlist
+          return [];
         }
+
+        // Use the first wishlist from the list (or handle multiple wishlists if needed)
+        const wishlistId = wishlists[0]?.id;
 
         // Get wishlist items with product details
         const { data: items, error: itemsError } = await supabase
