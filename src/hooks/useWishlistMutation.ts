@@ -1,3 +1,4 @@
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -39,22 +40,37 @@ export function useWishlistMutation(productId: string) {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
+  // Toggle wishlist mutation
   const { mutate: toggleWishlist, isPending } = useMutation({
     mutationFn: async () => {
       if (!session?.user) {
         throw new Error('Please login to add items to wishlist');
       }
 
-      // First get the existing wishlist state
-      const { data: existingWishlist } = await supabase
+      const { data: existingWishlist, error: wishlistError } = await supabase
         .from('wishlists')
         .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      const wishlistId = existingWishlist?.id;
+      let wishlistId;
+      if (!existingWishlist) {
+        const { data: newWishlist, error: createError } = await supabase
+          .from('wishlists')
+          .insert({
+            user_id: session.user.id,
+            name: 'My Wishlist',
+            visibility: 'private'
+          })
+          .select()
+          .single();
 
-      // If item is in wishlist, remove it, otherwise add it
+        if (createError) throw createError;
+        wishlistId = newWishlist.id;
+      } else {
+        wishlistId = existingWishlist.id;
+      }
+
       if (isInWishlist) {
         const { error: removeError } = await supabase
           .from('wishlist_items')
@@ -64,43 +80,15 @@ export function useWishlistMutation(productId: string) {
 
         if (removeError) throw removeError;
       } else {
-        // Create wishlist if it doesn't exist
-        if (!wishlistId) {
-          const { data: newWishlist, error: createError } = await supabase
-            .from('wishlists')
-            .insert({
-              user_id: session.user.id,
-              name: 'My Wishlist',
-              visibility: 'private'
-            })
-            .select()
-            .single();
+        const { error: addError } = await supabase
+          .from('wishlist_items')
+          .insert({
+            wishlist_id: wishlistId,
+            product_id: productId
+          });
 
-          if (createError) throw createError;
-
-          const { error: addError } = await supabase
-            .from('wishlist_items')
-            .insert({
-              wishlist_id: newWishlist.id,
-              product_id: productId
-            });
-
-          if (addError) throw addError;
-        } else {
-          const { error: addError } = await supabase
-            .from('wishlist_items')
-            .insert({
-              wishlist_id: wishlistId,
-              product_id: productId
-            });
-
-          if (addError) throw addError;
-        }
+        if (addError) throw addError;
       }
-    },
-    onMutate: async () => {
-      // Optimistically update the UI
-      queryClient.setQueryData(['wishlist', productId, session?.user?.id], !isInWishlist);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
