@@ -34,7 +34,7 @@ const ProductCard = ({
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
-  const [isHovered, setIsHovered] = useState(false);
+  // Removed isHovered state
   const imageUrl = getProductImageUrl(product);
 
   // Get user type
@@ -221,20 +221,17 @@ const ProductCard = ({
   return (
     <Card 
       className="w-full h-[500px] rounded-xl overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border border-gray-200 dark:border-gray-700 flex flex-col"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // Removed onMouseEnter and onMouseLeave event handlers
     >
       {/* Card Image with fixed height */}
       <div 
         className="relative h-52 overflow-hidden cursor-pointer"
         onClick={onClick}
       >
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/10 z-10 opacity-0 transition-opacity duration-300 ${isHovered ? 'opacity-100' : ''}`} />
-        
         <ImageLoader
           src={imageUrl}
           alt={product.title || ""}
-          className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover"  // Removed transition and hover scale
           width={400}
           height={208}
           priority={false}
@@ -371,8 +368,7 @@ const ProductCard = ({
         )}
       </div>
       
-      {/* Hover Overlay for Touch Devices */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-0" />
+      {/* Removed hover overlay for touch devices */}
     </Card>
   );
 };
