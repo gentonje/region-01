@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, memo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
@@ -10,7 +11,6 @@ import { ProductCardActions } from "./product/ProductCardActions";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { convertCurrency } from "@/utils/currencyConverter";
 
 interface ProductCardProps {
   product: Product;
@@ -32,7 +32,6 @@ const ProductCard = ({
   isAdmin: isAdminProp
 }: ProductCardProps) => {
   const { session } = useAuth();
-  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const imageUrl = getProductImageUrl(product);
   const { addItemMutation } = useCartMutations();
   const { toggleWishlist, isInWishlist, isPending } = useWishlistMutation(product.id);
@@ -60,19 +59,6 @@ const ProductCard = ({
   });
 
   const isAdmin = userType === 'admin';
-
-  // Convert price effect
-  useEffect(() => {
-    const updatePrice = async () => {
-      const converted = await convertCurrency(
-        product.price || 0,
-        (product.currency || "SSP") as SupportedCurrency,
-        selectedCurrency
-      );
-      setConvertedPrice(converted);
-    };
-    updatePrice();
-  }, [product.price, product.currency, selectedCurrency]);
 
   const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -105,7 +91,6 @@ const ProductCard = ({
       <ProductCardContent
         product={product}
         selectedCurrency={selectedCurrency}
-        convertedPrice={convertedPrice}
       />
       
       <ProductCardActions
