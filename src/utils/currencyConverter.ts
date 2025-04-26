@@ -53,6 +53,11 @@ export const convertCurrency = async (
   toCurrency: SupportedCurrency
 ): Promise<number> => {
   try {
+    // If currencies are the same, no conversion needed
+    if (fromCurrency === toCurrency) {
+      return amount;
+    }
+    
     const rates = await getCurrencyRates();
     console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`, { rates });
 

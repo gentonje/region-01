@@ -21,11 +21,13 @@ export const ProductCardContent = memo(({
     const updatePrice = async () => {
       setIsLoading(true);
       try {
+        console.log(`Converting price for ${product.title} from ${product.currency} to ${selectedCurrency}`);
         const converted = await convertCurrency(
           product.price || 0,
           (product.currency || "SSP") as SupportedCurrency,
           selectedCurrency
         );
+        console.log(`Converted price: ${converted}`);
         setConvertedPrice(converted);
       } catch (error) {
         console.error('Error converting price:', error);
