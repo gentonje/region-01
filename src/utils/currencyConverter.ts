@@ -10,7 +10,7 @@ interface CurrencyRate {
 
 let ratesCache: Record<string, number> | null = null;
 let lastFetchTime = 0;
-const CACHE_DURATION = 60000; // 1 minute in milliseconds (reduced from 1 hour)
+const CACHE_DURATION = 30000; // 30 seconds - reduced for more immediate updates
 
 const getCurrencyRates = async (): Promise<Record<string, number>> => {
   const currentTime = Date.now();
@@ -47,6 +47,12 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
   }
 };
 
+// Force a refresh of the rates cache
+export const refreshCurrencyRates = async (): Promise<void> => {
+  lastFetchTime = 0; // Reset the cache timer to force a fresh fetch
+  await getCurrencyRates();
+};
+
 export const convertCurrency = async (
   amount: number,
   fromCurrency: SupportedCurrency,
@@ -78,5 +84,5 @@ export const convertCurrency = async (
   }
 };
 
-// Initialize rates cache with a shorter cache duration
+// Initialize rates cache
 getCurrencyRates().catch(console.error);

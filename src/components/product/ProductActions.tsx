@@ -2,7 +2,7 @@
 import { Button } from "../ui/button";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useEffect, useState } from "react";
-import { convertCurrency } from "@/utils/currencyConverter";
+import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 
 interface ProductActionsProps {
   price: number;
@@ -25,10 +25,24 @@ export const ProductActions = ({
 }: ProductActionsProps) => {
   const [displayPrice, setDisplayPrice] = useState(convertedPrice);
   
-  // Update display price when selected currency changes
+  // Update display price immediately when selected currency changes
   useEffect(() => {
-    setDisplayPrice(convertedPrice);
-  }, [convertedPrice, selectedCurrency]);
+    const updatePrice = async () => {
+      // Force a refresh of currency rates
+      await refreshCurrencyRates();
+      
+      // Convert the price again with fresh rates
+      const freshConvertedPrice = await convertCurrency(
+        price,
+        currency as SupportedCurrency,
+        selectedCurrency
+      );
+      
+      setDisplayPrice(freshConvertedPrice);
+    };
+    
+    updatePrice();
+  }, [convertedPrice, selectedCurrency, price, currency]);
 
   return (
     <div className="flex justify-between items-center w-full">

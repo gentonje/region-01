@@ -32,11 +32,26 @@ const App = () => {
 
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     console.log("Changing currency to:", currency);
+    
+    // Update the selected currency immediately
     setSelectedCurrency(currency);
     
-    // Force refresh of currency data
+    // Force refresh all relevant queries to ensure immediate updates
     queryClient.invalidateQueries({ queryKey: ['currencies'] });
+    queryClient.invalidateQueries({ queryKey: ['products'] });
+    queryClient.invalidateQueries({ queryKey: ['similar-products'] });
+    
+    // Store the selected currency in local storage for persistence
+    localStorage.setItem('selectedCurrency', currency);
   };
+  
+  // Load saved currency preference on app init
+  React.useEffect(() => {
+    const savedCurrency = localStorage.getItem('selectedCurrency') as SupportedCurrency;
+    if (savedCurrency) {
+      setSelectedCurrency(savedCurrency);
+    }
+  }, []);
 
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>

@@ -2,7 +2,7 @@
 import { Card, CardContent } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { convertCurrency } from "@/utils/currencyConverter";
+import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 import { useState, useEffect } from "react";
 
 interface ProductSimilarProps {
@@ -20,9 +20,12 @@ export const ProductSimilar = ({
 }: ProductSimilarProps) => {
   const [convertedPrices, setConvertedPrices] = useState<Record<string, number>>({});
 
-  // Update prices when selectedCurrency changes
+  // Update prices immediately when selectedCurrency changes
   useEffect(() => {
     const updatePrices = async () => {
+      // Force refresh currency rates when currency changes
+      await refreshCurrencyRates();
+      
       const prices: Record<string, number> = {};
       for (const product of products) {
         prices[product.id] = await convertCurrency(
