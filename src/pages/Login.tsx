@@ -68,10 +68,10 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-start bg-white">
+    <div className="min-h-screen w-full flex flex-col items-center justify-start bg-background">
       <div className="w-full max-w-md space-y-6 p-4 pt-16">
         {/* Title Section */}
-        <h1 className="text-4xl font-bold text-gray-900">
+        <h1 className="text-4xl font-bold text-foreground">
           {mode === 'sign_in' ? 'Sign in' : 'Sign up'}
         </h1>
         
@@ -79,7 +79,7 @@ const Login = () => {
         <div className="space-y-3">
           <Button
             variant="outline"
-            className="w-full py-6 bg-[#f5f5f4] hover:bg-[#e7e5e4] border border-gray-200 flex items-center justify-center gap-2 font-medium text-base"
+            className="w-full py-6 bg-muted hover:bg-muted/80 border border-input flex items-center justify-center gap-2 font-medium text-base text-foreground"
             onClick={() => handleOAuthSignIn('github')}
           >
             <Github className="w-5 h-5" />
@@ -88,7 +88,7 @@ const Login = () => {
           
           <Button
             variant="outline"
-            className="w-full py-6 bg-[#dbeafe] hover:bg-[#bfdbfe] border border-gray-200 text-gray-800 flex items-center justify-center gap-2 font-medium text-base"
+            className="w-full py-6 bg-blue-100 hover:bg-blue-200 border border-input dark:bg-blue-900 dark:hover:bg-blue-800 dark:border-blue-700 text-foreground flex items-center justify-center gap-2 font-medium text-base"
             onClick={() => handleOAuthSignIn('google')}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -104,14 +104,14 @@ const Login = () => {
         {/* Divider */}
         <div className="relative flex items-center justify-center">
           <Separator className="flex-grow" />
-          <span className="mx-4 text-gray-500 text-sm py-2">OR</span>
+          <span className="mx-4 text-muted-foreground text-sm py-2">OR</span>
           <Separator className="flex-grow" />
         </div>
         
         {/* Email/Password Form */}
         <form onSubmit={handleSignInWithEmail} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
               Email
             </label>
             <Input
@@ -121,19 +121,19 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
               required
-              className="w-full py-5 px-3 bg-white border border-gray-300 rounded-md"
+              className="w-full py-5 px-3 bg-background border-input text-foreground"
             />
           </div>
           
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Password
               </label>
               <a 
                 href="#" 
                 onClick={(e) => { e.preventDefault(); toast.info("Password reset functionality will be added soon."); }} 
-                className="text-sm text-gray-600 hover:text-gray-800"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Forgot password?
               </a>
@@ -145,20 +145,20 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               required
-              className="w-full py-5 px-3 bg-white border border-gray-300 rounded-md"
+              className="w-full py-5 px-3 bg-background border-input text-foreground"
             />
           </div>
           
           <Button
             type="submit"
-            className="w-full py-6 bg-black hover:bg-gray-800 text-white font-medium text-base"
+            className="w-full py-6 bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-base"
             disabled={loading}
           >
             {loading ? 'Processing...' : (mode === 'sign_in' ? 'Sign in' : 'Sign up')}
           </Button>
           
           <div className="text-center mt-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {mode === 'sign_in' ? "Don't have an account? " : "Already have an account? "}
               <a
                 href="#"
@@ -166,7 +166,7 @@ const Login = () => {
                   e.preventDefault();
                   setMode(mode === 'sign_in' ? 'sign_up' : 'sign_in');
                 }}
-                className="text-gray-900 font-medium hover:underline"
+                className="text-foreground font-medium hover:underline"
               >
                 {mode === 'sign_in' ? 'Sign Up' : 'Sign In'}
               </a>
