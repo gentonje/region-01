@@ -33,6 +33,9 @@ const App = () => {
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     console.log("Changing currency to:", currency);
     setSelectedCurrency(currency);
+    
+    // Force refresh of currency data
+    queryClient.invalidateQueries({ queryKey: ['currencies'] });
   };
 
   return (

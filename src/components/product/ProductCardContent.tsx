@@ -21,6 +21,7 @@ export const ProductCardContent = memo(({
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Use both product price and selectedCurrency as dependencies to trigger updates
   useEffect(() => {
     const updatePrice = async () => {
       setIsLoading(true);

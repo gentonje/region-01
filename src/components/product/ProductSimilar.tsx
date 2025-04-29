@@ -1,3 +1,4 @@
+
 import { Card, CardContent } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -19,6 +20,7 @@ export const ProductSimilar = ({
 }: ProductSimilarProps) => {
   const [convertedPrices, setConvertedPrices] = useState<Record<string, number>>({});
 
+  // Update prices when selectedCurrency changes
   useEffect(() => {
     const updatePrices = async () => {
       const prices: Record<string, number> = {};
