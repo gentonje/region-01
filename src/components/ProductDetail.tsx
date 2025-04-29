@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Suspense, useState, useEffect } from "react";
 import { ProductGallery } from "./product/ProductGallery";
@@ -100,9 +101,9 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-1 pb-1">
       <Card className="w-full max-w-2xl mx-auto">
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-1 p-1">
           <ProductInfo
             title={product.title || ''}
             category={product.category || 'Other'}
@@ -129,7 +130,7 @@ const ProductDetail = ({
           </Suspense>
         </CardContent>
 
-        <CardFooter>
+        <CardFooter className="p-1">
           <ProductActions
             price={product.price || 0}
             currency={product.currency || "SSP"}

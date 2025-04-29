@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "../ui/skeleton";
 import { useState, useEffect } from "react";
@@ -36,7 +37,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   }, [selectedImage, images]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100">
         <ImageLoader
           src={mainImageUrl}
@@ -47,11 +48,11 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
           priority={true}
         />
       </div>
-      <div className="flex gap-4 overflow-x-auto pb-4 px-2 pt-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+      <div className="flex gap-1 overflow-x-auto pb-1 px-1 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {images.map((image, index) => (
           <div
             key={index}
-            className={`relative min-w-[80px] h-20 rounded-md overflow-hidden cursor-pointer transition-all hover:opacity-90 ${
+            className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all hover:opacity-90 ${
               selectedImage === image.storage_path ? 'ring-2 ring-primary' : ''
             }`}
             onClick={() => onImageSelect(image.storage_path)}
@@ -60,8 +61,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
               src={thumbnailUrls[image.storage_path] || ''}
               alt={`${title} ${index + 1}`}
               className="w-full h-full object-cover"
-              width={80}
-              height={80}
+              width={60}
+              height={60}
               priority={false}
             />
           </div>

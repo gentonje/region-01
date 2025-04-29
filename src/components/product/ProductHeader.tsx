@@ -1,3 +1,4 @@
+
 import { ArrowLeft, Star } from "lucide-react";
 import { Button } from "../ui/button";
 import { CardTitle } from "../ui/card";
@@ -29,7 +30,7 @@ export const ProductHeader = ({ title, category, averageRating, onBack }: Produc
   return (
     <div className="space-y-1">
       <div className="flex items-center">
-        <Button variant="ghost" size="icon" onClick={onBack} className="mr-2">
+        <Button variant="ghost" size="icon" onClick={onBack} className="mr-1 p-1">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <CardTitle className="text-2xl">{title}</CardTitle>
