@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { MessageSquare, Send, Star, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MessageSquare, Send, Star, User, Edit2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { ScrollArea } from "../ui/scroll-area";
@@ -43,6 +43,8 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
   const [newReview, setNewReview] = useState("");
   const [selectedRating, setSelectedRating] = useState(5);
   const [replyContent, setReplyContent] = useState<{ [key: string]: string }>({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [existingReviewId, setExistingReviewId] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -78,6 +80,23 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
     }
   });
 
+  // Check if user has already reviewed this product and load their review for editing
+  useEffect(() => {
+    if (currentUser && reviews) {
+      const userReview = reviews.find(review => review.user_id === currentUser.id);
+      if (userReview) {
+        setExistingReviewId(userReview.id);
+        // Pre-fill the form with existing review data only if user is in editing mode
+        if (isEditing) {
+          setNewReview(userReview.comment || '');
+          setSelectedRating(userReview.rating);
+        }
+      } else {
+        setExistingReviewId(null);
+      }
+    }
+  }, [currentUser, reviews, isEditing]);
+
   const addReviewMutation = useMutation({
     mutationFn: async () => {
       if (!currentUser) throw new Error("Must be logged in to review");
@@ -106,7 +125,41 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
     onError: (error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Failed to add review",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const updateReviewMutation = useMutation({
+    mutationFn: async () => {
+      if (!currentUser) throw new Error("Must be logged in to update a review");
+      if (!existingReviewId) throw new Error("No existing review to update");
+
+      const { error } = await supabase
+        .from('reviews')
+        .update({
+          rating: selectedRating,
+          comment: newReview
+        })
+        .eq('id', existingReviewId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', productId] });
+      setNewReview("");
+      setSelectedRating(5);
+      setIsEditing(false);
+      toast({
+        title: "Review updated",
+        description: "Your review has been updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to update review",
         variant: "destructive",
       });
     }
@@ -137,7 +190,7 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
     onError: (error) => {
       toast({
         title: "Error",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Failed to add reply",
         variant: "destructive",
       });
     }
@@ -145,7 +198,29 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    addReviewMutation.mutate();
+    
+    if (existingReviewId && isEditing) {
+      // Update existing review
+      updateReviewMutation.mutate();
+    } else if (!existingReviewId) {
+      // Add new review
+      addReviewMutation.mutate();
+    }
+  };
+
+  const handleEditReview = () => {
+    setIsEditing(true);
+    const userReview = reviews?.find(review => review.user_id === currentUser?.id);
+    if (userReview) {
+      setNewReview(userReview.comment || '');
+      setSelectedRating(userReview.rating);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setNewReview('');
+    setSelectedRating(5);
   };
 
   const handleSubmitReply = async (reviewId: string) => {
@@ -156,6 +231,7 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
   };
 
   const canReview = currentUser && currentUser.id !== sellerId;
+  const hasReviewed = existingReviewId !== null;
 
   // Function to format date
   const formatDate = (dateString: string) => {
@@ -180,40 +256,77 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
       </div>
       
       {canReview && (
-        <form onSubmit={handleSubmitReview} className="space-y-1 bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-medium">Your rating:</span>
-            <div className="flex items-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Star
-                  key={star}
-                  size={18}
-                  className={`cursor-pointer ${
-                    star <= selectedRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-                  }`}
-                  onClick={() => setSelectedRating(star)}
-                />
-              ))}
+        <div>
+          {hasReviewed && !isEditing ? (
+            <div className="flex items-center justify-between bg-gray-50 dark:bg-gray-800/50 p-2 rounded-md border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-muted-foreground">
+                You have already reviewed this product.
+              </p>
+              <Button 
+                onClick={handleEditReview} 
+                variant="outline" 
+                size="sm"
+                className="flex items-center"
+              >
+                <Edit2 className="mr-1 h-4 w-4" />
+                Edit Your Review
+              </Button>
             </div>
-          </div>
-          <Textarea
-            placeholder="Write your review..."
-            value={newReview}
-            onChange={(e) => setNewReview(e.target.value)}
-            className="resize-none bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-          />
-          <div className="flex justify-end">
-            <Button 
-              type="submit" 
-              disabled={addReviewMutation.isPending}
-              size="sm"
-              className="flex items-center"
-            >
-              <Send className="mr-1 h-4 w-4" />
-              {addReviewMutation.isPending ? 'Posting...' : 'Post Review'}
-            </Button>
-          </div>
-        </form>
+          ) : (
+            <form onSubmit={handleSubmitReview} className="space-y-1 bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-sm font-medium">Your rating:</span>
+                  <div className="flex items-center">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={18}
+                        className={`cursor-pointer ${
+                          star <= selectedRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                        }`}
+                        onClick={() => setSelectedRating(star)}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {isEditing && (
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={handleCancelEdit}
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+              <Textarea
+                placeholder="Write your review..."
+                value={newReview}
+                onChange={(e) => setNewReview(e.target.value)}
+                className="resize-none bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+              />
+              <div className="flex justify-end">
+                <Button 
+                  type="submit" 
+                  disabled={addReviewMutation.isPending || updateReviewMutation.isPending}
+                  size="sm"
+                  className="flex items-center"
+                >
+                  <Send className="mr-1 h-4 w-4" />
+                  {hasReviewed && isEditing 
+                    ? updateReviewMutation.isPending 
+                      ? 'Updating...' 
+                      : 'Update Review' 
+                    : addReviewMutation.isPending 
+                      ? 'Posting...' 
+                      : 'Post Review'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
       )}
 
       <ScrollArea className="h-[320px] pr-1">
