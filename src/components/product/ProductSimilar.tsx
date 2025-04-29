@@ -75,19 +75,19 @@ export const ProductSimilar = ({
           return (
             <Card 
               key={similarProduct.id}
-              className="w-full m-1 p-1 overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gray-900 border-gray-800 cursor-pointer"
+              className="w-full m-1 p-1 overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer"
               onClick={() => onProductClick(similarProduct)}
             >
               {/* Product Image Section - Matching main card design */}
-              <div className="w-full relative overflow-hidden bg-gray-900">
+              <div className="w-full relative overflow-hidden bg-gray-100 dark:bg-gray-900">
                 {/* Decorative orange element in top left */}
                 <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
                 
-                <AspectRatio ratio={4/3} className="bg-gray-900">
+                <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900">
                   <ImageLoader
                     src={getProductImageUrl(similarProduct)}
                     alt={similarProduct.title || ""}
-                    className="w-full h-full object-cover opacity-90"
+                    className="w-full h-full object-cover opacity-100 dark:opacity-90"
                     width={400}
                     height={300}
                     priority={false}
@@ -130,12 +130,12 @@ export const ProductSimilar = ({
               {/* Product Content Section */}
               <div className="p-2 space-y-1">
                 <div className="pt-0">
-                  <h3 className="text-sm font-medium truncate text-gray-100 min-w-[100px] text-left">
+                  <h3 className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left">
                     {similarProduct.title}
                   </h3>
                 </div>
                 <div className="h-[20px] overflow-hidden">
-                  <p className="text-xs text-gray-300 line-clamp-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
                     {similarProduct.description}
                   </p>
                 </div>

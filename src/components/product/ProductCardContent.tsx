@@ -47,12 +47,12 @@ export const ProductCardContent = memo(({
   return (
     <CardContent className="p-0 space-y-0.5">
       <div className="pt-0">
-        <CardTitle className="text-sm font-medium truncate text-gray-100 min-w-[100px] text-left px-2">
+        <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left px-2">
           {product.title}
         </CardTitle>
       </div>
       <div className="h-[20px] overflow-hidden px-2">
-        <p className="text-xs text-gray-300 line-clamp-1">
+        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
           {product.description}
         </p>
       </div>
