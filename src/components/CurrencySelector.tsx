@@ -57,12 +57,16 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
         return fallbackCurrencies;
       }
     },
-    onError: (error) => {
-      console.error('Query error fetching currencies:', error);
-      toast.error('Failed to load currencies, using defaults');
-    },
+    // Remove the onError property and handle errors within queryFn
     retry: 1,
     retryDelay: 1000,
+    // Use onSettled which is supported in the current version
+    meta: {
+      onError: (error: Error) => {
+        console.error('Query error fetching currencies:', error);
+        toast.error('Failed to load currencies, using defaults');
+      }
+    }
   });
 
   // Ensure we always have some currencies to display
