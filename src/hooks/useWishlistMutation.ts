@@ -91,6 +91,7 @@ export function useWishlistMutation(productId: string) {
       }
     },
     onSuccess: () => {
+      // Invalidate all relevant queries to ensure UI is updated
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist-items'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist', productId, session?.user?.id] });
