@@ -21,19 +21,26 @@ export const ProductCardContent = memo(({
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Update immediately when currency changes
+  // Update immediately when currency changes or product changes
   useEffect(() => {
     const updatePrice = async () => {
       setIsLoading(true);
       try {
-        console.log(`Converting price for ${product.title} from ${product.currency} to ${selectedCurrency}`);
-        const converted = await convertCurrency(
-          product.price || 0,
-          (product.currency || "SSP") as SupportedCurrency,
-          selectedCurrency
-        );
-        console.log(`Converted price: ${converted}`);
-        setConvertedPrice(converted);
+        // If the selected currency is SSP, just use the exact database price
+        if (selectedCurrency === "SSP") {
+          console.log(`Displaying original SSP price for ${product.title}: ${product.price}`);
+          setConvertedPrice(product.price || 0);
+        } else {
+          // Only convert if we're going from SSP to another currency (mainly USD)
+          console.log(`Converting price for ${product.title} from ${product.currency} to ${selectedCurrency}`);
+          const converted = await convertCurrency(
+            product.price || 0,
+            (product.currency || "SSP") as SupportedCurrency,
+            selectedCurrency
+          );
+          console.log(`Converted price: ${converted}`);
+          setConvertedPrice(converted);
+        }
       } catch (error) {
         console.error('Error converting price:', error);
       } finally {

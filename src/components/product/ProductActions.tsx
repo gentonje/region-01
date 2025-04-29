@@ -1,4 +1,3 @@
-
 import { Button } from "../ui/button";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useEffect, useState } from "react";
@@ -29,10 +28,16 @@ export const ProductActions = ({
   // Update display price immediately when selected currency changes
   useEffect(() => {
     const updatePrice = async () => {
-      // Force a refresh of currency rates
+      // If selected currency is SSP, use the exact database price
+      if (selectedCurrency === "SSP") {
+        setDisplayPrice(price);
+        return;
+      }
+      
+      // Otherwise, refresh rates and convert from SSP to the selected currency
       await refreshCurrencyRates();
       
-      // Convert the price again with fresh rates
+      // Convert the price with fresh rates
       const freshConvertedPrice = await convertCurrency(
         price,
         currency as SupportedCurrency,
