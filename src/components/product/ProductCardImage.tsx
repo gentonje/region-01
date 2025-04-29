@@ -38,8 +38,8 @@ export const ProductCardImage = memo(({
         onClick?.();
       }}
     >
-      {/* Decorative orange element in top left for aesthetics */}
-      <div className="absolute top-12 left-0 z-10 bg-orange-500 h-6 w-20 rounded-r-lg opacity-90"></div>
+      {/* Decorative orange element in top left with lower z-index */}
+      <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
       
       {/* Using AspectRatio component for 4:3 ratio */}
       <AspectRatio ratio={4/3} className="bg-gray-900">
@@ -81,7 +81,7 @@ export const ProductCardImage = memo(({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70"
+          className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
