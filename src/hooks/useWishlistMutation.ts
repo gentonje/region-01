@@ -29,7 +29,15 @@ export function useWishlistMutation(productId: string) {
           .eq('wishlist_id', wishlist.id)
           .eq('product_id', productId);
 
-        if (itemError) return false;
+        if (itemError) {
+          console.error('Wishlist item query error:', itemError);
+          return false;
+        }
+        
+        // Log the results for debugging
+        console.log(`Checking wishlist status for product ${productId}:`, 
+          wishlistItems && wishlistItems.length > 0);
+          
         return wishlistItems && wishlistItems.length > 0;
       } catch (error) {
         console.error('Wishlist query error:', error);
@@ -47,6 +55,9 @@ export function useWishlistMutation(productId: string) {
         throw new Error('Please login to add items to wishlist');
       }
 
+      // Log the operation start
+      console.log(`Toggling wishlist item for product ${productId}`);
+
       const { data: existingWishlist, error: wishlistError } = await supabase
         .from('wishlists')
         .select('id')
@@ -55,6 +66,7 @@ export function useWishlistMutation(productId: string) {
 
       let wishlistId;
       if (!existingWishlist) {
+        console.log('Creating new wishlist for user', session.user.id);
         const { data: newWishlist, error: createError } = await supabase
           .from('wishlists')
           .insert({
@@ -65,21 +77,31 @@ export function useWishlistMutation(productId: string) {
           .select()
           .single();
 
-        if (createError) throw createError;
+        if (createError) {
+          console.error('Wishlist creation error:', createError);
+          throw createError;
+        }
         wishlistId = newWishlist.id;
+        console.log('New wishlist created with ID:', wishlistId);
       } else {
         wishlistId = existingWishlist.id;
+        console.log('Using existing wishlist with ID:', wishlistId);
       }
 
       if (isInWishlist) {
+        console.log(`Removing product ${productId} from wishlist ${wishlistId}`);
         const { error: removeError } = await supabase
           .from('wishlist_items')
           .delete()
           .eq('wishlist_id', wishlistId)
           .eq('product_id', productId);
 
-        if (removeError) throw removeError;
+        if (removeError) {
+          console.error('Wishlist item removal error:', removeError);
+          throw removeError;
+        }
       } else {
+        console.log(`Adding product ${productId} to wishlist ${wishlistId}`);
         const { error: addError } = await supabase
           .from('wishlist_items')
           .insert({
@@ -87,11 +109,16 @@ export function useWishlistMutation(productId: string) {
             product_id: productId
           });
 
-        if (addError) throw addError;
+        if (addError) {
+          console.error('Wishlist item addition error:', addError);
+          throw addError;
+        }
       }
+      
+      console.log('Wishlist operation completed successfully');
     },
     onSuccess: () => {
-      // Invalidate all relevant queries to ensure UI is updated
+      // Force refetch wishlist data
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist-items'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist', productId, session?.user?.id] });

@@ -4,44 +4,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { WishlistItem } from "@/components/wishlist/WishlistItem";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Heart } from "lucide-react";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect } from "react";
 
 const Wishlist = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
 
-  const { data: wishlistItems, isLoading, refetch } = useQuery({
+  const { data: wishlistItems, isLoading, error, refetch } = useQuery({
     queryKey: ["wishlist-items", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) {
-        navigate("/login");
         return [];
       }
 
       try {
-        // Get the user's wishlist - here we select all wishlists for the user
+        console.log("Fetching wishlist for user:", session.user.id);
+        
+        // Get the user's wishlist
         const { data: wishlists, error: wishlistError } = await supabase
           .from("wishlists")
           .select("id")
           .eq("user_id", session.user.id);
 
         if (wishlistError) {
-          console.error("Error fetching wishlist:", wishlistError);
-          toast({
-            title: "Error",
-            description: "Failed to fetch wishlist",
-            variant: "destructive",
-          });
+          console.error("Error fetching wishlists:", wishlistError);
           return [];
         }
 
-        // If no wishlist exists, create one
         if (!wishlists || wishlists.length === 0) {
+          console.log("No wishlist found for user, creating one");
           const { data: newWishlist, error: createError } = await supabase
             .from("wishlists")
             .insert({
@@ -54,20 +51,16 @@ const Wishlist = () => {
 
           if (createError) {
             console.error("Error creating wishlist:", createError);
-            toast({
-              title: "Error",
-              description: "Failed to create wishlist",
-              variant: "destructive",
-            });
             return [];
           }
           
-          // Use the newly created wishlist
+          console.log("Created new wishlist:", newWishlist);
           return [];
         }
 
-        // Use the first wishlist from the list (or handle multiple wishlists if needed)
+        // Use the first wishlist
         const wishlistId = wishlists[0]?.id;
+        console.log("Using wishlist ID:", wishlistId);
 
         // Get wishlist items with product details
         const { data: items, error: itemsError } = await supabase
@@ -82,6 +75,7 @@ const Wishlist = () => {
               price,
               currency,
               in_stock,
+              category,
               product_images (
                 storage_path,
                 is_main
@@ -92,11 +86,6 @@ const Wishlist = () => {
 
         if (itemsError) {
           console.error("Error fetching wishlist items:", itemsError);
-          toast({
-            title: "Error",
-            description: "Failed to fetch wishlist items",
-            variant: "destructive",
-          });
           return [];
         }
 
@@ -104,17 +93,24 @@ const Wishlist = () => {
         return items || [];
       } catch (error) {
         console.error("Unexpected error:", error);
-        toast({
-          title: "Error",
-          description: "An unexpected error occurred",
-          variant: "destructive",
-        });
         return [];
       }
     },
     enabled: !!session?.user,
-    retry: 1
+    retry: 1,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 1, // 1 minute
   });
+
+  useEffect(() => {
+    // Force refetch when the component mounts
+    refetch();
+  }, [refetch, session?.user?.id]);
+
+  if (error) {
+    console.error("Wishlist query error:", error);
+    toast.error("Failed to load wishlist items");
+  }
 
   if (!session) {
     navigate("/login");
@@ -176,7 +172,7 @@ const Wishlist = () => {
             Your wishlist is empty. Browse products to add items to your wishlist.
           </p>
           <Button 
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/products")}
             className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
           >
             Start Shopping
