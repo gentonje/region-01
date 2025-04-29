@@ -10,6 +10,8 @@ import { Button } from "../ui/button";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCartMutations } from "@/hooks/useCartMutations";
+import { toast } from "sonner";
 
 interface ProductSimilarProps {
   products: Product[];
@@ -26,6 +28,7 @@ export const ProductSimilar = ({
 }: ProductSimilarProps) => {
   const [convertedPrices, setConvertedPrices] = useState<Record<string, number>>({});
   const { session } = useAuth();
+  const { addItemMutation } = useCartMutations();
 
   // Update prices immediately when selectedCurrency changes
   useEffect(() => {
@@ -45,6 +48,20 @@ export const ProductSimilar = ({
     };
     updatePrices();
   }, [products, selectedCurrency]);
+
+  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
+    e.stopPropagation(); // Prevent clicking through to the product detail
+    
+    if (!product.in_stock) {
+      toast.error('This product is out of stock');
+      return;
+    }
+    
+    addItemMutation.mutate({ 
+      productId: product.id,
+      quantity: 1
+    });
+  };
 
   if (!products?.length) return null;
 
@@ -131,9 +148,11 @@ export const ProductSimilar = ({
                     size="sm" 
                     className="h-7 px-3 py-0 text-xs"
                     variant="secondary"
+                    onClick={(e) => handleAddToCart(e, similarProduct)}
+                    disabled={!similarProduct.in_stock || addItemMutation.isPending}
                   >
                     <ShoppingCart className="h-3 w-3 mr-1" />
-                    View
+                    Add to Cart
                   </Button>
                 </div>
               </div>
