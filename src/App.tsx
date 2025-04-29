@@ -28,7 +28,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
 
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     console.log("Changing currency to:", currency);

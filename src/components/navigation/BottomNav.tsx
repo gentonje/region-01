@@ -14,7 +14,7 @@ interface BottomNavProps {
 
 export const BottomNav = ({
   isAuthenticated,
-  selectedCurrency = "SSP",
+  selectedCurrency = "USD",
   onCurrencyChange
 }: BottomNavProps) => {
   const location = useLocation();
@@ -23,7 +23,7 @@ export const BottomNav = ({
 
   const handleCurrencyToggle = () => {
     if (onCurrencyChange) {
-      onCurrencyChange(selectedCurrency === "SSP" ? "USD" : "SSP");
+      onCurrencyChange(selectedCurrency === "USD" ? "SSP" : "USD");
     }
   };
 
@@ -51,7 +51,7 @@ export const BottomNav = ({
           </Link>
 
           <Toggle
-            pressed={selectedCurrency === "USD"}
+            pressed={selectedCurrency === "SSP"}
             onPressedChange={handleCurrencyToggle}
             className={cn(
               "flex flex-col items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
@@ -84,7 +84,7 @@ export const BottomNav = ({
         </Link>
 
         <Toggle
-          pressed={selectedCurrency === "USD"}
+          pressed={selectedCurrency === "SSP"}
           onPressedChange={handleCurrencyToggle}
           className={cn(
             "flex flex-col items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
@@ -98,4 +98,3 @@ export const BottomNav = ({
     </nav>
   );
 };
-

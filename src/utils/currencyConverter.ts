@@ -29,13 +29,13 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
 
     if (error) {
       console.error('Error fetching currency rates:', error);
-      return ratesCache || { SSP: 1, USD: 0.0016 }; // Fallback rates
+      return ratesCache || { USD: 1, SSP: 625 }; // Fallback rates with USD as base
     }
 
     const rates = data.reduce((acc: Record<string, number>, curr: CurrencyRate) => ({
       ...acc,
       [curr.code]: curr.rate
-    }), { SSP: 1 }); // SSP is our base currency
+    }), { USD: 1 }); // USD is our base currency
 
     console.log('Fetched rates:', rates);
     ratesCache = rates;
@@ -43,7 +43,7 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
     return rates;
   } catch (error) {
     console.error('Error in getCurrencyRates:', error);
-    return ratesCache || { SSP: 1, USD: 0.0016 }; // Fallback rates
+    return ratesCache || { USD: 1, SSP: 625 }; // Fallback rates with USD as base
   }
 };
 
@@ -72,10 +72,10 @@ export const convertCurrency = async (
       return amount;
     }
 
-    // Convert to base currency (SSP) first
-    const amountInSSP = amount / rates[fromCurrency];
-    // Convert from SSP to target currency
-    const result = Number((amountInSSP * rates[toCurrency]).toFixed(2));
+    // Convert to base currency (USD) first
+    const amountInUSD = amount / rates[fromCurrency];
+    // Convert from USD to target currency
+    const result = Number((amountInUSD * rates[toCurrency]).toFixed(2));
     console.log('Conversion result:', result);
     return result;
   } catch (error) {
