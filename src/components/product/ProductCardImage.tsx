@@ -1,11 +1,10 @@
-
 import { Heart } from "lucide-react";
 import { Button } from "../ui/button";
 import { ImageLoader } from "../ImageLoader";
 import { Product } from "@/types/product";
 import { Session } from "@supabase/supabase-js";
 import { memo } from "react";
-import { AspectRatio } from "../ui/aspect-ratio";
+import { UseMutateFunction } from "@tanstack/react-query";
 
 interface ProductCardImageProps {
   product: Product;
@@ -32,31 +31,23 @@ export const ProductCardImage = memo(({
 }: ProductCardImageProps) => {
   return (
     <div 
-      className="w-full relative overflow-hidden cursor-pointer bg-gray-900"
+      className="h-44 w-full relative overflow-hidden cursor-pointer bg-gray-900"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
       }}
     >
-      {/* Decorative orange element in top left for aesthetics */}
-      <div className="absolute top-12 left-0 z-10 bg-orange-500 h-6 w-20 rounded-r-lg opacity-90"></div>
-      
-      {/* Using AspectRatio component for 4:3 ratio */}
-      <AspectRatio ratio={4/3} className="bg-gray-900">
-        <ImageLoader
-          src={imageUrl}
-          alt={product.title || ""}
-          className="w-full h-full object-cover opacity-90"
-          width={400}
-          height={300}
-          priority={false}
-        />
-      </AspectRatio>
-      
+      <ImageLoader
+        src={imageUrl}
+        alt={product.title || ""}
+        className="w-full h-full object-cover opacity-90"
+        width={400}
+        height={208}
+        priority={false}
+      />
       <span className="absolute bottom-1 left-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%]">
         {product.category}
       </span>
-      
       <span 
         className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
           product.in_stock 
@@ -66,7 +57,6 @@ export const ProductCardImage = memo(({
       >
         {product.in_stock ? 'In Stock' : 'Out of Stock'}
       </span>
-      
       {showStatus && (
         <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full ${
           product.product_status === 'published' 
@@ -76,7 +66,6 @@ export const ProductCardImage = memo(({
           {product.product_status === 'published' ? 'Published' : 'Unpublished'}
         </span>
       )}
-      
       {session && !isAdmin && (
         <Button
           variant="ghost"
