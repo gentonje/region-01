@@ -38,7 +38,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
 
   return (
     <div className="space-y-1">
-      <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100">
+      <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
         <ImageLoader
           src={mainImageUrl}
           alt={title}
@@ -52,8 +52,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
         {images.map((image, index) => (
           <div
             key={index}
-            className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all hover:opacity-90 ${
-              selectedImage === image.storage_path ? 'ring-2 ring-primary' : ''
+            className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all border hover:opacity-90 ${
+              selectedImage === image.storage_path ? 'ring-1 ring-primary border-primary' : 'border-gray-200 dark:border-gray-700'
             }`}
             onClick={() => onImageSelect(image.storage_path)}
           >

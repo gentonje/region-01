@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { MessageSquare, Send, Star } from "lucide-react";
+import { MessageSquare, Send, Star, User } from "lucide-react";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { ScrollArea } from "../ui/scroll-area";
@@ -7,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { StarRating } from "./ProductHeader";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "../ui/badge";
 
 interface Review {
   id: string;
@@ -153,84 +157,169 @@ export const ProductReviews = ({ productId, sellerId }: ProductReviewsProps) => 
 
   const canReview = currentUser && currentUser.id !== sellerId;
 
+  // Function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    }).format(date);
+  };
+
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Reviews</h3>
+    <div className="space-y-1 mt-1">
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold flex items-center">
+          <MessageSquare className="mr-1 h-5 w-5" />
+          Reviews & Comments
+        </h3>
+        <Badge variant="outline" className="text-xs">
+          {reviews?.length || 0} {reviews?.length === 1 ? 'review' : 'reviews'}
+        </Badge>
+      </div>
       
       {canReview && (
-        <form onSubmit={handleSubmitReview} className="space-y-2">
-          <div className="flex items-center gap-2">
-            <StarRating rating={selectedRating} />
-            <span className="text-sm text-muted-foreground">Select rating</span>
+        <form onSubmit={handleSubmitReview} className="space-y-1 bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-medium">Your rating:</span>
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={18}
+                  className={`cursor-pointer ${
+                    star <= selectedRating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+                  }`}
+                  onClick={() => setSelectedRating(star)}
+                />
+              ))}
+            </div>
           </div>
           <Textarea
             placeholder="Write your review..."
             value={newReview}
             onChange={(e) => setNewReview(e.target.value)}
+            className="resize-none bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
           />
-          <Button type="submit" disabled={addReviewMutation.isPending}>
-            Post Review
-          </Button>
+          <div className="flex justify-end">
+            <Button 
+              type="submit" 
+              disabled={addReviewMutation.isPending}
+              size="sm"
+              className="flex items-center"
+            >
+              <Send className="mr-1 h-4 w-4" />
+              {addReviewMutation.isPending ? 'Posting...' : 'Post Review'}
+            </Button>
+          </div>
         </form>
       )}
 
-      <div className="space-y-4">
-        {isLoadingReviews ? (
-          <div>Loading reviews...</div>
-        ) : (
-          <div className="space-y-4">
-            {reviews?.map((review) => (
-              <div key={review.id} className="border rounded-lg p-4 space-y-2">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{review.profiles.full_name}</div>
-                    <StarRating rating={review.rating} />
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {new Date(review.created_at).toLocaleDateString()}
-                  </div>
-                </div>
-                <p className="text-sm">{review.comment}</p>
-
-                <div className="ml-6 space-y-2">
-                  {review.review_replies?.map((reply) => (
-                    <div key={reply.id} className="border-l-2 pl-4 py-2">
-                      <div className="flex items-center justify-between">
-                        <div className="font-medium text-sm">{reply.profiles.full_name}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(reply.created_at).toLocaleDateString()}
+      <ScrollArea className="h-[320px] pr-1">
+        <div className="space-y-1">
+          {isLoadingReviews ? (
+            <div className="flex items-center justify-center h-20">
+              <p className="text-sm text-muted-foreground">Loading reviews...</p>
+            </div>
+          ) : reviews?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-20 py-1">
+              <MessageSquare className="h-10 w-10 text-muted-foreground mb-1" />
+              <p className="text-sm text-muted-foreground">No reviews yet. Be the first to review!</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {reviews?.map((review) => (
+                <div key={review.id} className="bg-white dark:bg-gray-800/30 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  <div className="p-1 space-y-1">
+                    {/* Review header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={review.profiles.avatar_url} />
+                          <AvatarFallback>
+                            <User className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="ml-1">
+                          <p className="text-sm font-medium">{review.profiles.full_name}</p>
+                          <div className="flex items-center">
+                            <StarRating rating={review.rating} />
+                            <span className="text-xs text-muted-foreground ml-1">
+                              {formatDate(review.created_at)}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <p className="text-sm">{reply.content}</p>
                     </div>
-                  ))}
 
-                  {currentUser && (
-                    <div className="flex gap-2">
-                      <Textarea
-                        placeholder="Write a reply..."
-                        value={replyContent[review.id] || ''}
-                        onChange={(e) => setReplyContent(prev => ({
-                          ...prev,
-                          [review.id]: e.target.value
-                        }))}
-                        className="text-sm"
-                      />
-                      <Button
-                        size="sm"
-                        onClick={() => handleSubmitReply(review.id)}
-                        disabled={addReplyMutation.isPending}
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                    {/* Review content */}
+                    <p className="text-sm">{review.comment}</p>
+                    
+                    {/* Review replies */}
+                    {review.review_replies?.length > 0 && (
+                      <div className="ml-1 mt-1 space-y-1 border-l-2 border-gray-200 dark:border-gray-700 pl-1">
+                        {review.review_replies.map((reply) => (
+                          <div key={reply.id} className="bg-gray-50 dark:bg-gray-800/50 rounded-sm p-1">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={reply.profiles.avatar_url} />
+                                  <AvatarFallback>
+                                    <User className="h-3 w-3" />
+                                  </AvatarFallback>
+                                </Avatar>
+                                <p className="font-medium text-xs ml-1">
+                                  {reply.profiles.full_name}
+                                </p>
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatDate(reply.created_at)}
+                              </div>
+                            </div>
+                            <p className="text-xs mt-1">{reply.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Reply form */}
+                    {currentUser && (
+                      <div className="mt-1 pt-1 border-t border-gray-100 dark:border-gray-700">
+                        <div className="flex gap-1">
+                          <Avatar className="h-6 w-6">
+                            <AvatarFallback>
+                              <User className="h-3 w-3" />
+                            </AvatarFallback>
+                          </Avatar>
+                          <Textarea
+                            placeholder="Write a reply..."
+                            value={replyContent[review.id] || ''}
+                            onChange={(e) => setReplyContent(prev => ({
+                              ...prev,
+                              [review.id]: e.target.value
+                            }))}
+                            className="text-xs min-h-[40px] py-1 resize-none bg-gray-50 dark:bg-gray-800/50"
+                          />
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => handleSubmitReply(review.id)}
+                            disabled={addReplyMutation.isPending}
+                          >
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </ScrollArea>
     </div>
   );
 };

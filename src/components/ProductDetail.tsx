@@ -12,6 +12,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Info, MessageSquare, PackageSearch } from "lucide-react";
 
 interface ProductDetailProps {
   product: Product;
@@ -24,7 +26,7 @@ const ProductDetail = ({
   product, 
   onBack, 
   getProductImageUrl,
-  selectedCurrency = "SSP" 
+  selectedCurrency = "USD" 
 }: ProductDetailProps) => {
   const [selectedImage, setSelectedImage] = useState<string>(
     product.product_images?.find(img => !img.is_main)?.storage_path || 
@@ -32,6 +34,7 @@ const ProductDetail = ({
     ''
   );
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
+  const [activeTab, setActiveTab] = useState("details");
 
   const queryClient = useQueryClient();
 
@@ -102,8 +105,8 @@ const ProductDetail = ({
 
   return (
     <div className="space-y-1 pb-1">
-      <Card className="w-full max-w-2xl mx-auto">
-        <CardContent className="space-y-1 p-1">
+      <Card className="w-full max-w-2xl mx-auto overflow-hidden">
+        <CardContent className="p-1">
           <ProductInfo
             title={product.title || ''}
             category={product.category || 'Other'}
@@ -122,12 +125,53 @@ const ProductDetail = ({
             />
           </Suspense>
 
-          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-            <ProductReviews 
-              productId={product.id} 
-              sellerId={product.seller_id || ''} 
-            />
-          </Suspense>
+          <Tabs defaultValue="details" className="mt-1" onValueChange={setActiveTab}>
+            <TabsList className="grid grid-cols-2 w-full">
+              <TabsTrigger value="details" className="flex items-center">
+                <Info className="h-4 w-4 mr-1" />
+                Details
+              </TabsTrigger>
+              <TabsTrigger value="reviews" className="flex items-center">
+                <MessageSquare className="h-4 w-4 mr-1" />
+                Reviews
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="details" className="pt-1">
+              <div className="space-y-1">
+                <div className="grid grid-cols-2 gap-x-1 gap-y-1">
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground">Category</p>
+                    <p className="text-sm font-medium">{product.category || 'Other'}</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground">Availability</p>
+                    <p className="text-sm font-medium">{product.in_stock ? 'In Stock' : 'Out of Stock'}</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground">Original Price</p>
+                    <p className="text-sm font-medium">{product.currency} {product.price?.toLocaleString()}</p>
+                  </div>
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                    <p className="text-xs text-muted-foreground">Rating</p>
+                    <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs text-muted-foreground">Product Description</p>
+                  <p className="text-sm">{product.description}</p>
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="reviews" className="pt-1">
+              <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+                <ProductReviews 
+                  productId={product.id} 
+                  sellerId={product.seller_id || ''} 
+                />
+              </Suspense>
+            </TabsContent>
+          </Tabs>
         </CardContent>
 
         <CardFooter className="p-1">
@@ -143,19 +187,25 @@ const ProductDetail = ({
         </CardFooter>
       </Card>
 
-      {similarProducts && (
-        <ProductSimilar
-          products={similarProducts}
-          getProductImageUrl={getProductImageUrl}
-          onProductClick={(similarProduct) => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            onBack();
-            setTimeout(() => {
+      {similarProducts && similarProducts.length > 0 && (
+        <div className="mt-1">
+          <div className="flex items-center mb-1">
+            <PackageSearch className="h-5 w-5 mr-1" />
+            <h3 className="text-lg font-semibold">Similar Products</h3>
+          </div>
+          <ProductSimilar
+            products={similarProducts}
+            getProductImageUrl={getProductImageUrl}
+            onProductClick={(similarProduct) => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
               onBack();
-            }, 100);
-          }}
-          selectedCurrency={selectedCurrency}
-        />
+              setTimeout(() => {
+                onBack();
+              }, 100);
+            }}
+            selectedCurrency={selectedCurrency}
+          />
+        </div>
       )}
     </div>
   );

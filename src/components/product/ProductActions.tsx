@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useEffect, useState } from "react";
 import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
+import { ShoppingCart } from "lucide-react";
 
 interface ProductActionsProps {
   price: number;
@@ -45,14 +46,16 @@ export const ProductActions = ({
   }, [convertedPrice, selectedCurrency, price, currency]);
 
   return (
-    <div className="flex justify-between items-center w-full">
+    <div className="flex justify-between items-center w-full p-1 border-t border-gray-200 dark:border-gray-700">
       <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
         {selectedCurrency} {Math.round(displayPrice).toLocaleString()}
       </p>
       <Button 
         onClick={onAddToCart}
         disabled={!inStock || isAddingToCart}
+        className="flex items-center space-x-1"
       >
+        <ShoppingCart className="h-4 w-4 mr-1" />
         {isAddingToCart ? 'Adding...' : 'Add to Cart'}
       </Button>
     </div>
