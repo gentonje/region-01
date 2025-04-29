@@ -96,7 +96,7 @@ const ProductCard = ({
       
       {/* Remove the ProductCardActions component since we moved the Add to Cart button to ProductCardContent */}
       {(isAdminProp || isAdmin) && onDelete && (
-        <div className="absolute bottom-2 right-2 z-10">
+        <div className="absolute bottom-1 right-1 z-10">
           <button
             onClick={handleDeleteClick}
             className="p-1 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"

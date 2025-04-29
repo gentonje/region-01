@@ -25,13 +25,13 @@ interface ModifyProductsListProps {
 }
 
 const ProductSkeleton = () => (
-  <div className="flex items-center gap-4 py-4">
+  <div className="flex items-center gap-1 py-1">
     <Skeleton className="h-20 w-20 rounded" />
     <div className="flex-1">
-      <Skeleton className="h-6 w-3/4 mb-2" />
+      <Skeleton className="h-6 w-3/4 mb-1" />
       <Skeleton className="h-4 w-1/2" />
     </div>
-    <div className="flex gap-2">
+    <div className="flex gap-1">
       <Skeleton className="h-8 w-8" />
       <Skeleton className="h-8 w-8" />
     </div>
@@ -111,22 +111,22 @@ export const ModifyProductsList = ({
     });
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+    <div className="space-y-1 m-1">
+      <div className="flex flex-col md:flex-row gap-1 mb-1">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-1 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by product or username..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
+            className="pl-6"
           />
         </div>
         <Select
           value={selectedCategory}
           onValueChange={setSelectedCategory}
         >
-          <SelectTrigger className="w-full md:w-[200px]">
+          <SelectTrigger className="w-full md:w-[180px]">
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
           <SelectContent>
@@ -142,7 +142,7 @@ export const ModifyProductsList = ({
           value={sortOrder}
           onValueChange={setSortOrder}
         >
-          <SelectTrigger className="w-full md:w-[200px]">
+          <SelectTrigger className="w-full md:w-[180px]">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
@@ -157,7 +157,7 @@ export const ModifyProductsList = ({
 
       <div className="divide-y divide-gray-200 bg-white rounded-lg shadow">
         {filteredAndSortedProducts.map((product) => (
-          <div key={`product-${product.id}`} className="p-4">
+          <div key={`product-${product.id}`} className="p-1">
             <ProductModifyCard
               product={product}
               onDelete={onDelete}
@@ -168,9 +168,9 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-gray-200 bg-white rounded-lg shadow mt-4">
+        <div className="divide-y divide-gray-200 bg-white rounded-lg shadow mt-1">
           {[1, 2, 3].map((i) => (
-            <div key={`skeleton-${i}`} className="p-4">
+            <div key={`skeleton-${i}`} className="p-1">
               <ProductSkeleton />
             </div>
           ))}
@@ -178,14 +178,14 @@ export const ModifyProductsList = ({
       )}
 
       {!isLoading && filteredAndSortedProducts.length === 0 && (
-        <div className="text-center py-8">
+        <div className="text-center py-1 m-1">
           <p className="text-gray-600">No products found</p>
         </div>
       )}
 
-      <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+      <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
         {hasMore && <div className="loading">Loading more...</div>}
       </div>
-    </>
+    </div>
   );
 };

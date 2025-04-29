@@ -46,7 +46,7 @@ export const ProductListingSection = ({
   };
 
   return (
-    <>
+    <div className="space-y-1 m-1">
       <ProductFilters onSearchChange={handleSearchChange} />
       <ProductList
         products={products}
@@ -60,6 +60,6 @@ export const ProductListingSection = ({
         isAdmin={isAdmin}
         emptyMessage={emptyMessage}
       />
-    </>
+    </div>
   );
 };
