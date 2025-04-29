@@ -48,42 +48,47 @@
 
 /* Enhanced spacing utilities */
 .space-y-comfortable {
-  @apply space-y-4 md:space-y-6;
+  @apply space-y-2 md:space-y-4 lg:space-y-6;
 }
 
 .space-x-comfortable {
-  @apply space-x-2 md:space-x-4;
+  @apply space-x-1 md:space-x-2 lg:space-x-4;
 }
 
 .padding-comfortable {
-  @apply p-3 md:p-4 lg:p-6;
+  @apply p-2 md:p-3 lg:p-4;
 }
 
 .margin-comfortable {
-  @apply m-3 md:m-4 lg:m-6;
+  @apply m-1 md:m-2 lg:m-3;
 }
 
 /* Enhanced contrast text colors */
 .text-readable {
-  @apply text-gray-800 dark:text-gray-200;
+  @apply text-gray-900 dark:text-gray-100;
 }
 
 .text-muted-readable {
-  @apply text-gray-600 dark:text-gray-300;
+  @apply text-gray-700 dark:text-gray-200;
 }
 
 /* Card and container styles with better readability */
 .card-readable {
   @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
-  text-gray-800 dark:text-gray-200 shadow-md hover:shadow-lg transition-shadow;
+  text-gray-900 dark:text-gray-100 shadow-md hover:shadow-lg transition-shadow;
 }
 
 .container-readable {
-  @apply bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200;
+  @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
 }
 
 /* Button with better contrast */
 .btn-readable {
   @apply bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800 
   dark:text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all;
+}
+
+/* Mobile responsive spacing */
+.mobile-spacing {
+  @apply space-y-1 md:space-y-2 space-x-1 md:space-x-2 m-1 md:m-2 p-1 md:p-2;
 }

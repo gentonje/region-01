@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,10 +17,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="username"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -30,10 +31,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="full_name"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Full Name</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -44,10 +45,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="contact_email"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Contact Email</FormLabel>
             <FormControl>
-              <Input {...field} type="email" />
+              <Input {...field} type="email" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -58,10 +59,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="phone_number"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Phone Number</FormLabel>
             <FormControl>
-              <Input {...field} type="tel" />
+              <Input {...field} type="tel" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -72,10 +73,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="address"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Shipping Address</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -86,10 +87,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="shop_name"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Shop Name (Optional)</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -100,10 +101,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         control={form.control}
         name="shop_description"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-1 m-1">
             <FormLabel>Shop Description (Optional)</FormLabel>
             <FormControl>
-              <Textarea {...field} />
+              <Textarea {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
             <FormMessage />
           </FormItem>

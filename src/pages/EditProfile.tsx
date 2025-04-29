@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -92,29 +93,45 @@ export default function EditProfile() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="container max-w-2xl mx-auto p-3 md:p-4 mt-4 space-y-2 md:space-y-4">
+        <div className="animate-pulse flex space-x-2 items-center">
+          <div className="rounded-full bg-gray-200 dark:bg-gray-700 h-8 w-8"></div>
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+        </div>
+        <div className="space-y-3">
+          {[...Array(7)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container max-w-2xl mx-auto p-4 pb-20 mt-16">
-      <div className="flex items-center gap-2 mb-6">
-        <UserCog className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">Edit Profile</h1>
+    <div className="container max-w-2xl mx-auto p-3 md:p-4 pb-16 mt-4 space-y-2 md:space-y-4">
+      <div className="flex items-center gap-2 mb-2 md:mb-4">
+        <UserCog className="h-5 w-5 md:h-6 md:w-6" />
+        <h1 className="text-xl md:text-2xl font-bold">Edit Profile</h1>
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 md:space-y-4">
           <ProfileFormFields form={form} />
           
-          <div className="flex gap-4">
+          <div className="flex gap-2 md:gap-4 mt-4 pt-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => navigate("/")}
+              className="m-1"
             >
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit" className="m-1">Save Changes</Button>
           </div>
         </form>
       </Form>
