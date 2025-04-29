@@ -24,15 +24,22 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Add cache control meta tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
   </head>
 
   <body>
     <div id="root"></div>
     <script>
-      // Register Service Worker
+      // Register Service Worker with options to update on reload
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
+          navigator.serviceWorker.register('/sw.js', {
+            updateViaCache: 'none' // Never use cached version of the service worker
+          })
             .then(registration => {
               console.log('ServiceWorker registration successful');
             })

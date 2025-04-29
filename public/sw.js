@@ -8,31 +8,29 @@ const urlsToCache = [
   '/placeholder.svg'
 ];
 
-// Cache first, then network strategy for images
-const cacheFirst = async (request) => {
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+// Network first, fallback to cache strategy
+const networkFirst = async (request) => {
   try {
-    const networkResponse = await fetch(request);
-    if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-      return networkResponse;
-    }
-    const cache = await caches.open(CACHE_NAME);
-    cache.put(request, networkResponse.clone());
+    // Always try network first
+    const networkResponse = await fetch(request, { cache: 'no-store' });
     return networkResponse;
   } catch (error) {
-    console.warn('Fetch failed:', error);
+    console.log('Fetch failed, falling back to cache:', error);
+    // Only fall back to cache if network fails completely
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
     throw error;
   }
 };
 
 self.addEventListener('install', (event) => {
+  // Only cache essential files
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        // Cache what we can, ignore failures
+        // Cache minimal set of files, just for offline fallback
         return Promise.allSettled(
           urlsToCache.map(url => 
             cache.add(url).catch(err => {
@@ -46,45 +44,12 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Special handling for image requests
-  if (event.request.destination === 'image' || 
-      event.request.url.includes('images') || 
-      event.request.url.includes('icons')) {
-    event.respondWith(cacheFirst(event.request));
-    return;
-  }
-
-  // Default fetch handling for other resources
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .then((response) => {
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            const responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache)
-                  .catch(err => {
-                    console.warn('Failed to cache response:', err);
-                  });
-              });
-            return response;
-          })
-          .catch(error => {
-            console.warn('Fetch failed:', error);
-            throw error;
-          });
-      })
-  );
+  // Use network-first approach for all requests
+  event.respondWith(networkFirst(event.request));
 });
 
 self.addEventListener('activate', (event) => {
+  // Clean up old caches
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -101,4 +66,11 @@ self.addEventListener('activate', (event) => {
 // Handle immediate claiming of all clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(clients.claim());
+});
+
+// Add this to force update on reload
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
