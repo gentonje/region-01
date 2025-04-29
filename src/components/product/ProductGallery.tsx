@@ -1,5 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { getStorageUrl } from "@/utils/storage";
 import { Skeleton } from "../ui/skeleton";
 import { useState, useEffect } from "react";
 import { ImageLoader } from "../ImageLoader";
@@ -24,13 +24,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
       try {
         // Load main image
         if (selectedImage && selectedImage.trim() !== '') {
-          const { data, error } = supabase.storage.from('images').getPublicUrl(selectedImage);
-          
-          if (error) {
-            throw error;
-          }
-          
-          setMainImageUrl(data.publicUrl);
+          const mainUrl = getStorageUrl(selectedImage);
+          setMainImageUrl(mainUrl);
         } else {
           // If no selected image, use placeholder
           setMainImageUrl("/placeholder.svg");
@@ -41,13 +36,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
         
         for (const image of images) {
           if (image.storage_path && image.storage_path.trim() !== '') {
-            const { data, error } = supabase.storage.from('images').getPublicUrl(image.storage_path);
-            
-            if (!error) {
-              urls[image.storage_path] = data.publicUrl;
-            } else {
-              urls[image.storage_path] = "/placeholder.svg";
-            }
+            const thumbnailUrl = getStorageUrl(image.storage_path);
+            urls[image.storage_path] = thumbnailUrl;
           }
         }
         

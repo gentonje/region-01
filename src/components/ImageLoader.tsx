@@ -116,7 +116,6 @@ export const ImageLoader = memo(({
         height={height}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        fetchPriority={priority ? "high" : "auto"}
         onLoad={() => setIsLoading(false)}
         onError={() => {
           // If the image fails to load, use the fallback
