@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Suspense, useState, useEffect } from "react";
 import { ProductGallery } from "./product/ProductGallery";
@@ -20,13 +19,15 @@ interface ProductDetailProps {
   getProductImageUrl: (product: Product) => string;
   onBack: () => void;
   selectedCurrency?: SupportedCurrency;
+  setSelectedProduct?: (product: Product) => void;
 }
 
 const ProductDetail = ({ 
   product, 
   onBack, 
   getProductImageUrl,
-  selectedCurrency = "USD" 
+  selectedCurrency = "USD",
+  setSelectedProduct
 }: ProductDetailProps) => {
   const [selectedImage, setSelectedImage] = useState<string>(
     product.product_images?.find(img => !img.is_main)?.storage_path || 
@@ -101,6 +102,22 @@ const ProductDetail = ({
       return;
     }
     addToCartMutation.mutate();
+  };
+
+  // Handle similar product selection
+  const handleSimilarProductClick = (similarProduct: Product) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // If setSelectedProduct prop exists, use it to update the selected product
+    if (setSelectedProduct) {
+      setSelectedProduct(similarProduct);
+    } else {
+      // Fallback to previous behavior
+      onBack();
+      setTimeout(() => {
+        onBack();
+      }, 100);
+    }
   };
 
   return (
@@ -196,13 +213,7 @@ const ProductDetail = ({
           <ProductSimilar
             products={similarProducts}
             getProductImageUrl={getProductImageUrl}
-            onProductClick={(similarProduct) => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              onBack();
-              setTimeout(() => {
-                onBack();
-              }, 100);
-            }}
+            onProductClick={handleSimilarProductClick}
             selectedCurrency={selectedCurrency}
           />
         </div>

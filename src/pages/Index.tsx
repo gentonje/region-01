@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,6 +147,7 @@ export default function Index() {
           getProductImageUrl={getProductImageUrl}
           onBack={handleBack}
           selectedCurrency={selectedCurrency}
+          setSelectedProduct={setSelectedProduct}
         />
       ) : (
         <ProductListingSection

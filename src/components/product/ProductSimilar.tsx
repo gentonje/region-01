@@ -1,9 +1,13 @@
 
-import { Card, CardContent } from "../ui/card";
+import { Card } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 import { useState, useEffect } from "react";
+import { ImageLoader } from "../ImageLoader";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "../ui/button";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 interface ProductSimilarProps {
   products: Product[];
@@ -43,33 +47,71 @@ export const ProductSimilar = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">Similar Products</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
         {products.map((similarProduct) => (
           <Card 
             key={similarProduct.id}
-            className="cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              onProductClick(similarProduct);
-            }}
+            className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gray-900 border-gray-800 cursor-pointer"
+            onClick={() => onProductClick(similarProduct)}
           >
-            <CardContent className="p-2">
-              <div className="aspect-square w-full relative mb-2">
-                <img
+            {/* Product Image Section - Matching main card design */}
+            <div className="w-full relative overflow-hidden bg-gray-900">
+              {/* Decorative orange element in top left */}
+              <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
+              
+              <AspectRatio ratio={4/3} className="bg-gray-900">
+                <ImageLoader
                   src={getProductImageUrl(similarProduct)}
                   alt={similarProduct.title || ""}
-                  className="w-full h-full object-cover rounded-md"
-                  loading="lazy"
+                  className="w-full h-full object-cover opacity-90"
+                  width={400}
+                  height={300}
+                  priority={false}
                 />
+              </AspectRatio>
+              
+              <span className="absolute bottom-1 left-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%]">
+                {similarProduct.category}
+              </span>
+              
+              <span 
+                className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
+                  similarProduct.in_stock 
+                    ? 'bg-green-500/90 text-white' 
+                    : 'bg-red-500/90 text-white'
+                }`}
+              >
+                {similarProduct.in_stock ? 'In Stock' : 'Out of Stock'}
+              </span>
+            </div>
+            
+            {/* Product Content Section */}
+            <div className="p-0 space-y-0.5">
+              <div className="pt-0">
+                <h3 className="text-sm font-medium truncate text-gray-100 min-w-[100px] text-left px-2">
+                  {similarProduct.title}
+                </h3>
               </div>
-              <h3 className="text-sm font-medium text-gray-900 truncate">
-                {similarProduct.title}
-              </h3>
-              <p className="text-sm font-medium text-gray-900">
-                {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
-              </p>
-            </CardContent>
+              <div className="h-[20px] overflow-hidden px-2">
+                <p className="text-xs text-gray-300 line-clamp-1">
+                  {similarProduct.description}
+                </p>
+              </div>
+              <div className="flex justify-between items-center pt-0 px-2 pb-2">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
+                  {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
+                </span>
+                
+                <Button 
+                  size="sm" 
+                  className="h-7 px-2 py-0 text-xs"
+                  variant="secondary"
+                >
+                  <ShoppingCart className="h-3 w-3 mr-1" />
+                  View
+                </Button>
+              </div>
+            </div>
           </Card>
         ))}
       </div>
