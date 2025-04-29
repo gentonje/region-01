@@ -108,7 +108,7 @@ export const ProductSimilar = ({
                   {similarProduct.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
 
-                {/* Wishlist button - added to match main card */}
+                {/* Wishlist button - Updated to use golden color when selected */}
                 {session && (
                   <Button
                     variant="ghost"
@@ -121,7 +121,7 @@ export const ProductSimilar = ({
                     disabled={isPending}
                   >
                     <Heart 
-                      className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+                      className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400' : 'text-white'}`} 
                     />
                   </Button>
                 )}

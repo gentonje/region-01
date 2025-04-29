@@ -1,3 +1,4 @@
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -43,4 +44,46 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
   }
+}
+
+/* Enhanced spacing utilities */
+.space-y-comfortable {
+  @apply space-y-4 md:space-y-6;
+}
+
+.space-x-comfortable {
+  @apply space-x-2 md:space-x-4;
+}
+
+.padding-comfortable {
+  @apply p-3 md:p-4 lg:p-6;
+}
+
+.margin-comfortable {
+  @apply m-3 md:m-4 lg:m-6;
+}
+
+/* Enhanced contrast text colors */
+.text-readable {
+  @apply text-gray-800 dark:text-gray-200;
+}
+
+.text-muted-readable {
+  @apply text-gray-600 dark:text-gray-300;
+}
+
+/* Card and container styles with better readability */
+.card-readable {
+  @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 
+  text-gray-800 dark:text-gray-200 shadow-md hover:shadow-lg transition-shadow;
+}
+
+.container-readable {
+  @apply bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200;
+}
+
+/* Button with better contrast */
+.btn-readable {
+  @apply bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-700 dark:hover:bg-blue-800 
+  dark:text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all;
 }

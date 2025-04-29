@@ -89,7 +89,7 @@ export const ProductCardImage = memo(({
           disabled={isPending}
         >
           <Heart 
-            className={`w-4 h-4 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-white'}`} 
+            className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400' : 'text-white'}`} 
           />
         </Button>
       )}

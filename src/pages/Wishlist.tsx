@@ -6,10 +6,10 @@ import { WishlistItem } from "@/components/wishlist/WishlistItem";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Heart } from "lucide-react";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Wishlist = () => {
   const { session } = useAuth();
@@ -123,10 +123,10 @@ const Wishlist = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto p-4 space-y-4 mt-20">
-        <h1 className="text-2xl font-bold">My Wishlist</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full" />
+            <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700" />
           ))}
         </div>
       </div>
@@ -134,25 +134,29 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-4 mt-20">
+    <div className="container mx-auto p-4 space-y-6 mt-20">
       <BreadcrumbNav
         items={[
-          {
-            label: "Wishlist",
-          },
+          { label: "Home", href: "/" },
+          { label: "Wishlist" },
         ]}
       />
+      
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">My Wishlist</h1>
+        <div className="flex items-center gap-2">
+          <Heart className="h-6 w-6 fill-amber-400 text-amber-400" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
+        </div>
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
         >
           <ArrowLeft className="w-4 h-4" />
           Continue Shopping
         </Button>
       </div>
+      
       {wishlistItems && wishlistItems.length > 0 ? (
         <div className="space-y-4">
           {wishlistItems.map((item: any) => (
@@ -164,11 +168,15 @@ const Wishlist = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground mb-4">
+        <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 border border-gray-200 dark:border-gray-700">
+          <Heart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+          <p className="text-gray-700 dark:text-gray-300 font-medium text-lg mt-4 mb-6">
             Your wishlist is empty. Browse products to add items to your wishlist.
           </p>
-          <Button onClick={() => navigate("/")}>
+          <Button 
+            onClick={() => navigate("/")}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Start Shopping
           </Button>
         </div>

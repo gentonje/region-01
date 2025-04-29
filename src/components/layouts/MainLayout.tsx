@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
@@ -26,15 +27,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen pb-14">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
         selectedCurrency={selectedCurrency}
         onCurrencyChange={onCurrencyChange}
       />
-      <div className="container mx-auto px-4 pt-14 pb-16">
-        {children || <Outlet />}
+      <div className="container mx-auto px-4 pt-16 pb-20 sm:pt-20 sm:pb-24">
+        <div className="max-w-7xl mx-auto">
+          {children || <Outlet />}
+        </div>
       </div>
       
       {isAuthenticated && (
