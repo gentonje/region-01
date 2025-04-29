@@ -10,14 +10,20 @@ interface ImageLoaderProps {
   width?: number;
   height?: number;
   priority?: boolean;
+  fallbackSrc?: string;
 }
 
 const preloadImage = (src: string): Promise<void> => {
   return new Promise((resolve, reject) => {
+    if (!src) {
+      reject(new Error('No source provided'));
+      return;
+    }
+    
     const img = new Image();
     img.src = src;
     img.onload = () => resolve();
-    img.onerror = () => reject();
+    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
   });
 };
 
@@ -28,13 +34,19 @@ export const ImageLoader = memo(({
   width,
   height,
   priority = false,
+  fallbackSrc = "/placeholder.svg"
 }: ImageLoaderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(src || fallbackSrc);
   const { toast } = useToast();
 
   const loadImage = useCallback(async () => {
-    if (!src) return;
+    if (!src) {
+      setImageSrc(fallbackSrc);
+      setIsLoading(false);
+      return;
+    }
     
     try {
       // Check if image is in cache
@@ -52,26 +64,38 @@ export const ImageLoader = memo(({
       setIsLoading(false);
     } catch (err) {
       console.error('Error loading image:', err);
+      setImageSrc(fallbackSrc);
       setError(true);
       setIsLoading(false);
-      toast({
-        title: "Error loading image",
-        description: "Failed to load image. Please try again later.",
-        variant: "destructive",
-      });
+      
+      // Only show toast for non-placeholder images to avoid spamming
+      if (src && src !== fallbackSrc && !src.includes('placeholder')) {
+        toast({
+          title: "Error loading image",
+          description: "Using placeholder image instead",
+          variant: "destructive",
+        });
+      }
     }
-  }, [src, toast]);
+  }, [src, fallbackSrc, toast]);
 
   useEffect(() => {
     setIsLoading(true);
     setError(false);
+    setImageSrc(src || fallbackSrc);
     loadImage();
-  }, [loadImage]);
+  }, [loadImage, src, fallbackSrc]);
 
   if (error) {
     return (
       <div className="flex items-center justify-center bg-gray-100 rounded-md" style={{ width, height }}>
-        <span className="text-sm text-gray-500">Failed to load image</span>
+        <img 
+          src={fallbackSrc} 
+          alt={alt} 
+          className={className}
+          width={width}
+          height={height}
+        />
       </div>
     );
   }
@@ -85,7 +109,7 @@ export const ImageLoader = memo(({
         />
       )}
       <img
-        src={src}
+        src={imageSrc}
         alt={alt}
         className={`${className} ${isLoading ? 'hidden' : 'block'}`}
         width={width}
@@ -94,6 +118,12 @@ export const ImageLoader = memo(({
         decoding="async"
         fetchPriority={priority ? "high" : "auto"}
         onLoad={() => setIsLoading(false)}
+        onError={() => {
+          // If the image fails to load, use the fallback
+          if (imageSrc !== fallbackSrc) {
+            setImageSrc(fallbackSrc);
+          }
+        }}
       />
     </>
   );

@@ -23,12 +23,17 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
 
   useEffect(() => {
     const updatePrice = async () => {
-      const converted = await convertCurrency(
-        product.price || 0,
-        (product.currency || "SSP") as SupportedCurrency,
-        selectedCurrency
-      );
-      setConvertedPrice(converted);
+      try {
+        const converted = await convertCurrency(
+          product.price || 0,
+          (product.currency || "SSP") as SupportedCurrency,
+          selectedCurrency
+        );
+        setConvertedPrice(converted);
+      } catch (error) {
+        console.error("Error converting price:", error);
+        setConvertedPrice(product.price || 0);
+      }
     };
     updatePrice();
   }, [product.price, product.currency, selectedCurrency]);
@@ -85,6 +90,34 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
     }
     addToCartMutation.mutate();
   };
+
+  // Track product view while handling potential conflicts
+  useEffect(() => {
+    const trackProductView = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        const { error } = await supabase.from('product_views').insert({
+          product_id: product.id,
+          viewer_id: user?.id || null,
+        });
+
+        // Conflict errors (409) are expected when the unique constraint is violated
+        // This happens if the user views the same product multiple times in a day
+        // We can safely ignore this specific error
+        if (error && error.code !== '23505' && error.code !== '409') {
+          console.error('Error tracking product view:', error);
+        }
+      } catch (error) {
+        // Silent fail for view tracking as it's not critical
+        console.warn('Error tracking product view:', error);
+      }
+    };
+
+    if (product.id) {
+      trackProductView();
+    }
+  }, [product.id]);
 
   return {
     selectedImage,
