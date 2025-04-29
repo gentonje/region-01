@@ -150,11 +150,7 @@ export const ProductSimilar = ({
                 </div>
                 <div className="flex justify-between items-center pt-1">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
-                    {selectedCurrency} {
-                      selectedCurrency === "SSP" 
-                        ? Math.round(similarProduct.price || 0).toLocaleString() 
-                        : Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()
-                    }
+                    {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || similarProduct.price || 0).toLocaleString()}
                   </span>
                   
                   <Button 

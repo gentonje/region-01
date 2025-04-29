@@ -64,31 +64,6 @@ export const convertCurrency = async (
       return amount;
     }
     
-    // If the target currency is SSP, display the original amount without calculation
-    // This assumes all prices in the database are in SSP
-    if (toCurrency === "SSP") {
-      console.log(`Display original price: ${amount} in SSP`);
-      return amount;
-    }
-    
-    // Only convert when changing from SSP to another currency (mainly USD)
-    if (fromCurrency === "SSP") {
-      const rates = await getCurrencyRates();
-      console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`, { rates });
-
-      if (!rates[fromCurrency] || !rates[toCurrency]) {
-        console.error('Invalid currency code', { fromCurrency, toCurrency, rates });
-        return amount;
-      }
-
-      // Convert from SSP to target currency
-      const result = Number((amount * rates[toCurrency] / rates[fromCurrency]).toFixed(2));
-      
-      console.log(`Conversion result: ${amount} ${fromCurrency} = ${result} ${toCurrency}`);
-      return result;
-    }
-    
-    // For other currency conversions (not from SSP)
     const rates = await getCurrencyRates();
     console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`, { rates });
 

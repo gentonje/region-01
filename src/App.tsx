@@ -28,7 +28,11 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>(() => {
+    // Set default currency to USD
+    const savedCurrency = localStorage.getItem('selectedCurrency') as SupportedCurrency;
+    return savedCurrency || "USD"; 
+  });
 
   const handleCurrencyChange = (currency: SupportedCurrency) => {
     console.log("Changing currency to:", currency);
@@ -44,14 +48,6 @@ const App = () => {
     // Store the selected currency in local storage for persistence
     localStorage.setItem('selectedCurrency', currency);
   };
-  
-  // Load saved currency preference on app init
-  React.useEffect(() => {
-    const savedCurrency = localStorage.getItem('selectedCurrency') as SupportedCurrency;
-    if (savedCurrency) {
-      setSelectedCurrency(savedCurrency);
-    }
-  }, []);
 
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
