@@ -16,9 +16,10 @@ interface WishlistItemProps {
     product_id: string;
   };
   product: Product;
+  onItemRemoved?: () => void;
 }
 
-export const WishlistItem = ({ item, product }: WishlistItemProps) => {
+export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps) => {
   const [isSharing, setIsSharing] = useState(false);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -34,10 +35,15 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+      // Also invalidate the specific product wishlist status
+      queryClient.invalidateQueries({ queryKey: ["wishlist", product.id] });
       toast({
         title: "Success",
         description: "Item removed from wishlist",
       });
+      if (onItemRemoved) {
+        onItemRemoved();
+      }
     },
     onError: (error) => {
       console.error("Error removing from wishlist:", error);
@@ -126,7 +132,7 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow m-1">
       <CardContent className="p-0">
         <div className="flex flex-col sm:flex-row">
           <div className="w-full sm:w-48 h-48 relative">
@@ -139,7 +145,7 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
             />
             <Heart className="absolute top-2 left-2 w-5 h-5 fill-amber-400 text-amber-400" />
           </div>
-          <div className="flex-1 p-4 flex flex-col justify-between space-y-2">
+          <div className="flex-1 p-4 flex flex-col justify-between space-y-1">
             <div>
               <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">{product.title}</h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
@@ -149,13 +155,13 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
                 {product.currency} {product.price?.toFixed(2)}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2 space-x-1">
               <Button
                 variant="default"
                 size="sm"
                 onClick={() => addToCart.mutate()}
                 disabled={!product.in_stock || addToCart.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
                 Add to Cart
@@ -165,7 +171,7 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
                 size="sm"
                 onClick={handleShare}
                 disabled={isSharing}
-                className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 m-1 p-1"
               >
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
@@ -175,7 +181,7 @@ export const WishlistItem = ({ item, product }: WishlistItemProps) => {
                 size="sm"
                 onClick={() => removeFromWishlist.mutate()}
                 disabled={removeFromWishlist.isPending}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-red-600 hover:bg-red-700 m-1 p-1"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
                 Remove

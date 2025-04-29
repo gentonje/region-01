@@ -42,3 +42,27 @@
 .mobile-grid {
   @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
 }
+
+/* Product card and wishlist styles */
+.wishlist-heart {
+  @apply w-4 h-4;
+}
+
+.wishlist-heart-active {
+  @apply fill-amber-400 text-amber-400;
+}
+
+.wishlist-heart-inactive {
+  @apply text-white;
+}
+
+/* Layout spacing for components */
+.component-spacing {
+  @apply space-y-1 space-x-1 m-1 p-1;
+}
+
+/* Layout spacing for pages */
+.page-spacing {
+  @apply space-y-1 md:space-y-2 m-1 p-1;
+}
+

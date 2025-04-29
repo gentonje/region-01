@@ -15,7 +15,7 @@ const Wishlist = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
 
-  const { data: wishlistItems, isLoading } = useQuery({
+  const { data: wishlistItems, isLoading, refetch } = useQuery({
     queryKey: ["wishlist-items", session?.user?.id],
     queryFn: async () => {
       if (!session?.user) {
@@ -24,7 +24,7 @@ const Wishlist = () => {
       }
 
       try {
-        // Get the user's wishlist - here we select all wishlists for the user instead of using maybeSingle
+        // Get the user's wishlist - here we select all wishlists for the user
         const { data: wishlists, error: wishlistError } = await supabase
           .from("wishlists")
           .select("id")
@@ -100,6 +100,7 @@ const Wishlist = () => {
           return [];
         }
 
+        console.log("Wishlist items fetched:", items);
         return items || [];
       } catch (error) {
         console.error("Unexpected error:", error);
@@ -122,11 +123,11 @@ const Wishlist = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-4 space-y-4 mt-20">
+      <div className="container mx-auto p-4 space-y-1 mt-20">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
-        <div className="space-y-4">
+        <div className="space-y-1">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700" />
+            <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700 m-1 p-1" />
           ))}
         </div>
       </div>
@@ -134,7 +135,7 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 space-y-6 mt-20">
+    <div className="container mx-auto p-4 space-y-1 mt-20">
       <BreadcrumbNav
         items={[
           { label: "Home", href: "/" },
@@ -142,15 +143,15 @@ const Wishlist = () => {
         ]}
       />
       
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
+      <div className="flex justify-between items-center m-1 p-1">
+        <div className="flex items-center gap-2 space-x-1">
           <Heart className="h-6 w-6 fill-amber-400 text-amber-400" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
         </div>
         <Button
           variant="outline"
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 m-1 p-1"
         >
           <ArrowLeft className="w-4 h-4" />
           Continue Shopping
@@ -158,24 +159,25 @@ const Wishlist = () => {
       </div>
       
       {wishlistItems && wishlistItems.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-1">
           {wishlistItems.map((item: any) => (
             <WishlistItem 
               key={item.id} 
               item={item} 
               product={item.products as Product}
+              onItemRemoved={refetch}
             />
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 border border-gray-200 dark:border-gray-700">
+        <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700 m-1">
           <Heart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
           <p className="text-gray-700 dark:text-gray-300 font-medium text-lg mt-4 mb-6">
             Your wishlist is empty. Browse products to add items to your wishlist.
           </p>
           <Button 
             onClick={() => navigate("/")}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
           >
             Start Shopping
           </Button>

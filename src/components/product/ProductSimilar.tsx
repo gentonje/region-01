@@ -66,8 +66,8 @@ export const ProductSimilar = ({
   if (!products?.length) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="w-full max-w-2xl mx-auto space-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 space-x-1 space-y-1">
         {products.map((similarProduct) => {
           // Initialize wishlist functionality for each product
           const { isInWishlist, toggleWishlist, isPending } = useWishlistMutation(similarProduct.id);
@@ -75,7 +75,7 @@ export const ProductSimilar = ({
           return (
             <Card 
               key={similarProduct.id}
-              className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gray-900 border-gray-800 cursor-pointer"
+              className="w-full m-1 p-1 overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-gray-900 border-gray-800 cursor-pointer"
               onClick={() => onProductClick(similarProduct)}
             >
               {/* Product Image Section - Matching main card design */}
@@ -108,7 +108,7 @@ export const ProductSimilar = ({
                   {similarProduct.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
 
-                {/* Wishlist button - Updated to use golden color when selected */}
+                {/* Wishlist button - Ensure golden color when selected */}
                 {session && (
                   <Button
                     variant="ghost"

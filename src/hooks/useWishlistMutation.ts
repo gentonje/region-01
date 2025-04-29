@@ -9,7 +9,7 @@ export function useWishlistMutation(productId: string) {
   const queryClient = useQueryClient();
 
   // Check if product is in wishlist
-  const { data: isInWishlist } = useQuery({
+  const { data: isInWishlist, isLoading } = useQuery({
     queryKey: ['wishlist', productId, session?.user?.id],
     queryFn: async () => {
       if (!session?.user) return false;
@@ -30,7 +30,7 @@ export function useWishlistMutation(productId: string) {
           .eq('product_id', productId);
 
         if (itemError) return false;
-        return wishlistItems.length > 0;
+        return wishlistItems && wishlistItems.length > 0;
       } catch (error) {
         console.error('Wishlist query error:', error);
         return false;
@@ -92,13 +92,20 @@ export function useWishlistMutation(productId: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
+      queryClient.invalidateQueries({ queryKey: ['wishlist-items'] });
+      queryClient.invalidateQueries({ queryKey: ['wishlist', productId, session?.user?.id] });
       toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
     },
+    onError: (error) => {
+      console.error("Wishlist error:", error);
+      toast.error("Wishlist operation failed. Please try again.");
+    }
   });
 
   return {
     isInWishlist,
     toggleWishlist,
-    isPending
+    isPending,
+    isLoading
   };
 }
