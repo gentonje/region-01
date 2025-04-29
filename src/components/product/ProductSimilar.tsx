@@ -47,7 +47,7 @@ export const ProductSimilar = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {products.map((similarProduct) => (
           <Card 
             key={similarProduct.id}
@@ -86,25 +86,25 @@ export const ProductSimilar = ({
             </div>
             
             {/* Product Content Section */}
-            <div className="p-0 space-y-0.5">
+            <div className="p-2 space-y-1">
               <div className="pt-0">
-                <h3 className="text-sm font-medium truncate text-gray-100 min-w-[100px] text-left px-2">
+                <h3 className="text-sm font-medium truncate text-gray-100 min-w-[100px] text-left">
                   {similarProduct.title}
                 </h3>
               </div>
-              <div className="h-[20px] overflow-hidden px-2">
+              <div className="h-[20px] overflow-hidden">
                 <p className="text-xs text-gray-300 line-clamp-1">
                   {similarProduct.description}
                 </p>
               </div>
-              <div className="flex justify-between items-center pt-0 px-2 pb-2">
+              <div className="flex justify-between items-center pt-1">
                 <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
                   {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
                 </span>
                 
                 <Button 
                   size="sm" 
-                  className="h-7 px-2 py-0 text-xs"
+                  className="h-7 px-3 py-0 text-xs"
                   variant="secondary"
                 >
                   <ShoppingCart className="h-3 w-3 mr-1" />
@@ -118,3 +118,4 @@ export const ProductSimilar = ({
     </div>
   );
 };
+
