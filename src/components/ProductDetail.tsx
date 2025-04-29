@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Suspense, useState, useEffect } from "react";
 import { ProductGallery } from "./product/ProductGallery";
@@ -29,15 +30,19 @@ const ProductDetail = ({
   selectedCurrency = "USD",
   setSelectedProduct
 }: ProductDetailProps) => {
-  const [selectedImage, setSelectedImage] = useState<string>(
-    product.product_images?.find(img => !img.is_main)?.storage_path || 
-    product.product_images?.[0]?.storage_path || 
-    ''
-  );
+  const [selectedImage, setSelectedImage] = useState<string>("");
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [activeTab, setActiveTab] = useState("details");
 
   const queryClient = useQueryClient();
+
+  // Set the selected image whenever the product changes
+  useEffect(() => {
+    // Reset the selected image when product changes
+    const mainImagePath = product.product_images?.find(img => img.is_main)?.storage_path || 
+      product.product_images?.[0]?.storage_path || '';
+    setSelectedImage(mainImagePath);
+  }, [product.id, product.product_images]);
 
   useEffect(() => {
     const updatePrice = async () => {
