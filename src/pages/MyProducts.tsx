@@ -132,10 +132,10 @@ export default function MyProducts() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 mt-20">
-        <div className="space-y-4">
+      <div className="container mx-auto px-0 mt-20 w-full">
+        <div className="space-y-1">
           <Skeleton className="h-12 w-full" />
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <Skeleton key={i} className="h-48 w-full" />
             ))}
@@ -148,7 +148,7 @@ export default function MyProducts() {
   return (
     <>
       <Navigation searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-      <div className="container mx-auto px-4 pt-20 pb-20">
+      <div className="container mx-auto px-0 pt-20 pb-20 w-full max-w-none">
         <BreadcrumbNav
           items={[
             { label: "My Products", href: "/my-products" }
@@ -162,24 +162,26 @@ export default function MyProducts() {
             selectedCurrency={selectedCurrency}
           />
         ) : (
-          <ProductListingSection
-            products={allProducts}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={handleCategoryChange}
-            onProductClick={handleProductClick}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-            onPriceRangeChange={handlePriceRangeChange}
-            onSortChange={handleSortChange}
-            getProductImageUrl={getProductImageUrl}
-            emptyMessage="You don't have any products yet"
-            showStatus={true}
-            onDelete={handleDeleteProduct}
-            isAdmin={true}
-          />
+          <div className="w-full">
+            <ProductListingSection
+              products={allProducts}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={handleCategoryChange}
+              onProductClick={handleProductClick}
+              isFetchingNextPage={isFetchingNextPage}
+              observerRef={ref}
+              selectedCurrency={selectedCurrency}
+              onPriceRangeChange={handlePriceRangeChange}
+              onSortChange={handleSortChange}
+              getProductImageUrl={getProductImageUrl}
+              emptyMessage="You don't have any products yet"
+              showStatus={true}
+              onDelete={handleDeleteProduct}
+              isAdmin={true}
+            />
+          </div>
         )}
       </div>
     </>

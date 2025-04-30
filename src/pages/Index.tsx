@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from "react";
 import { useInView } from "react-intersection-observer";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,9 +124,9 @@ export default function Index() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-1 w-full">
         <Skeleton className="h-12 w-full" />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-48 w-full" />
           ))}
@@ -135,7 +136,7 @@ export default function Index() {
   }
 
   return (
-    <>
+    <div className="w-full px-0 mx-0 max-w-none">
       <BreadcrumbNav
         items={[
           { label: "All Products", href: "/products" }
@@ -150,23 +151,25 @@ export default function Index() {
           setSelectedProduct={setSelectedProduct}
         />
       ) : (
-        <ProductListingSection
-          products={allProducts}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={handleCategoryChange}
-          onProductClick={handleProductClick}
-          isFetchingNextPage={isFetchingNextPage}
-          observerRef={ref}
-          selectedCurrency={selectedCurrency}
-          onPriceRangeChange={handlePriceRangeChange}
-          onSortChange={handleSortChange}
-          getProductImageUrl={getProductImageUrl}
-          emptyMessage="No products found"
-          showStatus={false}
-        />
+        <div className="w-full">
+          <ProductListingSection
+            products={allProducts}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={handleCategoryChange}
+            onProductClick={handleProductClick}
+            isFetchingNextPage={isFetchingNextPage}
+            observerRef={ref}
+            selectedCurrency={selectedCurrency}
+            onPriceRangeChange={handlePriceRangeChange}
+            onSortChange={handleSortChange}
+            getProductImageUrl={getProductImageUrl}
+            emptyMessage="No products found"
+            showStatus={false}
+          />
+        </div>
       )}
-    </>
+    </div>
   );
 }

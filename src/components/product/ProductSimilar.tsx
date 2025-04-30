@@ -67,7 +67,7 @@ export const ProductSimilar = ({
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-1">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 space-x-1 space-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 space-x-1 space-y-1">
         {products.map((similarProduct) => {
           // Initialize wishlist functionality for each product
           const { isInWishlist, toggleWishlist, isPending } = useWishlistMutation(similarProduct.id);
@@ -94,12 +94,12 @@ export const ProductSimilar = ({
                   />
                 </AspectRatio>
                 
-                <span className="absolute bottom-1 left-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%]">
+                <span className="absolute bottom-1 left-1 text-xs px-1 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%]">
                   {similarProduct.category}
                 </span>
                 
                 <span 
-                  className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
+                  className={`absolute top-1 right-1 text-xs px-1 py-0.5 rounded-full ${
                     similarProduct.in_stock 
                       ? 'bg-green-500/90 text-white' 
                       : 'bg-red-500/90 text-white'
@@ -113,7 +113,7 @@ export const ProductSimilar = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10"
+                    className="absolute top-1 left-1 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleWishlist();
@@ -128,7 +128,7 @@ export const ProductSimilar = ({
               </div>
               
               {/* Product Content Section */}
-              <div className="p-2 space-y-1">
+              <div className="p-1 space-y-1">
                 <div className="pt-0">
                   <h3 className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left">
                     {similarProduct.title}
@@ -140,19 +140,19 @@ export const ProductSimilar = ({
                   </p>
                 </div>
                 <div className="flex justify-between items-center pt-1">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
+                  <span className="text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
                     {selectedCurrency} {convertedPrices[similarProduct.id]?.toFixed(2) || '0.00'}
                   </span>
                   
                   <Button 
                     size="sm" 
-                    className="h-7 px-3 py-0 text-xs"
+                    className="h-7 px-1 py-0 text-xs"
                     variant="secondary"
                     onClick={(e) => handleAddToCart(e, similarProduct)}
                     disabled={!similarProduct.in_stock || addItemMutation.isPending}
                   >
                     <ShoppingCart className="h-3 w-3 mr-1" />
-                    Add to Cart
+                    Add
                   </Button>
                 </div>
               </div>

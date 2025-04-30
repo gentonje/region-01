@@ -34,8 +34,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         selectedCurrency={selectedCurrency}
         onCurrencyChange={onCurrencyChange}
       />
-      <div className="container mx-auto p-2 md:px-4 pt-16 pb-20 sm:pt-20 sm:pb-24 space-y-2 md:space-y-4">
-        <div className="max-w-7xl mx-auto space-y-2 md:space-y-4">
+      <div className="w-full p-0 md:px-0 pt-16 pb-20 sm:pt-20 sm:pb-24 space-y-1 md:space-y-1 max-w-none">
+        <div className="w-full mx-auto space-y-1 md:space-y-1 px-0 max-w-none">
           {children || <Outlet />}
         </div>
       </div>
