@@ -112,84 +112,86 @@ export default function Cart() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 mt-16 space-y-6">
-        <BreadcrumbNav
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Cart" },
-          ]}
-        />
-        
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Shopping Cart</h1>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/")}
-            className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Continue Shopping
-          </Button>
-        </div>
-        
-        {!cartItems?.length ? (
-          <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <CardContent className="p-8">
-              <div className="text-center space-y-4">
-                <ShoppingBag className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                <p className="text-center text-gray-700 dark:text-gray-300 font-medium text-lg">Your cart is empty</p>
-                <Button
-                  className="mt-4 mx-auto block w-full sm:w-auto px-4 py-2 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white"
-                  onClick={() => navigate("/")}
-                >
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Start Shopping
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Cart Items ({cartItems.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 p-4">
-                {cartItems.map((item) => (
-                  <CartItem
-                    key={item.id}
-                    id={item.id}
-                    title={item.product.title}
-                    quantity={item.quantity}
-                    price={item.product.price}
-                    currency={item.product.currency}
-                    onDelete={() => deleteItemMutation.mutate(item.id)}
-                  />
-                ))}
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Checkout Summary</CardTitle>
-              </CardHeader>
-              <CardContent className="p-4">
-                <CartSummary
-                  currency={cartItems[0]?.product.currency || "USD"}
-                  totalAmount={cartItems.reduce(
-                    (sum, item) => sum + item.product.price * item.quantity,
-                    0
-                  )}
-                  selectedPaymentMethod={selectedPaymentMethod}
-                  onPaymentMethodChange={setSelectedPaymentMethod}
-                  onCheckout={handleCheckout}
-                  isLoading={orderCreation.isPending}
-                />
-              </CardContent>
-            </Card>
+    <div className="w-full">
+      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
+        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
+          <BreadcrumbNav
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Cart" },
+            ]}
+          />
+          
+          <div className="flex justify-between items-center mb-1 m-1 p-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Shopping Cart</h1>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/")}
+              className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 m-1 p-1"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Continue Shopping
+            </Button>
           </div>
-        )}
+          
+          {!cartItems?.length ? (
+            <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
+              <CardContent className="p-1">
+                <div className="text-center space-y-1">
+                  <ShoppingBag className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+                  <p className="text-center text-gray-700 dark:text-gray-300 font-medium text-lg">Your cart is empty</p>
+                  <Button
+                    className="mt-1 mx-auto block w-full sm:w-auto px-1 py-1 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
+                    onClick={() => navigate("/")}
+                  >
+                    <ShoppingBag className="mr-1 h-4 w-4" />
+                    Start Shopping
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-1 md:grid-cols-2 m-1 p-1">
+              <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
+                <CardHeader className="pb-1 m-1 p-1">
+                  <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Cart Items ({cartItems.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-1 p-1 m-1">
+                  {cartItems.map((item) => (
+                    <CartItem
+                      key={item.id}
+                      id={item.id}
+                      title={item.product.title}
+                      quantity={item.quantity}
+                      price={item.product.price}
+                      currency={item.product.currency}
+                      onDelete={() => deleteItemMutation.mutate(item.id)}
+                    />
+                  ))}
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
+                <CardHeader className="pb-1 m-1 p-1">
+                  <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Checkout Summary</CardTitle>
+                </CardHeader>
+                <CardContent className="p-1 m-1">
+                  <CartSummary
+                    currency={cartItems[0]?.product.currency || "USD"}
+                    totalAmount={cartItems.reduce(
+                      (sum, item) => sum + item.product.price * item.quantity,
+                      0
+                    )}
+                    selectedPaymentMethod={selectedPaymentMethod}
+                    onPaymentMethodChange={setSelectedPaymentMethod}
+                    onCheckout={handleCheckout}
+                    isLoading={orderCreation.isPending}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

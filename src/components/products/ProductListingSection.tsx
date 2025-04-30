@@ -46,7 +46,7 @@ export const ProductListingSection = ({
   };
 
   return (
-    <div className="w-full space-y-1">
+    <div className="w-full space-y-1 m-1 p-1">
       <ProductFilters onSearchChange={handleSearchChange} />
       <ProductList
         products={products}

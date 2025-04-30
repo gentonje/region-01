@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -26,16 +27,16 @@ export const CartSummary = ({
   isLoading,
 }: CartSummaryProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-1 m-1 p-1">
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-1">
           Payment Method
         </label>
         <Select
           value={selectedPaymentMethod}
           onValueChange={onPaymentMethodChange}
         >
-          <SelectTrigger>
+          <SelectTrigger className="m-1 p-1">
             <SelectValue placeholder="Select payment method" />
           </SelectTrigger>
           <SelectContent>
@@ -47,15 +48,15 @@ export const CartSummary = ({
         </Select>
       </div>
 
-      <div className="pt-4 border-t">
-        <p className="flex justify-between mb-2">
+      <div className="pt-1 border-t">
+        <p className="flex justify-between mb-1">
           <span>Total</span>
           <span className="font-bold">
             {currency} {totalAmount}
           </span>
         </p>
         <Button
-          className="w-full"
+          className="w-full m-1 p-1"
           onClick={onCheckout}
           disabled={isLoading}
         >

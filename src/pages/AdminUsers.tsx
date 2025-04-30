@@ -2,14 +2,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import { Navigation, BottomNavigation } from "@/components/Navigation";
 import { Database } from "@/integrations/supabase/types";
 import { UserStatsCard } from "@/components/admin/UserStatsCard";
-import { CategoryStatsCard } from "@/components/admin/CategoryStatsCard";
-import { TotalProductsCard } from "@/components/admin/TotalProductsCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { UserProductGroup } from "@/components/UserProductGroup";
 import { toast } from "sonner";
+import { MainLayout } from "@/components/layouts/MainLayout";
 
 type ProductCategory = Database['public']['Enums']['product_category'];
 
@@ -76,19 +74,18 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="min-h-screen pb-16 bg-background text-foreground">
-      <Navigation />
-      <main className="container mx-auto px-4 pt-20 md:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="w-full">
+      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
+        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
           <BreadcrumbNav items={[{ label: "Admin Users" }]} />
-          <h1 className="text-xl md:text-2xl font-bold mb-6 dark:text-gray-100">User Management</h1>
+          <h1 className="text-xl md:text-2xl font-bold mb-6 dark:text-gray-100 m-1 p-1">User Management</h1>
           
           {isUsersLoading ? (
             <div className="flex justify-center items-center h-48">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <div className="grid gap-6">
+            <div className="grid gap-1 space-y-1 m-1 p-1">
               {users?.map((user) => (
                 <div 
                   key={user.id}
@@ -104,8 +101,7 @@ const AdminUsers = () => {
             </div>
           )}
         </div>
-      </main>
-      <BottomNavigation isAuthenticated={!!session} />
+      </div>
     </div>
   );
 };

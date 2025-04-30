@@ -117,68 +117,65 @@ const Wishlist = () => {
     return null;
   }
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto p-4 space-y-1 mt-20">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
-        <div className="space-y-1">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700 m-1 p-1" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto p-4 space-y-1 mt-20">
-      <BreadcrumbNav
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Wishlist" },
-        ]}
-      />
-      
-      <div className="flex justify-between items-center m-1 p-1">
-        <div className="flex items-center gap-2 space-x-1">
-          <Heart className="h-6 w-6 fill-amber-400 text-amber-400" />
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
+    <div className="w-full">
+      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
+        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
+          <BreadcrumbNav
+            items={[
+              { label: "Home", href: "/" },
+              { label: "Wishlist" },
+            ]}
+          />
+          
+          <div className="flex justify-between items-center m-1 p-1">
+            <div className="flex items-center gap-1 space-x-1">
+              <Heart className="h-6 w-6 fill-amber-400 text-amber-400" />
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">My Wishlist</h1>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/")}
+              className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 m-1 p-1"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Continue Shopping
+            </Button>
+          </div>
+          
+          {isLoading ? (
+            <div className="space-y-1">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700 m-1 p-1" />
+              ))}
+            </div>
+          ) : wishlistItems && wishlistItems.length > 0 ? (
+            <div className="space-y-1">
+              {wishlistItems.map((item: any) => (
+                <WishlistItem 
+                  key={item.id} 
+                  item={item} 
+                  product={item.products as Product}
+                  onItemRemoved={refetch}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 border border-gray-200 dark:border-gray-700 m-1">
+              <Heart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+              <p className="text-gray-700 dark:text-gray-300 font-medium text-lg mt-1 mb-1">
+                Your wishlist is empty. Browse products to add items to your wishlist.
+              </p>
+              <Button 
+                onClick={() => navigate("/products")}
+                className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
+              >
+                Start Shopping
+              </Button>
+            </div>
+          )}
         </div>
-        <Button
-          variant="outline"
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 m-1 p-1"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Continue Shopping
-        </Button>
       </div>
-      
-      {wishlistItems && wishlistItems.length > 0 ? (
-        <div className="space-y-1">
-          {wishlistItems.map((item: any) => (
-            <WishlistItem 
-              key={item.id} 
-              item={item} 
-              product={item.products as Product}
-              onItemRemoved={refetch}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 border border-gray-200 dark:border-gray-700 m-1">
-          <Heart className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-          <p className="text-gray-700 dark:text-gray-300 font-medium text-lg mt-4 mb-6">
-            Your wishlist is empty. Browse products to add items to your wishlist.
-          </p>
-          <Button 
-            onClick={() => navigate("/products")}
-            className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
-          >
-            Start Shopping
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

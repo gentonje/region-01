@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -6,6 +7,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductFilters } from "@/components/ProductFilters";
 import { Star } from "lucide-react";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface Profile {
   id: string;
@@ -85,99 +87,108 @@ const AdminManagement = () => {
     return 0;
   });
 
-  if (isLoading) {
-    return <div className="container mx-auto p-4">Loading...</div>;
-  }
-
   // Separate admins and regular users
   const adminProfiles = sortedProfiles?.filter(profile => profile.user_type === 'admin');
   const regularProfiles = sortedProfiles?.filter(profile => profile.user_type !== 'admin');
 
   return (
-    <div className="container mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold mb-4 mt-10">Admin Management</h1>
-      <ProductFilters onSearchChange={setSearchQuery} />
-      
-      {/* Admin Section */}
-      {adminProfiles && adminProfiles.length > 0 && (
-        <>
-          <h2 className="text-xl font-semibold mt-6 mb-2">Administrators</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {adminProfiles.map((profile) => (
-              <Card key={profile.id} className="overflow-hidden">
-                <CardContent className="p-4 space-y-3">
-                  <div className="space-y-1">
-                    <div className="font-medium flex items-center gap-2">
-                      {profile.full_name || 'N/A'}
-                      <Star className="h-4 w-4 text-blue-500 fill-blue-500" />
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {profile.contact_email || 'N/A'}
-                    </div>
+    <div className="w-full">
+      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
+        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
+          <BreadcrumbNav items={[{ label: "Admin Management" }]} />
+          <h1 className="text-2xl font-bold mb-4 dark:text-gray-100 m-1 p-1">Admin Management</h1>
+          <ProductFilters onSearchChange={setSearchQuery} />
+          
+          {isLoading ? (
+            <div className="flex justify-center items-center h-48">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <>
+              {/* Admin Section */}
+              {adminProfiles && adminProfiles.length > 0 && (
+                <div className="w-full space-y-1 m-1 p-1">
+                  <h2 className="text-xl font-semibold mt-1 mb-1">Administrators</h2>
+                  <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3">
+                    {adminProfiles.map((profile) => (
+                      <Card key={profile.id} className="overflow-hidden m-1 shadow-sm">
+                        <CardContent className="p-1 space-y-1">
+                          <div className="space-y-1">
+                            <div className="font-medium flex items-center gap-1">
+                              {profile.full_name || 'N/A'}
+                              <Star className="h-4 w-4 text-blue-500 fill-blue-500" />
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {profile.contact_email || 'N/A'}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="font-medium">Role</div>
+                            <div className="text-sm text-muted-foreground">
+                              {profile.user_type || 'user'}
+                            </div>
+                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-1"
+                            onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
+                            disabled={isUpdating || profile.user_type === 'super_admin'}
+                          >
+                            {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  <div className="space-y-1">
-                    <div className="font-medium">Role</div>
-                    <div className="text-sm text-muted-foreground">
-                      {profile.user_type || 'user'}
-                    </div>
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                    disabled={isUpdating || profile.user_type === 'super_admin'}
-                  >
-                    {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
-      )}
+                </div>
+              )}
 
-      {/* Regular Users Section */}
-      {regularProfiles && regularProfiles.length > 0 && (
-        <>
-          <h2 className="text-xl font-semibold mt-6 mb-2">Users</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {regularProfiles.map((profile) => (
-              <Card key={profile.id} className="overflow-hidden">
-                <CardContent className="p-4 space-y-3">
-                  <div className="space-y-1">
-                    <div className="font-medium">
-                      {profile.full_name || 'N/A'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {profile.contact_email || 'N/A'}
-                    </div>
+              {/* Regular Users Section */}
+              {regularProfiles && regularProfiles.length > 0 && (
+                <div className="w-full space-y-1 m-1 p-1">
+                  <h2 className="text-xl font-semibold mt-1 mb-1">Users</h2>
+                  <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3">
+                    {regularProfiles.map((profile) => (
+                      <Card key={profile.id} className="overflow-hidden m-1 shadow-sm">
+                        <CardContent className="p-1 space-y-1">
+                          <div className="space-y-1">
+                            <div className="font-medium">
+                              {profile.full_name || 'N/A'}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              {profile.contact_email || 'N/A'}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <div className="font-medium">Role</div>
+                            <div className="text-sm text-muted-foreground">
+                              {profile.user_type || 'user'}
+                            </div>
+                          </div>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full mt-1"
+                            onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
+                            disabled={isUpdating || profile.user_type === 'super_admin'}
+                          >
+                            {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  <div className="space-y-1">
-                    <div className="font-medium">Role</div>
-                    <div className="text-sm text-muted-foreground">
-                      {profile.user_type || 'user'}
-                    </div>
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full mt-2"
-                    onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                    disabled={isUpdating || profile.user_type === 'super_admin'}
-                  >
-                    {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </>
-      )}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

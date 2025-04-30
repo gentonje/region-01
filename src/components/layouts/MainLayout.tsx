@@ -27,15 +27,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
         selectedCurrency={selectedCurrency}
         onCurrencyChange={onCurrencyChange}
       />
-      <div className="w-full p-0 md:px-0 pt-16 pb-20 sm:pt-20 sm:pb-24 space-y-1 md:space-y-1 max-w-none">
-        <div className="w-full mx-auto space-y-1 md:space-y-1 px-0 max-w-none">
+      <div className="w-full p-0 pt-16 pb-20 sm:pt-20 sm:pb-24 max-w-none space-y-1">
+        <div className="w-full mx-auto space-y-1 px-0 max-w-none">
           {children || <Outlet />}
         </div>
       </div>

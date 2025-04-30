@@ -122,19 +122,19 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
               width={192}
               height={192}
             />
-            <Heart className="absolute top-2 left-2 w-5 h-5 fill-amber-400 text-amber-400" />
+            <Heart className="absolute top-1 left-1 w-5 h-5 fill-amber-400 text-amber-400" />
           </div>
-          <div className="flex-1 p-4 flex flex-col justify-between space-y-1">
+          <div className="flex-1 p-1 flex flex-col justify-between space-y-1">
             <div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-gray-100">{product.title}</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
+              <h3 className="text-lg font-semibold mb-1 text-gray-800 dark:text-gray-100">{product.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-1">
                 {product.description}
               </p>
               <p className="text-lg font-medium text-orange-500">
                 {product.currency} {product.price?.toFixed(2)}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2 space-x-1">
+            <div className="flex flex-wrap gap-1 mt-1 space-x-1">
               <Button
                 variant="default"
                 size="sm"
@@ -142,7 +142,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 disabled={!product.in_stock || addToCart.isPending}
                 className="bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
               >
-                <ShoppingCart className="w-4 h-4 mr-2" />
+                <ShoppingCart className="w-4 h-4 mr-1" />
                 Add to Cart
               </Button>
               <Button
@@ -152,7 +152,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 disabled={isSharing}
                 className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 m-1 p-1"
               >
-                <Share2 className="w-4 h-4 mr-2" />
+                <Share2 className="w-4 h-4 mr-1" />
                 Share
               </Button>
               <Button
@@ -162,7 +162,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 disabled={removeFromWishlist.isPending}
                 className="bg-red-600 hover:bg-red-700 m-1 p-1"
               >
-                <Trash2 className="w-4 h-4 mr-2" />
+                <Trash2 className="w-4 h-4 mr-1" />
                 Remove
               </Button>
             </div>
