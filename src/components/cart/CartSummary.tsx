@@ -27,7 +27,7 @@ export const CartSummary = ({
   isLoading,
 }: CartSummaryProps) => {
   return (
-    <div className="space-y-1 m-1 p-1">
+    <div className="space-y-1 p-1">
       <div>
         <label className="block text-sm font-medium mb-1">
           Payment Method
@@ -36,7 +36,7 @@ export const CartSummary = ({
           value={selectedPaymentMethod}
           onValueChange={onPaymentMethodChange}
         >
-          <SelectTrigger className="m-1 p-1">
+          <SelectTrigger className="p-1">
             <SelectValue placeholder="Select payment method" />
           </SelectTrigger>
           <SelectContent>
@@ -56,7 +56,7 @@ export const CartSummary = ({
           </span>
         </p>
         <Button
-          className="w-full m-1 p-1"
+          className="w-full p-1"
           onClick={onCheckout}
           disabled={isLoading}
         >

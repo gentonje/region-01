@@ -24,8 +24,8 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     : '/placeholder.svg';
 
   return (
-    <div className="flex flex-col md:flex-row gap-2 md:gap-4 space-x-1 space-y-1">
-      <div className="w-full md:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm m-1">
+    <div className="flex flex-col md:flex-row gap-1 space-x-1 space-y-1 p-1">
+      <div className="w-full md:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm">
         <ImageLoader
           src={imageUrl}
           alt={product.title || ''}
@@ -34,26 +34,26 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           height={128}
         />
       </div>
-      <div className="flex-1 min-w-0 m-1 space-y-1">
+      <div className="flex-1 min-w-0 space-y-1">
         <ProductModifyHeader title={product.title || ''} ownerName={ownerName} />
-        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-2 md:mb-3">
+        <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-1">
           {product.description}
         </p>
-        <div className="flex flex-wrap items-center gap-2 space-x-1">
-          <span className="text-base md:text-lg font-bold bg-primary/10 text-primary px-2 md:px-3 py-1 rounded-full m-1">
+        <div className="flex flex-wrap items-center gap-1 space-x-1">
+          <span className="text-base md:text-lg font-bold bg-primary/10 text-primary px-1 py-1 rounded-full">
             ${product.price}
           </span>
-          <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full text-xs m-1">
+          <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full text-xs">
             {status === 'published' ? 'Published' : 'Draft'}
           </Badge>
           {product.category && (
-            <Badge variant="outline" className="rounded-full text-xs m-1">
+            <Badge variant="outline" className="rounded-full text-xs">
               {product.category}
             </Badge>
           )}
         </div>
       </div>
-      <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-start gap-2 mt-2 md:mt-0 space-x-1 space-y-1">
+      <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-start gap-1 mt-1 md:mt-0 space-x-1 space-y-1">
         <ProductModifyActions productId={product.id} onDelete={onDelete} />
         {isAdmin && (
           <ProductPublishSwitch 
