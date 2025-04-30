@@ -53,12 +53,12 @@ export const ProductCardImage = memo(({
         />
       </AspectRatio>
       
-      <span className="absolute bottom-1 left-1 text-xs px-1 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%] m-1">
+      <span className="absolute bottom-1 left-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%] m-1">
         {product.category}
       </span>
       
       <span 
-        className={`absolute top-1 right-1 text-xs px-1 py-0.5 rounded-full ${
+        className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
           product.in_stock 
             ? 'bg-green-500/90 text-white' 
             : 'bg-red-500/90 text-white'
@@ -68,7 +68,7 @@ export const ProductCardImage = memo(({
       </span>
       
       {showStatus && (
-        <span className={`absolute top-1 left-1 text-xs px-1 py-0.5 rounded-full ${
+        <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full ${
           product.product_status === 'published' 
             ? 'bg-green-500/90 text-white' 
             : 'bg-yellow-500/90 text-white'
@@ -81,7 +81,7 @@ export const ProductCardImage = memo(({
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-1 left-1 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 z-10 m-1"
+          className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10 m-1"
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist();
@@ -89,7 +89,7 @@ export const ProductCardImage = memo(({
           disabled={isPending}
         >
           <Heart 
-            className={`w-3 h-3 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white wishlist-heart-inactive'}`} 
+            className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white wishlist-heart-inactive'}`} 
           />
         </Button>
       )}

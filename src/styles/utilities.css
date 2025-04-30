@@ -15,24 +15,24 @@
 
 /* Consistent spacing utilities */
 .space-y-consistent {
-  @apply space-y-1;
+  @apply space-y-1 md:space-y-2 lg:space-y-3;
 }
 
 .space-x-consistent {
-  @apply space-x-1;
+  @apply space-x-1 md:space-x-2 lg:space-x-3;
 }
 
 .padding-consistent {
-  @apply p-1;
+  @apply p-1 md:p-2 lg:p-3;
 }
 
 .margin-consistent {
-  @apply m-1;
+  @apply m-1 md:m-2 lg:m-3;
 }
 
 /* Mobile optimizations */
 .mobile-optimized {
-  @apply text-sm md:text-base;
+  @apply text-sm md:text-base lg:text-lg;
 }
 
 .mobile-layout {
@@ -63,5 +63,5 @@
 
 /* Layout spacing for pages */
 .page-spacing {
-  @apply space-y-1 m-1 p-1;
+  @apply space-y-1 md:space-y-2 m-1 p-1;
 }
