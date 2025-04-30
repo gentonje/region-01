@@ -22,17 +22,19 @@ export const ProductSimilarSection = ({
   }
 
   return (
-    <div className="mt-1">
-      <div className="flex items-center mb-1">
+    <div className="mt-4 w-full">
+      <div className="flex items-center mb-2">
         <PackageSearch className="h-5 w-5 mr-1" />
         <h3 className="text-lg font-semibold">Similar Products</h3>
       </div>
-      <ProductSimilar
-        products={similarProducts}
-        getProductImageUrl={getProductImageUrl}
-        onProductClick={onProductClick}
-        selectedCurrency={selectedCurrency}
-      />
+      <div className="w-full">
+        <ProductSimilar
+          products={similarProducts}
+          getProductImageUrl={getProductImageUrl}
+          onProductClick={onProductClick}
+          selectedCurrency={selectedCurrency}
+        />
+      </div>
     </div>
   );
 };

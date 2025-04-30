@@ -54,12 +54,12 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-1 pb-1">
+    <div className="space-y-4 pb-4">
       <Card className="w-full max-w-none mx-auto overflow-hidden">
-        <CardContent className="p-1">
+        <CardContent className="p-4">
           <div className="flex flex-col md:flex-row md:gap-4">
             {/* Left column - Product gallery */}
-            <div className="md:w-1/2 space-y-1">
+            <div className="md:w-1/2 space-y-4">
               <div className="flex items-center mb-1">
                 <button 
                   onClick={onBack} 
@@ -94,7 +94,7 @@ const ProductDetail = ({
             </div>
 
             {/* Right column - Tabs with product details and reviews */}
-            <div className="md:w-1/2 mt-1 md:mt-0 md:pt-10">
+            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10">
               <ProductTabs 
                 product={product}
                 activeTab={activeTab}
@@ -104,7 +104,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-1">
+        <CardFooter className="p-4">
           <ProductActions
             price={product.price || 0}
             currency={product.currency || "SSP"}
@@ -117,12 +117,15 @@ const ProductDetail = ({
         </CardFooter>
       </Card>
 
-      <ProductSimilarSection
-        similarProducts={similarProducts}
-        getProductImageUrl={getProductImageUrl}
-        onProductClick={handleSimilarProductClick}
-        selectedCurrency={selectedCurrency}
-      />
+      {/* Similar products section - full width */}
+      <div className="w-full -mx-4 px-4">
+        <ProductSimilarSection
+          similarProducts={similarProducts}
+          getProductImageUrl={getProductImageUrl}
+          onProductClick={handleSimilarProductClick}
+          selectedCurrency={selectedCurrency}
+        />
+      </div>
     </div>
   );
 };

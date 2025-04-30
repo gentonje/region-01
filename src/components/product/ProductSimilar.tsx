@@ -66,8 +66,8 @@ export const ProductSimilar = ({
   if (!products?.length) return null;
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-1">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 space-x-1 space-y-1">
+    <div className="w-full mx-auto space-y-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
         {products.map((similarProduct) => {
           // Initialize wishlist functionality for each product
           const { isInWishlist, toggleWishlist, isPending } = useWishlistMutation(similarProduct.id);
@@ -75,7 +75,7 @@ export const ProductSimilar = ({
           return (
             <Card 
               key={similarProduct.id}
-              className="w-full m-1 p-1 overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer"
+              className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer"
               onClick={() => onProductClick(similarProduct)}
             >
               {/* Product Image Section - Matching main card design */}
@@ -128,7 +128,7 @@ export const ProductSimilar = ({
               </div>
               
               {/* Product Content Section */}
-              <div className="p-1 space-y-1">
+              <div className="p-2 space-y-1">
                 <div className="pt-0">
                   <h3 className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left">
                     {similarProduct.title}
