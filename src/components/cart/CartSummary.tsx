@@ -27,7 +27,7 @@ export const CartSummary = ({
   isLoading,
 }: CartSummaryProps) => {
   return (
-    <div className="space-y-1 p-1">
+    <div className="space-y-1 m-1 p-1">
       <div>
         <label className="block text-sm font-medium mb-1">
           Payment Method

@@ -14,7 +14,7 @@ export const UserStatsCard = ({ id, username, product_count, is_active, user_typ
   const isAdmin = user_type === 'admin' || user_type === 'super_admin';
   
   return (
-    <Card className="p-1 overflow-hidden">
+    <Card className="overflow-hidden m-1 p-1">
       <div className="flex items-center">
         <div className="flex items-center gap-1">
           <Users className="h-8 w-8 text-muted-foreground" />

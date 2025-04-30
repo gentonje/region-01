@@ -25,15 +25,16 @@ interface ModifyProductsListProps {
 }
 
 const ProductSkeleton = () => (
-  <div className="flex items-center gap-4 py-4">
-    <Skeleton className="h-20 w-20 rounded" />
-    <div className="flex-1">
-      <Skeleton className="h-6 w-3/4 mb-2" />
+  <div className="flex items-center gap-1 p-1">
+    <Skeleton className="h-20 w-20 rounded-md" />
+    <div className="flex-1 space-y-1">
+      <Skeleton className="h-6 w-3/4" />
       <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-1/3" />
     </div>
-    <div className="flex gap-2">
-      <Skeleton className="h-8 w-8" />
-      <Skeleton className="h-8 w-8" />
+    <div className="flex gap-1">
+      <Skeleton className="h-8 w-8 rounded-full" />
+      <Skeleton className="h-8 w-8 rounded-full" />
     </div>
   </div>
 );
@@ -112,9 +113,9 @@ export const ModifyProductsList = ({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-1 mb-1 m-1 p-1">
         <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-1 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search by product or username..."
             value={searchQuery}
@@ -155,9 +156,9 @@ export const ModifyProductsList = ({
         </Select>
       </div>
 
-      <div className="divide-y divide-gray-200 bg-white rounded-lg shadow">
+      <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow m-1 p-1">
         {filteredAndSortedProducts.map((product) => (
-          <div key={`product-${product.id}`} className="p-4">
+          <div key={`product-${product.id}`} className="p-1">
             <ProductModifyCard
               product={product}
               onDelete={onDelete}
@@ -168,9 +169,9 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-gray-200 bg-white rounded-lg shadow mt-4">
+        <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 m-1 p-1">
           {[1, 2, 3].map((i) => (
-            <div key={`skeleton-${i}`} className="p-4">
+            <div key={`skeleton-${i}`} className="p-1">
               <ProductSkeleton />
             </div>
           ))}
@@ -178,12 +179,12 @@ export const ModifyProductsList = ({
       )}
 
       {!isLoading && filteredAndSortedProducts.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-gray-600">No products found</p>
+        <div className="text-center py-1 m-1 p-1">
+          <p className="text-gray-600 dark:text-gray-400">No products found</p>
         </div>
       )}
 
-      <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+      <div ref={loadMoreRef} className="h-16 flex items-center justify-center m-1 p-1">
         {hasMore && <div className="loading">Loading more...</div>}
       </div>
     </>

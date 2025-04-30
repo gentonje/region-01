@@ -119,7 +119,7 @@ const Wishlist = () => {
 
   return (
     <div className="w-full">
-      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
+      <div className="w-full mx-auto px-0 md:px-0 pt-20 pb-16">
         <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
           <BreadcrumbNav
             items={[
@@ -144,9 +144,24 @@ const Wishlist = () => {
           </div>
           
           {isLoading ? (
-            <div className="space-y-1">
+            <div className="space-y-1 m-1">
               {[1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-32 w-full bg-gray-200 dark:bg-gray-700 m-1 p-1" />
+                <div key={i} className="flex rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm m-1">
+                  <div className="w-32 h-32">
+                    <Skeleton className="h-full w-full" />
+                  </div>
+                  <div className="flex-1 p-1 space-y-1">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex justify-between items-center">
+                      <Skeleton className="h-8 w-24" />
+                      <div className="flex space-x-1">
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                        <Skeleton className="h-8 w-20 rounded-md" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           ) : wishlistItems && wishlistItems.length > 0 ? (

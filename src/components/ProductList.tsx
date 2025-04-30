@@ -21,14 +21,14 @@ interface ProductListProps {
 }
 
 const ProductSkeleton = memo(() => (
-  <div className="space-y-1 rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-1 shadow-md">
-    <Skeleton className="h-[200px] w-full rounded-lg bg-gray-300 dark:bg-gray-700" />
-    <Skeleton className="h-6 w-2/3 bg-gray-300 dark:bg-gray-700" />
-    <Skeleton className="h-4 w-full bg-gray-300 dark:bg-gray-700" />
-    <Skeleton className="h-4 w-3/4 bg-gray-300 dark:bg-gray-700" />
+  <div className="space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
+    <Skeleton className="h-[200px] w-full rounded-lg" />
+    <Skeleton className="h-6 w-2/3" />
+    <Skeleton className="h-4 w-full" />
+    <Skeleton className="h-4 w-3/4" />
     <div className="flex justify-between mt-1 space-x-1">
-      <Skeleton className="h-8 w-20 rounded-full bg-gray-300 dark:bg-gray-700" />
-      <Skeleton className="h-8 w-20 rounded-full bg-gray-300 dark:bg-gray-700" />
+      <Skeleton className="h-8 w-20 rounded-md" />
+      <Skeleton className="h-8 w-20 rounded-md" />
     </div>
   </div>
 ));
