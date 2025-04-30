@@ -57,11 +57,11 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   if (!images || images.length === 0) {
     return (
       <div className="space-y-1">
-        <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
+        <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
           <ImageLoader
             src="/placeholder.svg"
             alt={title || "Product placeholder"}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             width={800}
             height={600}
             priority={true}
@@ -73,11 +73,11 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
 
   return (
     <div className="space-y-1">
-      <div className="aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
+      <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
         <ImageLoader
           src={mainImageUrl}
           alt={title}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           width={800}
           height={600}
           priority={true}

@@ -55,31 +55,39 @@ const ProductDetail = ({
 
   return (
     <div className="space-y-1 pb-1">
-      <Card className="w-full max-w-2xl mx-auto overflow-hidden">
+      <Card className="w-full max-w-none mx-auto overflow-hidden">
         <CardContent className="p-1">
-          <ProductInfo
-            title={product.title || ''}
-            category={product.category || 'Other'}
-            averageRating={product.average_rating || 0}
-            inStock={product.in_stock || false}
-            description={product.description || ''}
-            onBack={onBack}
-          />
+          <div className="flex flex-col md:flex-row md:gap-4">
+            {/* Left column - Product info and Gallery */}
+            <div className="md:w-1/2 space-y-1">
+              <ProductInfo
+                title={product.title || ''}
+                category={product.category || 'Other'}
+                averageRating={product.average_rating || 0}
+                inStock={product.in_stock || false}
+                description={product.description || ''}
+                onBack={onBack}
+              />
 
-          <Suspense fallback={<Skeleton className="aspect-[4/3] w-full rounded-lg" />}>
-            <ProductGallery
-              images={product.product_images || []}
-              selectedImage={selectedImage}
-              onImageSelect={setSelectedImage}
-              title={product.title || ''}
-            />
-          </Suspense>
+              <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full rounded-lg" />}>
+                <ProductGallery
+                  images={product.product_images || []}
+                  selectedImage={selectedImage}
+                  onImageSelect={setSelectedImage}
+                  title={product.title || ''}
+                />
+              </Suspense>
+            </div>
 
-          <ProductTabs 
-            product={product}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-          />
+            {/* Right column - Tabs with product details and reviews */}
+            <div className="md:w-1/2 mt-1 md:mt-0">
+              <ProductTabs 
+                product={product}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+            </div>
+          </div>
         </CardContent>
 
         <CardFooter className="p-1">

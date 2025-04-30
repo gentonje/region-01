@@ -14,7 +14,7 @@ interface ProductTabsProps {
 
 export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProps) => {
   return (
-    <Tabs defaultValue={activeTab} className="mt-1" onValueChange={onTabChange}>
+    <Tabs defaultValue={activeTab} className="w-full h-full" onValueChange={onTabChange}>
       <TabsList className="grid grid-cols-2 w-full">
         <TabsTrigger value="details" className="flex items-center">
           <Info className="h-4 w-4 mr-1" />
@@ -25,41 +25,45 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
           Reviews
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="details" className="pt-1">
-        <div className="space-y-1">
-          <div className="grid grid-cols-2 gap-x-1 gap-y-1">
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-muted-foreground">Category</p>
-              <p className="text-sm font-medium">{product.category || 'Other'}</p>
+      
+      <div className="h-[calc(100%-40px)] overflow-auto">
+        <TabsContent value="details" className="pt-1 h-full">
+          <div className="space-y-1">
+            <div className="grid grid-cols-2 gap-x-1 gap-y-1">
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-muted-foreground">Category</p>
+                <p className="text-sm font-medium">{product.category || 'Other'}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-muted-foreground">Availability</p>
+                <p className="text-sm font-medium">{product.in_stock ? 'In Stock' : 'Out of Stock'}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-muted-foreground">Original Price</p>
+                <p className="text-sm font-medium">{product.currency} {product.price?.toLocaleString()}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-muted-foreground">Rating</p>
+                <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
+              </div>
             </div>
+            
             <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-muted-foreground">Availability</p>
-              <p className="text-sm font-medium">{product.in_stock ? 'In Stock' : 'Out of Stock'}</p>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-muted-foreground">Original Price</p>
-              <p className="text-sm font-medium">{product.currency} {product.price?.toLocaleString()}</p>
-            </div>
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-xs text-muted-foreground">Rating</p>
-              <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
+              <p className="text-xs text-muted-foreground">Product Description</p>
+              <p className="text-sm">{product.description}</p>
             </div>
           </div>
-          
-          <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-muted-foreground">Product Description</p>
-            <p className="text-sm">{product.description}</p>
-          </div>
-        </div>
-      </TabsContent>
-      <TabsContent value="reviews" className="pt-1">
-        <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-          <ProductReviews 
-            productId={product.id} 
-            sellerId={product.seller_id || ''} 
-          />
-        </Suspense>
-      </TabsContent>
+        </TabsContent>
+
+        <TabsContent value="reviews" className="pt-1 h-full">
+          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
+            <ProductReviews 
+              productId={product.id} 
+              sellerId={product.seller_id || ''} 
+            />
+          </Suspense>
+        </TabsContent>
+      </div>
     </Tabs>
   );
 };
