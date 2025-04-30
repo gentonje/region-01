@@ -85,7 +85,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
         />
       </div>
       {images.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto pb-1 px-1 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="flex gap-1 overflow-x-auto pb-1 px-0 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {images.map((image, index) => (
             <div
               key={index}

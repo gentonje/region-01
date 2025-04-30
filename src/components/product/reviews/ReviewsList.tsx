@@ -35,7 +35,7 @@ export const ReviewsList = ({
   }
 
   return (
-    <ScrollArea className="h-[280px] md:h-[320px] pr-1">
+    <ScrollArea className="h-[280px] md:h-[400px] pr-1">
       <div className="space-y-1">
         {reviews.map((review) => (
           <ReviewItem 
