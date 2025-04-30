@@ -74,7 +74,7 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
 
   // Log when currency changes (helpful for debugging)
   useEffect(() => {
-    console.log('Current selected currency:', value);
+    console.log('Changing currency to:', value);
   }, [value]);
 
   return (

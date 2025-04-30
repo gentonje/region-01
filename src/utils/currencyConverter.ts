@@ -72,6 +72,8 @@ export const convertCurrency = async (
       return amount;
     }
 
+    // For SSP to USD: amount * (USD rate / SSP rate)
+    // For USD to SSP: amount * (SSP rate / USD rate)
     // General formula: amount * (target rate / source rate)
     const result = Number((amount * rates[toCurrency] / rates[fromCurrency]).toFixed(2));
     

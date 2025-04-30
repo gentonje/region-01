@@ -1,3 +1,4 @@
+
 import { Card } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
@@ -32,17 +33,7 @@ export const ProductSimilar = ({
   // Update prices immediately when selectedCurrency changes
   useEffect(() => {
     const updatePrices = async () => {
-      // If selected currency is SSP, use the exact database prices
-      if (selectedCurrency === "SSP") {
-        const prices: Record<string, number> = {};
-        for (const product of products) {
-          prices[product.id] = product.price || 0;
-        }
-        setConvertedPrices(prices);
-        return;
-      }
-      
-      // Otherwise, refresh rates and convert from SSP to the selected currency
+      // Force refresh currency rates when currency changes
       await refreshCurrencyRates();
       
       const prices: Record<string, number> = {};
@@ -150,7 +141,7 @@ export const ProductSimilar = ({
                 </div>
                 <div className="flex justify-between items-center pt-1">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
-                    {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || similarProduct.price || 0).toLocaleString()}
+                    {selectedCurrency} {convertedPrices[similarProduct.id]?.toFixed(2) || '0.00'}
                   </span>
                   
                   <Button 

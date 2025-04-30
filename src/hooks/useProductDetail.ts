@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,13 +24,6 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
   useEffect(() => {
     const updatePrice = async () => {
       try {
-        // If selected currency is SSP, use the exact database price
-        if (selectedCurrency === "SSP") {
-          setConvertedPrice(product.price || 0);
-          return;
-        }
-        
-        // Otherwise convert from SSP to the selected currency
         const converted = await convertCurrency(
           product.price || 0,
           (product.currency || "SSP") as SupportedCurrency,
