@@ -34,7 +34,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         selectedCurrency={selectedCurrency}
         onCurrencyChange={onCurrencyChange}
       />
-      <div className="w-full pt-16 pb-16 sm:pt-16 sm:pb-20 max-w-none">
+      <div className={cn(
+        "w-full pt-16", 
+        isMobile ? "pb-16" : "pb-4", 
+        "sm:pt-16 max-w-none"
+      )}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {children || <Outlet />}
         </div>
@@ -50,3 +54,6 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     </div>
   );
 };
+
+// Ensure cn is imported
+import { cn } from "@/lib/utils";
