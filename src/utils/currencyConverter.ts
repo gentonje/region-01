@@ -10,7 +10,7 @@ interface CurrencyRate {
 
 let ratesCache: Record<string, number> | null = null;
 let lastFetchTime = 0;
-const CACHE_DURATION = 30000; // 30 seconds - reduced for more immediate updates
+const CACHE_DURATION = 300000; // 5 minutes - increased from 30 seconds
 
 const getCurrencyRates = async (): Promise<Record<string, number>> => {
   const currentTime = Date.now();
@@ -65,7 +65,11 @@ export const convertCurrency = async (
     }
     
     const rates = await getCurrencyRates();
-    console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`, { rates });
+    
+    // Only log conversions for debugging when currencies differ
+    if (fromCurrency !== toCurrency) {
+      console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`);
+    }
 
     if (!rates[fromCurrency] || !rates[toCurrency]) {
       console.error('Invalid currency code', { fromCurrency, toCurrency, rates });
@@ -77,7 +81,11 @@ export const convertCurrency = async (
     // General formula: amount * (target rate / source rate)
     const result = Number((amount * rates[toCurrency] / rates[fromCurrency]).toFixed(2));
     
-    console.log(`Conversion result: ${amount} ${fromCurrency} = ${result} ${toCurrency}`);
+    // Only log result for debugging when currencies differ
+    if (fromCurrency !== toCurrency) {
+      console.log(`Conversion result: ${amount} ${fromCurrency} = ${result} ${toCurrency}`);
+    }
+    
     return result;
   } catch (error) {
     console.error('Error converting currency:', error);

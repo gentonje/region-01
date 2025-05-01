@@ -5,7 +5,7 @@ export const Logo = () => {
   return (
     <Link 
       to="/" 
-      className="transition-all" 
+      className="transition-all font-bold text-lg" 
       style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}
     >
       <span style={{ color: '#F97316' }}>Online</span>

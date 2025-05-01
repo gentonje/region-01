@@ -91,20 +91,26 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
     addToCartMutation.mutate();
   };
 
-  // Track product view while handling potential conflicts
+  // Track product view with improved error handling for conflicts
   useEffect(() => {
     const trackProductView = async () => {
       try {
+        if (!product.id) return;
+        
         const { data: { user } } = await supabase.auth.getUser();
         
-        const { error } = await supabase.from('product_views').insert({
-          product_id: product.id,
-          viewer_id: user?.id || null,
-        });
+        // Use upsert instead of insert to handle conflicts gracefully
+        const { error } = await supabase
+          .from('product_views')
+          .upsert({
+            product_id: product.id,
+            viewer_id: user?.id || null,
+            viewed_at: new Date().toISOString(),
+          }, {
+            onConflict: 'product_id,viewer_id,view_date', // Specify conflict fields
+            ignoreDuplicates: true // Ignore duplicates instead of error
+          });
 
-        // Conflict errors (409) are expected when the unique constraint is violated
-        // This happens if the user views the same product multiple times in a day
-        // We can safely ignore this specific error
         if (error && error.code !== '23505' && error.code !== '409') {
           console.error('Error tracking product view:', error);
         }
