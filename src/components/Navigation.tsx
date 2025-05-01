@@ -13,7 +13,6 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LogOut } from "lucide-react";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { CurrencySelector } from "./CurrencySelector";
 
 interface NavigationProps {
   searchQuery?: string;
@@ -109,13 +108,6 @@ export const Navigation = ({
               {session && (
                 <>
                   <CartIndicator />
-                  {/* Add desktop currency selector */}
-                  <div className="hidden md:block">
-                    <CurrencySelector 
-                      value={selectedCurrency}
-                      onValueChange={onCurrencyChange || (() => {})}
-                    />
-                  </div>
                   <Button 
                     variant="destructive" 
                     size="sm" 

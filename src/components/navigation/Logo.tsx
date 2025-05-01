@@ -8,8 +8,8 @@ export const Logo = () => {
       className="transition-all" 
       style={{ fontFamily: 'Noto Sans Arabic, sans-serif' }}
     >
-      <span style={{ color: '#F97316' }}>السوق</span>
-      <span style={{ color: '#0EA5E9' }}> الحر</span>
+      <span style={{ color: '#F97316' }}>Online</span>
+      <span style={{ color: '#0EA5E9' }}> Business</span>
     </Link>
   );
 };

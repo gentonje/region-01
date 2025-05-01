@@ -1,8 +1,8 @@
 
 {
-  "name": "East African Online Market",
-  "short_name": "السوق الحر",
-  "description": "Shop freely across borders - Your trusted East African marketplace",
+  "name": "Online Business",
+  "short_name": "Online Business",
+  "description": "Shop freely across borders - Your trusted online business marketplace",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
