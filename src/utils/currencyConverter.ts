@@ -61,7 +61,7 @@ export const convertCurrency = async (
   try {
     // If currencies are the same, no conversion needed
     if (fromCurrency === toCurrency) {
-      return amount;
+      return Math.round(amount);
     }
     
     const rates = await getCurrencyRates();
@@ -73,13 +73,13 @@ export const convertCurrency = async (
 
     if (!rates[fromCurrency] || !rates[toCurrency]) {
       console.error('Invalid currency code', { fromCurrency, toCurrency, rates });
-      return amount;
+      return Math.round(amount);
     }
 
     // For SSP to USD: amount * (USD rate / SSP rate)
     // For USD to SSP: amount * (SSP rate / USD rate)
     // General formula: amount * (target rate / source rate)
-    const result = Number((amount * rates[toCurrency] / rates[fromCurrency]).toFixed(2));
+    const result = Math.round(amount * rates[toCurrency] / rates[fromCurrency]);
     
     // Only log result for debugging when currencies differ
     if (fromCurrency !== toCurrency) {
@@ -89,7 +89,7 @@ export const convertCurrency = async (
     return result;
   } catch (error) {
     console.error('Error converting currency:', error);
-    return amount;
+    return Math.round(amount);
   }
 };
 

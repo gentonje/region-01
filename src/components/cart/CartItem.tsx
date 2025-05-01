@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -23,7 +24,7 @@ export const CartItem = ({ id, title, quantity, price, currency, onDelete }: Car
       </div>
       <div className="flex items-center gap-4">
         <p className="font-medium">
-          {currency} {price * quantity}
+          {currency} {Math.round(price * quantity).toLocaleString()}
         </p>
         <Button
           variant="ghost"

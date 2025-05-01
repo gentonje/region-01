@@ -52,7 +52,7 @@ export const CartSummary = ({
         <p className="flex justify-between mb-1">
           <span>Total</span>
           <span className="font-bold">
-            {currency} {totalAmount}
+            {currency} {Math.round(totalAmount).toLocaleString()}
           </span>
         </p>
         <Button

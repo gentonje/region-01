@@ -131,7 +131,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 {product.description}
               </p>
               <p className="text-lg font-medium text-orange-500">
-                {product.currency} {product.price?.toFixed(2)}
+                {product.currency} {Math.round(product.price || 0).toLocaleString()}
               </p>
             </div>
             <div className="flex flex-wrap gap-1 mt-1 space-x-1">
