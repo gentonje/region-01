@@ -62,9 +62,11 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full">
         {Array.from({ length: 8 }).map((_, index) => (
-          <ProductSkeleton key={index} />
+          <div key={index} className="p-1">
+            <ProductSkeleton />
+          </div>
         ))}
       </div>
     );
@@ -82,12 +84,12 @@ export const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full">
       {products.map((product, index) => (
         <div
           key={product.id}
           ref={index === products.length - 1 ? setLastElementRef : undefined}
-          className="transform transition-transform hover:-translate-y-1 duration-300"
+          className="p-1 transform transition-transform hover:-translate-y-1 duration-300"
         >
           <ProductCard
             product={product}
@@ -103,9 +105,9 @@ export const ProductList = ({
       
       {isFetchingNextPage && (
         <>
-          <ProductSkeleton />
-          <ProductSkeleton />
-          <ProductSkeleton />
+          <div className="p-1"><ProductSkeleton /></div>
+          <div className="p-1"><ProductSkeleton /></div>
+          <div className="p-1"><ProductSkeleton /></div>
         </>
       )}
     </div>

@@ -1,10 +1,9 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Heart, DollarSign } from "lucide-react";
+import { Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { Toggle } from "../ui/toggle";
 
 interface BottomNavProps {
   isAuthenticated: boolean;
@@ -20,12 +19,6 @@ export const BottomNav = ({
   const location = useLocation();
   const isMobile = useIsMobile();
   const isActive = (path: string) => location.pathname === path;
-
-  const handleCurrencyToggle = () => {
-    if (onCurrencyChange) {
-      onCurrencyChange(selectedCurrency === "USD" ? "SSP" : "USD");
-    }
-  };
 
   // Don't render BottomNav on login page or if not authenticated
   if (!isAuthenticated || location.pathname === '/login') {
@@ -49,20 +42,11 @@ export const BottomNav = ({
           )}
           aria-label="Wishlist"
         >
-          <Heart className="w-6 h-6 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+          <Heart className={cn(
+            "w-6 h-6 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]",
+            isActive("/wishlist") ? "fill-orange-500" : ""
+          )} />
         </Link>
-
-        <Toggle
-          pressed={selectedCurrency === "SSP"}
-          onPressedChange={handleCurrencyToggle}
-          className={cn(
-            "flex items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
-            "relative backdrop-blur-sm bg-white/10 hover:bg-white/20 flex-1 h-full"
-          )}
-          aria-label={`Switch currency to ${selectedCurrency === "USD" ? "SSP" : "USD"}`}
-        >
-          <DollarSign className="w-6 h-6 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
-        </Toggle>
       </div>
     </nav>
   );

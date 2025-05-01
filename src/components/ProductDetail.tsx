@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardFooter } from "./ui/card";
 import { Suspense } from "react";
 import { ProductGallery } from "./product/ProductGallery";
@@ -53,9 +54,9 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-4 pb-4">
+    <div className="space-y-4">
       <Card className="w-full max-w-none mx-auto overflow-hidden">
-        <CardContent className="p-4">
+        <CardContent className="p-1 md:p-4">
           <div className="flex flex-col md:flex-row md:gap-4">
             {/* Left column - Product gallery */}
             <div className="md:w-1/2 space-y-4">
@@ -103,7 +104,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-4">
+        <CardFooter className="p-1 md:p-4">
           <ProductActions
             price={product.price || 0}
             currency={product.currency || "SSP"}
@@ -117,7 +118,7 @@ const ProductDetail = ({
       </Card>
 
       {/* Similar products section - full width */}
-      <div className="w-full -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+      <div className="w-full -mx-0 px-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}

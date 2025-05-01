@@ -23,7 +23,7 @@ export const ProductSimilarSection = ({
 
   return (
     <div className="mt-4 w-full">
-      <div className="flex items-center mb-2">
+      <div className="flex items-center mb-2 px-1">
         <PackageSearch className="h-5 w-5 mr-1" />
         <h3 className="text-lg font-semibold">Similar Products</h3>
       </div>
