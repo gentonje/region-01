@@ -7,6 +7,7 @@ import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { getStorageUrl } from "@/utils/storage";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
@@ -84,6 +85,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     setSelectedCounty(county);
   };
 
+  // Use the consistent getStorageUrl utility function
   const getProductImageUrl = (product: Product) => {
     if (
       !product.product_images ||
@@ -93,9 +95,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
       return "/placeholder.svg";
     }
 
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
+    return getStorageUrl(product.product_images[0].storage_path);
   };
 
   if (selectedProduct) {

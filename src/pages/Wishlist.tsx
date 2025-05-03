@@ -7,24 +7,18 @@ import { Heart } from "lucide-react";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/types/product";
+import { getStorageUrl } from "@/utils/storage";
 
 interface WishlistItem {
   product_id: string;
 }
-
-interface FetchWishlistParams {
-  pageParam?: number;
-}
-
-// Use this type to explicitly describe the query return type
-type WishlistQueryResult = Product[];
 
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();
   
   // Fetch wishlist items with related products
-  const { data: wishlist, isLoading } = useQuery<WishlistQueryResult, Error>({
+  const { data: wishlist, isLoading } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -39,7 +33,7 @@ const Wishlist = () => {
       if (error) throw error;
       
       if (!data || data.length === 0) {
-        return [];
+        return [] as Product[];
       }
       
       // Get all product details for the wishlist items
@@ -61,7 +55,7 @@ const Wishlist = () => {
       if (productsError) throw productsError;
       
       return (products || []) as Product[];
-    }
+    },
   });
 
   // Delete mutation for removing items from wishlist
@@ -102,9 +96,8 @@ const Wishlist = () => {
       return "/placeholder.svg";
     }
 
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
+    // Use the getStorageUrl utility function for consistent image URL generation
+    return getStorageUrl(product.product_images[0].storage_path);
   };
 
   const handleProductClick = (product: Product) => {
