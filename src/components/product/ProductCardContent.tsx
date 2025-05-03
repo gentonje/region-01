@@ -62,7 +62,7 @@ export const ProductCardContent = memo(({
       <div className="flex justify-between items-center pt-0 px-1 pb-1">
         <div className="flex flex-col">
           {showBothPrices && (
-            <span className="text-xs line-through text-orange-500 opacity-75">
+            <span className="text-xs px-1 py-0.5 rounded-full bg-green-100 text-green-800 font-medium whitespace-nowrap inline-block">
               {product.currency} {Math.round(product.price || 0).toLocaleString()}
             </span>
           )}
