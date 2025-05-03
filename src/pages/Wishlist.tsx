@@ -12,6 +12,10 @@ interface WishlistItem {
   product_id: string;
 }
 
+interface FetchWishlistParams {
+  pageParam?: number;
+}
+
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();

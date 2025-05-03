@@ -12,6 +12,10 @@ interface IndexProps {
   selectedCurrency?: SupportedCurrency;
 }
 
+interface FetchProductsParams {
+  pageParam: number;
+}
+
 const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -27,7 +31,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isLoading,
   } = useInfiniteQuery({
     queryKey: ["products", searchQuery, selectedCounty],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam = 0 }: FetchProductsParams) => {
       let query = supabase
         .from("products")
         .select(`

@@ -244,6 +244,7 @@ export type Database = {
           available_quantity: number | null
           average_rating: number | null
           category: Database["public"]["Enums"]["product_category"] | null
+          county: string | null
           created_at: string
           currency: string | null
           description: string | null
@@ -264,6 +265,7 @@ export type Database = {
           available_quantity?: number | null
           average_rating?: number | null
           category?: Database["public"]["Enums"]["product_category"] | null
+          county?: string | null
           created_at?: string
           currency?: string | null
           description?: string | null
@@ -284,6 +286,7 @@ export type Database = {
           available_quantity?: number | null
           average_rating?: number | null
           category?: Database["public"]["Enums"]["product_category"] | null
+          county?: string | null
           created_at?: string
           currency?: string | null
           description?: string | null
