@@ -16,12 +16,15 @@ interface FetchWishlistParams {
   pageParam?: number;
 }
 
+// Use this type to explicitly describe the query return type
+type WishlistQueryResult = Product[];
+
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();
   
   // Fetch wishlist items with related products
-  const { data: wishlist, isLoading } = useQuery<Product[], Error>({
+  const { data: wishlist, isLoading } = useQuery<WishlistQueryResult, Error>({
     queryKey: ["wishlist"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -36,7 +39,7 @@ const Wishlist = () => {
       if (error) throw error;
       
       if (!data || data.length === 0) {
-        return [] as Product[];
+        return [];
       }
       
       // Get all product details for the wishlist items
