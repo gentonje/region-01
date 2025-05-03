@@ -1,9 +1,10 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, DollarSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { CurrencySelector } from "../CurrencySelector";
 
 interface BottomNavProps {
   isAuthenticated: boolean;
@@ -47,6 +48,26 @@ export const BottomNav = ({
             isActive("/wishlist") ? "fill-orange-500" : ""
           )} />
         </Link>
+        
+        {/* Currency Toggle Button */}
+        <div
+          className={cn(
+            "flex items-center justify-center px-2 hover:bg-accent group transition-all duration-300",
+            "relative backdrop-blur-sm bg-white/10 hover:bg-white/20 flex-1 h-full"
+          )}
+        >
+          <div className="flex flex-col items-center">
+            <DollarSign className="w-6 h-6 text-emerald-500 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+            {onCurrencyChange && (
+              <div className="mt-0.5 scale-75">
+                <CurrencySelector 
+                  value={selectedCurrency || "USD"} 
+                  onValueChange={onCurrencyChange} 
+                />
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </nav>
   );

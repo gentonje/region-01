@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { Currency } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 interface CurrencySelectorProps {
   value: SupportedCurrency;
   onValueChange: (currency: SupportedCurrency) => void;
+  variant?: "default" | "compact";
 }
 
 interface CurrencyData {
@@ -26,7 +27,11 @@ interface CurrencyData {
   status: 'active' | 'inactive';
 }
 
-export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelectorProps) => {
+export const CurrencySelector = ({ 
+  value = "USD", 
+  onValueChange,
+  variant = "default"
+}: CurrencySelectorProps) => {
   const [fallbackCurrencies, setFallbackCurrencies] = useState<CurrencyData[]>([
     { code: "USD", name: "US Dollar", symbol: "$", rate: 1, status: 'active' },
     { code: "SSP", name: "South Sudanese Pound", symbol: "SSP", rate: 625, status: 'active' },
@@ -57,10 +62,8 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
         return fallbackCurrencies;
       }
     },
-    // Remove the onError property and handle errors within queryFn
     retry: 1,
     retryDelay: 1000,
-    // Use onSettled which is supported in the current version
     meta: {
       onError: (error: Error) => {
         console.error('Query error fetching currencies:', error);
@@ -79,9 +82,15 @@ export const CurrencySelector = ({ value = "USD", onValueChange }: CurrencySelec
 
   return (
     <Select value={value} onValueChange={(val) => onValueChange(val as SupportedCurrency)}>
-      <SelectTrigger className="w-[80px] px-2 h-8">
-        <div className="flex items-center gap-2">
-          <Currency className="h-4 w-4" />
+      <SelectTrigger 
+        className={
+          variant === "compact" 
+            ? "w-[60px] px-1 h-6 text-xs bg-emerald-500/20 border-emerald-500/40" 
+            : "w-[80px] px-2 h-8"
+        }
+      >
+        <div className="flex items-center gap-1">
+          {variant === "default" && <DollarSign className="h-4 w-4" />}
           <SelectValue>{value}</SelectValue>
         </div>
       </SelectTrigger>
