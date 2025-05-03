@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { refreshCurrencyRates } from "@/utils/currencyConverter";
 
 interface Currency {
   id: string;
@@ -56,7 +58,11 @@ export const CurrencyManager = () => {
 
       if (error) throw error;
     },
-    onSuccess: (_, { id }) => {
+    onSuccess: async (_, { id }) => {
+      // Force refresh the cached currency rates
+      await refreshCurrencyRates();
+      
+      // Then invalidate the query to refresh UI
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success('Currency rate updated successfully');
       setSavingCurrencies(prev => ({ ...prev, [id]: false }));
@@ -152,7 +158,7 @@ export const CurrencyManager = () => {
                           value={editingRates[currency.id] !== undefined ? editingRates[currency.id] : currency.rate}
                           onChange={(e) => handleRateChange(currency.id, e.target.value)}
                           className="w-24 h-8"
-                          step="0.01"
+                          step="0.0001"
                           min="0"
                           onClick={(e) => e.stopPropagation()}
                         />

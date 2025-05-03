@@ -12,11 +12,20 @@ let ratesCache: Record<string, number> | null = null;
 let lastFetchTime = 0;
 const CACHE_DURATION = 300000; // 5 minutes - increased from 30 seconds
 
+// Force a refresh of the rates cache
+export const refreshCurrencyRates = async (): Promise<void> => {
+  console.log('Forcing refresh of currency rates');
+  lastFetchTime = 0; // Reset the cache timer to force a fresh fetch
+  ratesCache = null; // Clear the cache completely
+  await getCurrencyRates();
+};
+
 const getCurrencyRates = async (): Promise<Record<string, number>> => {
   const currentTime = Date.now();
   
   // Return cached rates if they're still valid
   if (ratesCache && (currentTime - lastFetchTime) < CACHE_DURATION) {
+    console.log('Using cached currency rates');
     return ratesCache;
   }
 
@@ -47,12 +56,6 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
   }
 };
 
-// Force a refresh of the rates cache
-export const refreshCurrencyRates = async (): Promise<void> => {
-  lastFetchTime = 0; // Reset the cache timer to force a fresh fetch
-  await getCurrencyRates();
-};
-
 export const convertCurrency = async (
   amount: number,
   fromCurrency: SupportedCurrency,
@@ -69,6 +72,7 @@ export const convertCurrency = async (
     // Only log conversions for debugging when currencies differ
     if (fromCurrency !== toCurrency) {
       console.log(`Converting ${amount} from ${fromCurrency} to ${toCurrency}`);
+      console.log(`Using rates: ${fromCurrency}=${rates[fromCurrency]}, ${toCurrency}=${rates[toCurrency]}`);
     }
 
     if (!rates[fromCurrency] || !rates[toCurrency]) {
