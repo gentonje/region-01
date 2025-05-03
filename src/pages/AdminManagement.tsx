@@ -1,5 +1,5 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -17,37 +17,56 @@ interface User {
 
 const AdminManagement = () => {
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
 
-  const { data: users, isLoading, refetch } = useQuery({
+  // Fetch users from profiles with user type
+  const { data: users, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_all_users");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      // Get profile data including user type
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, email, user_type")
+        .order("username", { ascending: true });
+
       if (error) throw error;
       return data as User[];
     },
   });
 
-  const updateUserRole = async (userId: string, role: 'user' | 'admin') => {
-    try {
-      const { error } = await supabase.rpc("update_user_role", {
-        user_id_param: userId,
-        new_role_param: role,
-      });
+  // Mutation to update user role
+  const updateRoleMutation = useMutation({
+    mutationFn: async ({ userId, newRole }: { userId: string, newRole: 'user' | 'admin' }) => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update({ user_type: newRole })
+        .eq("id", userId)
+        .select();
 
       if (error) throw error;
-
-      toast.success(`User role updated to ${role}`);
-      refetch();
-    } catch (error) {
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User role updated successfully");
+    },
+    onError: (error) => {
       console.error("Error updating user role:", error);
       toast.error("Failed to update user role");
     }
+  });
+
+  const handleUpdateUserRole = (userId: string, role: 'user' | 'admin') => {
+    updateRoleMutation.mutate({ userId, newRole: role });
   };
 
   const filteredUsers = users?.filter(
     (user) =>
-      user.username?.toLowerCase().includes(search.toLowerCase()) ||
-      user.email?.toLowerCase().includes(search.toLowerCase())
+      (user.username?.toLowerCase() || "").includes(search.toLowerCase()) ||
+      (user.email?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
   return (
@@ -56,7 +75,7 @@ const AdminManagement = () => {
 
       <div className="mb-4 flex w-full items-center space-x-2">
         <Input
-          placeholder="Search products..."
+          placeholder="Search users..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
@@ -89,7 +108,7 @@ const AdminManagement = () => {
                       <Button
                         size="sm"
                         className="h-8 flex items-center gap-1"
-                        onClick={() => updateUserRole(user.id, "admin")}
+                        onClick={() => handleUpdateUserRole(user.id, "admin")}
                       >
                         <UserCheck className="h-4 w-4" /> 
                         <span>Make Admin</span>
@@ -99,7 +118,7 @@ const AdminManagement = () => {
                         size="sm"
                         variant="destructive"
                         className="h-8 flex items-center gap-1"
-                        onClick={() => updateUserRole(user.id, "user")}
+                        onClick={() => handleUpdateUserRole(user.id, "user")}
                       >
                         <UserX className="h-4 w-4" /> 
                         <span>Remove Admin</span>

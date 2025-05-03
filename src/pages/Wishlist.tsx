@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
@@ -10,38 +10,77 @@ import { Product } from "@/types/product";
 
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
+  const queryClient = useQueryClient();
   
+  // Fetch wishlist items with related products
   const { data: wishlist, isLoading } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not logged in");
 
+      // Get wishlist_items table data which contains product_id for each item
       const { data, error } = await supabase
-        .from("wishlist")
-        .select(`
-          *,
-          products (
-            *,
-            product_images (
-              id,
-              storage_path
-            )
-          )
-        `)
+        .from("wishlist_items")
+        .select("product_id")
         .eq("user_id", user.id);
 
       if (error) throw error;
-      return data;
+      
+      if (!data || data.length === 0) {
+        return [];
+      }
+      
+      // Get all product details for the wishlist items
+      const productIds = data.map(item => item.product_id);
+      
+      const { data: products, error: productsError } = await supabase
+        .from("products")
+        .select(`
+          *,
+          product_images (
+            id,
+            storage_path
+          )
+        `)
+        .in("id", productIds);
+      
+      if (productsError) throw productsError;
+      
+      return products as Product[];
+    }
+  });
+
+  // Delete mutation for removing items from wishlist
+  const deleteMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not logged in");
+
+      const { error } = await supabase
+        .from("wishlist_items")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("product_id", productId);
+
+      if (error) throw error;
+      
+      return productId;
     },
+    onSuccess: (productId) => {
+      setWishlistProducts(prev => prev.filter(product => product.id !== productId));
+      toast.success("Product removed from wishlist");
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
+    },
+    onError: (error) => {
+      console.error("Error removing from wishlist:", error);
+      toast.error("Failed to remove from wishlist");
+    }
   });
 
   useEffect(() => {
     if (wishlist) {
-      const products = wishlist
-        .map((item) => item.products)
-        .filter((product): product is Product => !!product);
-      setWishlistProducts(products);
+      setWishlistProducts(wishlist);
     }
   }, [wishlist]);
 
@@ -60,27 +99,7 @@ const Wishlist = () => {
   };
 
   const handleDelete = async (productId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not logged in");
-
-      const { error } = await supabase
-        .from("wishlist")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("product_id", productId);
-
-      if (error) throw error;
-
-      setWishlistProducts((prev) => 
-        prev.filter((product) => product.id !== productId)
-      );
-
-      toast.success("Product removed from wishlist");
-    } catch (error) {
-      console.error("Error removing from wishlist:", error);
-      toast.error("Failed to remove from wishlist");
-    }
+    deleteMutation.mutate(productId);
   };
 
   return (

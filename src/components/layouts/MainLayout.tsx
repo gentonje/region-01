@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { SupportedCurrency } from '@/utils/currencyConverter';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { cn } from "@/lib/utils";
 
 type MainLayoutProps = {
   children?: React.ReactNode;
@@ -54,6 +55,3 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     </div>
   );
 };
-
-// Ensure cn is imported
-import { cn } from "@/lib/utils";

@@ -54,7 +54,7 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mx-1 px-0 w-full">
       <Card className="w-full max-w-none mx-auto overflow-hidden">
         <CardContent className="p-1 md:p-4">
           <div className="flex flex-col md:flex-row md:gap-4">
@@ -117,8 +117,8 @@ const ProductDetail = ({
         </CardFooter>
       </Card>
 
-      {/* Similar products section - full width */}
-      <div className="w-full -mx-0 px-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+      {/* Similar products section - using mx-1 for mobile consistency */}
+      <div className="w-full mx-0 px-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}

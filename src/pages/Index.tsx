@@ -38,7 +38,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
         `)
         .eq("product_status", "published")
         .eq("in_stock", true)
-        .range(pageParam, pageParam + pageSize - 1)
+        .range(pageParam as number, (pageParam as number) + pageSize - 1)
         .order("created_at", { ascending: false });
 
       if (searchQuery) {
@@ -47,8 +47,9 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
       const { data, error } = await query;
       if (error) throw error;
-      return data;
+      return data as Product[];
     },
+    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === pageSize
         ? allPages.length * pageSize

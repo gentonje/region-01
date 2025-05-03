@@ -1,6 +1,6 @@
 
 import { UserStatsCard } from "@/components/admin/UserStatsCard";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -8,16 +8,54 @@ import { UserProductGroup } from "@/components/UserProductGroup";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import { Product } from "@/types/product";
+
+interface UserStat {
+  id: string;
+  username: string | null;
+  product_count: string;
+  is_active: boolean;
+  user_type?: string;
+}
 
 const AdminUsers = () => {
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
 
   const { data: userStats, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["user-stats"],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_user_product_counts");
+      // Get statistics from profiles table
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(`
+          id, 
+          username, 
+          user_type,
+          is_active
+        `)
+        .order("username");
+
       if (error) throw error;
-      return data;
+
+      // Get product counts for each user
+      const statsWithCounts = await Promise.all(
+        data.map(async (user) => {
+          const { count, error: countError } = await supabase
+            .from("products")
+            .select("*", { count: 'exact', head: true })
+            .eq("user_id", user.id);
+          
+          if (countError) {
+            console.error("Error getting product count:", countError);
+            return { ...user, product_count: "0" };
+          }
+          
+          return { ...user, product_count: String(count || 0) };
+        })
+      );
+      
+      return statsWithCounts as UserStat[];
     },
   });
 
@@ -52,29 +90,33 @@ const AdminUsers = () => {
     },
   });
 
-  const handleDelete = async (productId: string) => {
-    try {
+  const deleteMutation = useMutation({
+    mutationFn: async (productId: string) => {
       const { error } = await supabase
         .from("products")
         .delete()
         .eq("id", productId);
       
       if (error) throw error;
-      
+      return productId;
+    },
+    onSuccess: () => {
       toast.success("Product deleted successfully");
-      // Invalidate queries to refresh data
-      await Promise.all([
-        supabase.invalidateQuery(["user-products"]),
-        supabase.invalidateQuery(["user-stats"]),
-      ]);
-    } catch (err) {
-      console.error("Error deleting product:", err);
+      queryClient.invalidateQueries({ queryKey: ["user-products"] });
+      queryClient.invalidateQueries({ queryKey: ["user-stats"] });
+    },
+    onError: (error) => {
+      console.error("Error deleting product:", error);
       toast.error("Failed to delete product");
     }
+  });
+
+  const handleDelete = async (productId: string) => {
+    deleteMutation.mutate(productId);
   };
 
   const filteredUsers = userStats?.filter(user => 
-    user.username?.toLowerCase().includes(search.toLowerCase()) ||
+    (user.username?.toLowerCase() || "").includes(search.toLowerCase()) ||
     String(user.id).includes(search)
   );
 
