@@ -63,6 +63,7 @@ export const BottomNav = ({
                 <CurrencySelector 
                   value={selectedCurrency || "USD"} 
                   onValueChange={onCurrencyChange} 
+                  variant="compact"
                 />
               </div>
             )}

@@ -93,15 +93,13 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
                 <span>My Products</span>
               </Link>
             </DropdownMenuItem>
-            {(isAdmin || isSuperAdmin) && (
-              <DropdownMenuItem asChild className="m-1">
-                <Link to="/products" className="cursor-pointer space-x-2">
-                  <UserCheck className="mr-2 h-4 w-4" />
-                  <span>All Products</span>
-                </Link>
-              </DropdownMenuItem>
-            )}
-            {!isAdmin && (
+            <DropdownMenuItem asChild className="m-1">
+              <Link to="/products" className="cursor-pointer space-x-2">
+                <UserCheck className="mr-2 h-4 w-4" />
+                <span>All Products</span>
+              </Link>
+            </DropdownMenuItem>
+            {!isAdmin && !isSuperAdmin && (
               <DropdownMenuItem asChild className="m-1">
                 <Link to="/wishlist" className="cursor-pointer space-x-2">
                   <Heart className="mr-2 h-4 w-4" />
@@ -115,7 +113,7 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
                 <span>Edit Profile</span>
               </Link>
             </DropdownMenuItem>
-            {isAdmin && (
+            {(isAdmin || isSuperAdmin) && (
               <DropdownMenuItem asChild className="m-1">
                 <Link to="/admin/users" className="cursor-pointer space-x-2">
                   <Users className="mr-2 h-4 w-4" />

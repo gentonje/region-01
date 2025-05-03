@@ -8,7 +8,6 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/types/product";
 
-// Fixed interface to avoid excessive type instantiation
 interface WishlistItem {
   product_id: string;
 }
@@ -105,7 +104,7 @@ const Wishlist = () => {
     window.location.href = `/product/${product.id}`;
   };
 
-  const handleDelete = async (productId: string) => {
+  const handleDelete = (productId: string) => {
     deleteMutation.mutate(productId);
   };
 
