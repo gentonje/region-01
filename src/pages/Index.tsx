@@ -101,9 +101,11 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
   return (
     <div className="pb-16 mx-1 sm:mx-auto">
-      <h1 className="text-2xl font-bold my-6">All Products</h1>
-      
-      <ProductFilters onSearchChange={handleSearchChange} />
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold my-6">All Products</h1>
+        
+        <ProductFilters onSearchChange={handleSearchChange} />
+      </div>
       
       <div className="mt-6">
         <ProductList
