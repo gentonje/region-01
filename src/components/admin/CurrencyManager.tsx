@@ -60,7 +60,8 @@ export const CurrencyManager = () => {
       queryClient.invalidateQueries({ queryKey: ['currencies'] });
       toast.success('Currency rate updated successfully');
       setSavingCurrencies(prev => ({ ...prev, [id]: false }));
-      // Clear the editing state for this currency
+      
+      // Only clear the editing state for this specific currency
       setEditingRates(prev => {
         const updated = { ...prev };
         delete updated[id];
@@ -77,6 +78,7 @@ export const CurrencyManager = () => {
     // Prevent negative values
     if (value.startsWith('-')) return;
     
+    // Update only the edited currency's rate, keeping others unchanged
     setEditingRates(prev => ({
       ...prev,
       [currencyId]: value,
@@ -84,11 +86,18 @@ export const CurrencyManager = () => {
   };
 
   const handleSaveRate = async (currency: Currency) => {
-    const newRate = parseFloat(editingRates[currency.id] || String(currency.rate));
+    const newRateString = editingRates[currency.id];
+    if (!newRateString) {
+      toast.error('No changes to save');
+      return;
+    }
+    
+    const newRate = parseFloat(newRateString);
     if (isNaN(newRate) || newRate <= 0) {
       toast.error('Please enter a valid positive number');
       return;
     }
+    
     await updateRateMutation.mutateAsync({ id: currency.id, rate: newRate });
   };
 
@@ -140,7 +149,7 @@ export const CurrencyManager = () => {
                       <div className="col-span-2 flex items-center gap-2">
                         <Input
                           type="number"
-                          value={editingRates[currency.id] ?? currency.rate}
+                          value={editingRates[currency.id] !== undefined ? editingRates[currency.id] : currency.rate}
                           onChange={(e) => handleRateChange(currency.id, e.target.value)}
                           className="w-24 h-8"
                           step="0.01"
