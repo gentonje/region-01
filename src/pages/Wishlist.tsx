@@ -8,9 +8,9 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/types/product";
 
-interface WishlistQueryResult {
+// Fixed interface to avoid excessive type instantiation
+interface WishlistItem {
   product_id: string;
-  products: Product;
 }
 
 const Wishlist = () => {

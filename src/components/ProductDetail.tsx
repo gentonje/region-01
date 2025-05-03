@@ -54,13 +54,13 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-4 mx-1 px-0 w-full">
-      <Card className="w-full max-w-none mx-auto overflow-hidden">
-        <CardContent className="p-1 md:p-4">
+    <div className="space-y-4 w-full mx-0 px-0">
+      <Card className="w-full max-w-none mx-0 overflow-hidden rounded-none sm:rounded-lg sm:mx-auto">
+        <CardContent className="p-0 sm:p-4">
           <div className="flex flex-col md:flex-row md:gap-4">
             {/* Left column - Product gallery */}
             <div className="md:w-1/2 space-y-4">
-              <div className="flex items-center mb-1">
+              <div className="flex items-center mb-1 p-2 sm:p-0">
                 <button 
                   onClick={onBack} 
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -72,9 +72,9 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{product.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-2 sm:px-0">{product.title}</h1>
               
-              <div className="flex items-center space-x-2 mb-2">
+              <div className="flex items-center space-x-2 mb-2 px-2 sm:px-0">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
                   {product.category || 'Other'}
                 </span>
@@ -94,7 +94,7 @@ const ProductDetail = ({
             </div>
 
             {/* Right column - Tabs with product details and reviews */}
-            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10">
+            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10 px-2 sm:px-0">
               <ProductTabs 
                 product={product}
                 activeTab={activeTab}
@@ -104,7 +104,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-1 md:p-4">
+        <CardFooter className="p-2 sm:p-4">
           <ProductActions
             price={product.price || 0}
             currency={product.currency || "SSP"}
@@ -117,8 +117,8 @@ const ProductDetail = ({
         </CardFooter>
       </Card>
 
-      {/* Similar products section - using mx-1 for mobile consistency */}
-      <div className="w-full mx-0 px-0 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8">
+      {/* Similar products section - using full width for mobile */}
+      <div className="w-full mx-0 px-0">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}

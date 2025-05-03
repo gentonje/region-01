@@ -87,7 +87,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
   if (selectedProduct) {
     return (
-      <div className="container mx-1 sm:mx-auto py-6">
+      <div className="container mx-0 px-0 w-full max-w-none py-0 sm:py-6 sm:mx-auto sm:px-4">
         <ProductDetail
           product={selectedProduct}
           onBack={() => setSelectedProduct(null)}
