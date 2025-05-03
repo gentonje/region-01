@@ -56,12 +56,12 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
       if (error) throw error;
       return data as Product[];
     },
-    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === pageSize
         ? allPages.length * pageSize
         : undefined;
     },
+    initialPageParam: 0
   });
 
   const products = data?.pages.flat() || [];
