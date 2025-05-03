@@ -10,6 +10,20 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+interface CartItemType {
+  id: string;
+  quantity: number;
+  product_id: string;
+  product: {
+    id: string;
+    title: string;
+    price: number;
+    currency: string;
+    in_stock: boolean;
+    user_id: string;
+  };
+}
+
 const Cart = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -40,7 +54,7 @@ const Cart = () => {
         .eq("user_id", user.user.id);
 
       if (error) throw error;
-      return data || [];
+      return data as CartItemType[] || [];
     },
   });
 

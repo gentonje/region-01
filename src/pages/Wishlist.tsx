@@ -10,6 +10,12 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { getStorageUrl } from "@/utils/storage";
 
+interface WishlistItemWithProduct {
+  id: string;
+  product_id: string;
+  products: Product;
+}
+
 const Wishlist = () => {
   const { session } = useAuth();
   const navigate = useNavigate();
@@ -65,7 +71,9 @@ const Wishlist = () => {
         return [];
       }
 
-      return items.map(item => item.products) as Product[];
+      // Convert the items to the correct format
+      const productList: Product[] = items.map((item: WishlistItemWithProduct) => item.products);
+      return productList;
     },
     enabled: !!session?.user,
   });
