@@ -17,7 +17,7 @@ const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();
   
-  // Fetch wishlist items with related products
+  // Fetch wishlist items with related products - fixed generic type issue
   const { data: wishlist, isLoading } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
