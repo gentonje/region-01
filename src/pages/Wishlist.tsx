@@ -8,6 +8,11 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/types/product";
 
+interface WishlistQueryResult {
+  product_id: string;
+  products: Product;
+}
+
 const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();
@@ -40,7 +45,9 @@ const Wishlist = () => {
           *,
           product_images (
             id,
-            storage_path
+            storage_path,
+            is_main,
+            display_order
           )
         `)
         .in("id", productIds);

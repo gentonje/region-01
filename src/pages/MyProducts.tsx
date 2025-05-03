@@ -37,7 +37,9 @@ const MyProducts = () => {
           ),
           product_images:product_images (
             id,
-            storage_path
+            storage_path,
+            is_main,
+            display_order
           )
         `)
         .eq("user_id", user.id)

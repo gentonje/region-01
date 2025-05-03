@@ -33,7 +33,9 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
           *,
           product_images (
             id,
-            storage_path
+            storage_path,
+            is_main,
+            display_order
           )
         `)
         .eq("product_status", "published")

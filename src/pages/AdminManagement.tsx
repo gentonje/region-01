@@ -10,8 +10,7 @@ import { CurrencyManager } from "@/components/admin/CurrencyManager";
 
 interface User {
   id: string;
-  username: string;
-  email: string;
+  username: string | null;
   user_type: string;
 }
 
@@ -26,10 +25,10 @@ const AdminManagement = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Get profile data including user type
+      // Get profile data including user type - but exclude email since it doesn't exist in profiles table
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, email, user_type")
+        .select("id, username, user_type")
         .order("username", { ascending: true });
 
       if (error) throw error;
@@ -65,8 +64,7 @@ const AdminManagement = () => {
 
   const filteredUsers = users?.filter(
     (user) =>
-      (user.username?.toLowerCase() || "").includes(search.toLowerCase()) ||
-      (user.email?.toLowerCase() || "").includes(search.toLowerCase())
+      (user.username?.toLowerCase() || "").includes(search.toLowerCase())
   );
 
   return (
@@ -96,7 +94,6 @@ const AdminManagement = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
                     <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
                     <div className="mt-1">
                       <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         Role: {user.user_type}
