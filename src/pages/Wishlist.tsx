@@ -8,6 +8,7 @@ import { WishlistItem } from "@/components/wishlist/WishlistItem";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { getStorageUrl } from "@/utils/storage";
 
 const Wishlist = () => {
   const { session } = useAuth();
@@ -22,9 +23,29 @@ const Wishlist = () => {
         return [];
       }
 
-      const { data: wishlistData, error } = await supabase
-        .from("wishlist")
+      // First get the user's wishlist id
+      const { data: userWishlist, error: wishlistError } = await supabase
+        .from("wishlists")
+        .select("id")
+        .eq("user_id", session.user.id)
+        .maybeSingle();
+
+      if (wishlistError) {
+        console.error("Error fetching wishlist:", wishlistError);
+        toast.error("Failed to load your wishlist. Please try again.");
+        return [];
+      }
+
+      if (!userWishlist) {
+        console.log("No wishlist found for user");
+        return [];
+      }
+
+      // Then get the items in the wishlist with product details
+      const { data: items, error: itemsError } = await supabase
+        .from("wishlist_items")
         .select(`
+          id,
           product_id,
           products (
             *,
@@ -36,15 +57,15 @@ const Wishlist = () => {
             )
           )
         `)
-        .eq("user_id", session.user.id);
+        .eq("wishlist_id", userWishlist.id);
 
-      if (error) {
-        console.error("Error fetching wishlist:", error);
-        toast.error("Failed to load your wishlist. Please try again.");
+      if (itemsError) {
+        console.error("Error fetching wishlist items:", itemsError);
+        toast.error("Failed to load your wishlist items. Please try again.");
         return [];
       }
 
-      return wishlistData.map((item) => item.products) as Product[];
+      return items.map(item => item.products) as Product[];
     },
     enabled: !!session?.user,
   });
@@ -54,20 +75,6 @@ const Wishlist = () => {
       setWishlistItems(wishlist);
     }
   }, [wishlist]);
-
-  const getProductImageUrl = (product: Product) => {
-    if (
-      !product.product_images ||
-      product.product_images.length === 0 ||
-      !product.product_images[0].storage_path
-    ) {
-      return "/placeholder.svg";
-    }
-
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
-  };
 
   if (isLoading) {
     return (
@@ -103,7 +110,14 @@ const Wishlist = () => {
           <WishlistItem
             key={product.id}
             product={product}
-            imageUrl={getProductImageUrl(product)}
+            item={{
+              id: "", // This will be regenerated when removing from wishlist
+              product_id: product.id
+            }}
+            onItemRemoved={() => {
+              // Refresh the wishlist data after item removal
+              setWishlistItems(prev => prev.filter(p => p.id !== product.id));
+            }}
           />
         ))}
       </div>

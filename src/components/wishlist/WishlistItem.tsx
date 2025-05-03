@@ -9,6 +9,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Share2, ShoppingCart, Trash2, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getStorageUrl } from "@/utils/storage";
 
 interface WishlistItemProps {
   item: {
@@ -26,11 +27,24 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
 
   const removeFromWishlist = useMutation({
     mutationFn: async () => {
-      console.log("Removing wishlist item:", item.id);
+      // First, get the user's wishlist
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be logged in");
+      
+      const { data: wishlist } = await supabase
+        .from("wishlists")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+        
+      if (!wishlist) throw new Error("Wishlist not found");
+      
+      // Then remove the item
       const { error } = await supabase
         .from("wishlist_items")
         .delete()
-        .eq("id", item.id);
+        .eq("wishlist_id", wishlist.id)
+        .eq("product_id", product.id);
 
       if (error) {
         console.error("Error removing wishlist item:", error);
@@ -39,7 +53,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
     },
     onSuccess: () => {
       // Invalidate all relevant queries
-      queryClient.invalidateQueries({ queryKey: ["wishlist-items"] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
       queryClient.invalidateQueries({ queryKey: ["wishlist", product.id] });
       toast.success("Item removed from wishlist");
       if (onItemRemoved) {
@@ -102,10 +116,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
   const getImageUrl = () => {
     const mainImage = product.product_images?.find(img => img.is_main === true);
     if (mainImage?.storage_path) {
-      const { data } = supabase.storage
-        .from("images")
-        .getPublicUrl(mainImage.storage_path);
-      return data.publicUrl;
+      return getStorageUrl(mainImage.storage_path);
     }
     return "/placeholder.svg";
   };
