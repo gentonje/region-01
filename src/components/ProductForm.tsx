@@ -1,9 +1,25 @@
+
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
 import { ProductFormField } from "./forms/product/ProductFormField";
 import { ProductSubmitButton } from "./forms/product/ProductSubmitButton";
 import { ProductFormData, productValidationRules } from "./forms/product/validation";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getAllCounties } from "@/data/southSudanCounties";
 
 interface ProductFormProps {
   formData: ProductFormData;
@@ -25,6 +41,8 @@ export const ProductForm = ({
     mode: "onChange",
   });
 
+  const counties = getAllCounties();
+
   const handleSubmit = async (data: ProductFormData) => {
     try {
       await onSubmit(data);
@@ -33,6 +51,10 @@ export const ProductForm = ({
       console.error("Error submitting form:", error);
       toast.error(error.message || "Failed to update product");
     }
+  };
+
+  const handleCountyChange = (value: string) => {
+    setFormData({ ...formData, county: value });
   };
 
   return (
@@ -79,6 +101,35 @@ export const ProductForm = ({
           type="number"
           formData={formData}
           setFormData={setFormData}
+        />
+
+        <FormField
+          control={form.control}
+          name="county"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>County</FormLabel>
+              <Select
+                value={formData.county || ""}
+                onValueChange={handleCountyChange}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a county" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="">Not specified</SelectItem>
+                  {counties.map((county) => (
+                    <SelectItem key={county.id} value={county.id}>
+                      {county.name} ({county.state})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
         <ProductSubmitButton

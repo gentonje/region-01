@@ -32,7 +32,7 @@ const Wishlist = () => {
       if (error) throw error;
       
       if (!data || data.length === 0) {
-        return [];
+        return [] as Product[];
       }
       
       // Get all product details for the wishlist items
@@ -53,7 +53,7 @@ const Wishlist = () => {
       
       if (productsError) throw productsError;
       
-      return products as Product[];
+      return (products || []) as Product[];
     }
   });
 

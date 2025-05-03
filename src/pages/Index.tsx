@@ -15,6 +15,7 @@ interface IndexProps {
 const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCounty, setSelectedCounty] = useState("");
   const pageSize = 12;
 
   // Fetch products with infinite scrolling
@@ -25,7 +26,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery],
+    queryKey: ["products", searchQuery, selectedCounty],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -45,6 +46,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
       if (searchQuery) {
         query = query.ilike("title", `%${searchQuery}%`);
+      }
+
+      if (selectedCounty) {
+        query = query.eq("county", selectedCounty);
       }
 
       const { data, error } = await query;
@@ -69,6 +74,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
+  };
+
+  const handleCountyChange = (county: string) => {
+    setSelectedCounty(county);
   };
 
   const getProductImageUrl = (product: Product) => {
@@ -103,7 +112,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     <div className="pb-16 mx-1 sm:mx-auto">
       <h1 className="text-2xl font-bold my-6">All Products</h1>
       
-      <ProductFilters onSearchChange={handleSearchChange} />
+      <ProductFilters 
+        onSearchChange={handleSearchChange}
+        onCountyChange={handleCountyChange} 
+      />
       
       <div className="mt-6">
         <ProductList

@@ -10,8 +10,6 @@ import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { LogOut } from "lucide-react";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface NavigationProps {
@@ -106,18 +104,7 @@ export const Navigation = ({
 
             <div className="flex items-center gap-2">
               {session && (
-                <>
-                  <CartIndicator />
-                  <Button 
-                    variant="destructive" 
-                    size="sm" 
-                    onClick={handleLogout}
-                    className="hidden md:flex items-center gap-1"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    <span>Logout</span>
-                  </Button>
-                </>
+                <CartIndicator />
               )}
               <ThemeToggle />
               <UserMenu 
