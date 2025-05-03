@@ -102,6 +102,8 @@ video {
     margin-top: 3.5rem;
     margin-bottom: 4.5rem;
     padding: 0;
+    margin-left: 0.25rem;  /* mx-1 equivalent */
+    margin-right: 0.25rem; /* mx-1 equivalent */
   }
   
   .grid {

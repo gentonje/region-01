@@ -65,3 +65,22 @@
 .page-spacing {
   @apply space-y-1 md:space-y-2 m-1 p-1;
 }
+
+/* Mobile specific margin overrides */
+@media (max-width: 768px) {
+  .mx-mobile-1 {
+    @apply mx-1;
+  }
+  
+  .px-mobile-1 {
+    @apply px-1;
+  }
+  
+  .m-mobile-1 {
+    @apply m-1;
+  }
+  
+  .p-mobile-1 {
+    @apply p-1;
+  }
+}

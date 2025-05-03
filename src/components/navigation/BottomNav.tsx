@@ -36,7 +36,7 @@ export const BottomNav = ({
         <Link 
           to="/wishlist" 
           className={cn(
-            "flex items-center justify-center px-5 hover:bg-accent group transition-all duration-300",
+            "flex items-center justify-center px-2 hover:bg-accent group transition-all duration-300",
             "relative backdrop-blur-sm bg-white/10 hover:bg-white/20 flex-1 h-full",
             isActive("/wishlist") && "text-orange-500 bg-white/20"
           )}
