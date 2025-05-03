@@ -21,7 +21,7 @@ const Wishlist = () => {
   const queryClient = useQueryClient();
   
   // Fetch wishlist items with related products
-  const { data: wishlist, isLoading } = useQuery({
+  const { data: wishlist, isLoading } = useQuery<Product[], Error>({
     queryKey: ["wishlist"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
