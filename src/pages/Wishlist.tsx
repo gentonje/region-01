@@ -7,7 +7,6 @@ import { Heart } from "lucide-react";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import ProductList from "@/components/ProductList";
 import { Product } from "@/types/product";
-import { getStorageUrl } from "@/utils/storage";
 
 interface WishlistItem {
   product_id: string;
@@ -17,7 +16,7 @@ const Wishlist = () => {
   const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
   const queryClient = useQueryClient();
   
-  // Fetch wishlist items with related products - fixed generic type issue
+  // Fetch wishlist items with related products
   const { data: wishlist, isLoading } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
@@ -33,7 +32,7 @@ const Wishlist = () => {
       if (error) throw error;
       
       if (!data || data.length === 0) {
-        return [] as Product[];
+        return [];
       }
       
       // Get all product details for the wishlist items
@@ -54,8 +53,8 @@ const Wishlist = () => {
       
       if (productsError) throw productsError;
       
-      return (products || []) as Product[];
-    },
+      return products as Product[];
+    }
   });
 
   // Delete mutation for removing items from wishlist
@@ -96,8 +95,9 @@ const Wishlist = () => {
       return "/placeholder.svg";
     }
 
-    // Use the getStorageUrl utility function for consistent image URL generation
-    return getStorageUrl(product.product_images[0].storage_path);
+    return supabase.storage
+      .from("images")
+      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
   };
 
   const handleProductClick = (product: Product) => {

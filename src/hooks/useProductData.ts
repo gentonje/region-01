@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStorageUrl } from "@/utils/storage";
@@ -12,7 +11,6 @@ export const useProductData = (id: string | undefined) => {
     price: "",
     category: "Other" as ProductCategory,
     available_quantity: "0",
-    county: "",
   });
   const [mainImageUrl, setMainImageUrl] = useState<string>();
   const [additionalImageUrls, setAdditionalImageUrls] = useState<{ url: string; id: string; }[]>([]);
@@ -44,7 +42,6 @@ export const useProductData = (id: string | undefined) => {
           price: product.price?.toString() || "",
           category: product.category || "Other",
           available_quantity: product.available_quantity?.toString() || "0",
-          county: product.county || "",
         });
 
         // Process images

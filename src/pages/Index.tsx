@@ -7,20 +7,14 @@ import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { getStorageUrl } from "@/utils/storage";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
 }
 
-interface FetchProductsParams {
-  pageParam: number;
-}
-
 const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedCounty, setSelectedCounty] = useState("");
   const pageSize = 12;
 
   // Fetch products with infinite scrolling
@@ -31,8 +25,8 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCounty],
-    queryFn: async ({ pageParam = 0 }: FetchProductsParams) => {
+    queryKey: ["products", searchQuery],
+    queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
         .select(`
@@ -53,20 +47,16 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
         query = query.ilike("title", `%${searchQuery}%`);
       }
 
-      if (selectedCounty) {
-        query = query.eq("county", selectedCounty);
-      }
-
       const { data, error } = await query;
       if (error) throw error;
       return data as Product[];
     },
+    initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === pageSize
         ? allPages.length * pageSize
         : undefined;
     },
-    initialPageParam: 0
   });
 
   const products = data?.pages.flat() || [];
@@ -81,11 +71,6 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     setSearchQuery(search);
   };
 
-  const handleCountyChange = (county: string) => {
-    setSelectedCounty(county);
-  };
-
-  // Use the consistent getStorageUrl utility function
   const getProductImageUrl = (product: Product) => {
     if (
       !product.product_images ||
@@ -95,7 +80,9 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
       return "/placeholder.svg";
     }
 
-    return getStorageUrl(product.product_images[0].storage_path);
+    return supabase.storage
+      .from("images")
+      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
   };
 
   if (selectedProduct) {
@@ -116,10 +103,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     <div className="pb-16 mx-1 sm:mx-auto">
       <h1 className="text-2xl font-bold my-6">All Products</h1>
       
-      <ProductFilters 
-        onSearchChange={handleSearchChange}
-        onCountyChange={handleCountyChange} 
-      />
+      <ProductFilters onSearchChange={handleSearchChange} />
       
       <div className="mt-6">
         <ProductList

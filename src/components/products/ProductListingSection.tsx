@@ -10,8 +10,6 @@ interface ProductListingSectionProps {
   setSearchQuery: (query: string) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
-  selectedCounty?: string;
-  setSelectedCounty?: (county: string) => void;
   onProductClick: (product: Product) => void;
   isFetchingNextPage: boolean;
   observerRef: (node?: Element | null) => void;
@@ -31,8 +29,6 @@ export const ProductListingSection = ({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
-  selectedCounty,
-  setSelectedCounty,
   onProductClick,
   isFetchingNextPage,
   observerRef,
@@ -49,16 +45,9 @@ export const ProductListingSection = ({
     setSearchQuery(search);
   };
 
-  const handleCountyChange = (county: string) => {
-    setSelectedCounty?.(county);
-  };
-
   return (
     <div className="w-full space-y-1 p-1">
-      <ProductFilters 
-        onSearchChange={handleSearchChange} 
-        onCountyChange={handleCountyChange}
-      />
+      <ProductFilters onSearchChange={handleSearchChange} />
       <ProductList
         products={products}
         getProductImageUrl={getProductImageUrl}
