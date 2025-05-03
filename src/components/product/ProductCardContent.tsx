@@ -44,6 +44,9 @@ export const ProductCardContent = memo(({
     updatePrice();
   }, [product.price, product.currency, selectedCurrency]);
 
+  // Check if we need to show both prices
+  const showBothPrices = product.currency !== selectedCurrency && product.currency;
+
   return (
     <CardContent className="p-0 space-y-1">
       <div className="pt-0">
@@ -57,11 +60,18 @@ export const ProductCardContent = memo(({
         </p>
       </div>
       <div className="flex justify-between items-center pt-0 px-1 pb-1">
-        <span className={`text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block ${
-          isLoading ? 'opacity-50' : ''
-        }`}>
-          {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
-        </span>
+        <div className="flex flex-col">
+          {showBothPrices && (
+            <span className="text-xs text-gray-500 line-through">
+              {product.currency} {Math.round(product.price || 0).toLocaleString()}
+            </span>
+          )}
+          <span className={`text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block ${
+            isLoading ? 'opacity-50' : ''
+          }`}>
+            {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
+          </span>
+        </div>
         
         <Button 
           size="sm" 

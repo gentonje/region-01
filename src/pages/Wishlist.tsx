@@ -104,8 +104,9 @@ const Wishlist = () => {
     window.location.href = `/product/${product.id}`;
   };
 
-  const handleDelete = (productId: string) => {
-    deleteMutation.mutate(productId);
+  // Fix the TypeScript error by making handleDelete return a Promise
+  const handleDelete = async (productId: string): Promise<void> => {
+    await deleteMutation.mutateAsync(productId);
   };
 
   return (
