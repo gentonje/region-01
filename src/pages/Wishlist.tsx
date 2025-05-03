@@ -1,97 +1,66 @@
 
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Heart } from "lucide-react";
-import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import ProductList from "@/components/ProductList";
+import { useAuth } from "@/contexts/AuthContext";
 import { Product } from "@/types/product";
-
-interface WishlistItem {
-  product_id: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { WishlistItem } from "@/components/wishlist/WishlistItem";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 const Wishlist = () => {
-  const [wishlistProducts, setWishlistProducts] = useState<Product[]>([]);
-  const queryClient = useQueryClient();
-  
-  // Fetch wishlist items with related products
+  const { session } = useAuth();
+  const navigate = useNavigate();
+  const [wishlistItems, setWishlistItems] = useState<Product[]>([]);
+
   const { data: wishlist, isLoading } = useQuery({
     queryKey: ["wishlist"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not logged in");
-
-      // Get wishlist_items table data which contains product_id for each item
-      const { data, error } = await supabase
-        .from("wishlist_items")
-        .select("product_id")
-        .eq("user_id", user.id);
-
-      if (error) throw error;
-      
-      if (!data || data.length === 0) {
+      if (!session?.user) {
+        navigate("/login");
         return [];
       }
-      
-      // Get all product details for the wishlist items
-      const productIds = data.map(item => item.product_id);
-      
-      const { data: products, error: productsError } = await supabase
-        .from("products")
+
+      const { data: wishlistData, error } = await supabase
+        .from("wishlist")
         .select(`
-          *,
-          product_images (
-            id,
-            storage_path,
-            is_main,
-            display_order
+          product_id,
+          products (
+            *,
+            product_images (
+              id,
+              storage_path,
+              is_main,
+              display_order
+            )
           )
         `)
-        .in("id", productIds);
-      
-      if (productsError) throw productsError;
-      
-      return products as Product[];
-    }
-  });
+        .eq("user_id", session.user.id);
 
-  // Delete mutation for removing items from wishlist
-  const deleteMutation = useMutation({
-    mutationFn: async (productId: string) => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not logged in");
+      if (error) {
+        console.error("Error fetching wishlist:", error);
+        toast.error("Failed to load your wishlist. Please try again.");
+        return [];
+      }
 
-      const { error } = await supabase
-        .from("wishlist_items")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("product_id", productId);
-
-      if (error) throw error;
-      
-      return productId;
+      return wishlistData.map((item) => item.products) as Product[];
     },
-    onSuccess: (productId) => {
-      setWishlistProducts(prev => prev.filter(product => product.id !== productId));
-      toast.success("Product removed from wishlist");
-      queryClient.invalidateQueries({ queryKey: ["wishlist"] });
-    },
-    onError: (error) => {
-      console.error("Error removing from wishlist:", error);
-      toast.error("Failed to remove from wishlist");
-    }
+    enabled: !!session?.user,
   });
 
   useEffect(() => {
     if (wishlist) {
-      setWishlistProducts(wishlist);
+      setWishlistItems(wishlist);
     }
   }, [wishlist]);
 
   const getProductImageUrl = (product: Product) => {
-    if (!product.product_images || product.product_images.length === 0) {
+    if (
+      !product.product_images ||
+      product.product_images.length === 0 ||
+      !product.product_images[0].storage_path
+    ) {
       return "/placeholder.svg";
     }
 
@@ -100,39 +69,44 @@ const Wishlist = () => {
       .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
   };
 
-  const handleProductClick = (product: Product) => {
-    window.location.href = `/product/${product.id}`;
-  };
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-96">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Loading your wishlist...</span>
+      </div>
+    );
+  }
 
-  const handleDelete = (productId: string): Promise<void> => {
-    return deleteMutation.mutateAsync(productId).then(() => {});
-  };
+  if (wishlistItems.length === 0) {
+    return (
+      <div className="text-center py-16 px-4">
+        <h1 className="text-2xl font-bold mb-4">Your Wishlist</h1>
+        <p className="text-muted-foreground mb-6">
+          You haven't added any products to your wishlist yet.
+        </p>
+        <button
+          onClick={() => navigate("/products")}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+        >
+          Browse Products
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-1 sm:mx-4 py-8">
-      <BreadcrumbNav
-        items={[
-          { href: "/products", label: "Home" },
-          { label: "Wishlist" },
-        ]}
-      />
-
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Heart className="h-6 w-6 text-red-500" /> Wishlist
-        </h1>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-2xl font-bold mb-6">Your Wishlist</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {wishlistItems.map((product) => (
+          <WishlistItem
+            key={product.id}
+            product={product}
+            imageUrl={getProductImageUrl(product)}
+          />
+        ))}
       </div>
-
-      <ProductList
-        products={wishlistProducts}
-        getProductImageUrl={getProductImageUrl}
-        onProductClick={handleProductClick}
-        isLoading={isLoading}
-        observerRef={() => {}}
-        selectedCurrency="USD"
-        onDelete={handleDelete}
-        emptyMessage="Your wishlist is empty"
-      />
     </div>
   );
 };

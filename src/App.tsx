@@ -57,7 +57,7 @@ const App = () => {
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
+          <ThemeProvider defaultTheme="light">
             <AuthProvider>
               <Routes 
                 selectedCurrency={selectedCurrency}
