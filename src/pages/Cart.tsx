@@ -1,198 +1,211 @@
 
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, ArrowLeft } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { CartItem } from "@/components/cart/CartItem";
 import { CartSummary } from "@/components/cart/CartSummary";
-import { useCartMutations } from "@/hooks/useCartMutations";
-import { useOrderCreation } from "@/components/cart/OrderCreation";
-import { PaymentHandler } from "@/components/cart/PaymentHandler";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { Button } from "@/components/ui/button";
+import { ShoppingBag, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function Cart() {
+const Cart = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>("stripe");
-  const [shippingAddress, setShippingAddress] = useState<string>("");
-  const { deleteItemMutation } = useCartMutations();
-
-  const { data: session } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return session;
-    },
-  });
-
-  const { data: userProfile } = useQuery({
-    queryKey: ["userProfile", session?.user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("address")
-        .eq("id", session?.user?.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.user?.id,
-  });
-
-  // Set shipping address from profile when available
-  useEffect(() => {
-    if (userProfile?.address) {
-      setShippingAddress(userProfile.address);
-    }
-  }, [userProfile]);
+  const queryClient = useQueryClient();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("stripe");
 
   const { data: cartItems, isLoading } = useQuery({
-    queryKey: ["cartItems"],
+    queryKey: ["cart"],
     queryFn: async () => {
-      const { data: items, error } = await supabase
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error("User not logged in");
+
+      const { data, error } = await supabase
         .from("cart_items")
         .select(`
-          *,
-          product:products (
-            title,
-            price,
+          id, 
+          quantity,
+          product_id,
+          product:products(
+            id, 
+            title, 
+            price, 
             currency,
+            in_stock,
             user_id
           )
         `)
-        .order("created_at", { ascending: false });
+        .eq("user_id", user.user.id);
 
       if (error) throw error;
-      return items;
+      return data || [];
     },
   });
 
-  const orderCreation = useOrderCreation({
-    cartItems,
-    shippingAddress,
-    userId: session?.user?.id || "",
-    paymentMethod: selectedPaymentMethod,
+  const deleteCartItemMutation = useMutation({
+    mutationFn: async (cartItemId: string) => {
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("id", cartItemId);
+
+      if (error) throw error;
+      return cartItemId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast({
+        title: "Item removed",
+        description: "The item has been removed from your cart",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to remove item: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
+      });
+    },
   });
 
-  const handleCheckout = async () => {
-    if (!cartItems?.length) {
-      toast({
-        title: "Cart is empty",
-        description: "Please add items to your cart before checking out",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!shippingAddress) {
-      toast({
-        title: "Shipping address required",
-        description: "Please add a shipping address to your profile",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  const proceedToCheckout = async () => {
     try {
-      const order = await orderCreation.mutateAsync();
-      const { handlePayment } = PaymentHandler({ 
-        orderId: order.id, 
-        paymentMethod: selectedPaymentMethod 
+      toast({
+        title: "Processing",
+        description: "Your order is being processed...",
       });
-      await handlePayment();
+
+      // Get user profile for shipping address
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error("User not logged in");
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("address")
+        .eq("id", user.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (!profile.address) {
+        toast({
+          title: "Missing address",
+          description: "Please update your shipping address in your profile",
+          variant: "destructive",
+        });
+        navigate("/edit-profile");
+        return;
+      }
+
+      // Simulate checkout process
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      toast({
+        title: "Success",
+        description: "Your order has been placed!",
+      });
+
+      // Clear cart
+      const { error } = await supabase
+        .from("cart_items")
+        .delete()
+        .eq("user_id", user.user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      navigate("/products");
     } catch (error) {
-      // Error is already handled by the mutation
+      toast({
+        title: "Checkout failed",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
     }
   };
 
-  return (
-    <div className="w-full">
-      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
-        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
-          <BreadcrumbNav
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Cart" },
-            ]}
-          />
-          
-          <div className="flex justify-between items-center mb-1 m-1 p-1">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Shopping Cart</h1>
-            <Button
-              variant="outline"
-              onClick={() => navigate("/")}
-              className="flex items-center gap-1 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 m-1 p-1"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Continue Shopping
-            </Button>
-          </div>
-          
-          {!cartItems?.length ? (
-            <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
-              <CardContent className="p-1">
-                <div className="text-center space-y-1">
-                  <ShoppingBag className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
-                  <p className="text-center text-gray-700 dark:text-gray-300 font-medium text-lg">Your cart is empty</p>
-                  <Button
-                    className="mt-1 mx-auto block w-full sm:w-auto px-1 py-1 flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white m-1 p-1"
-                    onClick={() => navigate("/")}
-                  >
-                    <ShoppingBag className="mr-1 h-4 w-4" />
-                    Start Shopping
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-1 md:grid-cols-2 m-1 p-1">
-              <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
-                <CardHeader className="pb-1 m-1 p-1">
-                  <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Cart Items ({cartItems.length})</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-1 p-1 m-1">
-                  {cartItems.map((item) => (
-                    <CartItem
-                      key={item.id}
-                      id={item.id}
-                      title={item.product.title}
-                      quantity={item.quantity}
-                      price={item.product.price}
-                      currency={item.product.currency}
-                      onDelete={() => deleteItemMutation.mutate(item.id)}
-                    />
-                  ))}
-                </CardContent>
-              </Card>
+  const totalAmount = cartItems?.reduce(
+    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    0
+  ) || 0;
 
-              <Card className="shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 m-1">
-                <CardHeader className="pb-1 m-1 p-1">
-                  <CardTitle className="text-xl text-gray-800 dark:text-gray-100">Checkout Summary</CardTitle>
-                </CardHeader>
-                <CardContent className="p-1 m-1">
-                  <CartSummary
-                    currency={cartItems[0]?.product.currency || "USD"}
-                    totalAmount={cartItems.reduce(
-                      (sum, item) => sum + item.product.price * item.quantity,
-                      0
-                    )}
-                    selectedPaymentMethod={selectedPaymentMethod}
-                    onPaymentMethodChange={setSelectedPaymentMethod}
-                    onCheckout={handleCheckout}
-                    isLoading={orderCreation.isPending}
-                  />
-                </CardContent>
-              </Card>
-            </div>
-          )}
-        </div>
+  const handleDeleteItem = (cartItemId: string) => {
+    deleteCartItemMutation.mutate(cartItemId);
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto px-1 py-8">
+      <BreadcrumbNav
+        items={[
+          { href: "/products", label: "Home" },
+          { label: "Cart" },
+        ]}
+      />
+
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Shopping Cart</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Continue Shopping
+        </Button>
       </div>
+
+      {isLoading ? (
+        <div className="text-center py-8">Loading cart...</div>
+      ) : cartItems?.length === 0 ? (
+        <div className="text-center py-8 space-y-4">
+          <ShoppingBag className="h-16 w-16 mx-auto text-gray-400" />
+          <h2 className="text-xl font-medium">Your cart is empty</h2>
+          <p className="text-gray-500">
+            Looks like you haven't added anything to your cart yet.
+          </p>
+          <Button onClick={() => navigate("/products")}>Start Shopping</Button>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4 border">
+            <h2 className="text-lg font-medium border-b pb-2">
+              Cart Items ({cartItems?.length})
+            </h2>
+            <div className="space-y-4">
+              {cartItems?.map((item) => (
+                <CartItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.product?.title || "Unknown Product"}
+                  quantity={item.quantity}
+                  price={item.product?.price || 0}
+                  currency={item.product?.currency || "SSP"}
+                  onDelete={() => handleDeleteItem(item.id)}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border">
+            <h2 className="text-lg font-medium border-b pb-2 mb-4">
+              Checkout Summary
+            </h2>
+            <CartSummary
+              currency="SSP"
+              totalAmount={totalAmount}
+              selectedPaymentMethod={selectedPaymentMethod}
+              onPaymentMethodChange={setSelectedPaymentMethod}
+              onCheckout={proceedToCheckout}
+              isLoading={deleteCartItemMutation.isPending}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default Cart;

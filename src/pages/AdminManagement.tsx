@@ -1,192 +1,128 @@
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { MoreHorizontal, UserCheck, UserX } from "lucide-react";
 import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { ProductFilters } from "@/components/ProductFilters";
-import { Star } from "lucide-react";
-import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { Input } from "@/components/ui/input";
+import { CurrencyManager } from "@/components/admin/CurrencyManager";
 
-interface Profile {
+interface User {
   id: string;
+  username: string;
+  email: string;
   user_type: string;
-  contact_email?: string | null;
-  full_name?: string | null;
 }
 
 const AdminManagement = () => {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [search, setSearch] = useState("");
 
-  const { data: profiles, isLoading, refetch } = useQuery({
-    queryKey: ["admin-profiles"],
+  const { data: users, isLoading, refetch } = useQuery({
+    queryKey: ["admin-users"],
     queryFn: async () => {
-      try {
-        console.log("Fetching profiles...");
-        const { data: profiles, error } = await supabase
-          .from("profiles")
-          .select(`
-            id,
-            user_type,
-            full_name,
-            contact_email
-          `);
-
-        if (error) {
-          console.error("Error fetching profiles:", error);
-          toast.error("Failed to fetch profiles");
-          throw error;
-        }
-
-        console.log("Fetched profiles:", profiles);
-        return profiles as Profile[];
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-        throw error;
-      }
-    }
+      const { data, error } = await supabase.rpc("get_all_users");
+      if (error) throw error;
+      return data as User[];
+    },
   });
 
-  const handleToggleAdmin = async (userId: string, shouldBeAdmin: boolean) => {
+  const updateUserRole = async (userId: string, role: 'user' | 'admin') => {
     try {
-      setIsUpdating(true);
-      const { error } = await supabase.rpc('manage_admin_user', {
-        target_user_id: userId,
-        should_be_admin: shouldBeAdmin
+      const { error } = await supabase.rpc("update_user_role", {
+        user_id_param: userId,
+        new_role_param: role,
       });
 
-      if (error) {
-        console.error('Error updating admin status:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      await refetch();
-      toast.success(`User ${shouldBeAdmin ? 'promoted to' : 'demoted from'} admin successfully`);
+      toast.success(`User role updated to ${role}`);
+      refetch();
     } catch (error) {
-      console.error('Error updating admin status:', error);
-      toast.error('Failed to update admin status');
-    } finally {
-      setIsUpdating(false);
+      console.error("Error updating user role:", error);
+      toast.error("Failed to update user role");
     }
   };
 
-  const filteredProfiles = profiles?.filter((profile) => {
-    const searchLower = searchQuery.toLowerCase();
-    return (
-      profile.full_name?.toLowerCase().includes(searchLower) ||
-      profile.contact_email?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  // Sort profiles: admins first, then other users
-  const sortedProfiles = filteredProfiles?.sort((a, b) => {
-    if (a.user_type === 'admin' && b.user_type !== 'admin') return -1;
-    if (a.user_type !== 'admin' && b.user_type === 'admin') return 1;
-    return 0;
-  });
-
-  // Separate admins and regular users
-  const adminProfiles = sortedProfiles?.filter(profile => profile.user_type === 'admin');
-  const regularProfiles = sortedProfiles?.filter(profile => profile.user_type !== 'admin');
+  const filteredUsers = users?.filter(
+    (user) =>
+      user.username?.toLowerCase().includes(search.toLowerCase()) ||
+      user.email?.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="w-full">
-      <div className="container w-full mx-auto px-0 md:px-0 pt-20 pb-16">
-        <div className="w-full max-w-none mx-auto space-y-1 m-1 p-1">
-          <BreadcrumbNav items={[{ label: "Admin Management" }]} />
-          <h1 className="text-2xl font-bold mb-4 dark:text-gray-100 m-1 p-1">Admin Management</h1>
-          <ProductFilters onSearchChange={setSearchQuery} />
-          
-          {isLoading ? (
-            <div className="flex justify-center items-center h-48">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <>
-              {/* Admin Section */}
-              {adminProfiles && adminProfiles.length > 0 && (
-                <div className="w-full space-y-1 m-1 p-1">
-                  <h2 className="text-xl font-semibold mt-1 mb-1">Administrators</h2>
-                  <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3">
-                    {adminProfiles.map((profile) => (
-                      <Card key={profile.id} className="overflow-hidden m-1 shadow-sm">
-                        <CardContent className="p-1 space-y-1">
-                          <div className="space-y-1">
-                            <div className="font-medium flex items-center gap-1">
-                              {profile.full_name || 'N/A'}
-                              <Star className="h-4 w-4 text-blue-500 fill-blue-500" />
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {profile.contact_email || 'N/A'}
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <div className="font-medium">Role</div>
-                            <div className="text-sm text-muted-foreground">
-                              {profile.user_type || 'user'}
-                            </div>
-                          </div>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-1"
-                            onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                            disabled={isUpdating || profile.user_type === 'super_admin'}
-                          >
-                            {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              )}
+    <div className="mx-1 sm:mx-4 py-8 space-y-6">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Management</h1>
 
-              {/* Regular Users Section */}
-              {regularProfiles && regularProfiles.length > 0 && (
-                <div className="w-full space-y-1 m-1 p-1">
-                  <h2 className="text-xl font-semibold mt-1 mb-1">Users</h2>
-                  <div className="grid gap-1 md:grid-cols-2 lg:grid-cols-3">
-                    {regularProfiles.map((profile) => (
-                      <Card key={profile.id} className="overflow-hidden m-1 shadow-sm">
-                        <CardContent className="p-1 space-y-1">
-                          <div className="space-y-1">
-                            <div className="font-medium">
-                              {profile.full_name || 'N/A'}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {profile.contact_email || 'N/A'}
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-1">
-                            <div className="font-medium">Role</div>
-                            <div className="text-sm text-muted-foreground">
-                              {profile.user_type || 'user'}
-                            </div>
-                          </div>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full mt-1"
-                            onClick={() => handleToggleAdmin(profile.id, profile.user_type !== 'admin')}
-                            disabled={isUpdating || profile.user_type === 'super_admin'}
-                          >
-                            {profile.user_type === 'admin' ? 'Remove Admin' : 'Make Admin'}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
+      <div className="mb-4 flex w-full items-center space-x-2">
+        <Input
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border">
+        <h2 className="text-xl font-semibold mb-4">Users</h2>
+        {isLoading ? (
+          <div className="text-center py-4">Loading...</div>
+        ) : (
+          <div className="space-y-6">
+            {filteredUsers?.map((user) => (
+              <div
+                key={user.id}
+                className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-900"
+              >
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{user.email}</p>
+                    <div className="mt-1">
+                      <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        Role: {user.user_type}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {user.user_type === "user" ? (
+                      <Button
+                        size="sm"
+                        className="h-8 flex items-center gap-1"
+                        onClick={() => updateUserRole(user.id, "admin")}
+                      >
+                        <UserCheck className="h-4 w-4" /> 
+                        <span>Make Admin</span>
+                      </Button>
+                    ) : user.user_type === "admin" ? (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="h-8 flex items-center gap-1"
+                        onClick={() => updateUserRole(user.id, "user")}
+                      >
+                        <UserX className="h-4 w-4" /> 
+                        <span>Remove Admin</span>
+                      </Button>
+                    ) : (
+                      <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-2 py-1">
+                        Super Admin
+                      </span>
+                    )}
                   </div>
                 </div>
-              )}
-            </>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border">
+        <h2 className="text-xl font-semibold mb-4">Manage Settings</h2>
+        <div className="space-y-4">
+          <div>
+            <CurrencyManager />
+          </div>
         </div>
       </div>
     </div>

@@ -74,7 +74,7 @@ export const ProductList = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-1 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full mx-1 sm:mx-4">
+      <div className="text-center py-1 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full mx-1">
         <div className="max-w-md mx-auto px-1 space-y-1">
           <h3 className="text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-300">{emptyMessage}</h3>
           <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filters to find what you're looking for</p>

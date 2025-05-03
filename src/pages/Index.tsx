@@ -1,175 +1,120 @@
 
-import React, { useState, useCallback, useMemo } from "react";
-import { useInView } from "react-intersection-observer";
+import { useState, useEffect, useCallback } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import { SupportedCurrency } from "@/utils/currencyConverter";
+import ProductList from "@/components/ProductList";
+import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ProductListingSection } from "@/components/products/ProductListingSection";
-import { useProducts } from "@/hooks/useProducts";
+import { Product } from "@/types/product";
+import { SupportedCurrency } from "@/utils/currencyConverter";
 
-export default function Index() {
+interface IndexProps {
+  selectedCurrency?: SupportedCurrency;
+}
+
+const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [sortOrder, setSortOrder] = useState<string>("none");
+  const pageSize = 12;
 
-  // Fetch products with optimized query - show all products, not just user's
+  // Fetch products with infinite scrolling
   const {
     data,
-    isLoading,
-    isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-    prefetchNextPage,
-  } = useProducts({
-    searchQuery,
-    selectedCategory,
-    sortOrder,
-    showOnlyPublished: true,
-    userOnly: false // Show all products, not just the user's
+    isFetchingNextPage,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ["products", searchQuery],
+    queryFn: async ({ pageParam = 0 }) => {
+      let query = supabase
+        .from("products")
+        .select(`
+          *,
+          product_images (
+            id,
+            storage_path
+          )
+        `)
+        .eq("product_status", "published")
+        .eq("in_stock", true)
+        .range(pageParam, pageParam + pageSize - 1)
+        .order("created_at", { ascending: false });
+
+      if (searchQuery) {
+        query = query.ilike("title", `%${searchQuery}%`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length === pageSize
+        ? allPages.length * pageSize
+        : undefined;
+    },
   });
 
-  // Setup intersection observer for infinite loading
-  const { ref, inView } = useInView({
-    threshold: 0.1,
-    rootMargin: "200px",
-  });
+  const products = data?.pages.flat() || [];
 
-  // Handle intersection to load more products
-  React.useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
+  const loadMoreProducts = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Prefetch next page when idle
-  React.useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
-      const handle = idleCallback(() => {
-        prefetchNextPage();
-      });
-      
-      return () => {
-        if (window.cancelIdleCallback) {
-          window.cancelIdleCallback(handle);
-        } else {
-          clearTimeout(handle);
-        }
-      };
+  const handleSearchChange = (search: string) => {
+    setSearchQuery(search);
+  };
+
+  const getProductImageUrl = (product: Product) => {
+    if (
+      !product.product_images ||
+      product.product_images.length === 0 ||
+      !product.product_images[0].storage_path
+    ) {
+      return "/placeholder.svg";
     }
-  }, [hasNextPage, isFetchingNextPage, prefetchNextPage]);
-
-  // Flatten product pages
-  const allProducts = useMemo(() => data?.pages.flat() || [], [data?.pages]);
-
-  // Get image URL with memoization
-  const getProductImageUrl = useCallback((product: Product) => {
-    if (!product.product_images?.length) return "/placeholder.svg";
-    
-    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
-    if (!mainImage) return "/placeholder.svg";
 
     return supabase.storage
       .from("images")
-      .getPublicUrl(mainImage.storage_path).data.publicUrl;
-  }, []);
-
-  // Event handlers
-  const handleProductClick = useCallback((product: Product) => {
-    setSelectedProduct(product);
-    // Track view
-    trackProductView(product.id).catch(console.error);
-  }, []);
-
-  const handleBack = useCallback(() => {
-    setSelectedProduct(null);
-  }, []);
-
-  const handleSortChange = useCallback((sort: string) => {
-    setSortOrder(sort);
-  }, []);
-
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, []);
-
-  const handleCategoryChange = useCallback((category: string) => {
-    setSelectedCategory(category);
-  }, []);
-
-  const handlePriceRangeChange = useCallback((min: number, max: number) => {
-    console.log('Price range changed:', { min, max });
-    // Implementation for price range filtering would go here
-  }, []);
-
-  // Track product views
-  const trackProductView = async (productId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      await supabase.from('product_views').insert({
-        product_id: productId,
-        viewer_id: user?.id || null,
-      });
-    } catch (error) {
-      console.error('Error tracking product view:', error);
-    }
+      .getPublicUrl(product.product_images[0].storage_path).data.publicUrl;
   };
 
-  // Loading state
-  if (isLoading) {
+  if (selectedProduct) {
     return (
-      <div className="space-y-1 w-full">
-        <Skeleton className="h-12 w-full" />
-        <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-48 w-full" />
-          ))}
-        </div>
+      <div className="container mx-1 sm:mx-auto py-6">
+        <ProductDetail
+          product={selectedProduct}
+          onBack={() => setSelectedProduct(null)}
+          getProductImageUrl={getProductImageUrl}
+          selectedCurrency={selectedCurrency}
+          setSelectedProduct={setSelectedProduct}
+        />
       </div>
     );
   }
 
   return (
-    <div className="w-full px-0 mx-0 max-w-none">
-      <BreadcrumbNav
-        items={[
-          { label: "All Products", href: "/products" }
-        ]}
-      />
-      {selectedProduct ? (
-        <ProductDetail 
-          product={selectedProduct}
+    <div className="pb-16 mx-1 sm:mx-auto">
+      <h1 className="text-2xl font-bold my-6">All Products</h1>
+      
+      <ProductFilters onSearchChange={handleSearchChange} />
+      
+      <div className="mt-6">
+        <ProductList
+          products={products}
           getProductImageUrl={getProductImageUrl}
-          onBack={handleBack}
+          onProductClick={setSelectedProduct}
+          isLoading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          observerRef={loadMoreProducts}
           selectedCurrency={selectedCurrency}
-          setSelectedProduct={setSelectedProduct}
         />
-      ) : (
-        <div className="w-full">
-          <ProductListingSection
-            products={allProducts}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={handleCategoryChange}
-            onProductClick={handleProductClick}
-            isFetchingNextPage={isFetchingNextPage}
-            observerRef={ref}
-            selectedCurrency={selectedCurrency}
-            onPriceRangeChange={handlePriceRangeChange}
-            onSortChange={handleSortChange}
-            getProductImageUrl={getProductImageUrl}
-            emptyMessage="No products found"
-            showStatus={false}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
-}
+};
+
+export default Index;

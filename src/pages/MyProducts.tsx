@@ -1,189 +1,134 @@
 
-import React, { useState, useCallback, useMemo } from "react";
-import { useInView } from "react-intersection-observer";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
-import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import { SupportedCurrency } from "@/utils/currencyConverter";
-import ProductDetail from "@/components/ProductDetail";
-import { Skeleton } from "@/components/ui/skeleton";
-import { ProductListingSection } from "@/components/products/ProductListingSection";
-import { useProducts } from "@/hooks/useProducts";
-import { Navigation } from "@/components/Navigation";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ModifyProductsList } from "@/components/ModifyProductsList";
+import { Product } from "@/types/product";
 
-export default function MyProducts() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("SSP");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [sortOrder, setSortOrder] = useState<string>("none");
+const MyProducts = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [myProducts, setMyProducts] = useState<Product[]>([]);
+  const pageSize = 10;
 
-  // Fetch only the current user's products
   const {
-    data,
+    data: products,
     isLoading,
-    isFetchingNextPage,
-    fetchNextPage,
-    hasNextPage,
-    prefetchNextPage,
-  } = useProducts({
-    searchQuery,
-    selectedCategory,
-    sortOrder,
-    showOnlyPublished: false, // Show all user's products regardless of status
-    userOnly: true // Only show current user's products
+    refetch,
+  } = useQuery({
+    queryKey: ["my-products", page],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not logged in");
+
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          profiles:user_id (
+            username,
+            full_name
+          ),
+          product_images:product_images (
+            id,
+            storage_path
+          )
+        `)
+        .eq("user_id", user.id)
+        .range((page - 1) * pageSize, page * pageSize - 1)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data as Product[];
+    },
   });
 
-  // Setup intersection observer for infinite loading
-  const { ref, inView } = useInView({
-    threshold: 0.1,
-    rootMargin: "200px",
-  });
-
-  // Handle intersection to load more products
-  React.useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // Prefetch next page when idle
-  React.useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      const idleCallback = window.requestIdleCallback || ((cb) => setTimeout(cb, 1));
-      const handle = idleCallback(() => {
-        prefetchNextPage();
-      });
+  useEffect(() => {
+    if (products) {
+      if (page === 1) {
+        setMyProducts(products);
+      } else {
+        setMyProducts((prev) => [...prev, ...products]);
+      }
       
-      return () => {
-        if (window.cancelIdleCallback) {
-          window.cancelIdleCallback(handle);
-        } else {
-          clearTimeout(handle);
-        }
-      };
+      setHasMore(products.length === pageSize);
     }
-  }, [hasNextPage, isFetchingNextPage, prefetchNextPage]);
+  }, [products, page]);
 
-  // Flatten product pages
-  const allProducts = useMemo(() => data?.pages.flat() || [], [data?.pages]);
+  const loadMoreProducts = () => {
+    if (hasMore && !isLoading) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
-  // Get image URL with memoization
-  const getProductImageUrl = useCallback((product: Product) => {
-    if (!product.product_images?.length) return "/placeholder.svg";
-    
-    const mainImage = product.product_images.find(img => img.is_main) || product.product_images[0];
-    if (!mainImage) return "/placeholder.svg";
-
-    return supabase.storage
-      .from("images")
-      .getPublicUrl(mainImage.storage_path).data.publicUrl;
-  }, []);
-
-  // Event handlers
-  const handleProductClick = useCallback((product: Product) => {
-    setSelectedProduct(product);
-  }, []);
-
-  const handleBack = useCallback(() => {
-    setSelectedProduct(null);
-  }, []);
-
-  const handleSortChange = useCallback((sort: string) => {
-    setSortOrder(sort);
-  }, []);
-
-  const handleSearchChange = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, []);
-
-  const handleCategoryChange = useCallback((category: string) => {
-    setSelectedCategory(category);
-  }, []);
-
-  const handlePriceRangeChange = useCallback((min: number, max: number) => {
-    console.log('Price range changed:', { min, max });
-    // Implementation for price range filtering would go here
-  }, []);
-
-  // Delete product handler
   const handleDeleteProduct = async (productId: string) => {
     try {
-      const { error } = await supabase
-        .from('products')
+      // First delete product images
+      const { data: productImages, error: imagesError } = await supabase
+        .from("product_images")
+        .select("storage_path")
+        .eq("product_id", productId);
+      
+      if (imagesError) throw imagesError;
+
+      // Delete image files from storage
+      for (const image of productImages || []) {
+        if (image.storage_path) {
+          const { error: storageError } = await supabase.storage
+            .from("images")
+            .remove([image.storage_path]);
+          
+          if (storageError) console.error("Error deleting image:", storageError);
+        }
+      }
+
+      // Delete the product
+      const { error: deleteError } = await supabase
+        .from("products")
         .delete()
-        .eq('id', productId);
+        .eq("id", productId);
       
-      if (error) throw error;
-      
+      if (deleteError) throw deleteError;
+
       toast.success("Product deleted successfully");
       
-      // Remove the deleted product from the current view without full refresh
-      const updatedProducts = allProducts.filter(product => product.id !== productId);
-      // Force a refetch to update the list
-      window.location.reload();
+      // Update local state
+      setMyProducts((prev) => prev.filter((product) => product.id !== productId));
+      
+      // Invalidate queries
+      queryClient.invalidateQueries({ queryKey: ["my-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error("Error deleting product:", error);
       toast.error("Failed to delete product");
     }
   };
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-0 mt-20 w-full">
-        <div className="space-y-1">
-          <Skeleton className="h-12 w-full" />
-          <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-48 w-full" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <>
-      <Navigation searchQuery={searchQuery} onSearchChange={handleSearchChange} />
-      <div className="container mx-auto px-0 pt-20 pb-20 w-full max-w-none">
-        <BreadcrumbNav
-          items={[
-            { label: "My Products", href: "/my-products" }
-          ]}
-        />
-        {selectedProduct ? (
-          <ProductDetail 
-            product={selectedProduct}
-            getProductImageUrl={getProductImageUrl}
-            onBack={handleBack}
-            selectedCurrency={selectedCurrency}
-          />
-        ) : (
-          <div className="w-full">
-            <ProductListingSection
-              products={allProducts}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={handleCategoryChange}
-              onProductClick={handleProductClick}
-              isFetchingNextPage={isFetchingNextPage}
-              observerRef={ref}
-              selectedCurrency={selectedCurrency}
-              onPriceRangeChange={handlePriceRangeChange}
-              onSortChange={handleSortChange}
-              getProductImageUrl={getProductImageUrl}
-              emptyMessage="You don't have any products yet"
-              showStatus={true}
-              onDelete={handleDeleteProduct}
-              isAdmin={true}
-            />
-          </div>
-        )}
+    <div className="mx-1 sm:mx-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">My Products</h1>
+        <Button onClick={() => navigate("/add-product")} className="gap-1">
+          <Plus className="h-4 w-4" />
+          <span>Add Product</span>
+        </Button>
       </div>
-    </>
+
+      <ModifyProductsList
+        products={myProducts}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        onLoadMore={loadMoreProducts}
+        onDelete={handleDeleteProduct}
+      />
+    </div>
   );
-}
+};
+
+export default MyProducts;

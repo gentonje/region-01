@@ -113,7 +113,7 @@ export const ModifyProductsList = ({
 
   return (
     <>
-      <div className="flex flex-col md:flex-row gap-1 mb-1 m-1 p-1">
+      <div className="flex flex-col md:flex-row gap-1 mb-1 mx-1">
         <div className="relative flex-1">
           <Search className="absolute left-1 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -156,7 +156,7 @@ export const ModifyProductsList = ({
         </Select>
       </div>
 
-      <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow m-1 p-1">
+      <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow mx-1">
         {filteredAndSortedProducts.map((product) => (
           <div key={`product-${product.id}`} className="p-1">
             <ProductModifyCard
@@ -169,7 +169,7 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 m-1 p-1">
+        <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 mx-1">
           {[1, 2, 3].map((i) => (
             <div key={`skeleton-${i}`} className="p-1">
               <ProductSkeleton />
@@ -179,12 +179,12 @@ export const ModifyProductsList = ({
       )}
 
       {!isLoading && filteredAndSortedProducts.length === 0 && (
-        <div className="text-center py-1 m-1 p-1">
+        <div className="text-center py-1 mx-1">
           <p className="text-gray-600 dark:text-gray-400">No products found</p>
         </div>
       )}
 
-      <div ref={loadMoreRef} className="h-16 flex items-center justify-center m-1 p-1">
+      <div ref={loadMoreRef} className="h-16 flex items-center justify-center mx-1">
         {hasMore && <div className="loading">Loading more...</div>}
       </div>
     </>

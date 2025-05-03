@@ -1,46 +1,19 @@
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { UserCog } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Loader2, User } from "lucide-react";
 import { ProfileFormFields } from "@/components/forms/profile/ProfileFormFields";
-import { profileFormSchema, type ProfileFormData } from "@/components/forms/profile/validation";
+import { profileFormSchema, ProfileFormData } from "@/components/forms/profile/validation";
+import { supabase } from "@/integrations/supabase/client";
 
-export default function EditProfile() {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-
-  const { data: session } = useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return session;
-    },
-  });
-
-  const { data: profile, isLoading } = useQuery({
-    queryKey: ["profile", session?.user?.id],
-    queryFn: async () => {
-      if (!session?.user?.id) return null;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .maybeSingle();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.user?.id,
-  });
-
+const EditProfile = () => {
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
@@ -52,89 +25,151 @@ export default function EditProfile() {
       shop_name: "",
       shop_description: "",
     },
+    mode: "onChange",
   });
 
   useEffect(() => {
-    if (profile) {
-      form.reset({
-        username: profile.username || "",
-        full_name: profile.full_name || "",
-        contact_email: profile.contact_email || "",
-        phone_number: profile.phone_number || "",
-        address: profile.address || "",
-        shop_name: profile.shop_name || "",
-        shop_description: profile.shop_description || "",
-      });
-    }
-  }, [profile, form]);
+    const fetchProfile = async () => {
+      try {
+        setIsLoading(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", user.id)
+            .single();
+          
+          if (error) throw error;
+          
+          if (data) {
+            form.reset({
+              username: data.username || "",
+              full_name: data.full_name || "",
+              contact_email: data.contact_email || user.email || "",
+              phone_number: data.phone_number || "",
+              address: data.address || "",
+              shop_name: data.shop_name || "",
+              shop_description: data.shop_description || "",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const updateProfileMutation = useMutation({
-    mutationFn: async (values: ProfileFormData) => {
-      if (!session?.user?.id) throw new Error("No user ID found");
+    fetchProfile();
+  }, [form, toast]);
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      setIsLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("You must be logged in to update your profile");
+      }
+      
+      // Check if username is already taken
+      if (data.username) {
+        const { data: existingUser, error: usernameError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("username", data.username)
+          .neq("id", user.id)
+          .maybeSingle();
+        
+        if (usernameError) throw usernameError;
+        
+        if (existingUser) {
+          form.setError("username", { 
+            type: "manual", 
+            message: "This username is already taken" 
+          });
+          return;
+        }
+      }
+      
       const { error } = await supabase
         .from("profiles")
-        .update(values)
-        .eq("id", session.user.id);
-
+        .update({
+          username: data.username,
+          full_name: data.full_name,
+          contact_email: data.contact_email,
+          phone_number: data.phone_number,
+          address: data.address,
+          shop_name: data.shop_name,
+          shop_description: data.shop_description,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id);
+      
       if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Profile updated successfully");
-      navigate("/");
-    },
-    onError: (error) => {
-      toast.error("Failed to update profile: " + error.message);
-    },
-  });
-
-  const onSubmit = (values: ProfileFormData) => {
-    updateProfileMutation.mutate(values);
+      
+      toast({
+        title: "Success",
+        description: "Your profile has been updated",
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="container max-w-2xl mx-auto p-3 md:p-4 mt-4 space-y-2 md:space-y-4">
-        <div className="animate-pulse flex space-x-2 items-center">
-          <div className="rounded-full bg-gray-200 dark:bg-gray-700 h-8 w-8"></div>
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-        </div>
-        <div className="space-y-3">
-          {[...Array(7)].map((_, i) => (
-            <div key={i} className="space-y-2">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container max-w-2xl mx-auto p-3 md:p-4 pb-16 mt-4 space-y-2 md:space-y-4">
-      <div className="flex items-center gap-2 mb-2 md:mb-4">
-        <UserCog className="h-5 w-5 md:h-6 md:w-6" />
-        <h1 className="text-xl md:text-2xl font-bold">Edit Profile</h1>
+    <div className="max-w-2xl mx-1 sm:mx-auto py-8">
+      <div className="flex items-center gap-2 mb-6">
+        <User className="h-6 w-6" />
+        <h1 className="text-2xl font-bold">Edit Profile</h1>
       </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 md:space-y-4">
-          <ProfileFormFields form={form} />
-          
-          <div className="flex gap-2 md:gap-4 mt-4 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/")}
-              className="m-1"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="m-1">Save Changes</Button>
-          </div>
-        </form>
-      </Form>
+      
+      {isLoading && !form.formState.isSubmitting ? (
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <ProfileFormFields form={form} />
+              
+              <div className="pt-4 border-t flex justify-end">
+                <Button 
+                  type="submit" 
+                  disabled={!form.formState.isValid || form.formState.isSubmitting}
+                  className="w-full sm:w-auto"
+                >
+                  {form.formState.isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Profile"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default EditProfile;
