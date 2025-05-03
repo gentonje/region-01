@@ -104,8 +104,8 @@ const Wishlist = () => {
     window.location.href = `/product/${product.id}`;
   };
 
-  const handleDelete = (productId: string) => {
-    return deleteMutation.mutateAsync(productId);
+  const handleDelete = (productId: string): Promise<void> => {
+    return deleteMutation.mutateAsync(productId).then(() => {});
   };
 
   return (
