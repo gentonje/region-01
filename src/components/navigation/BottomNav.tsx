@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { CurrencySelector } from "../CurrencySelector";
+import { useWishlistCount } from "@/hooks/useWishlistCount";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface BottomNavProps {
   isAuthenticated: boolean;
@@ -20,6 +22,7 @@ export const BottomNav = ({
   const location = useLocation();
   const isMobile = useIsMobile();
   const isActive = (path: string) => location.pathname === path;
+  const { wishlistCount } = useWishlistCount();
 
   // Don't render BottomNav on login page or if not authenticated
   if (!isAuthenticated || location.pathname === '/login') {
@@ -43,10 +46,25 @@ export const BottomNav = ({
           )}
           aria-label="Wishlist"
         >
-          <Heart className={cn(
-            "w-6 h-6 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]",
-            isActive("/wishlist") ? "fill-orange-500" : ""
-          )} />
+          <div className="relative">
+            <Heart className={cn(
+              "w-6 h-6 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]",
+              isActive("/wishlist") ? "fill-orange-500" : ""
+            )} />
+            
+            <AnimatePresence>
+              {wishlistCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center"
+                >
+                  {wishlistCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
         </Link>
         
         {/* Currency Toggle Button */}
