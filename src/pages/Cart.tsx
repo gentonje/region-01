@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { generateQueryKey } from "@/utils/queryUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface CartItemType {
   id: string;
@@ -73,6 +74,7 @@ const Cart = () => {
       
       return transformedData;
     },
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   const deleteCartItemMutation = useMutation({
@@ -159,17 +161,34 @@ const Cart = () => {
     }
   };
 
+  // Calculate total amount properly ensuring all items are valid
   const totalAmount = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
     0
-  ) || 0;
+  );
 
   const handleDeleteItem = (cartItemId: string) => {
     deleteCartItemMutation.mutate(cartItemId);
   };
 
+  // Container animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1 
+      } 
+    }
+  };
+
   return (
-    <div className="max-w-3xl mx-auto px-1 py-8">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="max-w-3xl mx-auto px-1 py-8"
+    >
       <BreadcrumbNav
         items={[
           { href: "/products", label: "Home" },
@@ -179,50 +198,76 @@ const Cart = () => {
 
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Shopping Cart</h1>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Continue Shopping
-        </Button>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Continue Shopping
+          </Button>
+        </motion.div>
       </div>
 
       {isLoading ? (
         <div className="text-center py-8">Loading cart...</div>
       ) : cartItems?.length === 0 ? (
-        <div className="text-center py-8 space-y-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center py-8 space-y-4"
+        >
           <ShoppingBag className="h-16 w-16 mx-auto text-gray-400" />
           <h2 className="text-xl font-medium">Your cart is empty</h2>
           <p className="text-gray-500">
             Looks like you haven't added anything to your cart yet.
           </p>
-          <Button onClick={() => navigate("/products")}>Start Shopping</Button>
-        </div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={() => navigate("/products")}>Start Shopping</Button>
+          </motion.div>
+        </motion.div>
       ) : (
-        <div className="space-y-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4 border">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="space-y-6"
+        >
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 space-y-4 border"
+          >
             <h2 className="text-lg font-medium border-b pb-2">
               Cart Items ({cartItems?.length})
             </h2>
-            <div className="space-y-4">
-              {cartItems?.map((item) => (
-                <CartItem
-                  key={item.id}
-                  id={item.id}
-                  title={item.product.title}
-                  quantity={item.quantity}
-                  price={item.product.price}
-                  currency={item.product.currency || "SSP"}
-                  onDelete={() => handleDeleteItem(item.id)}
-                />
-              ))}
-            </div>
-          </div>
+            <AnimatePresence>
+              <div className="space-y-4">
+                {cartItems?.map((item) => (
+                  <CartItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.product?.title || "Unnamed Product"}
+                    quantity={item.quantity}
+                    price={item.product?.price || 0}
+                    currency={item.product?.currency || "SSP"}
+                    onDelete={() => handleDeleteItem(item.id)}
+                  />
+                ))}
+              </div>
+            </AnimatePresence>
+          </motion.div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border">
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.2 }}
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border"
+          >
             <h2 className="text-lg font-medium border-b pb-2 mb-4">
               Checkout Summary
             </h2>
@@ -234,10 +279,10 @@ const Cart = () => {
               onCheckout={proceedToCheckout}
               isLoading={deleteCartItemMutation.isPending}
             />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 };
 

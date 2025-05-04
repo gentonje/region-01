@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { generateQueryKey } from "@/utils/queryUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function CartIndicator() {
   const navigate = useNavigate();
@@ -36,27 +37,37 @@ export function CartIndicator() {
         return 0;
       }
     },
-    staleTime: 1000 * 15, // 15 seconds (reduced stale time for more frequent updates)
+    staleTime: 1000 * 5, // 5 seconds (reduced for more frequent updates)
     gcTime: 1000 * 60 * 5, // 5 minutes
+    refetchInterval: 10000, // Refetch every 10 seconds
   });
 
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300"
-            onClick={() => navigate("/cart")}
-          >
-            <ShoppingCart className="h-5 w-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                {cartCount}
-              </span>
-            )}
-          </Button>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300"
+              onClick={() => navigate("/cart")}
+            >
+              <ShoppingCart className="h-5 w-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+              <AnimatePresence>
+                {cartCount > 0 && (
+                  <motion.span 
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  >
+                    {cartCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </Button>
+          </motion.div>
         </TooltipTrigger>
         <TooltipContent>
           <p>Cart ({cartCount || 0} items)</p>

@@ -16,9 +16,10 @@ export function useCartMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Force invalidate all cart-related queries to ensure immediate updates
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
       toast.success("Item removed from cart");
     },
     onError: (error) => {
@@ -43,9 +44,10 @@ export function useCartMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Force invalidate all cart-related queries to ensure immediate updates
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
       toast.success("Item added to cart");
     },
     onError: (error) => {
@@ -72,9 +74,10 @@ export function useCartMutations() {
       if (error) throw error;
     },
     onSuccess: () => {
+      // Force invalidate all cart-related queries to ensure immediate updates
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
       toast.success("Cart updated");
     },
     onError: (error) => {

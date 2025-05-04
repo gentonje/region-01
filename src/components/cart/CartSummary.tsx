@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface CartSummaryProps {
   currency: string;
@@ -49,23 +50,36 @@ export const CartSummary = ({
       </div>
 
       <div className="pt-1 border-t">
-        <p className="flex justify-between mb-1">
-          <span>Total</span>
-          <span className="font-bold">
-            {currency} {Math.round(totalAmount).toLocaleString()}
-          </span>
-        </p>
-        <Button
-          className="w-full p-1"
-          onClick={onCheckout}
-          disabled={isLoading}
+        <motion.p 
+          className="flex justify-between mb-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
         >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            "Proceed to Checkout"
-          )}
-        </Button>
+          <span>Total</span>
+          <motion.span 
+            className="font-bold"
+            key={totalAmount}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currency} {Math.round(totalAmount).toLocaleString()}
+          </motion.span>
+        </motion.p>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            className="w-full p-1 bg-violet-600 hover:bg-violet-700"
+            onClick={onCheckout}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Proceed to Checkout"
+            )}
+          </Button>
+        </motion.div>
       </div>
     </div>
   );
