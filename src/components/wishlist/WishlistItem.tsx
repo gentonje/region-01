@@ -83,6 +83,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Added to cart successfully");
     },
     onError: (error) => {
@@ -122,7 +123,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
   };
 
   return (
-    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow w-full max-w-3xl mx-auto">
+    <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow w-full mx-1">
       <CardContent className="p-0">
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-56 h-52 relative">

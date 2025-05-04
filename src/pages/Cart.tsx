@@ -9,6 +9,7 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { generateQueryKey } from "@/utils/queryUtils";
 
 interface CartItemType {
   id: string;
@@ -30,8 +31,8 @@ const Cart = () => {
   const queryClient = useQueryClient();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("stripe");
 
-  const { data: cartItems, isLoading } = useQuery({
-    queryKey: ["cart"],
+  const { data: cartItems = [], isLoading } = useQuery({
+    queryKey: generateQueryKey("cart", {}),
     queryFn: async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error("User not logged in");
@@ -56,10 +57,19 @@ const Cart = () => {
       if (error) throw error;
       
       // Transform the data to match CartItemType
-      const transformedData = data?.map(item => ({
+      const transformedData: CartItemType[] = data?.map(item => ({
         ...item,
-        product: Array.isArray(item.product) ? item.product[0] : item.product
-      })) as CartItemType[] || [];
+        product: Array.isArray(item.product) && item.product.length > 0 
+          ? item.product[0] 
+          : { 
+              id: "", 
+              title: "", 
+              price: 0, 
+              currency: "SSP", 
+              in_stock: false, 
+              user_id: "" 
+            }
+      })) || [];
       
       return transformedData;
     },
@@ -77,6 +87,7 @@ const Cart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast({
         title: "Item removed",
         description: "The item has been removed from your cart",
@@ -137,6 +148,7 @@ const Cart = () => {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       navigate("/products");
     } catch (error) {
       toast({
@@ -147,7 +159,7 @@ const Cart = () => {
     }
   };
 
-  const totalAmount = cartItems?.reduce(
+  const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   ) || 0;

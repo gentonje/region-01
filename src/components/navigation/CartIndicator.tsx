@@ -36,7 +36,7 @@ export function CartIndicator() {
         return 0;
       }
     },
-    staleTime: 1000 * 30, // 30 seconds
+    staleTime: 1000 * 15, // 15 seconds (reduced stale time for more frequent updates)
     gcTime: 1000 * 60 * 5, // 5 minutes
   });
 

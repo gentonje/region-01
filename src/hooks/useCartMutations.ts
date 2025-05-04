@@ -2,6 +2,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateQueryKey } from "@/utils/queryUtils";
 
 export function useCartMutations() {
   const queryClient = useQueryClient();
@@ -16,6 +17,8 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Item removed from cart");
     },
     onError: (error) => {
@@ -41,6 +44,8 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Item added to cart");
     },
     onError: (error) => {
@@ -68,6 +73,8 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Cart updated");
     },
     onError: (error) => {
