@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,8 +27,42 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const isAuthenticated = !!session;
   const isMobile = useIsMobile();
 
+  // Handle mobile full screen mode
+  useEffect(() => {
+    if (isMobile) {
+      // Apply full screen mode
+      document.documentElement.classList.add('mobile-full-screen');
+      
+      // Handle iOS devices which need special handling
+      if (navigator.userAgent.match(/iPhone|iPad|iPod/i)) {
+        // Set initial height
+        setFullScreenHeight();
+        
+        // Update height on orientation change and resize
+        window.addEventListener('resize', setFullScreenHeight);
+        window.addEventListener('orientationchange', setFullScreenHeight);
+      }
+      
+      return () => {
+        // Clean up
+        document.documentElement.classList.remove('mobile-full-screen');
+        window.removeEventListener('resize', setFullScreenHeight);
+        window.removeEventListener('orientationchange', setFullScreenHeight);
+      };
+    }
+  }, [isMobile]);
+
+  // Helper function to set correct viewport height for iOS
+  const setFullScreenHeight = () => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  };
+
   return (
-    <div className="min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <div className={cn(
+      "min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200",
+      isMobile && "h-[100vh] h-[calc(var(--vh,1vh)*100)]" // Use dynamic height on mobile
+    )}>
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
@@ -38,14 +72,13 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       <div className={cn(
         "w-full pt-16", 
         isMobile ? "pb-16" : "pb-4", 
-        "sm:pt-16 max-w-none"
+        "sm:pt-16 max-w-none",
+        isMobile && "h-[calc(100%-64px)]" // Adjust content area for nav heights
       )}>
-        <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 h-full">
           {children || <Outlet />}
         </div>
       </div>
-      
-      {/* We'll no longer render BottomNav here as it's now included in Navigation component */}
     </div>
   );
 };

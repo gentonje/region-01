@@ -111,6 +111,23 @@ video {
   }
 }
 
+/* Full screen mobile app styles */
+.mobile-full-screen {
+  /* Prevent bouncing/scrolling on iOS */
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Use custom viewport height calculation for iOS */
+@supports (-webkit-touch-callout: none) {
+  .h-\[100vh\] {
+    height: 100vh; /* Fallback */
+    height: calc(var(--vh, 1vh) * 100);
+  }
+}
+
 /* Fix for mobile bottom navigation */
 .pb-safe {
   padding-bottom: calc(env(safe-area-inset-bottom) + 4rem);

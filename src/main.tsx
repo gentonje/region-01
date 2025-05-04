@@ -9,6 +9,21 @@ if (!rootElement) {
   throw new Error('Failed to find the root element');
 }
 
+// Add meta tag for mobile fullscreen experience
+if (!document.querySelector('meta[name="apple-mobile-web-app-capable"]')) {
+  const metaAppleCapable = document.createElement('meta');
+  metaAppleCapable.setAttribute('name', 'apple-mobile-web-app-capable');
+  metaAppleCapable.setAttribute('content', 'yes');
+  document.head.appendChild(metaAppleCapable);
+}
+
+if (!document.querySelector('meta[name="mobile-web-app-capable"]')) {
+  const metaWebCapable = document.createElement('meta');
+  metaWebCapable.setAttribute('name', 'mobile-web-app-capable');
+  metaWebCapable.setAttribute('content', 'yes');
+  document.head.appendChild(metaWebCapable);
+}
+
 const root = createRoot(rootElement);
 
 root.render(
