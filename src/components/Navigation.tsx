@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +11,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { useScrollDirection, ScrollDirection } from "@/hooks/useScrollDirection";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface NavigationProps {
   searchQuery?: string;
@@ -31,6 +33,10 @@ export const Navigation = ({
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { scrollDirection, isAtTop } = useScrollDirection();
+  
+  // Keep top nav visible when at top of page or scrolling up
+  const shouldShowNav = scrollDirection === ScrollDirection.UP || isAtTop;
 
   useEffect(() => {
     const getUser = async () => {
@@ -96,35 +102,49 @@ export const Navigation = ({
 
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-between items-center h-14">
-            <div className="flex justify-center">
-              <Logo />
-            </div>
+      <AnimatePresence>
+        <motion.div 
+          className="fixed top-0 left-0 right-0 z-50 bg-background/50 backdrop-blur-sm border-b border-border"
+          initial={{ translateY: 0 }}
+          animate={{ 
+            translateY: shouldShowNav ? 0 : -72 // Hide nav when scrolling down
+          }}
+          transition={{ duration: 0.2 }}
+        >
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="flex justify-between items-center h-14">
+              <div className="flex justify-center">
+                <Logo />
+              </div>
 
-            <div className="flex items-center gap-2">
-              {session && (
-                <>
-                  <CartIndicator />
-                </>
-              )}
-              <ThemeToggle />
-              <UserMenu 
-                userName={userName} 
-                onLogout={handleLogout}
-                isLoading={isLoading}
-                isAuthenticated={!!session}
-              />
+              <div className="flex items-center gap-2">
+                {session && (
+                  <>
+                    <CartIndicator />
+                  </>
+                )}
+                <ThemeToggle />
+                <UserMenu 
+                  userName={userName} 
+                  onLogout={handleLogout}
+                  isLoading={isLoading}
+                  isAuthenticated={!!session}
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      <BottomNav 
-        isAuthenticated={!!session} 
-        selectedCurrency={selectedCurrency}
-        onCurrencyChange={onCurrencyChange}
-      />
+        </motion.div>
+      </AnimatePresence>
+      
+      {/* We'll pass the scroll state to BottomNav */}
+      {session && (
+        <BottomNav 
+          isAuthenticated={!!session} 
+          selectedCurrency={selectedCurrency}
+          onCurrencyChange={onCurrencyChange}
+          shouldShow={scrollDirection === ScrollDirection.UP}
+        />
+      )}
     </>
   );
 };

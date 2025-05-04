@@ -12,12 +12,14 @@ interface BottomNavProps {
   isAuthenticated: boolean;
   selectedCurrency?: SupportedCurrency;
   onCurrencyChange?: (currency: SupportedCurrency) => void;
+  shouldShow?: boolean;
 }
 
 export const BottomNav = ({
   isAuthenticated,
   selectedCurrency = "USD",
-  onCurrencyChange
+  onCurrencyChange,
+  shouldShow = true
 }: BottomNavProps) => {
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -35,7 +37,14 @@ export const BottomNav = ({
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 h-14 bg-background/80 backdrop-blur-lg border-t border-border">
+    <motion.nav 
+      className="fixed bottom-0 left-0 right-0 z-50 h-14 bg-background/80 backdrop-blur-lg border-t border-border"
+      initial={{ translateY: 0 }}
+      animate={{ 
+        translateY: shouldShow ? 0 : 100 // Hide nav when not scrolling up
+      }}
+      transition={{ duration: 0.2 }}
+    >
       <div className="flex justify-around items-center h-full max-w-lg mx-auto">
         <Link 
           to="/wishlist" 
@@ -88,6 +97,6 @@ export const BottomNav = ({
           </div>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };

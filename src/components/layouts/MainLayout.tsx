@@ -45,13 +45,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         </div>
       </div>
       
-      {isAuthenticated && (
-        <BottomNav 
-          isAuthenticated={isAuthenticated}
-          selectedCurrency={selectedCurrency}
-          onCurrencyChange={onCurrencyChange}
-        />
-      )}
+      {/* We'll no longer render BottomNav here as it's now included in Navigation component */}
     </div>
   );
 };
