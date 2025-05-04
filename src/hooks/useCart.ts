@@ -57,25 +57,30 @@ export function useCart() {
           user_id: "" 
         };
         
-        // Handle the product object properly based on what we get from Supabase
-        let productData = item.product;
+        // Get product data from the item
+        const rawProductData = item.product;
+        let productData;
         
-        // If product is null or undefined, use the default product
-        if (!productData) {
+        // Handle all possible shapes of product data
+        if (!rawProductData) {
+          // If no product data, use default
           productData = defaultProduct;
-        }
-        // If product is an array (from one-to-many relation), take the first item
-        else if (Array.isArray(productData)) {
-          productData = productData.length > 0 ? productData[0] : defaultProduct;
+        } else if (Array.isArray(rawProductData)) {
+          // If it's an array (from one-to-many relation), take the first item or use default
+          productData = rawProductData.length > 0 ? rawProductData[0] : defaultProduct;
+        } else {
+          // If it's an object, use it directly
+          productData = rawProductData;
         }
         
-        // Ensure the product has the correct type structure
+        // Now productData is guaranteed to be an object, not an array
+        // Create a properly typed product object with safe fallbacks
         const product = {
           id: productData.id || "",
           title: productData.title || "Unnamed Product",
           price: typeof productData.price === 'number' ? productData.price : 0,
           currency: productData.currency || "SSP",
-          in_stock: !!productData.in_stock,
+          in_stock: Boolean(productData.in_stock),
           user_id: productData.user_id || ""
         };
         
