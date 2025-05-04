@@ -4,12 +4,11 @@ import { Card } from "@/components/ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
-import { useCartMutations } from "@/hooks/useCartMutations";
-import { ProductCardImage } from "./product/ProductCardImage";
-import { ProductCardContent } from "./product/ProductCardContent";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductCardImage } from "./product/ProductCardImage";
+import { ProductCardContent } from "./product/ProductCardContent";
 
 interface ProductCardProps {
   product: Product;
@@ -32,7 +31,6 @@ const ProductCard = ({
 }: ProductCardProps) => {
   const { session } = useAuth();
   const imageUrl = getProductImageUrl(product);
-  const { addItemMutation } = useCartMutations();
   const { toggleWishlist, isInWishlist, isPending } = useWishlistMutation(product.id);
 
   // Get user type
@@ -59,13 +57,6 @@ const ProductCard = ({
 
   const isAdmin = userType === 'admin';
 
-  const handleAddToCart = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (product.in_stock) {
-      addItemMutation.mutate({ productId: product.id });
-    }
-  }, [addItemMutation, product.in_stock, product.id]);
-
   const handleDeleteClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDelete) {
@@ -90,7 +81,7 @@ const ProductCard = ({
       <ProductCardContent
         product={product}
         selectedCurrency={selectedCurrency}
-        onAddToCart={handleAddToCart}
+        // Remove onAddToCart prop here
       />
       
       {(isAdminProp || isAdmin) && onDelete && (
