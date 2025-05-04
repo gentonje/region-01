@@ -55,7 +55,7 @@ const ProductCard = ({
     enabled: !!session?.user
   });
 
-  const isAdmin = userType === 'admin';
+  const isAdmin = isAdminProp || userType === 'admin';
 
   const handleDeleteClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -81,7 +81,6 @@ const ProductCard = ({
       <ProductCardContent
         product={product}
         selectedCurrency={selectedCurrency}
-        // Remove onAddToCart prop here
       />
       
       {(isAdminProp || isAdmin) && onDelete && (

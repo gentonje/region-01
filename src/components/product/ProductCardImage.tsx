@@ -77,6 +77,7 @@ export const ProductCardImage = memo(({
         </span>
       )}
       
+      {/* Ensure the wishlist button is visible for users who are logged in */}
       {session && !isAdmin && (
         <Button
           variant="ghost"
@@ -87,6 +88,7 @@ export const ProductCardImage = memo(({
             toggleWishlist();
           }}
           disabled={isPending}
+          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart 
             className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white wishlist-heart-inactive'}`} 
