@@ -53,7 +53,7 @@ export const ProductActions = ({
       <Button 
         onClick={onAddToCart}
         disabled={!inStock || isAddingToCart}
-        className="flex items-center space-x-1"
+        className="flex items-center space-x-1 bg-violet-600 hover:bg-violet-700 text-white"
       >
         <ShoppingCart className="h-4 w-4 mr-1" />
         {isAddingToCart ? 'Adding...' : 'Add to Cart'}

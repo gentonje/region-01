@@ -75,8 +75,7 @@ export const ProductCardContent = memo(({
         
         <Button 
           size="sm" 
-          className="h-7 px-1 py-0 text-xs"
-          variant="secondary"
+          className="h-7 px-1 py-0 text-xs bg-violet-600 hover:bg-violet-700 text-white"
           onClick={onAddToCart}
           disabled={!product.in_stock}
         >

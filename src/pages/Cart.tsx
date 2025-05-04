@@ -54,7 +54,14 @@ const Cart = () => {
         .eq("user_id", user.user.id);
 
       if (error) throw error;
-      return data as CartItemType[] || [];
+      
+      // Transform the data to match CartItemType
+      const transformedData = data?.map(item => ({
+        ...item,
+        product: Array.isArray(item.product) ? item.product[0] : item.product
+      })) as CartItemType[] || [];
+      
+      return transformedData;
     },
   });
 
@@ -141,7 +148,7 @@ const Cart = () => {
   };
 
   const totalAmount = cartItems?.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    (sum, item) => sum + item.product.price * item.quantity,
     0
   ) || 0;
 
@@ -193,10 +200,10 @@ const Cart = () => {
                 <CartItem
                   key={item.id}
                   id={item.id}
-                  title={item.product?.title || "Unknown Product"}
+                  title={item.product.title}
                   quantity={item.quantity}
-                  price={item.product?.price || 0}
-                  currency={item.product?.currency || "SSP"}
+                  price={item.product.price}
+                  currency={item.product.currency || "SSP"}
                   onDelete={() => handleDeleteItem(item.id)}
                 />
               ))}
