@@ -47,25 +47,43 @@ export function useCart() {
       const transformedData: CartItemType[] = data?.map(item => {
         console.log("Processing cart item:", item);
         
-        // Handle the product object properly
+        // Create a default product object with the required structure
+        const defaultProduct = { 
+          id: "", 
+          title: "Product Not Found", 
+          price: 0, 
+          currency: "SSP", 
+          in_stock: false, 
+          user_id: "" 
+        };
+        
+        // Handle the product object properly based on what we get from Supabase
         let productData = item.product;
         
+        // If product is null or undefined, use the default product
+        if (!productData) {
+          productData = defaultProduct;
+        }
         // If product is an array (from one-to-many relation), take the first item
-        if (Array.isArray(productData)) {
-          console.log("Product is an array:", productData);
-          productData = productData.length > 0 ? productData[0] : null;
+        else if (Array.isArray(productData)) {
+          productData = productData.length > 0 ? productData[0] : defaultProduct;
         }
         
+        // Ensure the product has the correct type structure
+        const product = {
+          id: productData.id || "",
+          title: productData.title || "Unnamed Product",
+          price: typeof productData.price === 'number' ? productData.price : 0,
+          currency: productData.currency || "SSP",
+          in_stock: !!productData.in_stock,
+          user_id: productData.user_id || ""
+        };
+        
         return {
-          ...item,
-          product: productData || { 
-            id: "", 
-            title: "Product Not Found", 
-            price: 0, 
-            currency: "SSP", 
-            in_stock: false, 
-            user_id: "" 
-          }
+          id: item.id,
+          quantity: item.quantity,
+          product_id: item.product_id,
+          product
         };
       }) || [];
       
