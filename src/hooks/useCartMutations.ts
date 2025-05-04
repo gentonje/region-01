@@ -17,9 +17,8 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       // Force invalidate all cart-related queries to ensure immediate updates
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Item removed from cart");
     },
     onError: (error) => {
@@ -33,21 +32,39 @@ export function useCartMutations() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("You must be logged in to add items to cart");
 
-      const { error } = await supabase
+      // Check if the product already exists in the cart
+      const { data: existingItems } = await supabase
         .from("cart_items")
-        .insert({
-          user_id: user.id,
-          product_id: productId,
-          quantity
-        });
+        .select("id, quantity")
+        .eq("user_id", user.id)
+        .eq("product_id", productId)
+        .single();
 
-      if (error) throw error;
+      if (existingItems) {
+        // Update quantity if the product already exists in the cart
+        const { error } = await supabase
+          .from("cart_items")
+          .update({ quantity: existingItems.quantity + quantity })
+          .eq("id", existingItems.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new item if the product doesn't exist in the cart
+        const { error } = await supabase
+          .from("cart_items")
+          .insert({
+            user_id: user.id,
+            product_id: productId,
+            quantity
+          });
+
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       // Force invalidate all cart-related queries to ensure immediate updates
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Item added to cart");
     },
     onError: (error) => {
@@ -75,9 +92,8 @@ export function useCartMutations() {
     },
     onSuccess: () => {
       // Force invalidate all cart-related queries to ensure immediate updates
-      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      queryClient.invalidateQueries({ queryKey: ["cart_items"] });
+      queryClient.invalidateQueries({ queryKey: ["cart_items", { type: "count" }] });
       toast.success("Cart updated");
     },
     onError: (error) => {

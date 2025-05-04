@@ -1,9 +1,8 @@
 
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { Trash2, Plus, Minus } from "lucide-react";
 import { motion } from "framer-motion";
+import { useCartMutations } from "@/hooks/useCartMutations";
 
 interface CartItemProps {
   id: string;
@@ -15,7 +14,20 @@ interface CartItemProps {
 }
 
 export const CartItem = ({ id, title, quantity, price, currency, onDelete }: CartItemProps) => {
+  const { updateQuantityMutation } = useCartMutations();
   const itemTotal = quantity * price;
+  
+  const handleIncreaseQuantity = () => {
+    updateQuantityMutation.mutate({ itemId: id, quantity: quantity + 1 });
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (quantity > 1) {
+      updateQuantityMutation.mutate({ itemId: id, quantity: quantity - 1 });
+    } else {
+      onDelete();
+    }
+  };
   
   return (
     <motion.div 
@@ -25,11 +37,24 @@ export const CartItem = ({ id, title, quantity, price, currency, onDelete }: Car
       transition={{ duration: 0.3 }}
       className="flex justify-between items-center border-b pb-4"
     >
-      <div>
-        <h3 className="font-medium">{title}</h3>
-        <p className="text-sm text-muted-foreground">
-          Quantity: {quantity} × {currency} {Math.round(price).toLocaleString()}
-        </p>
+      <div className="flex-grow">
+        <h3 className="font-medium">{title || "Unnamed Product"}</h3>
+        <div className="flex items-center mt-2 text-sm text-muted-foreground">
+          <button 
+            onClick={handleDecreaseQuantity}
+            className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+          >
+            <Minus className="h-3 w-3" />
+          </button>
+          <span className="mx-2 w-6 text-center">{quantity}</span>
+          <button 
+            onClick={handleIncreaseQuantity}
+            className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600"
+          >
+            <Plus className="h-3 w-3" />
+          </button>
+          <span className="ml-2">× {currency} {Math.round(price).toLocaleString()}</span>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         <p className="font-medium">

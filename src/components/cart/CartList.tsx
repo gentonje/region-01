@@ -9,7 +9,7 @@ interface CartListProps {
 }
 
 export function CartList({ items }: CartListProps) {
-  const { deleteItemMutation } = useCartMutations();
+  const { deleteItemMutation, updateQuantityMutation } = useCartMutations();
 
   const handleDeleteItem = (cartItemId: string) => {
     deleteItemMutation.mutate(cartItemId);
@@ -26,6 +26,9 @@ export function CartList({ items }: CartListProps) {
     }
   };
 
+  // Debug cart items
+  console.log("CartList items:", items);
+
   return (
     <motion.div 
       variants={containerVariants}
@@ -34,17 +37,20 @@ export function CartList({ items }: CartListProps) {
       className="space-y-4"
     >
       <AnimatePresence>
-        {items?.map((item) => (
-          <CartItem
-            key={item.id}
-            id={item.id}
-            title={item.product?.title || "Unnamed Product"}
-            quantity={item.quantity}
-            price={item.product?.price || 0}
-            currency={item.product?.currency || "SSP"}
-            onDelete={() => handleDeleteItem(item.id)}
-          />
-        ))}
+        {items?.map((item) => {
+          console.log("Rendering cart item:", item.id, item.product);
+          return (
+            <CartItem
+              key={item.id}
+              id={item.id}
+              title={item.product?.title || "Unnamed Product"}
+              quantity={item.quantity}
+              price={item.product?.price || 0}
+              currency={item.product?.currency || "SSP"}
+              onDelete={() => handleDeleteItem(item.id)}
+            />
+          );
+        })}
       </AnimatePresence>
     </motion.div>
   );
