@@ -91,16 +91,14 @@ const AdminManagement = () => {
                 key={user.id}
                 className="border p-1 rounded-lg bg-gray-50 dark:bg-gray-900 my-1"
               >
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+                <div className="flex justify-between items-center gap-1">
                   <div>
                     <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
-                    <div className="mt-1">
-                      <span className="text-xs font-medium px-1 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        Role: {user.user_type}
-                      </span>
-                    </div>
                   </div>
                   <div className="flex items-center space-x-1">
+                    <span className="text-xs font-medium px-1 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      Role: {user.user_type}
+                    </span>
                     {user.user_type === "user" ? (
                       <Button
                         size="sm"
