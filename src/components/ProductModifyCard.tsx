@@ -23,6 +23,17 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     ? supabase.storage.from('images').getPublicUrl(product.product_images[0].storage_path).data.publicUrl
     : '/placeholder.svg';
 
+  // Process county data safely
+  const countyDisplay = (() => {
+    if (!product.county) return '';
+    
+    if (typeof product.county === 'object' && product.county !== null) {
+      return (product.county as { name: string }).name || 'Unknown County';
+    }
+    
+    return product.county;
+  })();
+
   return (
     <div className="flex flex-col md:flex-row gap-1 space-x-1 space-y-1 p-1">
       <div className="w-full md:w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden border border-white/30 shadow-sm">
@@ -51,11 +62,9 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
               {product.category}
             </Badge>
           )}
-          {product.county && (
+          {countyDisplay && (
             <Badge variant="outline" className="rounded-full text-xs bg-blue-100 text-blue-800">
-              {typeof product.county === 'object' ? 
-                (product.county as any).name || 'Unknown County' : 
-                product.county}
+              {countyDisplay}
             </Badge>
           )}
         </div>
