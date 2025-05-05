@@ -17,6 +17,7 @@ interface ProductDetailProps {
   onBack: () => void;
   selectedCurrency?: SupportedCurrency;
   setSelectedProduct?: (product: Product) => void;
+  isLoading?: boolean;
 }
 
 const ProductDetail = ({ 
@@ -24,7 +25,8 @@ const ProductDetail = ({
   onBack, 
   getProductImageUrl,
   selectedCurrency = "USD",
-  setSelectedProduct
+  setSelectedProduct,
+  isLoading = false
 }: ProductDetailProps) => {
   const { 
     selectedImage,
@@ -124,6 +126,7 @@ const ProductDetail = ({
           getProductImageUrl={getProductImageUrl}
           onProductClick={handleSimilarProductClick}
           selectedCurrency={selectedCurrency}
+          isLoading={isLoading}
         />
       </div>
     </div>

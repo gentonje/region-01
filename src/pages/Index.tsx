@@ -104,6 +104,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
           getProductImageUrl={getProductImageUrl}
           selectedCurrency={selectedCurrency}
           setSelectedProduct={setSelectedProduct}
+          isLoading={isLoading}
         />
       </div>
     );

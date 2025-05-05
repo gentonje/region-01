@@ -23,12 +23,26 @@ interface ProductListProps {
 
 const ProductSkeleton = memo(() => (
   <div className="space-y-2 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2 shadow-sm">
-    <Skeleton className="h-[200px] w-full rounded-lg" />
-    <Skeleton className="h-6 w-2/3" />
-    <Skeleton className="h-4 w-full" />
+    {/* Image section matching ProductCardImage */}
+    <div className="relative">
+      {/* Orange decorative element in top left */}
+      <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
+      <Skeleton className="h-[200px] w-full rounded-lg" />
+      {/* Bottom badges area */}
+      <div className="absolute bottom-1 left-1 flex flex-row gap-1 max-w-[90%]">
+        <Skeleton className="h-4 w-16 rounded-full" />
+        <Skeleton className="h-4 w-20 rounded-full" />
+      </div>
+      {/* Top right status badge */}
+      <Skeleton className="absolute top-2 right-2 h-4 w-16 rounded-full" />
+    </div>
+    
+    {/* Product info section matching ProductCardContent */}
+    <Skeleton className="h-6 w-2/3" /> {/* Title */}
+    <Skeleton className="h-4 w-full" /> {/* Description */}
     <div className="flex justify-between mt-2 space-x-2">
-      <Skeleton className="h-6 w-20 rounded-md" />
-      <Skeleton className="h-6 w-16 rounded-md" />
+      <Skeleton className="h-6 w-20 rounded-md" /> {/* Price */}
+      <Skeleton className="h-6 w-16 rounded-md" /> {/* Views badge */}
     </div>
   </div>
 ));

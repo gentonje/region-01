@@ -23,12 +23,26 @@ interface ProductSimilarProps {
 const ProductSimilarSkeleton = () => (
   <div className="p-1 mx-0">
     <div className="space-y-2 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2 shadow-sm">
-      <Skeleton className="h-[150px] w-full rounded-lg" />
-      <Skeleton className="h-5 w-2/3" />
-      <Skeleton className="h-3 w-full" />
+      {/* Image section matching exactly the product card layout */}
+      <div className="relative">
+        {/* Orange decorative element in top left */}
+        <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
+        <Skeleton className="h-[150px] w-full rounded-lg" />
+        {/* Bottom badges area matching ProductCardImage component */}
+        <div className="absolute bottom-1 left-1 flex flex-row gap-1 max-w-[90%]">
+          <Skeleton className="h-4 w-16 rounded-full" /> {/* Category */}
+          <Skeleton className="h-4 w-20 rounded-full" /> {/* County */}
+        </div>
+        {/* Stock status badge in top right */}
+        <Skeleton className="absolute top-1 right-1 h-4 w-16 rounded-full" />
+      </div>
+      
+      {/* Content section matching ProductCardContent */}
+      <Skeleton className="h-5 w-2/3" /> {/* Title */}
+      <Skeleton className="h-3 w-full" /> {/* Description */}
       <div className="flex justify-between mt-2 space-x-2">
-        <Skeleton className="h-5 w-16 rounded-md" />
-        <Skeleton className="h-5 w-12 rounded-md" />
+        <Skeleton className="h-5 w-16 rounded-md" /> {/* Currency badge */}
+        <Skeleton className="h-5 w-12 rounded-md" /> {/* Views badge */}
       </div>
     </div>
   </div>
