@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
+import { CountiesFilter } from "@/components/CountiesFilter";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
@@ -15,6 +16,7 @@ interface IndexProps {
 const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedCounty, setSelectedCounty] = useState("all");
   const pageSize = 12;
 
   // Fetch products with infinite scrolling
@@ -25,7 +27,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery],
+    queryKey: ["products", searchQuery, selectedCounty],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -45,6 +47,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
       if (searchQuery) {
         query = query.ilike("title", `%${searchQuery}%`);
+      }
+
+      if (selectedCounty !== "all") {
+        query = query.eq("county", selectedCounty);
       }
 
       const { data, error } = await query;
@@ -69,6 +75,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
+  };
+
+  const handleCountyChange = (county: string) => {
+    setSelectedCounty(county);
   };
 
   const getProductImageUrl = (product: Product) => {
@@ -101,10 +111,15 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
   return (
     <div className="pb-16 mx-1 sm:mx-auto">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold my-6">All Products</h1>
-        
-        <ProductFilters onSearchChange={handleSearchChange} />
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <CountiesFilter 
+            selectedCounty={selectedCounty} 
+            onCountyChange={handleCountyChange} 
+          />
+          
+          <ProductFilters onSearchChange={handleSearchChange} />
+        </div>
       </div>
       
       <div className="mt-6">

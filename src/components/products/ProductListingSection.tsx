@@ -2,6 +2,7 @@
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
+import { CountiesFilter } from "@/components/CountiesFilter";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface ProductListingSectionProps {
@@ -10,6 +11,8 @@ interface ProductListingSectionProps {
   setSearchQuery: (query: string) => void;
   selectedCategory: string;
   setSelectedCategory: (category: string) => void;
+  selectedCounty: string;
+  setSelectedCounty: (county: string) => void;
   onProductClick: (product: Product) => void;
   isFetchingNextPage: boolean;
   observerRef: (node?: Element | null) => void;
@@ -29,6 +32,8 @@ export const ProductListingSection = ({
   setSearchQuery,
   selectedCategory,
   setSelectedCategory,
+  selectedCounty,
+  setSelectedCounty,
   onProductClick,
   isFetchingNextPage,
   observerRef,
@@ -45,9 +50,20 @@ export const ProductListingSection = ({
     setSearchQuery(search);
   };
 
+  const handleCountyChange = (county: string) => {
+    setSelectedCounty(county);
+  };
+
   return (
     <div className="w-full space-y-1 p-1">
-      <ProductFilters onSearchChange={handleSearchChange} />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <CountiesFilter
+          selectedCounty={selectedCounty}
+          onCountyChange={handleCountyChange}
+        />
+        <ProductFilters onSearchChange={handleSearchChange} />
+      </div>
+      
       <ProductList
         products={products}
         getProductImageUrl={getProductImageUrl}
