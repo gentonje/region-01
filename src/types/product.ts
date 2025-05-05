@@ -10,7 +10,7 @@ export interface ProductFormData {
   category: ProductCategory;
   available_quantity: number;
   shipping_info?: string;
-  county: string;
+  county: string; // Ensuring county is required here too
 }
 
 export interface ProductImage {
