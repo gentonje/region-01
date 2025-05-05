@@ -1,134 +1,107 @@
 
-import { useState, useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Navigation } from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { ModifyProductsList } from "@/components/ModifyProductsList";
-import { Product } from "@/types/product";
+import { UserProductGroup } from "@/components/UserProductGroup";
+import { SampleProductsButton } from "@/components/SampleProductsButton";
+import { Plus } from "lucide-react";
 
 const MyProducts = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [myProducts, setMyProducts] = useState<Product[]>([]);
-  const pageSize = 10;
-
-  const {
-    data: products,
-    isLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ["my-products", page],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not logged in");
-
-      const { data, error } = await supabase
-        .from("products")
-        .select(`
-          *,
-          profiles:user_id (
-            username,
-            full_name
-          ),
-          product_images:product_images (
-            id,
-            storage_path,
-            is_main,
-            display_order
-          )
-        `)
-        .eq("user_id", user.id)
-        .range((page - 1) * pageSize, page * pageSize - 1)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      return data as Product[];
-    },
-  });
+  const { user } = useAuth();
+  const [products, setProducts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (products) {
-      if (page === 1) {
-        setMyProducts(products);
-      } else {
-        setMyProducts((prev) => [...prev, ...products]);
+    if (!user) return;
+
+    const fetchProducts = async () => {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_images (
+              id,
+              storage_path,
+              is_main,
+              display_order
+            )
+          `)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProducts(data || []);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      setHasMore(products.length === pageSize);
-    }
-  }, [products, page]);
+    };
 
-  const loadMoreProducts = () => {
-    if (hasMore && !isLoading) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
-  const handleDeleteProduct = async (productId: string) => {
-    try {
-      // First delete product images
-      const { data: productImages, error: imagesError } = await supabase
-        .from("product_images")
-        .select("storage_path")
-        .eq("product_id", productId);
-      
-      if (imagesError) throw imagesError;
-
-      // Delete image files from storage
-      for (const image of productImages || []) {
-        if (image.storage_path) {
-          const { error: storageError } = await supabase.storage
-            .from("images")
-            .remove([image.storage_path]);
-          
-          if (storageError) console.error("Error deleting image:", storageError);
-        }
-      }
-
-      // Delete the product
-      const { error: deleteError } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", productId);
-      
-      if (deleteError) throw deleteError;
-
-      toast.success("Product deleted successfully");
-      
-      // Update local state
-      setMyProducts((prev) => prev.filter((product) => product.id !== productId));
-      
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: ["my-products"] });
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      toast.error("Failed to delete product");
-    }
-  };
+    fetchProducts();
+  }, [user]);
 
   return (
-    <div className="mx-1 sm:mx-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Products</h1>
-        <Button onClick={() => navigate("/add-product")} className="gap-1">
-          <Plus className="h-4 w-4" />
-          <span>Add Product</span>
-        </Button>
-      </div>
+    <div className="min-h-screen bg-background dark:bg-gray-900">
+      <Navigation />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">My Products</h1>
+            <p className="mt-1 text-gray-500 dark:text-gray-400">
+              Manage your product listings
+            </p>
+          </div>
+          
+          <div className="flex space-x-4">
+            <SampleProductsButton />
+            <Button
+              onClick={() => navigate('/add-product')}
+              className="bg-gradient-to-r from-orange-500 to-blue-500 hover:from-orange-600 hover:to-blue-600 text-white transition-all"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Button>
+          </div>
+        </div>
 
-      <ModifyProductsList
-        products={myProducts}
-        isLoading={isLoading}
-        hasMore={hasMore}
-        onLoadMore={loadMoreProducts}
-        onDelete={handleDeleteProduct}
-      />
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : products.length > 0 ? (
+          <UserProductGroup
+            title="All Products"
+            products={products}
+            emptyMessage="No products found"
+          >
+            <ModifyProductsList products={products} />
+          </UserProductGroup>
+        ) : (
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">No products found</h3>
+            <p className="mt-1 text-gray-500 dark:text-gray-400">Get started by adding your first product or using sample products.</p>
+            <div className="mt-6 flex justify-center gap-4">
+              <SampleProductsButton />
+              <Button
+                onClick={() => navigate('/add-product')}
+                className="bg-gradient-to-r from-orange-500 to-blue-500 hover:from-orange-600 hover:to-blue-600 text-white transition-all"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Product
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
