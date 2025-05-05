@@ -33,9 +33,17 @@ const ProductDetail = ({
     activeTab,
     setActiveTab,
     similarProducts,
+    isLoadingSimilar,
+    viewCount,
     handleAddToCart,
     addToCartMutation
   } = useProductDetail(product, selectedCurrency);
+
+  // Update product with latest view count if available
+  const displayProduct = {
+    ...product,
+    views: viewCount !== undefined ? viewCount : product.views
+  };
 
   // Handle similar product selection
   const handleSimilarProductClick = (similarProduct: Product) => {
@@ -72,23 +80,23 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-2 sm:px-0">{product.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-2 sm:px-0">{displayProduct.title}</h1>
               
               <div className="flex items-center space-x-2 mb-2 px-2 sm:px-0">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
-                  {product.category || 'Other'}
+                  {displayProduct.category || 'Other'}
                 </span>
-                <span className={`px-2 py-1 ${product.in_stock ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'} rounded-full text-xs`}>
-                  {product.in_stock ? 'In Stock' : 'Out of Stock'}
+                <span className={`px-2 py-1 ${displayProduct.in_stock ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'} rounded-full text-xs`}>
+                  {displayProduct.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
               </div>
 
               <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full rounded-lg" />}>
                 <ProductGallery
-                  images={product.product_images || []}
+                  images={displayProduct.product_images || []}
                   selectedImage={selectedImage}
                   onImageSelect={setSelectedImage}
-                  title={product.title || ''}
+                  title={displayProduct.title || ''}
                 />
               </Suspense>
             </div>
@@ -96,7 +104,7 @@ const ProductDetail = ({
             {/* Right column - Tabs with product details and reviews */}
             <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10 px-2 sm:px-0">
               <ProductTabs 
-                product={product}
+                product={displayProduct}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
               />
@@ -106,11 +114,11 @@ const ProductDetail = ({
 
         <CardFooter className="p-2 sm:p-4">
           <ProductActions
-            price={product.price || 0}
-            currency={product.currency || "SSP"}
+            price={displayProduct.price || 0}
+            currency={displayProduct.currency || "SSP"}
             selectedCurrency={selectedCurrency}
             convertedPrice={convertedPrice}
-            inStock={product.in_stock || false}
+            inStock={displayProduct.in_stock || false}
             onAddToCart={handleAddToCart}
             isAddingToCart={addToCartMutation.isPending}
           />
@@ -124,6 +132,7 @@ const ProductDetail = ({
           getProductImageUrl={getProductImageUrl}
           onProductClick={handleSimilarProductClick}
           selectedCurrency={selectedCurrency}
+          isLoading={isLoadingSimilar}
         />
       </div>
     </div>

@@ -9,15 +9,17 @@ interface ProductSimilarSectionProps {
   getProductImageUrl: (product: Product) => string;
   onProductClick: (product: Product) => void;
   selectedCurrency: SupportedCurrency;
+  isLoading?: boolean;
 }
 
 export const ProductSimilarSection = ({ 
   similarProducts, 
   getProductImageUrl, 
   onProductClick, 
-  selectedCurrency 
+  selectedCurrency,
+  isLoading = false
 }: ProductSimilarSectionProps) => {
-  if (!similarProducts || similarProducts.length === 0) {
+  if (!isLoading && (!similarProducts || similarProducts.length === 0)) {
     return null;
   }
 
@@ -29,10 +31,11 @@ export const ProductSimilarSection = ({
       </div>
       <div className="w-full mx-0 px-0">
         <ProductSimilar
-          products={similarProducts}
+          products={similarProducts || []}
           getProductImageUrl={getProductImageUrl}
           onProductClick={onProductClick}
           selectedCurrency={selectedCurrency}
+          isLoading={isLoading}
         />
       </div>
     </div>
