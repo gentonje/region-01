@@ -135,14 +135,64 @@ video {
 
 /* Wishlist heart animation */
 .wishlist-heart-active {
-  animation: pulse 0.5s ease-in-out;
+  animation: heart-burst 0.8s ease forwards;
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+@keyframes heart-burst {
+  0% { 
+    transform: scale(1); 
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
+  }
+  15% { 
+    transform: scale(0.4); 
+    filter: brightness(0.8) drop-shadow(0 0 0 transparent);
+  }
+  30% { 
+    transform: scale(1.5); 
+    filter: brightness(1.1) drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+  }
+  50% { 
+    transform: scale(1.2); 
+    filter: brightness(1.15) drop-shadow(0 0 12px rgba(245, 158, 11, 0.8));
+  }
+  70% { 
+    transform: scale(1.3); 
+    filter: brightness(1.1) drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
+  }
+  100% { 
+    transform: scale(1); 
+    filter: brightness(1) drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));
+  }
 }
+
+@keyframes heart-particles {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0);
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.heart-particle {
+  position: absolute;
+  pointer-events: none;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  animation: heart-particles 0.6s ease-out forwards;
+}
+
+.heart-particle-1 { background-color: #FFDD00; width: 6px; height: 6px; }
+.heart-particle-2 { background-color: #FF9500; width: 8px; height: 8px; animation-delay: 0.05s; }
+.heart-particle-3 { background-color: #FF3B30; width: 10px; height: 10px; animation-delay: 0.1s; }
+.heart-particle-4 { background-color: #F59E0B; width: 6px; height: 6px; animation-delay: 0.15s; }
+.heart-particle-5 { background-color: #FFDD00; width: 8px; height: 8px; animation-delay: 0.2s; }
 
 /* Icon glow effects */
 .icon-glow {
@@ -187,4 +237,3 @@ video {
 .text-glow-orange {
   text-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
 }
-

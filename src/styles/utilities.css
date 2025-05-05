@@ -48,12 +48,18 @@
   @apply w-4 h-4;
 }
 
+/* Heart animation utilities */
 .wishlist-heart-active {
   @apply fill-amber-400 text-amber-400;
 }
 
 .wishlist-heart-inactive {
   @apply text-white;
+}
+
+/* Heart particle animation utilities */
+.heart-particle-container {
+  @apply absolute top-2 left-2 w-8 h-8 pointer-events-none overflow-visible;
 }
 
 /* Layout spacing for components */

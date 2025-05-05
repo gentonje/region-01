@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { ImageLoader } from "../ImageLoader";
 import { Product } from "@/types/product";
 import { Session } from "@supabase/supabase-js";
-import { memo } from "react";
+import { memo, useCallback, useState } from "react";
 import { AspectRatio } from "../ui/aspect-ratio";
 
 interface ProductCardImageProps {
@@ -30,6 +30,27 @@ export const ProductCardImage = memo(({
   isPending,
   onClick,
 }: ProductCardImageProps) => {
+  // State to manage heart particles
+  const [particles, setParticles] = useState<number[]>([]);
+
+  // Handle wishlist button click with animation
+  const handleWishlistClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Only create particles when adding to wishlist (not removing)
+    if (!isInWishlist && !isPending) {
+      // Create 5 particles for the burst effect
+      setParticles([1, 2, 3, 4, 5]);
+      
+      // Clean up particles after animation completes
+      setTimeout(() => {
+        setParticles([]);
+      }, 800);
+    }
+    
+    toggleWishlist();
+  }, [isInWishlist, isPending, toggleWishlist]);
+
   return (
     <div 
       className="w-full relative overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-900"
@@ -91,20 +112,27 @@ export const ProductCardImage = memo(({
       )}
       
       {session && !isAdmin && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10 m-1"
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist();
-          }}
-          disabled={isPending}
-        >
-          <Heart 
-            className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white wishlist-heart-inactive'}`} 
-          />
-        </Button>
+        <div className="relative">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10 m-1"
+            onClick={handleWishlistClick}
+            disabled={isPending}
+          >
+            <Heart 
+              className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white'}`} 
+            />
+          </Button>
+          
+          {/* Render particles when active */}
+          {particles.map((id) => (
+            <div 
+              key={`particle-${id}`} 
+              className={`heart-particle heart-particle-${id}`} 
+            />
+          ))}
+        </div>
       )}
     </div>
   );

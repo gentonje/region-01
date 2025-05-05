@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ interface WishlistItemProps {
 
 export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps) => {
   const [isSharing, setIsSharing] = useState(false);
+  const [particles, setParticles] = useState<number[]>([]);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -123,6 +125,23 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
     return "/placeholder.svg";
   };
 
+  const triggerHeartAnimation = () => {
+    // Create particles for the burst effect
+    setParticles([1, 2, 3, 4, 5]);
+    
+    // Clean up particles after animation completes
+    setTimeout(() => {
+      setParticles([]);
+    }, 800);
+  };
+
+  // Trigger animation on initial load
+  useState(() => {
+    setTimeout(() => {
+      triggerHeartAnimation();
+    }, 300);
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -146,8 +165,18 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
+                className="absolute top-2 left-2 z-10"
               >
-                <Heart className="absolute top-2 left-2 w-6 h-6 fill-amber-400 text-amber-400 icon-glow-amber" />
+                <div className="relative">
+                  <Heart className="w-6 h-6 fill-amber-400 text-amber-400 wishlist-heart-active" />
+                  {/* Render particles */}
+                  {particles.map((id) => (
+                    <div 
+                      key={`wishlist-particle-${id}`} 
+                      className={`heart-particle heart-particle-${id}`} 
+                    />
+                  ))}
+                </div>
               </motion.div>
             </div>
             <div className="flex-1 p-4 flex flex-col justify-between space-y-2">
