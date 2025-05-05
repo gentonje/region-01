@@ -91,6 +91,7 @@ export const ProductCardImage = memo(({
         )}
       </div>
       
+      {/* Stock status badge */}
       <span 
         className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
           product.in_stock 
@@ -101,6 +102,7 @@ export const ProductCardImage = memo(({
         {product.in_stock ? 'In Stock' : 'Out of Stock'}
       </span>
       
+      {/* Product status badge */}
       {showStatus && (
         <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full ${
           product.product_status === 'published' 
@@ -111,14 +113,16 @@ export const ProductCardImage = memo(({
         </span>
       )}
       
+      {/* Wishlist heart button */}
       {session && !isAdmin && (
-        <div className="relative">
+        <div className="absolute top-2 left-2 z-10">
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 left-2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 z-10 m-1"
+            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70"
             onClick={handleWishlistClick}
             disabled={isPending}
+            aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart 
               className={`w-4 h-4 ${isInWishlist ? 'fill-amber-400 text-amber-400 wishlist-heart-active' : 'text-white'}`} 
