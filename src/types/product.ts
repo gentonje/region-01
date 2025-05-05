@@ -6,9 +6,9 @@ export type ProductCategory = Database["public"]["Enums"]["product_category"];
 export interface ProductFormData {
   title: string;
   description: string;
-  price: number;
+  price: string;
   category: ProductCategory;
-  available_quantity: number;
+  available_quantity: string;
   shipping_info?: string;
   county?: string;
 }

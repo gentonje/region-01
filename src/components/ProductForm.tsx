@@ -4,7 +4,8 @@ import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
 import { ProductFormField } from "./forms/product/ProductFormField";
 import { ProductSubmitButton } from "./forms/product/ProductSubmitButton";
-import { ProductFormData, productValidationRules } from "./forms/product/validation";
+import { productValidationRules } from "./forms/product/validation";
+import { ProductFormData } from "@/types/product";
 
 interface ProductFormProps {
   formData: ProductFormData;
