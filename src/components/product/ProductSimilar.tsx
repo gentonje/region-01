@@ -94,9 +94,19 @@ export const ProductSimilar = ({
                     />
                   </AspectRatio>
                   
-                  <span className="absolute bottom-1 left-1 text-xs px-1 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%]">
-                    {similarProduct.category}
-                  </span>
+                  {/* Display category and county in the same row */}
+                  <div className="absolute bottom-1 left-1 flex flex-row gap-1 max-w-[90%]">
+                    <span className="text-xs px-1 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate">
+                      {similarProduct.category}
+                    </span>
+                    
+                    {similarProduct.county && (
+                      <span className="text-xs px-1 py-0.5 rounded-full bg-green-500/90 text-white font-medium truncate flex items-center">
+                        <MapPin className="h-2 w-2 mr-0.5" />
+                        {similarProduct.county}
+                      </span>
+                    )}
+                  </div>
                   
                   <span 
                     className={`absolute top-1 right-1 text-xs px-1 py-0.5 rounded-full ${
@@ -134,14 +144,6 @@ export const ProductSimilar = ({
                       {similarProduct.title}
                     </h3>
                   </div>
-                  
-                  {/* County information - Added here */}
-                  {similarProduct.county && (
-                    <div className="flex items-center">
-                      <MapPin className="h-3 w-3 mr-1 text-gray-500" />
-                      <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{similarProduct.county}</span>
-                    </div>
-                  )}
                   
                   <div className="h-[20px] overflow-hidden">
                     <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">

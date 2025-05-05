@@ -53,9 +53,22 @@ export const ProductCardImage = memo(({
         />
       </AspectRatio>
       
-      <span className="absolute bottom-1 left-2 text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate max-w-[90%] m-1">
-        {product.category}
-      </span>
+      {/* Display category and county in the same row */}
+      <div className="absolute bottom-1 left-1 flex flex-row gap-1 max-w-[95%]">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate">
+          {product.category}
+        </span>
+        
+        {product.county && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/90 text-white font-medium truncate flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {product.county}
+          </span>
+        )}
+      </div>
       
       <span 
         className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${

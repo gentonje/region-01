@@ -4,7 +4,6 @@ import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { memo, useEffect, useState } from "react";
 import { convertCurrency } from "@/utils/currencyConverter";
-import { MapPin } from "lucide-react";
 
 interface ProductCardContentProps {
   product: Product;
@@ -53,13 +52,7 @@ export const ProductCardContent = memo(({
         </CardTitle>
       </div>
       
-      {/* County information */}
-      {product.county && (
-        <div className="px-1 flex items-center">
-          <MapPin className="h-3 w-3 mr-1 text-gray-500" />
-          <span className="text-xs text-gray-600 dark:text-gray-400">{product.county}</span>
-        </div>
-      )}
+      {/* County information removed from here since it's now next to category */}
       
       <div className="h-[20px] overflow-hidden px-1">
         <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">

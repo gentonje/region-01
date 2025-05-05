@@ -47,14 +47,16 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
                 <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
               </div>
               
-              {/* County information - Added here */}
-              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-muted-foreground">County</p>
-                <div className="flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-blue-500" />
-                  <p className="text-sm font-medium">{product.county || 'Not specified'}</p>
+              {/* County information - kept in the same style */}
+              {product.county && (
+                <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                  <p className="text-xs text-muted-foreground">County</p>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-1 text-green-500" />
+                    <p className="text-sm font-medium">{product.county}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
             
             <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
