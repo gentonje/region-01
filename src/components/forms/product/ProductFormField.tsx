@@ -153,7 +153,8 @@ export const ProductFormField = ({
                     <SelectValue placeholder="Select a county" />
                   </SelectTrigger>
                   <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectItem value="">Select a county</SelectItem>
+                    {/* Changed: using a non-empty string value for the default option */}
+                    <SelectItem value="_none">Select a county</SelectItem>
                     {counties?.map((county) => (
                       <SelectItem key={county.name} value={county.name}>
                         {county.name} {county.state ? `(${county.state})` : ''}
