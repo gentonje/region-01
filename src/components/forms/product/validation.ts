@@ -1,3 +1,4 @@
+
 import { ProductCategory } from "@/types/product";
 
 export interface ProductFormData {
@@ -6,6 +7,7 @@ export interface ProductFormData {
   price: string;
   category: ProductCategory;
   available_quantity: string;
+  county?: string;
 }
 
 export const productValidationRules = {
@@ -36,5 +38,8 @@ export const productValidationRules = {
       message: "Please enter a valid quantity"
     },
     validate: (value: string) => Number(value) >= 0 || "Quantity cannot be negative"
+  },
+  county: {
+    required: "County is required"
   }
 };

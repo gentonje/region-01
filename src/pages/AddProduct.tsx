@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -10,6 +11,7 @@ import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { ProductFormData } from "@/components/forms/product/validation";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -23,9 +25,10 @@ const AddProduct = () => {
     price: "",
     category: "Other" as ProductCategory,
     available_quantity: "0",
+    county: "Juba",
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ProductFormData) => {
     if (!mainImage) {
       toast.error("Please upload a main product image");
       return;
@@ -52,6 +55,7 @@ const AddProduct = () => {
           category: data.category,
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
+          county: data.county || "Juba",
           user_id: user.id
         })
         .select()
@@ -130,7 +134,13 @@ const AddProduct = () => {
 
             <ProductForm
               formData={formData}
-              setFormData={setFormData}
+              setFormData={(data: ProductFormData) => {
+                setFormData({
+                  ...formData,
+                  ...data,
+                  county: data.county || "Juba"
+                });
+              }}
               isLoading={isLoading}
               submitButtonText="Add Product"
               onSubmit={handleSubmit}

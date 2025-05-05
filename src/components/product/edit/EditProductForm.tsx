@@ -1,9 +1,11 @@
+
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
 import { Product, ProductCategory } from "@/types/product";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ProductFormData } from "@/components/forms/product/validation";
 
 interface EditProductFormProps {
   product: Product;
@@ -27,9 +29,10 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     price: String(product?.price || ""),
     category: product?.category || "Other" as ProductCategory,
     available_quantity: String(product?.available_quantity || "0"),
+    county: product?.county || "Juba",
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ProductFormData) => {
     try {
       let mainImagePath = product.storage_path;
       let additionalImagePaths: string[] = [];
@@ -87,7 +90,13 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
 
       <ProductForm
         formData={formData}
-        setFormData={setFormData}
+        setFormData={(data: ProductFormData) => {
+          setFormData({
+            ...formData,
+            ...data,
+            county: data.county || "Juba"
+          });
+        }}
         isLoading={isLoading}
         submitButtonText="Update Product"
         onSubmit={handleSubmit}

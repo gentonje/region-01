@@ -59,6 +59,27 @@ export type Database = {
         }
         Relationships: []
       }
+      counties: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          state: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          state: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          state?: string
+        }
+        Relationships: []
+      }
       currencies: {
         Row: {
           code: string
