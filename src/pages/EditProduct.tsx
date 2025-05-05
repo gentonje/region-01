@@ -9,10 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useState } from "react";
+import { updateProduct } from "@/services/productService";
 
 const EditProduct = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["product", id],
@@ -59,49 +62,27 @@ const EditProduct = () => {
 
   const handleSubmit = async (formData: any) => {
     try {
+      setIsSubmitting(true);
       if (!id) throw new Error("Product ID is required");
+      
       if (!formData.county) {
         toast.error("Please select a county");
+        setIsSubmitting(false);
         return;
       }
 
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({
-          title: formData.title,
-          description: formData.description,
-          price: Number(formData.price),
-          category: formData.category,
-          available_quantity: Number(formData.available_quantity),
-          storage_path: formData.mainImagePath || product?.storage_path,
-          county: formData.county,
-        })
-        .eq("id", id);
-
-      if (updateError) throw updateError;
-
-      // If new additional images were uploaded, insert them
-      if (formData.additionalImagePaths?.length > 0) {
-        const imageInserts = formData.additionalImagePaths.map((path: string, index: number) => ({
-          product_id: id,
-          storage_path: path,
-          is_main: false,
-          display_order: index + 1,
-        }));
-
-        const { error: imagesError } = await supabase
-          .from("product_images")
-          .insert(imageInserts);
-
-        if (imagesError) throw imagesError;
-      }
-
+      await updateProduct(id, formData);
       toast.success("Product updated successfully!");
-      navigate("/my-products"); // Updated to redirect to my-products instead of modify-products
+      
+      // Ensure we're using a proper setTimeout to allow the toast to be displayed before navigation
+      setTimeout(() => {
+        navigate("/my-products");
+      }, 500);
     } catch (error: any) {
       console.error("Error updating product:", error);
       toast.error(error.message || "Failed to update product");
-      throw error;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -144,7 +125,7 @@ const EditProduct = () => {
           <EditProductForm
             product={product}
             onSubmit={handleSubmit}
-            isLoading={isLoading}
+            isLoading={isSubmitting}
           />
         </div>
       </div>
