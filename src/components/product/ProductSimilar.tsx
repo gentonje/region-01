@@ -5,7 +5,7 @@ import { SupportedCurrency } from "@/utils/currencyConverter";
 import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 import { useState, useEffect } from "react";
 import { ImageLoader } from "../ImageLoader";
-import { ShoppingCart, Heart } from "lucide-react";
+import { MapPin, ShoppingCart, Heart } from "lucide-react";
 import { Button } from "../ui/button";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
@@ -108,7 +108,7 @@ export const ProductSimilar = ({
                     {similarProduct.in_stock ? 'In Stock' : 'Out of Stock'}
                   </span>
 
-                  {/* Wishlist button - Ensure golden color when selected */}
+                  {/* Wishlist button */}
                   {session && (
                     <Button
                       variant="ghost"
@@ -134,6 +134,15 @@ export const ProductSimilar = ({
                       {similarProduct.title}
                     </h3>
                   </div>
+                  
+                  {/* County information - Added here */}
+                  {similarProduct.county && (
+                    <div className="flex items-center">
+                      <MapPin className="h-3 w-3 mr-1 text-gray-500" />
+                      <span className="text-xs text-gray-600 dark:text-gray-400 truncate">{similarProduct.county}</span>
+                    </div>
+                  )}
+                  
                   <div className="h-[20px] overflow-hidden">
                     <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
                       {similarProduct.description}

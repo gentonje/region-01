@@ -1,6 +1,6 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Info, MessageSquare } from "lucide-react";
+import { Info, MapPin, MessageSquare } from "lucide-react";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ProductReviews } from "../ProductReviews";
@@ -45,6 +45,15 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
               <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-muted-foreground">Rating</p>
                 <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
+              </div>
+              
+              {/* County information - Added here */}
+              <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-muted-foreground">County</p>
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-1 text-blue-500" />
+                  <p className="text-sm font-medium">{product.county || 'Not specified'}</p>
+                </div>
               </div>
             </div>
             

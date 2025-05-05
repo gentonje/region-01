@@ -6,6 +6,7 @@ import { ProductModifyActions } from "./product/modify/ProductModifyActions";
 import { ProductPublishSwitch } from "./product/modify/ProductPublishSwitch";
 import { Badge } from "./ui/badge";
 import { ImageLoader } from "./ImageLoader";
+import { MapPin } from "lucide-react";
 import { Product } from "@/types/product";
 
 interface ProductModifyCardProps {
@@ -36,6 +37,15 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
       </div>
       <div className="flex-1 min-w-0 space-y-1">
         <ProductModifyHeader title={product.title || ''} ownerName={ownerName} />
+        
+        {/* County information - Added here */}
+        {product.county && (
+          <div className="flex items-center mb-1">
+            <MapPin className="h-3 w-3 mr-1 text-gray-500" />
+            <span className="text-xs text-gray-600 dark:text-gray-400">{product.county}</span>
+          </div>
+        )}
+        
         <p className="text-xs md:text-sm text-muted-foreground line-clamp-2 mb-1">
           {product.description}
         </p>
@@ -49,6 +59,13 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           {product.category && (
             <Badge variant="outline" className="rounded-full text-xs">
               {product.category}
+            </Badge>
+          )}
+          {/* County badge - Add visibility here too */}
+          {product.county && (
+            <Badge variant="outline" className="rounded-full text-xs bg-blue-50 text-blue-700 border-blue-200">
+              <MapPin className="h-3 w-3 mr-1" />
+              {product.county}
             </Badge>
           )}
         </div>
