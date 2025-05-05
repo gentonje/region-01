@@ -83,6 +83,16 @@ export const ProductFormField = ({
     "Other"
   ];
 
+  // Handle the county value safely, ensuring we're always working with strings for the Select component
+  const getCountyValue = () => {
+    const county = form.getValues().county;
+    if (!county) return "_none";
+    if (typeof county === 'object' && county !== null && 'name' in county) {
+      return (county as {name: string}).name;
+    }
+    return county.toString();
+  };
+
   return (
     <FormField
       control={form.control}
@@ -140,7 +150,7 @@ export const ProductFormField = ({
                 <Skeleton className="h-10 w-full" />
               ) : (
                 <Select
-                  value={typeof field.value === 'object' ? (field.value as any)?.name : field.value}
+                  value={getCountyValue()}
                   onValueChange={(value) => {
                     field.onChange(value);
                     setFormData({
@@ -153,7 +163,6 @@ export const ProductFormField = ({
                     <SelectValue placeholder="Select a county" />
                   </SelectTrigger>
                   <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    {/* Changed: using a non-empty string value for the default option */}
                     <SelectItem value="_none">Select a county</SelectItem>
                     {counties?.map((county) => (
                       <SelectItem key={county.name} value={county.name}>
