@@ -10,7 +10,6 @@ interface ProductCardActionsProps {
   isAdmin: boolean;
   product: Product;
   onDelete: (e: React.MouseEvent) => void;
-  onAddToCart: (e: React.MouseEvent) => void;
   onClick?: () => void;
 }
 
@@ -19,25 +18,12 @@ export const ProductCardActions = ({
   isAdmin,
   product,
   onDelete,
-  onAddToCart,
   onClick,
 }: ProductCardActionsProps) => {
   if (!session && !isAdmin) return null;
 
   return (
     <div className="px-4 pb-4 flex items-center justify-between">
-      {!isAdmin && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full transition-all hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 dark:hover:bg-emerald-900/30 dark:hover:text-emerald-400"
-          onClick={onAddToCart}
-          disabled={!product.in_stock}
-        >
-          Add to Cart
-        </Button>
-      )}
-      
       {isAdmin && (
         <div className="flex gap-2 ml-auto">
           <Button

@@ -101,7 +101,7 @@ export const ProductSimilar = ({
                   )}
                 </div>
                 
-                {/* Use the same ProductCardContent component as the main product card */}
+                {/* Use the ProductCardContent component without add to cart button */}
                 <ProductCardContent 
                   product={similarProduct}
                   selectedCurrency={selectedCurrency}

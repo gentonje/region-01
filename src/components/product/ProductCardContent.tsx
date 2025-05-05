@@ -4,20 +4,16 @@ import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { memo, useEffect, useState } from "react";
 import { convertCurrency } from "@/utils/currencyConverter";
-import { Button } from "../ui/button";
-import { ShoppingCart } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 interface ProductCardContentProps {
   product: Product;
   selectedCurrency: SupportedCurrency;
-  onAddToCart?: (e: React.MouseEvent) => void;
 }
 
 export const ProductCardContent = memo(({ 
   product,
-  selectedCurrency,
-  onAddToCart
+  selectedCurrency
 }: ProductCardContentProps) => {
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,23 +70,10 @@ export const ProductCardContent = memo(({
           
           {product.views !== undefined && product.views > 0 && (
             <Badge variant="secondary" className="text-xs">
-              👁️ {product.views}
+              {Math.round(product.views)} Views
             </Badge>
           )}
         </div>
-        
-        {onAddToCart && (
-          <Button 
-            size="sm" 
-            className="h-7 px-1 py-0 text-xs"
-            variant="secondary"
-            onClick={onAddToCart}
-            disabled={!product.in_stock}
-          >
-            <ShoppingCart className="h-3 w-3 mr-1" />
-            Add
-          </Button>
-        )}
       </div>
     </CardContent>
   );
