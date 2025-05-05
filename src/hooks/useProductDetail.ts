@@ -18,7 +18,7 @@ export const useProductDetail = (
   const { addItemMutation } = useCartMutations();
   const queryClient = useQueryClient();
 
-  // Convert price to selected currency
+  // Convert price to selected currency - ensure this returns a number, not a Promise
   const convertedPrice = convertCurrency(
     product.price || 0,
     product.currency || "SSP",
