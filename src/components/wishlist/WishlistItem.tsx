@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -155,23 +154,26 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
     >
       <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full mx-0 my-0">
         <CardContent className="p-0">
-          <div className="flex flex-row">
-            <div className="w-24 h-24 relative">
+          {/* New layout: Image first, full width */}
+          <div className="flex flex-col">
+            {/* Image section - larger and full width */}
+            <div className="w-full h-48 relative">
               <ImageLoader
                 src={getImageUrl()}
                 alt={product.title || ""}
                 className="w-full h-full object-cover"
-                width={96}
-                height={96}
+                width={300}
+                height={192}
+                priority={true}
               />
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="absolute top-1 left-1 z-10"
+                className="absolute top-2 left-2 z-10"
               >
                 <div className="relative">
-                  <Heart className="w-4 h-4 fill-amber-400 text-amber-400 wishlist-heart-active" />
+                  <Heart className="w-5 h-5 fill-amber-400 text-amber-400 wishlist-heart-active" />
                   {/* Render particles */}
                   {particles.map((id) => (
                     <div 
@@ -182,14 +184,16 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 </div>
               </motion.div>
             </div>
-            <div className="flex-1 p-1 flex flex-col justify-between space-y-0">
+            
+            {/* Product info section */}
+            <div className="p-3 flex flex-col justify-between space-y-2">
               <div>
-                <h3 className="text-sm font-semibold mb-0 text-gray-800 dark:text-gray-100 line-clamp-1">{product.title}</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1 mb-1">
+                <h3 className="text-base font-semibold mb-1 text-gray-800 dark:text-gray-100 line-clamp-1">{product.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
                   {product.description}
                 </p>
                 <motion.p 
-                  className="text-sm font-medium text-orange-500"
+                  className="text-lg font-medium text-orange-500"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -198,43 +202,43 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 </motion.p>
               </div>
               
-              {/* New buttons container with all buttons in a single row */}
-              <div className="flex items-center justify-start gap-2 mt-1">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              {/* Buttons container in a single row */}
+              <div className="flex items-center justify-between gap-2 mt-2">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => addToCart.mutate()}
                     disabled={!product.in_stock || addToCart.isPending}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-8 text-xs px-3"
+                    className="bg-violet-600 hover:bg-violet-700 text-white w-full h-10 text-sm"
                   >
-                    <ShoppingCart className="w-3 h-3 mr-1 icon-glow" />
+                    <ShoppingCart className="w-4 h-4 mr-2 icon-glow" />
                     Add
                   </Button>
                 </motion.div>
                 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 h-8 text-xs px-3"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 w-full h-10 text-sm"
                   >
-                    <Share2 className="w-3 h-3 mr-1 icon-glow" />
+                    <Share2 className="w-4 h-4 mr-2 icon-glow" />
                     Share
                   </Button>
                 </motion.div>
                 
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => removeFromWishlist.mutate()}
                     disabled={removeFromWishlist.isPending}
-                    className="h-8 text-xs px-3"
+                    className="w-full h-10 text-sm"
                   >
-                    <Trash2 className="w-3 h-3 mr-1 icon-glow" />
+                    <Trash2 className="w-4 h-4 mr-2 icon-glow" />
                     Remove
                   </Button>
                 </motion.div>
