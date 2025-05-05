@@ -62,12 +62,8 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full mx-0 px-0">
-        {Array.from({ length: 8 }).map((_, index) => (
-          <div key={index} className="p-1 mx-0">
-            <ProductSkeleton />
-          </div>
-        ))}
+      <div className="flex items-center justify-center p-8 w-full">
+        <p className="text-base text-gray-500">Loading products...</p>
       </div>
     );
   }

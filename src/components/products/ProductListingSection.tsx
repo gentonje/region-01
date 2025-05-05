@@ -24,6 +24,7 @@ interface ProductListingSectionProps {
   onDelete?: (productId: string) => Promise<void>;
   isAdmin?: boolean;
   emptyMessage?: string;
+  isLoading?: boolean;
 }
 
 export const ProductListingSection = ({
@@ -44,7 +45,8 @@ export const ProductListingSection = ({
   showStatus = false,
   onDelete,
   isAdmin,
-  emptyMessage = "No products found"
+  emptyMessage = "No products found",
+  isLoading = false
 }: ProductListingSectionProps) => {
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
@@ -75,6 +77,7 @@ export const ProductListingSection = ({
         onDelete={onDelete}
         isAdmin={isAdmin}
         emptyMessage={emptyMessage}
+        isLoading={isLoading}
       />
     </div>
   );
