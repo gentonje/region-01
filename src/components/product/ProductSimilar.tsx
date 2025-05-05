@@ -11,7 +11,6 @@ import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "../ui/badge";
-import { getStorageUrl } from "@/utils/storage";
 
 interface ProductSimilarProps {
   products: Product[];
