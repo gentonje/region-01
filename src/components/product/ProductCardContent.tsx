@@ -4,6 +4,9 @@ import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { memo, useEffect, useState } from "react";
 import { convertCurrency } from "@/utils/currencyConverter";
+import { Button } from "../ui/button";
+import { ShoppingCart } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 interface ProductCardContentProps {
   product: Product;
@@ -13,7 +16,8 @@ interface ProductCardContentProps {
 
 export const ProductCardContent = memo(({ 
   product,
-  selectedCurrency
+  selectedCurrency,
+  onAddToCart
 }: ProductCardContentProps) => {
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,13 +27,11 @@ export const ProductCardContent = memo(({
     const updatePrice = async () => {
       setIsLoading(true);
       try {
-        console.log(`Converting price for ${product.title} from ${product.currency} to ${selectedCurrency}`);
         const converted = await convertCurrency(
           product.price || 0,
           (product.currency || "SSP") as SupportedCurrency,
           selectedCurrency
         );
-        console.log(`Converted price: ${converted}`);
         setConvertedPrice(converted);
       } catch (error) {
         console.error('Error converting price:', error);
@@ -52,8 +54,6 @@ export const ProductCardContent = memo(({
         </CardTitle>
       </div>
       
-      {/* County information removed from here since it's now next to category */}
-      
       <div className="h-[20px] overflow-hidden px-1">
         <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
           {product.description}
@@ -71,7 +71,26 @@ export const ProductCardContent = memo(({
           }`}>
             {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
           </span>
+          
+          {product.views !== undefined && product.views > 0 && (
+            <Badge variant="secondary" className="text-xs">
+              👁️ {product.views}
+            </Badge>
+          )}
         </div>
+        
+        {onAddToCart && (
+          <Button 
+            size="sm" 
+            className="h-7 px-1 py-0 text-xs"
+            variant="secondary"
+            onClick={onAddToCart}
+            disabled={!product.in_stock}
+          >
+            <ShoppingCart className="h-3 w-3 mr-1" />
+            Add
+          </Button>
+        )}
       </div>
     </CardContent>
   );

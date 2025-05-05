@@ -2,16 +2,15 @@
 import { Card } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 import { useState, useEffect } from "react";
 import { ImageLoader } from "../ImageLoader";
-import { MapPin, ShoppingCart, Heart } from "lucide-react";
+import { MapPin, Heart } from "lucide-react";
 import { Button } from "../ui/button";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCartMutations } from "@/hooks/useCartMutations";
-import { toast } from "sonner";
+import { convertCurrency } from "@/utils/currencyConverter";
+import { ProductCardContent } from "./ProductCardContent";
 
 interface ProductSimilarProps {
   products: Product[];
@@ -26,42 +25,7 @@ export const ProductSimilar = ({
   onProductClick,
   selectedCurrency 
 }: ProductSimilarProps) => {
-  const [convertedPrices, setConvertedPrices] = useState<Record<string, number>>({});
   const { session } = useAuth();
-  const { addItemMutation } = useCartMutations();
-
-  // Update prices immediately when selectedCurrency changes
-  useEffect(() => {
-    const updatePrices = async () => {
-      // Force refresh currency rates when currency changes
-      await refreshCurrencyRates();
-      
-      const prices: Record<string, number> = {};
-      for (const product of products) {
-        prices[product.id] = await convertCurrency(
-          product.price || 0,
-          (product.currency || "SSP") as SupportedCurrency,
-          selectedCurrency
-        );
-      }
-      setConvertedPrices(prices);
-    };
-    updatePrices();
-  }, [products, selectedCurrency]);
-
-  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
-    e.stopPropagation(); // Prevent clicking through to the product detail
-    
-    if (!product.in_stock) {
-      toast.error('This product is out of stock');
-      return;
-    }
-    
-    addItemMutation.mutate({ 
-      productId: product.id,
-      quantity: 1
-    });
-  };
 
   if (!products?.length) return null;
 
@@ -137,36 +101,11 @@ export const ProductSimilar = ({
                   )}
                 </div>
                 
-                {/* Product Content Section */}
-                <div className="p-1 space-y-1">
-                  <div className="pt-0">
-                    <h3 className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left">
-                      {similarProduct.title}
-                    </h3>
-                  </div>
-                  
-                  <div className="h-[20px] overflow-hidden">
-                    <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
-                      {similarProduct.description}
-                    </p>
-                  </div>
-                  <div className="flex justify-between items-center pt-1">
-                    <span className="text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
-                      {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
-                    </span>
-                    
-                    <Button 
-                      size="sm" 
-                      className="h-7 px-1 py-0 text-xs"
-                      variant="secondary"
-                      onClick={(e) => handleAddToCart(e, similarProduct)}
-                      disabled={!similarProduct.in_stock || addItemMutation.isPending}
-                    >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      Add
-                    </Button>
-                  </div>
-                </div>
+                {/* Use the same ProductCardContent component as the main product card */}
+                <ProductCardContent 
+                  product={similarProduct}
+                  selectedCurrency={selectedCurrency}
+                />
               </Card>
             </div>
           );
