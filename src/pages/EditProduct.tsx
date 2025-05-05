@@ -46,6 +46,8 @@ const EditProduct = () => {
         throw new Error("Product not found");
       }
 
+      console.log("Fetched product from database:", product);
+
       // Add publicUrl to each image and ensure type compatibility
       const productWithUrls: Product = {
         ...product,
@@ -65,12 +67,9 @@ const EditProduct = () => {
       setIsSubmitting(true);
       if (!id) throw new Error("Product ID is required");
       
-      if (!formData.county) {
-        toast.error("Please select a county");
-        setIsSubmitting(false);
-        return;
-      }
-
+      console.log("Submitting form with county:", formData.county);
+      
+      // Don't perform county validation here, trust the form component
       await updateProduct(id, formData);
       toast.success("Product updated successfully!");
       

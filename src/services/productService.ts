@@ -9,7 +9,8 @@ export const updateProduct = async (
 ) => {
   console.log("Updating product with data:", { id, formData });
   
-  if (!formData.county) {
+  // Don't throw an error if county exists (even if empty string)
+  if (formData.county === undefined || formData.county === null) {
     throw new Error("County is required");
   }
   

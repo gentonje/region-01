@@ -74,7 +74,15 @@ export const ProductFormField = ({
     fetchCounties();
   }, []);
 
+  // Debug log for the county field
+  useEffect(() => {
+    if (name === 'county') {
+      console.log('County value in field:', formData[name]);
+    }
+  }, [formData, name]);
+
   const handleValueChange = (value: string) => {
+    console.log(`Setting ${name} to:`, value);
     setFormData({
       ...formData,
       [name]: value,

@@ -3,7 +3,7 @@ import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
 import { Product, ProductCategory } from "@/types/product";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ProductFormData } from "@/components/forms/product/validation";
 
@@ -23,6 +23,9 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     uploadImages,
   } = useProductImages(product.id);
 
+  // Log the product data to debug county value
+  console.log("Product data in EditProductForm:", product);
+
   const [formData, setFormData] = useState<ProductFormData>({
     title: product?.title || "",
     description: product?.description || "",
@@ -31,6 +34,11 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     available_quantity: String(product?.available_quantity || "0"),
     county: product?.county || "",
   });
+
+  // Log the initial form data to debug county value
+  useEffect(() => {
+    console.log("Form data in EditProductForm:", formData);
+  }, [formData]);
 
   const handleSubmit = async (data: ProductFormData) => {
     try {

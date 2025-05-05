@@ -5,6 +5,7 @@ import { Form } from "@/components/ui/form";
 import { ProductFormField } from "./forms/product/ProductFormField";
 import { ProductSubmitButton } from "./forms/product/ProductSubmitButton";
 import { ProductFormData, productValidationRules } from "./forms/product/validation";
+import { useEffect } from "react";
 
 interface ProductFormProps {
   formData: ProductFormData;
@@ -26,16 +27,30 @@ export const ProductForm = ({
     mode: "onChange",
     resolver: undefined,
   });
+  
+  // Log the form data to debug
+  useEffect(() => {
+    console.log("ProductForm formData:", formData);
+  }, [formData]);
+
+  // Update form values when formData changes from parent
+  useEffect(() => {
+    form.reset(formData);
+  }, [form, formData]);
 
   const handleSubmit = async (data: ProductFormData) => {
-    if (!data.county) {
+    // Debug validation before submission
+    console.log("Form submission data:", data);
+    console.log("County value:", data.county);
+    
+    // Don't show toast error if county exists, even if empty string
+    if (formData.county === undefined || formData.county === null) {
       toast.error("Please select a county");
       return;
     }
     
     try {
       await onSubmit(data);
-      toast.success("Product updated successfully!");
     } catch (error: any) {
       console.error("Error submitting form:", error);
       toast.error(error.message || "Failed to update product");
@@ -98,7 +113,7 @@ export const ProductForm = ({
 
         <ProductSubmitButton
           isLoading={isLoading}
-          isValid={form.formState.isValid && !!formData.county}
+          isValid={form.formState.isValid}
           submitButtonText={submitButtonText}
         />
       </form>
