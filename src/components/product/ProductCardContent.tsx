@@ -44,9 +44,9 @@ export const ProductCardContent = memo(({
   // Check if we need to show both prices
   const showBothPrices = product.currency !== selectedCurrency && product.currency;
 
-  // Process county data - handle both string and object formats
+  // Process county data - properly handle it regardless of whether it's a string or object
   const countyDisplay = typeof product.county === 'object' && product.county !== null
-    ? (product.county as any).name || 'Unknown County'
+    ? product.county.name || 'Unknown County'
     : product.county || '';
 
   return (

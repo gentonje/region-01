@@ -139,24 +139,28 @@ export const ProductFormField = ({
               isCountiesLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-background dark:bg-gray-800 px-3 py-2 text-sm text-foreground dark:text-gray-200 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  onChange={(e) => {
-                    field.onChange(e);
+                <Select
+                  value={typeof field.value === 'object' ? (field.value as any)?.name : field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
                     setFormData({
                       ...formData,
-                      [name]: e.target.value,
+                      [name]: value,
                     });
                   }}
                 >
-                  <option value="">Select a county</option>
-                  {counties?.map((county) => (
-                    <option key={county.name} value={county.name}>
-                      {county.name} {county.state ? `(${county.state})` : ''}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
+                    <SelectValue placeholder="Select a county" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
+                    <SelectItem value="">Select a county</SelectItem>
+                    {counties?.map((county) => (
+                      <SelectItem key={county.name} value={county.name}>
+                        {county.name} {county.state ? `(${county.state})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )
             ) : (
               <Input

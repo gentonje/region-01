@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -44,6 +43,11 @@ const AddProduct = () => {
       const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
       console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
 
+      // Make sure county is a string, not an object
+      const countyValue = typeof data.county === 'object' ? 
+        (data.county as any).name || '' : 
+        data.county || '';
+
       console.log("Creating product...");
       const { data: productData, error: productError } = await supabase
         .from("products")
@@ -55,7 +59,7 @@ const AddProduct = () => {
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
           user_id: user.id,
-          county: data.county
+          county: countyValue
         })
         .select()
         .single();
