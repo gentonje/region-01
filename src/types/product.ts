@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 export type ProductCategory = Database["public"]["Enums"]["product_category"];
@@ -10,7 +9,6 @@ export interface ProductFormData {
   category: ProductCategory;
   available_quantity: number;
   shipping_info?: string;
-  county?: string;
 }
 
 export interface ProductImage {
@@ -50,5 +48,4 @@ export interface Product {
   currency: string | null;
   product_images: ProductImage[];
   profiles?: Profile;
-  county?: string | null;
 }

@@ -1,4 +1,3 @@
-
 import { ProductCategory } from "@/types/product";
 
 export interface ProductFormData {
@@ -7,7 +6,6 @@ export interface ProductFormData {
   price: string;
   category: ProductCategory;
   available_quantity: string;
-  county?: string;
 }
 
 export const productValidationRules = {
@@ -30,9 +28,6 @@ export const productValidationRules = {
   },
   category: { 
     required: "Category is required" 
-  },
-  county: {
-    required: "Location is required"
   },
   available_quantity: { 
     required: "Quantity is required",

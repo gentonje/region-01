@@ -15,7 +15,6 @@ export const updateProduct = async (
     category: formData.category,
     available_quantity: Number(formData.available_quantity),
     shipping_info: formData.shipping_info,
-    county: formData.county,
   };
 
   // Update main image if provided
@@ -96,3 +95,4 @@ export const updateProductStatus = async (productId: string, status: 'draft' | '
     throw error;
   }
 };
+

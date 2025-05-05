@@ -69,12 +69,6 @@ export const ProductCardContent = memo(({
             {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
           </span>
         </div>
-        
-        {product.county && (
-          <span className="text-xs px-1 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium whitespace-nowrap">
-            {product.county}
-          </span>
-        )}
       </div>
     </CardContent>
   );
