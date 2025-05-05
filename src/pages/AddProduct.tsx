@@ -44,9 +44,9 @@ const AddProduct = () => {
       console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
 
       // Make sure county is a string, not an object
-      const countyValue = typeof data.county === 'object' ? 
-        (data.county as any).name || '' : 
-        data.county || '';
+      const countyValue = typeof data.county === 'object' && data.county !== null && 'name' in data.county
+        ? data.county.name
+        : data.county || '';
 
       console.log("Creating product...");
       const { data: productData, error: productError } = await supabase

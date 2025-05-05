@@ -87,9 +87,11 @@ export const ProductFormField = ({
   const getCountyValue = () => {
     const county = form.getValues().county;
     if (!county) return "_none";
+    
     if (typeof county === 'object' && county !== null && 'name' in county) {
-      return (county as {name: string}).name;
+      return county.name;
     }
+    
     return String(county);
   };
 

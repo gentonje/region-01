@@ -50,7 +50,7 @@ export const ProductCardContent = memo(({
     
     if (typeof product.county === 'object' && product.county !== null) {
       // Handle county as object with name property
-      return 'name' in product.county ? product.county.name : '';
+      return product.county.name ? String(product.county.name) : '';
     }
     
     return String(product.county);

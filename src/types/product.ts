@@ -48,7 +48,7 @@ export interface Product {
   product_status?: string | null;
   shipping_info?: string | null;
   currency: string | null;
-  county?: string | null;
+  county?: { name: string; state?: string } | string | null;
   product_images: ProductImage[];
   profiles?: Profile;
 }

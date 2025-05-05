@@ -29,7 +29,7 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     
     if (typeof product.county === 'object' && product.county !== null) {
       // Handle county as object with name property
-      return 'name' in product.county ? String(product.county.name) : '';
+      return product.county.name ? String(product.county.name) : '';
     }
     
     return String(product.county);
