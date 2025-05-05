@@ -1,4 +1,3 @@
-
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -53,7 +52,7 @@ export function CartIndicator() {
               className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300"
               onClick={() => navigate("/cart")}
             >
-              <ShoppingCart className="h-5 w-5 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+              <ShoppingCart className="h-5 w-5 icon-glow" />
               <AnimatePresence>
                 {cartCount > 0 && (
                   <motion.span 

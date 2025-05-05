@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -148,7 +147,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Heart className="absolute top-2 left-2 w-6 h-6 fill-amber-400 text-amber-400" />
+                <Heart className="absolute top-2 left-2 w-6 h-6 fill-amber-400 text-amber-400 icon-glow-amber" />
               </motion.div>
             </div>
             <div className="flex-1 p-4 flex flex-col justify-between space-y-2">
@@ -175,7 +174,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                     disabled={!product.in_stock || addToCart.isPending}
                     className="bg-violet-600 hover:bg-violet-700 text-white"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-1" />
+                    <ShoppingCart className="w-4 h-4 mr-1 icon-glow" />
                     Add to Cart
                   </Button>
                 </motion.div>
@@ -187,7 +186,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                     disabled={isSharing}
                     className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
                   >
-                    <Share2 className="w-4 h-4 mr-1" />
+                    <Share2 className="w-4 h-4 mr-1 icon-glow" />
                     Share
                   </Button>
                 </motion.div>
@@ -198,7 +197,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                     onClick={() => removeFromWishlist.mutate()}
                     disabled={removeFromWishlist.isPending}
                   >
-                    <Trash2 className="w-4 h-4 mr-1" />
+                    <Trash2 className="w-4 h-4 mr-1 icon-glow" />
                     Remove
                   </Button>
                 </motion.div>

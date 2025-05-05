@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import {
   DropdownMenu,
@@ -73,7 +72,7 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
           size="icon" 
           className="relative backdrop-blur-sm bg-white/10 hover:bg-white/20 transition-all duration-300 m-1"
         >
-          <User className="h-4 w-4 drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]" />
+          <User className="h-4 w-4 icon-glow" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="backdrop-blur-sm bg-background/95 space-y-1">
@@ -83,40 +82,40 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
           <>
             <DropdownMenuItem asChild className="m-1">
               <Link to="/add-product" className="cursor-pointer space-x-2">
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4 icon-glow-primary" />
                 <span>Add Product</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="m-1">
               <Link to="/my-products" className="cursor-pointer space-x-2">
-                <PenTool className="mr-2 h-4 w-4" />
+                <PenTool className="mr-2 h-4 w-4 icon-glow-primary" />
                 <span>My Products</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild className="m-1">
               <Link to="/products" className="cursor-pointer space-x-2">
-                <UserCheck className="mr-2 h-4 w-4" />
+                <UserCheck className="mr-2 h-4 w-4 icon-glow-primary" />
                 <span>All Products</span>
               </Link>
             </DropdownMenuItem>
             {!isAdmin && !isSuperAdmin && (
               <DropdownMenuItem asChild className="m-1">
                 <Link to="/wishlist" className="cursor-pointer space-x-2">
-                  <Heart className="mr-2 h-4 w-4" />
+                  <Heart className="mr-2 h-4 w-4 icon-glow-primary" />
                   <span>Wishlist</span>
                 </Link>
               </DropdownMenuItem>
             )}
             <DropdownMenuItem asChild className="m-1">
               <Link to="/edit-profile" className="cursor-pointer space-x-2">
-                <Settings className="mr-2 h-4 w-4" />
+                <Settings className="mr-2 h-4 w-4 icon-glow-primary" />
                 <span>Edit Profile</span>
               </Link>
             </DropdownMenuItem>
             {(isAdmin || isSuperAdmin) && (
               <DropdownMenuItem asChild className="m-1">
                 <Link to="/admin/users" className="cursor-pointer space-x-2">
-                  <Users className="mr-2 h-4 w-4" />
+                  <Users className="mr-2 h-4 w-4 icon-glow-primary" />
                   <span>Manage Users</span>
                 </Link>
               </DropdownMenuItem>
@@ -124,21 +123,21 @@ export const UserMenu = ({ userName, onLogout, isLoading, isAuthenticated }: Use
             {isSuperAdmin && (
               <DropdownMenuItem asChild className="m-1">
                 <Link to="/admin/manage" className="cursor-pointer space-x-2">
-                  <Shield className="mr-2 h-4 w-4" />
+                  <Shield className="mr-2 h-4 w-4 icon-glow-primary" />
                   <span>Manage Admins</span>
                 </Link>
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={onLogout} className="cursor-pointer m-1 space-x-2">
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4 icon-glow" />
               <span>Logout</span>
             </DropdownMenuItem>
           </>
         ) : (
           <DropdownMenuItem asChild className="m-1">
             <Link to="/login" className="cursor-pointer space-x-2">
-              <LogIn className="mr-2 h-4 w-4" />
+              <LogIn className="mr-2 h-4 w-4 icon-glow-primary" />
               <span>Login</span>
             </Link>
           </DropdownMenuItem>
