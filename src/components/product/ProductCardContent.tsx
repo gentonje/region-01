@@ -5,28 +5,11 @@ import { convertCurrency } from "@/utils/currencyConverter";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { Product } from "@/types/product";
 import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
 
 interface ProductCardContentProps {
   product: Product;
   selectedCurrency: SupportedCurrency;
 }
-
-export const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <div className="flex items-center">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={14}
-          className={`${
-            star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
-        />
-      ))}
-    </div>
-  );
-};
 
 export const ProductCardContent = ({
   product,
@@ -65,7 +48,9 @@ export const ProductCardContent = ({
           </p>
         </div>
         <div className="text-right">
-          <StarRating rating={product.average_rating || 0} />
+          <span className="text-xs bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200 px-2 py-1 rounded-full">
+            View Details
+          </span>
         </div>
       </div>
     </CardContent>
