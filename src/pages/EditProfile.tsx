@@ -101,6 +101,7 @@ const EditProfile = () => {
       }
       
       // Clean up data before submitting to ensure valid values
+      // Remove the updated_at field as it doesn't exist in the database schema
       const profileData = {
         username: data.username,
         full_name: data.full_name,
@@ -109,7 +110,6 @@ const EditProfile = () => {
         address: data.address,
         shop_name: data.shop_name || null,
         shop_description: data.shop_description || null,
-        updated_at: new Date().toISOString(),
       };
       
       const { error } = await supabase
