@@ -1,13 +1,12 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense, lazy, useState, useEffect } from 'react';
+import { Suspense, lazy } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Routes } from "@/Routes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { BrowserRouter } from 'react-router-dom';
-import { SupportedCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 
 // Create a client with optimized configuration
 const queryClient = new QueryClient({
@@ -27,44 +26,13 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
-
-  // Load saved currency preference on app init
-  useEffect(() => {
-    const savedCurrency = localStorage.getItem('selectedCurrency') as SupportedCurrency;
-    if (savedCurrency) {
-      setSelectedCurrency(savedCurrency);
-    }
-    
-    // Ensure we have fresh currency rates when the app starts
-    refreshCurrencyRates().catch(console.error);
-  }, []);
-
-  const handleCurrencyChange = (currency: SupportedCurrency) => {
-    console.log("Changing currency to:", currency);
-    
-    // Update the selected currency immediately
-    setSelectedCurrency(currency);
-    
-    // Force refresh all relevant queries to ensure immediate updates
-    queryClient.invalidateQueries({ queryKey: ['currencies'] });
-    queryClient.invalidateQueries({ queryKey: ['products'] });
-    queryClient.invalidateQueries({ queryKey: ['similar-products'] });
-    
-    // Store the selected currency in local storage for persistence
-    localStorage.setItem('selectedCurrency', currency);
-  };
-
   return (
     <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center">Loading application...</div>}>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="light">
             <AuthProvider>
-              <Routes 
-                selectedCurrency={selectedCurrency}
-                onCurrencyChange={handleCurrencyChange}
-              />
+              <Routes />
               <Toaster />
               <SonnerToaster position="top-right" expand={false} closeButton theme="light" richColors />
             </AuthProvider>

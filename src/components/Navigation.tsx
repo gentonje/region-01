@@ -10,7 +10,6 @@ import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useScrollDirection, ScrollDirection } from "@/hooks/useScrollDirection";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -18,15 +17,11 @@ import { cn } from "@/lib/utils";
 interface NavigationProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
-  selectedCurrency?: SupportedCurrency;
-  onCurrencyChange?: (currency: SupportedCurrency) => void;
 }
 
 export const Navigation = ({ 
   searchQuery = "", 
-  onSearchChange,
-  selectedCurrency = "SSP",
-  onCurrencyChange
+  onSearchChange
 }: NavigationProps) => {
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -136,12 +131,9 @@ export const Navigation = ({
         </motion.div>
       </AnimatePresence>
       
-      {/* We'll pass the scroll state to BottomNav */}
       {session && (
         <BottomNav 
           isAuthenticated={!!session} 
-          selectedCurrency={selectedCurrency}
-          onCurrencyChange={onCurrencyChange}
           shouldShow={scrollDirection === ScrollDirection.UP}
         />
       )}

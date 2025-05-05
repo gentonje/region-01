@@ -7,7 +7,6 @@ import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from './components/ui/skeleton';
 import { MainLayout } from '@/components/layouts/MainLayout';
-import { SupportedCurrency } from '@/utils/currencyConverter';
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('./pages/Index'));
@@ -34,13 +33,7 @@ const PageLoader = () => (
   </div>
 );
 
-// Add interface for Routes component props
-interface RoutesProps {
-  selectedCurrency?: SupportedCurrency;
-  onCurrencyChange?: (currency: SupportedCurrency) => void;
-}
-
-export const Routes: React.FC<RoutesProps> = ({ selectedCurrency = "SSP", onCurrencyChange }) => {
+export const Routes = () => {
   const { session, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -69,8 +62,6 @@ export const Routes: React.FC<RoutesProps> = ({ selectedCurrency = "SSP", onCurr
             <MainLayout 
               searchQuery={searchQuery} 
               onSearchChange={setSearchQuery}
-              selectedCurrency={selectedCurrency}
-              onCurrencyChange={onCurrencyChange} 
             />
           } 
         >
