@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { getStorageUrl } from "@/utils/storage";
 import { motion, AnimatePresence } from "framer-motion";
 import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
+import { Badge } from "@/components/ui/badge";
 
 interface WishlistItemProps {
   item: {
@@ -224,23 +224,18 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                   {product.description}
                 </p>
                 
-                {/* Currency display - matching main product page style */}
-                <div className="flex flex-col items-start space-y-1 my-2">
-                  {/* Original SSP price - larger, orange text */}
-                  <motion.p 
-                    className="text-2xl font-bold text-orange-500"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                {/* Currency display - both badges on the same line */}
+                <div className="flex flex-row items-center gap-2 my-2">
+                  {/* SSP price in orange badge */}
+                  <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-semibold">
                     SSP {formatNumber(product.price || 0)}
-                  </motion.p>
+                  </Badge>
                   
-                  {/* USD converted price - smaller, in badge */}
+                  {/* USD converted price in green badge */}
                   {convertedPrice > 0 && (
-                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
+                    <Badge className="bg-green-100 hover:bg-green-200 text-green-800 font-medium">
                       USD {formatNumber(convertedPrice)}
-                    </span>
+                    </Badge>
                   )}
                 </div>
               </div>
