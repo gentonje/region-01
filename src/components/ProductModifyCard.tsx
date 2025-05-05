@@ -46,10 +46,33 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     updatePrice();
   }, [product.price, productCurrency, defaultCurrency]);
   
-  // Get the proper image URL with better fallback handling
-  const imageUrl = product.product_images && product.product_images.length > 0 && product.product_images[0].storage_path
-    ? getStorageUrl(product.product_images[0].storage_path)
-    : '/placeholder.svg';
+  // Fix image URL generation with better debugging
+  const getImageUrl = () => {
+    try {
+      // Log product image data to debug
+      console.log('Product images:', product.product_images);
+      
+      if (!product.product_images || product.product_images.length === 0) {
+        console.log('No product images found, using placeholder');
+        return '/placeholder.svg';
+      }
+      
+      const firstImage = product.product_images[0];
+      if (!firstImage.storage_path) {
+        console.log('Image has no storage path, using placeholder');
+        return '/placeholder.svg';
+      }
+      
+      const url = getStorageUrl(firstImage.storage_path);
+      console.log('Generated image URL:', url);
+      return url;
+    } catch (error) {
+      console.error('Error getting image URL:', error);
+      return '/placeholder.svg';
+    }
+  };
+  
+  const imageUrl = getImageUrl();
 
   // Determine if we should show both prices
   const showBothPrices = productCurrency !== defaultCurrency;
@@ -63,7 +86,7 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
           width={128}
           height={128}
-          priority={false}
+          priority={true}
           fallbackSrc="/placeholder.svg"
         />
       </div>

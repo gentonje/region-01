@@ -1,4 +1,3 @@
-
 import { UserStatsCard } from "@/components/admin/UserStatsCard";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -66,6 +65,7 @@ const AdminUsers = () => {
         .from("products")
         .select(`
           *,
+          product_images(*),
           profiles:user_id (
             username,
             full_name
@@ -75,6 +75,8 @@ const AdminUsers = () => {
 
       if (error) throw error;
 
+      console.log("Raw product data:", data);
+      
       // Group products by user
       const productsByUser: Record<string, any[]> = {};
       
@@ -126,6 +128,9 @@ const AdminUsers = () => {
         username.toLowerCase().includes(search.toLowerCase())
       )
     ) : {};
+
+  // Log filtered products for debugging
+  console.log("Filtered products:", filteredProducts);
 
   return (
     <div className="mx-1 py-1 space-y-1">

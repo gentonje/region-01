@@ -42,28 +42,25 @@ export const ImageLoader = memo(({
   const { toast } = useToast();
 
   const loadImage = useCallback(async () => {
-    if (!src) {
+    if (!src || src === fallbackSrc) {
+      console.log('Using fallback image directly:', fallbackSrc);
       setImageSrc(fallbackSrc);
       setIsLoading(false);
       return;
     }
     
+    console.log('Attempting to load image:', src);
+    
     try {
-      // Check if image is in cache
-      const cache = await caches.open('image-cache');
-      const cachedResponse = await cache.match(src);
+      // Simplified image loading with better error handling
+      await preloadImage(src);
       
-      if (!cachedResponse) {
-        // If not in cache, preload and cache it
-        await preloadImage(src);
-        const response = await fetch(src);
-        const clonedResponse = response.clone();
-        await cache.put(src, clonedResponse);
-      }
-      
+      // If preloading succeeds, use the original source
+      setImageSrc(src);
       setIsLoading(false);
+      console.log('Image loaded successfully:', src);
     } catch (err) {
-      console.error('Error loading image:', err);
+      console.error('Error loading image:', src, err);
       setImageSrc(fallbackSrc);
       setError(true);
       setIsLoading(false);
@@ -80,18 +77,24 @@ export const ImageLoader = memo(({
   }, [src, fallbackSrc, toast]);
 
   useEffect(() => {
+    // Reset state when src changes
     setIsLoading(true);
     setError(false);
+    
+    // Set initial src early to possibly show something
     setImageSrc(src || fallbackSrc);
+    
+    // Start loading process
     loadImage();
-  }, [loadImage, src, fallbackSrc]);
+  }, [src, loadImage, fallbackSrc]);
 
+  // If we already know there's an error, show fallback immediately
   if (error) {
     return (
       <div className="flex items-center justify-center bg-gray-100 rounded-md" style={{ width, height }}>
         <img 
           src={fallbackSrc} 
-          alt={alt} 
+          alt={alt || "Placeholder image"} 
           className={className}
           width={width}
           height={height}
@@ -104,23 +107,28 @@ export const ImageLoader = memo(({
     <>
       {isLoading && (
         <Skeleton 
-          className={`${className} animate-none`}
+          className={`${className} animate-pulse`}
           style={{ width, height }}
         />
       )}
       <img
         src={imageSrc}
-        alt={alt}
+        alt={alt || "Product image"}
         className={`${className} ${isLoading ? 'hidden' : 'block'}`}
         width={width}
         height={height}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        onLoad={() => setIsLoading(false)}
+        onLoad={() => {
+          console.log('Image onload fired:', imageSrc);
+          setIsLoading(false);
+        }}
         onError={() => {
+          console.error('Image failed to load:', imageSrc);
           // If the image fails to load, use the fallback
           if (imageSrc !== fallbackSrc) {
             setImageSrc(fallbackSrc);
+            setError(true);
           }
         }}
       />

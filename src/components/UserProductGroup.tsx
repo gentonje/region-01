@@ -16,6 +16,9 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
+  // Check and log products data for debugging
+  console.log(`UserProductGroup for ${username}:`, products);
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.title?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
