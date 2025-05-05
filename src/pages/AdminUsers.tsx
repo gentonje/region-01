@@ -128,10 +128,10 @@ const AdminUsers = () => {
     ) : {};
 
   return (
-    <div className="mx-1 sm:mx-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">User Management</h1>
+    <div className="mx-1 py-1 space-y-1">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">User Management</h1>
       
-      <div className="mb-4 flex w-full items-center space-x-2">
+      <div className="mb-1 flex w-full items-center space-x-1 mx-1">
         <Input
           placeholder="Search users..."
           value={search}
@@ -140,19 +140,19 @@ const AdminUsers = () => {
         />
       </div>
       
-      <Tabs defaultValue="users" className="w-full">
-        <TabsList className="mb-4">
+      <Tabs defaultValue="users" className="w-full mx-1">
+        <TabsList className="mb-1">
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="products">Products by User</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="users" className="space-y-4">
+        <TabsContent value="users" className="space-y-1">
           {isLoadingUsers ? (
-            <div className="text-center py-4">Loading user data...</div>
+            <div className="text-center py-1">Loading user data...</div>
           ) : filteredUsers?.length === 0 ? (
-            <div className="text-center py-4">No users found</div>
+            <div className="text-center py-1">No users found</div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
               {filteredUsers?.map((user) => (
                 <UserStatsCard
                   key={user.id}
@@ -167,11 +167,11 @@ const AdminUsers = () => {
           )}
         </TabsContent>
         
-        <TabsContent value="products" className="space-y-4">
+        <TabsContent value="products" className="space-y-1">
           {isLoadingProducts ? (
-            <div className="text-center py-4">Loading product data...</div>
+            <div className="text-center py-1">Loading product data...</div>
           ) : Object.keys(filteredProducts).length === 0 ? (
-            <div className="text-center py-4">No products found</div>
+            <div className="text-center py-1">No products found</div>
           ) : (
             Object.entries(filteredProducts).map(([username, products]) => (
               <UserProductGroup

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, UserCheck, UserX } from "lucide-react";
+import { UserCheck, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { CurrencyManager } from "@/components/admin/CurrencyManager";
@@ -68,10 +68,10 @@ const AdminManagement = () => {
   );
 
   return (
-    <div className="mx-1 sm:mx-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Admin Management</h1>
+    <div className="mx-1 sm:mx-1 py-1 space-y-1">
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">Admin Management</h1>
 
-      <div className="mb-4 flex w-full items-center space-x-2">
+      <div className="mb-1 flex w-full items-center space-x-1 mx-1">
         <Input
           placeholder="Search users..."
           value={search}
@@ -80,27 +80,27 @@ const AdminManagement = () => {
         />
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border">
-        <h2 className="text-xl font-semibold mb-4">Users</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-1 border mx-1">
+        <h2 className="text-xl font-semibold mb-1 mx-1">Users</h2>
         {isLoading ? (
-          <div className="text-center py-4">Loading...</div>
+          <div className="text-center py-1">Loading...</div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-1 mx-1">
             {filteredUsers?.map((user) => (
               <div
                 key={user.id}
-                className="border p-4 rounded-lg bg-gray-50 dark:bg-gray-900"
+                className="border p-1 rounded-lg bg-gray-50 dark:bg-gray-900 my-1"
               >
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
                   <div>
                     <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
                     <div className="mt-1">
-                      <span className="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                      <span className="text-xs font-medium px-1 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                         Role: {user.user_type}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-1">
                     {user.user_type === "user" ? (
                       <Button
                         size="sm"
@@ -121,7 +121,7 @@ const AdminManagement = () => {
                         <span>Remove Admin</span>
                       </Button>
                     ) : (
-                      <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-2 py-1">
+                      <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-1 py-1">
                         Super Admin
                       </span>
                     )}
@@ -133,9 +133,9 @@ const AdminManagement = () => {
         )}
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border">
-        <h2 className="text-xl font-semibold mb-4">Manage Settings</h2>
-        <div className="space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-1 border mx-1 my-1">
+        <h2 className="text-xl font-semibold mb-1 mx-1">Manage Settings</h2>
+        <div className="space-y-1 mx-1">
           <div>
             <CurrencyManager />
           </div>

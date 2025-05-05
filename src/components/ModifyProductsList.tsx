@@ -1,4 +1,3 @@
-
 import { ProductModifyCard } from "@/components/ProductModifyCard";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
@@ -153,9 +152,9 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="flex justify-center items-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 mx-1">
+        <div className="flex justify-center items-center p-1 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 mx-1">
           <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-          <span className="ml-2 text-gray-600 dark:text-gray-400">Loading products...</span>
+          <span className="ml-1 text-gray-600 dark:text-gray-400">Loading products...</span>
         </div>
       )}
 
