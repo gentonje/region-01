@@ -2,16 +2,15 @@
 import { Card } from "../ui/card";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
+import { convertCurrency } from "@/utils/currencyConverter";
 import { useState, useEffect } from "react";
 import { ImageLoader } from "../ImageLoader";
-import { MapPin, ShoppingCart, Heart } from "lucide-react";
+import { MapPin, Heart, Eye } from "lucide-react";
 import { Button } from "../ui/button";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCartMutations } from "@/hooks/useCartMutations";
-import { toast } from "sonner";
+import { Badge } from "../ui/badge";
 
 interface ProductSimilarProps {
   products: Product[];
@@ -28,17 +27,13 @@ export const ProductSimilar = ({
 }: ProductSimilarProps) => {
   const [convertedPrices, setConvertedPrices] = useState<Record<string, number>>({});
   const { session } = useAuth();
-  const { addItemMutation } = useCartMutations();
 
   // Update prices immediately when selectedCurrency changes
   useEffect(() => {
     const updatePrices = async () => {
-      // Force refresh currency rates when currency changes
-      await refreshCurrencyRates();
-      
       const prices: Record<string, number> = {};
       for (const product of products) {
-        prices[product.id] = await convertCurrency(
+        prices[product.id] = convertCurrency(
           product.price || 0,
           (product.currency || "SSP") as SupportedCurrency,
           selectedCurrency
@@ -48,20 +43,6 @@ export const ProductSimilar = ({
     };
     updatePrices();
   }, [products, selectedCurrency]);
-
-  const handleAddToCart = (e: React.MouseEvent, product: Product) => {
-    e.stopPropagation(); // Prevent clicking through to the product detail
-    
-    if (!product.in_stock) {
-      toast.error('This product is out of stock');
-      return;
-    }
-    
-    addItemMutation.mutate({ 
-      productId: product.id,
-      quantity: 1
-    });
-  };
 
   if (!products?.length) return null;
 
@@ -150,21 +131,21 @@ export const ProductSimilar = ({
                       {similarProduct.description}
                     </p>
                   </div>
-                  <div className="flex justify-between items-center pt-1">
-                    <span className="text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
-                      {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap pt-1">
+                    <Badge variant="outline" className="bg-violet-50 text-violet-700 border-violet-200 text-xs">
+                      {similarProduct.currency} {Math.round(similarProduct.price || 0).toLocaleString()}
+                    </Badge>
                     
-                    <Button 
-                      size="sm" 
-                      className="h-7 px-1 py-0 text-xs"
-                      variant="secondary"
-                      onClick={(e) => handleAddToCart(e, similarProduct)}
-                      disabled={!similarProduct.in_stock || addItemMutation.isPending}
-                    >
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      Add
-                    </Button>
+                    <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
+                      {selectedCurrency} {Math.round(convertedPrices[similarProduct.id] || 0).toLocaleString()}
+                    </Badge>
+                    
+                    {typeof similarProduct.view_count === 'number' && (
+                      <Badge variant="outline" className="flex gap-1 items-center bg-blue-50 text-blue-700 border-blue-200 text-xs">
+                        <Eye className="h-3 w-3" />
+                        <span>{similarProduct.view_count}</span>
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </Card>
