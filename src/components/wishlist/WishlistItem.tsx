@@ -130,8 +130,9 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       exit={{ opacity: 0, height: 0 }}
+      className="w-full px-0"
     >
-      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow w-full mx-1">
+      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow w-full mx-0">
         <CardContent className="p-0">
           <div className="flex flex-col md:flex-row">
             <div className="w-full md:w-56 h-52 relative">
