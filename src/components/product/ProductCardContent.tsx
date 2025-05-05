@@ -4,8 +4,6 @@ import { CardContent, CardTitle } from "../ui/card";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { memo, useEffect, useState } from "react";
 import { convertCurrency } from "@/utils/currencyConverter";
-import { Button } from "../ui/button";
-import { ShoppingCart } from "lucide-react";
 
 interface ProductCardContentProps {
   product: Product;
@@ -15,8 +13,7 @@ interface ProductCardContentProps {
 
 export const ProductCardContent = memo(({ 
   product,
-  selectedCurrency,
-  onAddToCart
+  selectedCurrency
 }: ProductCardContentProps) => {
   const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +57,7 @@ export const ProductCardContent = memo(({
         </p>
       </div>
       <div className="flex justify-between items-center pt-0 px-1 pb-1">
-        <div className="flex flex-col space-y-1.5">
+        <div className="flex items-center space-x-2">
           {showBothPrices && (
             <span className="text-xs px-1 py-0.5 rounded-full bg-green-100 text-green-800 font-medium whitespace-nowrap inline-block">
               {product.currency} {Math.round(product.price || 0).toLocaleString()}
@@ -72,16 +69,6 @@ export const ProductCardContent = memo(({
             {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
           </span>
         </div>
-        
-        <Button 
-          size="sm" 
-          className="h-7 px-1 py-0 text-xs bg-violet-600 hover:bg-violet-700 text-white"
-          onClick={onAddToCart}
-          disabled={!product.in_stock}
-        >
-          <ShoppingCart className="h-3 w-3 mr-1" />
-          Add
-        </Button>
       </div>
     </CardContent>
   );
