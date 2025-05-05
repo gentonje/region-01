@@ -8,6 +8,8 @@ import { Badge } from "./ui/badge";
 import { ImageLoader } from "./ImageLoader";
 import { MapPin } from "lucide-react";
 import { Product } from "@/types/product";
+import { useEffect, useState } from "react";
+import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
 
 interface ProductModifyCardProps {
   product: Product;
@@ -18,11 +20,38 @@ interface ProductModifyCardProps {
 export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyCardProps) => {
   const ownerName = product.profiles?.username || product.profiles?.full_name || 'Unknown User';
   const status = product.product_status || 'draft';
+  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
+  const productCurrency = (product.currency || "SSP") as SupportedCurrency;
+  const [defaultCurrency, setDefaultCurrency] = useState<SupportedCurrency>("USD");
+  
+  // Convert price to display currency (USD by default if different from product currency)
+  useEffect(() => {
+    const updatePrice = async () => {
+      // Only convert if currencies are different
+      if (productCurrency !== defaultCurrency) {
+        try {
+          const converted = await convertCurrency(
+            product.price || 0,
+            productCurrency,
+            defaultCurrency
+          );
+          setConvertedPrice(converted);
+        } catch (error) {
+          console.error('Error converting price:', error);
+        }
+      }
+    };
+    
+    updatePrice();
+  }, [product.price, productCurrency, defaultCurrency]);
   
   // Get the public URL for the first product image or use placeholder
   const imageUrl = product.product_images?.[0]
     ? supabase.storage.from('images').getPublicUrl(product.product_images[0].storage_path).data.publicUrl
     : '/placeholder.svg';
+
+  // Determine if we should show both prices
+  const showBothPrices = productCurrency !== defaultCurrency;
 
   return (
     <div className="flex flex-col md:flex-row gap-1 space-x-1 space-y-1 p-1">
@@ -42,9 +71,18 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           {product.description}
         </p>
         <div className="flex flex-wrap items-center gap-1 space-x-1">
+          {/* Show original price with currency */}
           <span className="text-base md:text-lg font-bold bg-primary/10 text-primary px-1 py-1 rounded-full">
-            ${product.price}
+            {productCurrency} {Math.round(product.price || 0).toLocaleString()}
           </span>
+          
+          {/* Show converted price if currencies are different */}
+          {showBothPrices && (
+            <span className="text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block">
+              {defaultCurrency} {Math.round(convertedPrice).toLocaleString()}
+            </span>
+          )}
+          
           <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full text-xs">
             {status === 'published' ? 'Published' : 'Draft'}
           </Badge>
