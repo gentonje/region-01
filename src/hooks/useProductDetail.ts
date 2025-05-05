@@ -1,129 +1,76 @@
 
-import { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import { Product } from "@/types/product";
 import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useCartMutations } from "./useCartMutations";
 
-export const useProductDetail = (product: Product, selectedCurrency: SupportedCurrency = "USD") => {
-  const [selectedImage, setSelectedImage] = useState<string>("");
-  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
+export const useProductDetail = (
+  product: Product,
+  selectedCurrency: SupportedCurrency = "USD"
+) => {
+  const [selectedImage, setSelectedImage] = useState<string | null>(
+    product.product_images?.[0]?.storage_path || null
+  );
   const [activeTab, setActiveTab] = useState("details");
   
+  const { addItemMutation } = useCartMutations();
   const queryClient = useQueryClient();
 
-  // Set the selected image whenever the product changes
-  useEffect(() => {
-    // Reset the selected image when product changes
-    const mainImagePath = product.product_images?.find(img => img.is_main)?.storage_path || 
-      product.product_images?.[0]?.storage_path || '';
-    setSelectedImage(mainImagePath);
-  }, [product.id, product.product_images]);
+  // Convert price to selected currency
+  const convertedPrice = convertCurrency(
+    product.price || 0,
+    product.currency || "SSP",
+    selectedCurrency
+  );
 
-  useEffect(() => {
-    const updatePrice = async () => {
-      try {
-        const converted = await convertCurrency(
-          product.price || 0,
-          (product.currency || "SSP") as SupportedCurrency,
-          selectedCurrency
-        );
-        setConvertedPrice(converted);
-      } catch (error) {
-        console.error("Error converting price:", error);
-        setConvertedPrice(product.price || 0);
-      }
-    };
-    updatePrice();
-  }, [product.price, product.currency, selectedCurrency]);
-
-  const { data: similarProducts } = useQuery({
-    queryKey: ['similar-products', product.id, product.category],
+  // Fetch similar products by category
+  const { data: similarProducts = [] } = useQuery({
+    queryKey: ["similarProducts", product.category, product.id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*, product_images(*)')
-        .eq('category', product.category)
-        .neq('id', product.id)
-        .limit(4);
+      const { data } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category", product.category)
+        .neq("id", product.id)
+        .eq("product_status", "published")
+        .limit(6);
+      return data || [];
+    },
+  });
+
+  // Increment view count mutation
+  const incrementViewCountMutation = useMutation({
+    mutationFn: async (productId: string) => {
+      const { data, error } = await supabase.rpc('increment_product_view', {
+        product_id: productId
+      });
       
       if (error) throw error;
-      return data as Product[];
-    },
-    enabled: !!product.category,
-  });
-
-  const addToCartMutation = useMutation({
-    mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('You must be logged in to add items to cart');
-
-      const { error } = await supabase
-        .from('cart_items')
-        .insert({
-          user_id: user.id,
-          product_id: product.id,
-          quantity: 1,
-        });
-
-      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cartItems'] });
-      toast.success('Added to cart successfully');
-    },
-    onError: (error) => {
-      console.error('Error adding to cart:', error);
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error('Failed to add to cart');
-      }
+      // Invalidate product queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product', product.id] });
     },
   });
 
-  const handleAddToCart = () => {
-    if (!product.in_stock) {
-      toast.error('This product is out of stock');
-      return;
-    }
-    addToCartMutation.mutate();
-  };
-
-  // Track product view with improved error handling for conflicts
-  useEffect(() => {
-    const trackProductView = async () => {
-      try {
-        if (!product.id) return;
-        
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        // Use upsert instead of insert to handle conflicts gracefully
-        const { error } = await supabase
-          .from('product_views')
-          .upsert({
-            product_id: product.id,
-            viewer_id: user?.id || null,
-            viewed_at: new Date().toISOString(),
-          }, {
-            onConflict: 'product_id,viewer_id,view_date', // Specify conflict fields
-            ignoreDuplicates: true // Ignore duplicates instead of error
-          });
-
-        if (error && error.code !== '23505' && error.code !== '409') {
-          console.error('Error tracking product view:', error);
-        }
-      } catch (error) {
-        // Silent fail for view tracking as it's not critical
-        console.warn('Error tracking product view:', error);
-      }
-    };
-
+  // Increment view count when product detail is opened
+  useState(() => {
     if (product.id) {
-      trackProductView();
+      incrementViewCountMutation.mutate(product.id);
     }
-  }, [product.id]);
+  });
+
+  // Add to cart handler
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product.in_stock) {
+      addItemMutation.mutate({ productId: product.id });
+    }
+  };
 
   return {
     selectedImage,
@@ -132,7 +79,7 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
     activeTab,
     setActiveTab,
     similarProducts,
+    handleAddToCart,
     addToCartMutation,
-    handleAddToCart
   };
 };

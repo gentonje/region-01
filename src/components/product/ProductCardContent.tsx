@@ -1,80 +1,56 @@
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Product } from "@/types/product";
-import { CardContent, CardTitle } from "../ui/card";
-import { SupportedCurrency } from "@/utils/currencyConverter";
-import { memo, useEffect, useState } from "react";
-import { convertCurrency } from "@/utils/currencyConverter";
+import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
+import { ShoppingBag, Eye } from "lucide-react";
 
 interface ProductCardContentProps {
   product: Product;
   selectedCurrency: SupportedCurrency;
-  onAddToCart?: (e: React.MouseEvent) => void;
+  onAddToCart: (e: React.MouseEvent) => void;
 }
 
-export const ProductCardContent = memo(({ 
-  product,
-  selectedCurrency
+export const ProductCardContent = ({ 
+  product, 
+  selectedCurrency,
+  onAddToCart 
 }: ProductCardContentProps) => {
-  const [convertedPrice, setConvertedPrice] = useState<number>(product.price || 0);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Update immediately when currency changes
-  useEffect(() => {
-    const updatePrice = async () => {
-      setIsLoading(true);
-      try {
-        console.log(`Converting price for ${product.title} from ${product.currency} to ${selectedCurrency}`);
-        const converted = await convertCurrency(
-          product.price || 0,
-          (product.currency || "SSP") as SupportedCurrency,
-          selectedCurrency
-        );
-        console.log(`Converted price: ${converted}`);
-        setConvertedPrice(converted);
-      } catch (error) {
-        console.error('Error converting price:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    updatePrice();
-  }, [product.price, product.currency, selectedCurrency]);
-
-  // Check if we need to show both prices
-  const showBothPrices = product.currency !== selectedCurrency && product.currency;
-
+  const { price = 0, currency = "SSP", title = "", view_count = 0 } = product;
+  
+  // Convert price to selected currency
+  const convertedPrice = convertCurrency(price, currency || "SSP", selectedCurrency);
+  const formattedPrice = Math.round(convertedPrice).toLocaleString();
+  
   return (
-    <CardContent className="p-0 space-y-1">
-      <div className="pt-0">
-        <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left px-1">
-          {product.title}
-        </CardTitle>
-      </div>
+    <div className="p-3 space-y-2">
+      <h3 className="font-semibold text-sm line-clamp-2 min-h-[2.5rem] text-left">{title}</h3>
       
-      {/* County information removed from here since it's now next to category */}
-      
-      <div className="h-[20px] overflow-hidden px-1">
-        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
-          {product.description}
-        </p>
-      </div>
-      <div className="flex justify-between items-center pt-0 px-1 pb-1">
-        <div className="flex items-center space-x-2">
-          {showBothPrices && (
-            <span className="text-xs px-1 py-0.5 rounded-full bg-green-100 text-green-800 font-medium whitespace-nowrap inline-block">
-              {product.currency} {Math.round(product.price || 0).toLocaleString()}
-            </span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <p className="font-bold text-base">
+            {selectedCurrency} {formattedPrice}
+          </p>
+          
+          {view_count !== undefined && (
+            <Badge variant="outline" className="flex gap-1 items-center bg-blue-50 text-blue-700 border-blue-200">
+              <Eye className="h-3 w-3" />
+              <span>{view_count}</span>
+            </Badge>
           )}
-          <span className={`text-xs px-1 py-0.5 rounded-full bg-orange-500 text-white font-bold whitespace-nowrap inline-block ${
-            isLoading ? 'opacity-50' : ''
-          }`}>
-            {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
-          </span>
         </div>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          className="px-2 py-1 h-8 border-primary/30 bg-primary/5 hover:bg-primary/10"
+          onClick={onAddToCart}
+          disabled={!product.in_stock}
+        >
+          <ShoppingBag className="h-4 w-4 mr-1" />
+          <span className="hidden sm:inline">Add</span>
+        </Button>
       </div>
-    </CardContent>
+    </div>
   );
-});
-
-ProductCardContent.displayName = 'ProductCardContent';
+};
