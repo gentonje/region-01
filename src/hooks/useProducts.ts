@@ -8,6 +8,7 @@ interface UseProductsProps {
   searchQuery: string;
   selectedCategory: string;
   selectedCounty?: string;
+  selectedCountry?: string;
   sortOrder: string;
   showOnlyPublished?: boolean;
   userOnly?: boolean;
@@ -18,6 +19,7 @@ export const useProducts = ({
   searchQuery, 
   selectedCategory, 
   selectedCounty = "all",
+  selectedCountry = "all",
   sortOrder,
   showOnlyPublished = false,
   userOnly = false,
@@ -27,8 +29,8 @@ export const useProducts = ({
 
   // Memoize the queryKey to prevent unnecessary re-renders
   const queryKey = useMemo(() => 
-    ["products", searchQuery, selectedCategory, selectedCounty, sortOrder, showOnlyPublished, userOnly],
-    [searchQuery, selectedCategory, selectedCounty, sortOrder, showOnlyPublished, userOnly]
+    ["products", searchQuery, selectedCategory, selectedCounty, selectedCountry, sortOrder, showOnlyPublished, userOnly],
+    [searchQuery, selectedCategory, selectedCounty, selectedCountry, sortOrder, showOnlyPublished, userOnly]
   );
 
   const fetchProducts = async ({ pageParam = 0 }) => {
@@ -48,6 +50,10 @@ export const useProducts = ({
 
     if (selectedCategory !== "all") {
       query = query.eq("category", selectedCategory as ProductCategory);
+    }
+
+    if (selectedCountry && selectedCountry !== "all") {
+      query = query.eq("country", selectedCountry);
     }
 
     if (selectedCounty && selectedCounty !== "all") {
