@@ -18,7 +18,7 @@ export const useProductDetail = (
   const { addItemMutation } = useCartMutations();
   const queryClient = useQueryClient();
 
-  // Convert price to selected currency - ensure this returns a number, not a Promise
+  // Convert price to selected currency - uses synchronous version
   const convertedPrice = convertCurrency(
     product.price || 0,
     product.currency || "SSP",
@@ -65,8 +65,7 @@ export const useProductDetail = (
   }, [product.id, incrementViewCountMutation]);
 
   // Add to cart handler
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleAddToCart = () => {
     if (product.in_stock) {
       addItemMutation.mutate({ productId: product.id });
     }

@@ -56,7 +56,8 @@ const getCurrencyRates = async (): Promise<Record<string, number>> => {
   }
 };
 
-export const convertCurrency = async (
+// Async version - returns a Promise<number>
+export const convertCurrencyAsync = async (
   amount: number,
   fromCurrency: SupportedCurrency,
   toCurrency: SupportedCurrency
@@ -93,6 +94,39 @@ export const convertCurrency = async (
     return result;
   } catch (error) {
     console.error('Error converting currency:', error);
+    return Math.round(amount);
+  }
+};
+
+// Synchronous version - returns a number directly using cached rates
+export const convertCurrency = (
+  amount: number,
+  fromCurrency: SupportedCurrency,
+  toCurrency: SupportedCurrency
+): number => {
+  try {
+    // If currencies are the same, no conversion needed
+    if (fromCurrency === toCurrency) {
+      return Math.round(amount);
+    }
+    
+    // Use cached rates
+    if (!ratesCache) {
+      // If no cached rates, return the original amount and trigger a refresh in the background
+      getCurrencyRates().catch(console.error);
+      return Math.round(amount);
+    }
+    
+    const rates = ratesCache;
+    
+    if (!rates[fromCurrency] || !rates[toCurrency]) {
+      console.error('Invalid currency code in sync conversion', { fromCurrency, toCurrency });
+      return Math.round(amount);
+    }
+
+    return Math.round(amount * rates[toCurrency] / rates[fromCurrency]);
+  } catch (error) {
+    console.error('Error in sync currency conversion:', error);
     return Math.round(amount);
   }
 };

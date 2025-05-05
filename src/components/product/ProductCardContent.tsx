@@ -18,7 +18,7 @@ export const ProductCardContent = ({
 }: ProductCardContentProps) => {
   const { price = 0, currency = "SSP", title = "", view_count = 0 } = product;
   
-  // Convert price to selected currency - ensure this is a number, not a Promise
+  // Use synchronous conversion that returns a number directly
   const convertedPrice = convertCurrency(price, currency || "SSP", selectedCurrency);
   const formattedPrice = Math.round(convertedPrice).toLocaleString();
   
