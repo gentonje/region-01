@@ -14,6 +14,13 @@ import { ProductCategory } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductFormFieldProps {
   form: UseFormReturn<ProductFormData>;
@@ -62,6 +69,20 @@ export const ProductFormField = ({
     },
   });
 
+  // Define all available product categories as a fallback
+  const productCategories: ProductCategory[] = [
+    "Electronics",
+    "Clothing",
+    "Home & Garden",
+    "Books",
+    "Sports & Outdoors",
+    "Toys & Games",
+    "Health & Beauty",
+    "Automotive",
+    "Food & Beverages",
+    "Other"
+  ];
+
   return (
     <FormField
       control={form.control}
@@ -84,24 +105,35 @@ export const ProductFormField = ({
               isCategoriesLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
-                <select
-                  {...field}
-                  className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-background dark:bg-gray-800 px-3 py-2 text-sm text-foreground dark:text-gray-200 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  onChange={(e) => {
-                    field.onChange(e);
+                <Select
+                  value={field.value}
+                  onValueChange={(value) => {
+                    field.onChange(value);
                     setFormData({
                       ...formData,
-                      [name]: e.target.value as ProductCategory,
+                      [name]: value as ProductCategory,
                     });
                   }}
                 >
-                  <option value="">Select a category</option>
-                  {categories?.map((category) => (
-                    <option key={category.name} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
+                    {/* Use productCategories as fallback if API categories are empty */}
+                    {categories && categories.length > 0 
+                      ? categories.map((category) => (
+                          <SelectItem key={category.name} value={category.name}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      : productCategories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))
+                    }
+                  </SelectContent>
+                </Select>
               )
             ) : name === "county" ? (
               isCountiesLoading ? (

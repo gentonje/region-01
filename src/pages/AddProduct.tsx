@@ -133,7 +133,7 @@ const AddProduct = () => {
 
             <ProductForm
               formData={formData}
-              setFormData={(data: ProductFormData) => setFormData(data)}
+              setFormData={setFormData}
               isLoading={isLoading}
               submitButtonText="Add Product"
               onSubmit={handleSubmit}
