@@ -18,10 +18,10 @@ import {
 
 interface ModifyProductsListProps {
   products: Product[];
-  isLoading?: boolean;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
-  onDelete?: (productId: string) => Promise<void>;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
+  onDelete: (productId: string) => Promise<void>;
 }
 
 const ProductSkeleton = () => (
@@ -41,10 +41,10 @@ const ProductSkeleton = () => (
 
 export const ModifyProductsList = ({
   products,
-  isLoading = false,
-  hasMore = false,
-  onLoadMore = () => {},
-  onDelete = async () => {},
+  isLoading,
+  hasMore,
+  onLoadMore,
+  onDelete,
 }: ModifyProductsListProps) => {
   const { ref: loadMoreRef, inView } = useInView({
     threshold: 0,
@@ -79,7 +79,7 @@ export const ModifyProductsList = ({
         .order("name");
       
       if (error) throw error;
-      return data?.map(category => category.name) || [];
+      return data.map(category => category.name);
     }
   });
 
