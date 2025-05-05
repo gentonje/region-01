@@ -13,7 +13,7 @@ export const ProductModifyActions = ({ productId, onDelete }: ProductModifyActio
   const navigate = useNavigate();
 
   return (
-    <div className="flex space-x-6">
+    <div className="space-x-4">
       <Button
         variant="outline"
         size="icon"

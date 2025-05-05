@@ -33,7 +33,6 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     category: product?.category || "Other" as ProductCategory,
     available_quantity: String(product?.available_quantity || "0"),
     county: product?.county || "",
-    country: product?.country || "",
   });
 
   // Log the initial form data to debug county value

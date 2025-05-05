@@ -7,8 +7,8 @@ interface ProductImageSectionProps {
   additionalImages: (File | null)[];
   setAdditionalImages: (callback: (prev: (File | null)[]) => (File | null)[]) => void;
   mainImageUrl?: string;
-  additionalImageUrls?: { url: string; id: string; }[];
-  onDeleteExisting?: (id: string) => void;
+  additionalImageUrls: { url: string; id: string; }[];
+  onDeleteExisting: (id: string) => void;
   isLoading: boolean;
 }
 
@@ -18,8 +18,8 @@ export const ProductImageSection = ({
   additionalImages,
   setAdditionalImages,
   mainImageUrl,
-  additionalImageUrls = [],
-  onDeleteExisting = () => {},
+  additionalImageUrls,
+  onDeleteExisting,
   isLoading,
 }: ProductImageSectionProps) => {
   return (

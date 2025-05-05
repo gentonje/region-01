@@ -6,7 +6,6 @@ import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { CountiesFilter } from "@/components/CountiesFilter";
-import { CountryFilter } from "@/components/CountryFilter";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
@@ -18,7 +17,6 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCounty, setSelectedCounty] = useState("all");
-  const [selectedCountry, setSelectedCountry] = useState("all");
   const pageSize = 12;
 
   // Fetch products with infinite scrolling
@@ -29,7 +27,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCounty, selectedCountry],
+    queryKey: ["products", searchQuery, selectedCounty],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -49,10 +47,6 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
 
       if (searchQuery) {
         query = query.ilike("title", `%${searchQuery}%`);
-      }
-
-      if (selectedCountry !== "all") {
-        query = query.eq("country", selectedCountry);
       }
 
       if (selectedCounty !== "all") {
@@ -87,11 +81,6 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     setSelectedCounty(county);
   };
 
-  const handleCountryChange = (country: string) => {
-    setSelectedCountry(country);
-    setSelectedCounty("all"); // Reset county when country changes
-  };
-
   const getProductImageUrl = (product: Product) => {
     if (
       !product.product_images ||
@@ -124,17 +113,10 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     <div className="pb-16 mx-1 sm:mx-auto">
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <CountryFilter 
-              selectedCountry={selectedCountry} 
-              onCountryChange={handleCountryChange} 
-            />
-            <CountiesFilter 
-              selectedCounty={selectedCounty} 
-              onCountyChange={handleCountyChange}
-              selectedCountry={selectedCountry}
-            />
-          </div>
+          <CountiesFilter 
+            selectedCounty={selectedCounty} 
+            onCountyChange={handleCountyChange} 
+          />
           
           <ProductFilters onSearchChange={handleSearchChange} />
         </div>

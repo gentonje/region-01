@@ -11,11 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface County {
   name: string;
-  country: string;
-}
-
-interface Country {
-  name: string;
 }
 
 interface ProductFormFieldProps {
@@ -38,9 +33,7 @@ export const ProductFormField = ({
   setFormData,
 }: ProductFormFieldProps) => {
   const [counties, setCounties] = useState<County[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
   const [isLoadingCounties, setIsLoadingCounties] = useState<boolean>(false);
-  const [isLoadingCountries, setIsLoadingCountries] = useState<boolean>(false);
 
   // List of available product categories
   const productCategories: ProductCategory[] = [
@@ -56,47 +49,15 @@ export const ProductFormField = ({
     "Other"
   ];
 
-  // Fetch countries from Supabase
-  useEffect(() => {
-    const fetchCountries = async () => {
-      setIsLoadingCountries(true);
-      try {
-        const { data, error } = await supabase
-          .from('countries')
-          .select('name')
-          .order('name');
-
-        if (error) {
-          console.error('Error fetching countries:', error);
-        } else {
-          setCountries(data || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch countries:', error);
-      } finally {
-        setIsLoadingCountries(false);
-      }
-    };
-
-    fetchCountries();
-  }, []);
-
   // Fetch counties from Supabase
   useEffect(() => {
     const fetchCounties = async () => {
       setIsLoadingCounties(true);
       try {
-        let query = supabase
+        const { data, error } = await supabase
           .from('counties')
-          .select('name, country')
+          .select('name')
           .order('name');
-        
-        // Filter counties by selected country if available
-        if (formData.country && formData.country !== "all") {
-          query = query.eq('country', formData.country);
-        }
-
-        const { data, error } = await query;
 
         if (error) {
           console.error('Error fetching counties:', error);
@@ -111,7 +72,7 @@ export const ProductFormField = ({
     };
 
     fetchCounties();
-  }, [formData.country]);
+  }, []);
 
   // Debug log for the county field
   useEffect(() => {
@@ -122,20 +83,10 @@ export const ProductFormField = ({
 
   const handleValueChange = (value: string) => {
     console.log(`Setting ${name} to:`, value);
-    
-    // If country changes, reset county
-    if (name === 'country') {
-      setFormData({
-        ...formData,
-        [name]: value,
-        county: 'all'
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
   const renderField = () => {
@@ -165,40 +116,15 @@ export const ProductFormField = ({
           </SelectContent>
         </Select>
       );
-    } else if (name === "country") {
-      return (
-        <Select
-          value={formData[name] || ""}
-          onValueChange={handleValueChange}
-          disabled={isLoadingCountries}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={isLoadingCountries ? "Loading countries..." : "Select a country"} />
-          </SelectTrigger>
-          <SelectContent>
-            {countries.map((country) => (
-              <SelectItem key={country.name} value={country.name}>
-                {country.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
     } else if (name === "county") {
       return (
         <Select
           value={formData[name] || ""}
           onValueChange={handleValueChange}
-          disabled={isLoadingCounties || !formData.country}
+          disabled={isLoadingCounties}
         >
           <SelectTrigger>
-            <SelectValue placeholder={
-              !formData.country 
-                ? "Select a country first"
-                : isLoadingCounties 
-                  ? "Loading counties..." 
-                  : "Select a county"
-            } />
+            <SelectValue placeholder={isLoadingCounties ? "Loading counties..." : "Select a county"} />
           </SelectTrigger>
           <SelectContent>
             {counties.map((county) => (

@@ -12,13 +12,11 @@ import {
 interface CountiesFilterProps {
   selectedCounty: string;
   onCountyChange: (county: string) => void;
-  selectedCountry?: string;
 }
 
 export const CountiesFilter = ({
   selectedCounty,
   onCountyChange,
-  selectedCountry = "all"
 }: CountiesFilterProps) => {
   const [counties, setCounties] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,16 +25,10 @@ export const CountiesFilter = ({
     const fetchCounties = async () => {
       try {
         setLoading(true);
-        let query = supabase
+        const { data, error } = await supabase
           .from("counties")
-          .select("name, country")
+          .select("name")
           .order("name");
-        
-        if (selectedCountry && selectedCountry !== "all") {
-          query = query.eq("country", selectedCountry);
-        }
-
-        const { data, error } = await query;
 
         if (error) {
           console.error("Error fetching counties:", error);
@@ -46,11 +38,6 @@ export const CountiesFilter = ({
         // Extract unique counties
         const uniqueCounties = data.map(item => item.name);
         setCounties(uniqueCounties);
-        
-        // Reset selected county if it's not in the filtered list anymore
-        if (selectedCounty !== "all" && !uniqueCounties.includes(selectedCounty)) {
-          onCountyChange("all");
-        }
       } catch (error) {
         console.error("Failed to fetch counties:", error);
       } finally {
@@ -59,7 +46,7 @@ export const CountiesFilter = ({
     };
 
     fetchCounties();
-  }, [selectedCountry, selectedCounty, onCountyChange]);
+  }, []);
 
   return (
     <div className="w-full max-w-xs">

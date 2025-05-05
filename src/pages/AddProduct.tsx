@@ -1,71 +1,145 @@
-
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { ProductForm } from "@/components/ProductForm";
-import { ProductImageSection } from "@/components/ProductImageSection";
-import { addProduct } from "@/services/productService";
-import { useState } from "react";
 import { toast } from "sonner";
-import { ProductFormData } from "@/components/forms/product/validation";
+import { useProductImages } from "@/hooks/useProductImages";
+import { useState } from "react";
+import { ProductImageSection } from "@/components/ProductImageSection";
+import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { ProductFormData } from "@/components/forms/product/validation";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [mainImage, setMainImage] = useState<File | null>(null);
-  const [additionalImages, setAdditionalImages] = useState<Array<File | null>>([]);
-
+  const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
     description: "",
     price: "",
     category: "Other" as ProductCategory,
-    available_quantity: "1",
+    available_quantity: "0",
     county: "",
-    country: "",
   });
 
   const handleSubmit = async (data: ProductFormData) => {
+    if (!mainImage) {
+      toast.error("Please upload a main product image");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("You must be logged in to add a product");
+      return;
+    }
+
+    if (!data.county) {
+      toast.error("Please select a county");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      if (!mainImage) {
-        toast.error("Please upload a main product image");
-        return;
+      console.log("Uploading images...");
+      const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
+      console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
+
+      console.log("Creating product...");
+      const { data: productData, error: productError } = await supabase
+        .from("products")
+        .insert({
+          title: data.title,
+          description: data.description,
+          price: Number(data.price),
+          category: data.category,
+          available_quantity: Number(data.available_quantity),
+          storage_path: mainImagePath,
+          county: data.county,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (productError) throw productError;
+
+      // Insert main image into product_images table
+      const { error: mainImageError } = await supabase
+        .from("product_images")
+        .insert({
+          product_id: productData.id,
+          storage_path: mainImagePath,
+          is_main: true,
+          display_order: 0
+        });
+
+      if (mainImageError) throw mainImageError;
+
+      // Insert additional images into product_images table
+      if (additionalImagePaths.length > 0) {
+        const additionalImagesData = additionalImagePaths.map((path, index) => ({
+          product_id: productData.id,
+          storage_path: path,
+          is_main: false,
+          display_order: index + 1
+        }));
+
+        const { error: additionalImagesError } = await supabase
+          .from("product_images")
+          .insert(additionalImagesData);
+
+        if (additionalImagesError) throw additionalImagesError;
       }
 
-      setIsLoading(true);
-      const result = await addProduct(data, mainImage, additionalImages.filter(Boolean) as File[]);
+      console.log("Product created successfully");
+      toast.success("Product added successfully!");
       
-      if (result.success) {
-        toast.success("Product added successfully!");
+      // Add a short delay to allow for the toast to be displayed before navigation
+      setTimeout(() => {
         navigate("/my-products");
-      } else {
-        toast.error(result.error || "Failed to add product");
-      }
+      }, 500);
     } catch (error: any) {
       console.error("Error adding product:", error);
-      toast.error(error.message || "An unknown error occurred");
+      toast.error(error.message || "Failed to add product");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background dark:bg-gray-900">
       <Navigation />
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
-        
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-          <ProductImageSection 
-            mainImage={mainImage}
-            setMainImage={setMainImage}
-            additionalImages={additionalImages}
-            setAdditionalImages={setAdditionalImages}
-            additionalImageUrls={[]}
-            isLoading={isLoading}
-          />
-          
-          <div className="mt-8">
+      
+      <div className="max-w-2xl mx-1 px-1 py-1 sm:px-1 lg:px-1 pb-16 mt-1">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1 overflow-y-auto">
+          <div className="flex flex-col gap-1 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-1 border-b border-gray-200 dark:border-gray-700">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:font-bold">Add New Product</h1>
+            <div className="flex justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/")}
+                className="bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 transition-colors"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <ProductImageSection
+              mainImage={mainImage}
+              setMainImage={setMainImage}
+              additionalImages={additionalImages}
+              setAdditionalImages={setAdditionalImages}
+              additionalImageUrls={[]}
+              onDeleteExisting={() => {}}
+              isLoading={isLoading}
+            />
+
             <ProductForm
               formData={formData}
               setFormData={setFormData}

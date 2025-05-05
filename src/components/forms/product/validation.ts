@@ -7,8 +7,7 @@ export interface ProductFormData {
   price: string;
   category: ProductCategory;
   available_quantity: string;
-  county: string;
-  country: string; // Added country field
+  county: string; // Making sure county is required
 }
 
 export const productValidationRules = {
@@ -42,8 +41,5 @@ export const productValidationRules = {
   },
   county: {
     required: "County is required"
-  },
-  country: {
-    required: "Country is required"
   }
 };

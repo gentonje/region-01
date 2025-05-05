@@ -3,7 +3,6 @@ import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import { CountiesFilter } from "@/components/CountiesFilter";
-import { CountryFilter } from "@/components/CountryFilter";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface ProductListingSectionProps {
@@ -14,8 +13,6 @@ interface ProductListingSectionProps {
   setSelectedCategory: (category: string) => void;
   selectedCounty: string;
   setSelectedCounty: (county: string) => void;
-  selectedCountry: string;
-  setSelectedCountry: (country: string) => void;
   onProductClick: (product: Product) => void;
   isFetchingNextPage: boolean;
   observerRef: (node?: Element | null) => void;
@@ -38,8 +35,6 @@ export const ProductListingSection = ({
   setSelectedCategory,
   selectedCounty,
   setSelectedCounty,
-  selectedCountry,
-  setSelectedCountry,
   onProductClick,
   isFetchingNextPage,
   observerRef,
@@ -61,24 +56,13 @@ export const ProductListingSection = ({
     setSelectedCounty(county);
   };
 
-  const handleCountryChange = (country: string) => {
-    setSelectedCountry(country);
-  };
-
   return (
     <div className="w-full space-y-1 p-1">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <CountryFilter 
-            selectedCountry={selectedCountry}
-            onCountryChange={handleCountryChange}
-          />
-          <CountiesFilter
-            selectedCounty={selectedCounty}
-            onCountyChange={handleCountyChange}
-            selectedCountry={selectedCountry}
-          />
-        </div>
+        <CountiesFilter
+          selectedCounty={selectedCounty}
+          onCountyChange={handleCountyChange}
+        />
         <ProductFilters onSearchChange={handleSearchChange} />
       </div>
       
