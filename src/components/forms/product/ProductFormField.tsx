@@ -90,7 +90,7 @@ export const ProductFormField = ({
     if (typeof county === 'object' && county !== null && 'name' in county) {
       return (county as {name: string}).name;
     }
-    return county.toString();
+    return String(county);
   };
 
   return (

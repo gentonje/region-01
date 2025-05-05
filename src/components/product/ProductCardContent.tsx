@@ -45,11 +45,16 @@ export const ProductCardContent = memo(({
   const showBothPrices = product.currency !== selectedCurrency && product.currency;
 
   // Process county data with proper null checking
-  const countyDisplay = product.county
-    ? (typeof product.county === 'object' && product.county !== null
-      ? (product.county as { name: string }).name || 'Unknown County'
-      : product.county)
-    : '';
+  const countyDisplay = (() => {
+    if (!product.county) return '';
+    
+    if (typeof product.county === 'object' && product.county !== null) {
+      // Handle county as object with name property
+      return 'name' in product.county ? product.county.name : '';
+    }
+    
+    return String(product.county);
+  })();
 
   return (
     <CardContent className="p-0 space-y-1">

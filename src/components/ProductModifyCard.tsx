@@ -28,10 +28,11 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     if (!product.county) return '';
     
     if (typeof product.county === 'object' && product.county !== null) {
-      return (product.county as { name: string }).name || 'Unknown County';
+      // Handle county as object with name property
+      return 'name' in product.county ? String(product.county.name) : '';
     }
     
-    return product.county;
+    return String(product.county);
   })();
 
   return (
