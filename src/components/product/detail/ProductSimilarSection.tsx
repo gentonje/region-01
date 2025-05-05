@@ -9,15 +9,13 @@ interface ProductSimilarSectionProps {
   getProductImageUrl: (product: Product) => string;
   onProductClick: (product: Product) => void;
   selectedCurrency: SupportedCurrency;
-  isLoading?: boolean;
 }
 
 export const ProductSimilarSection = ({ 
   similarProducts, 
   getProductImageUrl, 
   onProductClick, 
-  selectedCurrency,
-  isLoading = false
+  selectedCurrency 
 }: ProductSimilarSectionProps) => {
   if (!similarProducts || similarProducts.length === 0) {
     return null;
@@ -35,7 +33,6 @@ export const ProductSimilarSection = ({
           getProductImageUrl={getProductImageUrl}
           onProductClick={onProductClick}
           selectedCurrency={selectedCurrency}
-          isLoading={isLoading}
         />
       </div>
     </div>
