@@ -66,6 +66,8 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
         .from('products')
         .select('*, product_images(*)')
         .eq('category', product.category)
+        .eq('product_status', 'published')  // Only get published products
+        .eq('in_stock', true)  // Only get in-stock products
         .neq('id', product.id)
         .limit(4);
       
