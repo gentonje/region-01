@@ -9,7 +9,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { ProductFormData } from "./validation";
+import { ProductFormData } from "@/types/product";
 import { ProductCategory } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -121,7 +121,7 @@ export const ProductFormField = ({
                   <option value="">Select a county</option>
                   {counties?.map((county) => (
                     <option key={county.name} value={county.name}>
-                      {county.name} ({county.state})
+                      {county.name} {county.state ? `(${county.state})` : ''}
                     </option>
                   ))}
                 </select>

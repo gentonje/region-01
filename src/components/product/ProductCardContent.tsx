@@ -44,6 +44,11 @@ export const ProductCardContent = memo(({
   // Check if we need to show both prices
   const showBothPrices = product.currency !== selectedCurrency && product.currency;
 
+  // Process county data - handle both string and object formats
+  const countyDisplay = typeof product.county === 'object' && product.county !== null
+    ? (product.county as any).name || 'Unknown County'
+    : product.county || '';
+
   return (
     <CardContent className="p-0 space-y-1">
       <div className="pt-0">
@@ -70,9 +75,9 @@ export const ProductCardContent = memo(({
           </span>
         </div>
         
-        {product.county && (
+        {countyDisplay && (
           <span className="text-xs px-1 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium whitespace-nowrap">
-            {product.county}
+            {countyDisplay}
           </span>
         )}
       </div>

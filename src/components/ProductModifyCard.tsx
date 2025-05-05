@@ -51,6 +51,13 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
               {product.category}
             </Badge>
           )}
+          {product.county && (
+            <Badge variant="outline" className="rounded-full text-xs bg-blue-100 text-blue-800">
+              {typeof product.county === 'object' ? 
+                (product.county as any).name || 'Unknown County' : 
+                product.county}
+            </Badge>
+          )}
         </div>
       </div>
       <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-start gap-1 mt-1 md:mt-0 space-x-1 space-y-1">
