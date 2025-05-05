@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -23,6 +24,7 @@ const AddProduct = () => {
     price: "",
     category: "Other" as ProductCategory,
     available_quantity: "0",
+    county: "",
   });
 
   const handleSubmit = async (data: any) => {
@@ -52,7 +54,8 @@ const AddProduct = () => {
           category: data.category,
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
-          user_id: user.id
+          user_id: user.id,
+          county: data.county
         })
         .select()
         .single();

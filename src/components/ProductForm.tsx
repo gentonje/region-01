@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Form } from "@/components/ui/form";
@@ -68,6 +69,14 @@ export const ProductForm = ({
           form={form}
           name="category"
           label="Category"
+          formData={formData}
+          setFormData={setFormData}
+        />
+
+        <ProductFormField
+          form={form}
+          name="county"
+          label="Location (County)"
           formData={formData}
           setFormData={setFormData}
         />

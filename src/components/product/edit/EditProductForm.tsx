@@ -1,3 +1,4 @@
+
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
@@ -27,6 +28,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     price: String(product?.price || ""),
     category: product?.category || "Other" as ProductCategory,
     available_quantity: String(product?.available_quantity || "0"),
+    county: product?.county || "",
   });
 
   const handleSubmit = async (data: any) => {
