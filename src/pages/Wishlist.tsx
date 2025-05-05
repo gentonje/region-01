@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -95,9 +94,8 @@ const Wishlist = () => {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="text-center py-16 px-4">
-        <h1 className="text-2xl font-bold mb-4">Your Wishlist</h1>
-        <p className="text-muted-foreground mb-6">
+      <div className="text-center py-8 px-2">
+        <p className="text-muted-foreground mb-4">
           You haven't added any products to your wishlist yet.
         </p>
         <button
@@ -111,19 +109,17 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="mx-0 sm:mx-1 py-4">
-      <h1 className="text-2xl font-bold mb-4 px-1">Your Wishlist</h1>
-      <div className="grid grid-cols-1 gap-2">
+    <div className="mx-1 my-1">
+      <div className="grid grid-cols-1 gap-1 space-y-1">
         {wishlistItems.map((product) => (
           <WishlistItem
             key={product.id}
             product={product}
             item={{
-              id: "", // This will be regenerated when removing from wishlist
+              id: "",
               product_id: product.id
             }}
             onItemRemoved={() => {
-              // Refresh the wishlist data after item removal
               setWishlistItems(prev => prev.filter(p => p.id !== product.id));
             }}
           />

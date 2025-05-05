@@ -153,25 +153,25 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
       exit={{ opacity: 0, height: 0 }}
       className="w-full px-0"
     >
-      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow w-full mx-0">
+      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full mx-0 my-0">
         <CardContent className="p-0">
-          <div className="flex flex-col md:flex-row">
-            <div className="w-full md:w-56 h-52 relative">
+          <div className="flex flex-row">
+            <div className="w-24 h-24 relative">
               <ImageLoader
                 src={getImageUrl()}
                 alt={product.title || ""}
                 className="w-full h-full object-cover"
-                width={224}
-                height={208}
+                width={96}
+                height={96}
               />
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2 }}
-                className="absolute top-2 left-2 z-10"
+                className="absolute top-1 left-1 z-10"
               >
                 <div className="relative">
-                  <Heart className="w-6 h-6 fill-amber-400 text-amber-400 wishlist-heart-active" />
+                  <Heart className="w-4 h-4 fill-amber-400 text-amber-400 wishlist-heart-active" />
                   {/* Render particles */}
                   {particles.map((id) => (
                     <div 
@@ -182,14 +182,14 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 </div>
               </motion.div>
             </div>
-            <div className="flex-1 p-4 flex flex-col justify-between space-y-2">
+            <div className="flex-1 p-1 flex flex-col justify-between space-y-0">
               <div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-gray-100">{product.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
+                <h3 className="text-sm font-semibold mb-0 text-gray-800 dark:text-gray-100 line-clamp-1">{product.title}</h3>
+                <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1 mb-1">
                   {product.description}
                 </p>
                 <motion.p 
-                  className="text-lg font-medium text-orange-500"
+                  className="text-sm font-medium text-orange-500"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -197,17 +197,17 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                   {product.currency} {Math.round(product.price || 0).toLocaleString()}
                 </motion.p>
               </div>
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-1 mt-0">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => addToCart.mutate()}
                     disabled={!product.in_stock || addToCart.isPending}
-                    className="bg-violet-600 hover:bg-violet-700 text-white"
+                    className="bg-violet-600 hover:bg-violet-700 text-white h-7 text-xs px-2"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-1 icon-glow" />
-                    Add to Cart
+                    <ShoppingCart className="w-3 h-3 mr-1 icon-glow" />
+                    Add
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -216,9 +216,9 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                     size="sm"
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 h-7 text-xs px-2"
                   >
-                    <Share2 className="w-4 h-4 mr-1 icon-glow" />
+                    <Share2 className="w-3 h-3 mr-1 icon-glow" />
                     Share
                   </Button>
                 </motion.div>
@@ -228,8 +228,9 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                     size="sm"
                     onClick={() => removeFromWishlist.mutate()}
                     disabled={removeFromWishlist.isPending}
+                    className="h-7 text-xs px-2"
                   >
-                    <Trash2 className="w-4 h-4 mr-1 icon-glow" />
+                    <Trash2 className="w-3 h-3 mr-1 icon-glow" />
                     Remove
                   </Button>
                 </motion.div>
