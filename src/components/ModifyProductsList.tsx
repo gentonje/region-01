@@ -1,6 +1,5 @@
 
 import { ProductModifyCard } from "@/components/ProductModifyCard";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useInView } from "react-intersection-observer";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
@@ -23,21 +22,6 @@ interface ModifyProductsListProps {
   onLoadMore: () => void;
   onDelete: (productId: string) => Promise<void>;
 }
-
-const ProductSkeleton = () => (
-  <div className="flex items-center gap-1 p-1">
-    <Skeleton className="h-20 w-20 rounded-md" />
-    <div className="flex-1 space-y-1">
-      <Skeleton className="h-6 w-3/4" />
-      <Skeleton className="h-4 w-1/2" />
-      <Skeleton className="h-4 w-1/3" />
-    </div>
-    <div className="flex gap-1">
-      <Skeleton className="h-8 w-8 rounded-full" />
-      <Skeleton className="h-8 w-8 rounded-full" />
-    </div>
-  </div>
-);
 
 export const ModifyProductsList = ({
   products,
@@ -169,12 +153,8 @@ export const ModifyProductsList = ({
       </div>
 
       {isLoading && (
-        <div className="divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 mx-1">
-          {[1, 2, 3].map((i) => (
-            <div key={`skeleton-${i}`} className="p-1">
-              <ProductSkeleton />
-            </div>
-          ))}
+        <div className="text-center py-4 bg-white dark:bg-gray-800 rounded-lg shadow mt-1 mx-1">
+          <p className="text-gray-500">Loading products...</p>
         </div>
       )}
 

@@ -7,7 +7,6 @@ import { productPageStyles as styles } from "@/styles/productStyles";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
-import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useState } from "react";
 import { updateProduct } from "@/services/productService";
@@ -102,10 +101,9 @@ const EditProduct = () => {
         <Navigation />
         <div className={styles.mainContent}>
           <div className={styles.formContainer}>
-            <Skeleton className="h-8 w-48 mb-6" />
-            <div className="space-y-6">
-              <Skeleton className="h-[400px]" />
-              <Skeleton className="h-[200px]" />
+            <div className="flex justify-center items-center h-40">
+              <div className="w-8 h-8 border-3 border-gray-300 border-t-blue-500 rounded-full animate-spin mr-3"></div>
+              <p className="text-lg text-gray-500">Loading product data...</p>
             </div>
           </div>
         </div>

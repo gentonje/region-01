@@ -4,7 +4,6 @@ import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useInView } from "react-intersection-observer";
-import { Skeleton } from "./ui/skeleton";
 
 interface ProductListProps {
   products: Product[];
@@ -19,21 +18,6 @@ interface ProductListProps {
   isAdmin?: boolean;
   emptyMessage?: string;
 }
-
-const ProductSkeleton = memo(() => (
-  <div className="space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
-    <Skeleton className="h-[200px] w-full rounded-lg" />
-    <Skeleton className="h-6 w-2/3" />
-    <Skeleton className="h-4 w-full" />
-    <Skeleton className="h-4 w-3/4" />
-    <div className="flex justify-between mt-1 space-x-1">
-      <Skeleton className="h-8 w-20 rounded-md" />
-      <Skeleton className="h-8 w-20 rounded-md" />
-    </div>
-  </div>
-));
-
-ProductSkeleton.displayName = 'ProductSkeleton';
 
 export const ProductList = ({
   products,
@@ -62,12 +46,8 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-0 w-full mx-0 px-0">
-        {Array.from({ length: 8 }).map((_, index) => (
-          <div key={index} className="p-1 mx-0">
-            <ProductSkeleton />
-          </div>
-        ))}
+      <div className="flex items-center justify-center w-full h-40">
+        <p className="text-lg text-gray-500">Loading products...</p>
       </div>
     );
   }
@@ -104,11 +84,9 @@ export const ProductList = ({
       ))}
       
       {isFetchingNextPage && (
-        <>
-          <div className="p-1"><ProductSkeleton /></div>
-          <div className="p-1"><ProductSkeleton /></div>
-          <div className="p-1"><ProductSkeleton /></div>
-        </>
+        <div className="col-span-full flex justify-center p-4">
+          <p className="text-gray-500">Loading more products...</p>
+        </div>
       )}
     </div>
   );

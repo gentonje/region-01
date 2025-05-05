@@ -20,6 +20,7 @@ export const ReviewsList = ({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-20">
+        <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin mr-2"></div>
         <p className="text-sm text-muted-foreground">Loading reviews...</p>
       </div>
     );
