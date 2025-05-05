@@ -4,11 +4,10 @@ import { Skeleton } from "../ui/skeleton";
 import { useState, useEffect } from "react";
 import { ImageLoader } from "../ImageLoader";
 import { toast } from "sonner";
-import { ProductImage } from "@/types/product";
 
 interface ProductGalleryProps {
-  images: ProductImage[];
-  selectedImage: string | null;
+  images: { storage_path: string; is_main: boolean }[];
+  selectedImage: string;
   onImageSelect: (path: string) => void;
   title: string;
 }

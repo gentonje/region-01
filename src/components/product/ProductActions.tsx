@@ -2,7 +2,7 @@
 import { Button } from "../ui/button";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useEffect, useState } from "react";
-import { convertCurrencyAsync, refreshCurrencyRates } from "@/utils/currencyConverter";
+import { convertCurrency, refreshCurrencyRates } from "@/utils/currencyConverter";
 import { ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -34,7 +34,7 @@ export const ProductActions = ({
       await refreshCurrencyRates();
       
       // Convert the price again with fresh rates
-      const freshConvertedPrice = await convertCurrencyAsync(
+      const freshConvertedPrice = await convertCurrency(
         price,
         currency as SupportedCurrency,
         selectedCurrency

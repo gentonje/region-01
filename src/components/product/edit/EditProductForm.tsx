@@ -2,10 +2,10 @@
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
-import { Product, ProductCategory, ProductFormData } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { ProductFormData } from "@/components/forms/product/validation";
 
 interface EditProductFormProps {
   product: Product;
@@ -42,7 +42,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
 
   const handleSubmit = async (data: ProductFormData) => {
     try {
-      let mainImagePath = product.storage_path || "";
+      let mainImagePath = product.storage_path;
       let additionalImagePaths: string[] = [];
 
       // Only upload images if they have been changed
@@ -73,8 +73,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
   };
 
   // Find the main image URL from product_images
-  const mainImageUrl = product.product_images?.find(img => img.is_main)?.publicUrl || 
-                      (product.storage_path ? supabase.storage.from('images').getPublicUrl(product.storage_path).data.publicUrl : '');
+  const mainImageUrl = product.product_images?.find(img => img.is_main)?.publicUrl || product.storage_path;
   
   // Get additional images excluding the main one
   const additionalImageUrls = product.product_images
