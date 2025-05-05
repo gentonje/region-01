@@ -24,11 +24,11 @@ export const CountiesFilter = ({
   useEffect(() => {
     const fetchCounties = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase
-          .from("products")
-          .select("county")
-          .not("county", "is", null)
-          .order("county");
+          .from("counties")
+          .select("name")
+          .order("name");
 
         if (error) {
           console.error("Error fetching counties:", error);
@@ -36,9 +36,7 @@ export const CountiesFilter = ({
         }
 
         // Extract unique counties
-        const uniqueCounties = Array.from(
-          new Set(data.map((item) => item.county).filter(Boolean))
-        );
+        const uniqueCounties = data.map(item => item.name);
         setCounties(uniqueCounties);
       } catch (error) {
         console.error("Failed to fetch counties:", error);
@@ -58,7 +56,7 @@ export const CountiesFilter = ({
         disabled={loading}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue placeholder="Select County" />
+          <SelectValue placeholder={loading ? "Loading counties..." : "Select County"} />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Counties</SelectItem>

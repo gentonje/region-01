@@ -4,9 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCategory } from "@/types/product";
-import { counties } from "@/data/counties";
 import { useForm } from "react-hook-form";
 import { ProductFormData } from "./validation";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface County {
+  name: string;
+}
 
 interface ProductFormFieldProps {
   form: ReturnType<typeof useForm<ProductFormData>>;
@@ -27,6 +32,9 @@ export const ProductFormField = ({
   formData,
   setFormData,
 }: ProductFormFieldProps) => {
+  const [counties, setCounties] = useState<County[]>([]);
+  const [isLoadingCounties, setIsLoadingCounties] = useState<boolean>(false);
+
   // List of available product categories
   const productCategories: ProductCategory[] = [
     "Electronics",
@@ -40,6 +48,31 @@ export const ProductFormField = ({
     "Food & Beverages",
     "Other"
   ];
+
+  // Fetch counties from Supabase
+  useEffect(() => {
+    const fetchCounties = async () => {
+      setIsLoadingCounties(true);
+      try {
+        const { data, error } = await supabase
+          .from('counties')
+          .select('name')
+          .order('name');
+
+        if (error) {
+          console.error('Error fetching counties:', error);
+        } else {
+          setCounties(data || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch counties:', error);
+      } finally {
+        setIsLoadingCounties(false);
+      }
+    };
+
+    fetchCounties();
+  }, []);
 
   const handleValueChange = (value: string) => {
     setFormData({
@@ -80,9 +113,10 @@ export const ProductFormField = ({
         <Select
           value={formData[name] || ""}
           onValueChange={handleValueChange}
+          disabled={isLoadingCounties}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Select a county" />
+            <SelectValue placeholder={isLoadingCounties ? "Loading counties..." : "Select a county"} />
           </SelectTrigger>
           <SelectContent>
             {counties.map((county) => (
