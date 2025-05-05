@@ -98,7 +98,11 @@ const AddProduct = () => {
 
       console.log("Product created successfully");
       toast.success("Product added successfully!");
-      navigate("/");
+      
+      // Add a short delay to allow for the toast to be displayed before navigation
+      setTimeout(() => {
+        navigate("/my-products");
+      }, 500);
     } catch (error: any) {
       console.error("Error adding product:", error);
       toast.error(error.message || "Failed to add product");
