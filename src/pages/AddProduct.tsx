@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -7,7 +8,7 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory, ProductFormData } from "@/types/product";
+import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -17,7 +18,7 @@ const AddProduct = () => {
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState({
     title: "",
     description: "",
     price: "",
@@ -26,7 +27,7 @@ const AddProduct = () => {
     county: "",
   });
 
-  const handleSubmit = async (data: ProductFormData) => {
+  const handleSubmit = async (data: any) => {
     if (!mainImage) {
       toast.error("Please upload a main product image");
       return;
@@ -43,14 +44,6 @@ const AddProduct = () => {
       const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
       console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
 
-      // Make sure county is a string, not an object
-      let countyValue = "";
-      if (data.county) {
-        countyValue = typeof data.county === 'object' && 'name' in data.county
-          ? String(data.county.name)
-          : String(data.county);
-      }
-
       console.log("Creating product...");
       const { data: productData, error: productError } = await supabase
         .from("products")
@@ -62,7 +55,7 @@ const AddProduct = () => {
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
           user_id: user.id,
-          county: countyValue
+          county: data.county
         })
         .select()
         .single();

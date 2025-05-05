@@ -9,18 +9,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
-import { ProductFormData } from "@/types/product";
+import { ProductFormData } from "./validation";
 import { ProductCategory } from "@/types/product";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 interface ProductFormFieldProps {
   form: UseFormReturn<ProductFormData>;
@@ -69,33 +62,6 @@ export const ProductFormField = ({
     },
   });
 
-  // Define all available product categories as a fallback
-  const productCategories: ProductCategory[] = [
-    "Electronics",
-    "Clothing",
-    "Home & Garden",
-    "Books",
-    "Sports & Outdoors",
-    "Toys & Games",
-    "Health & Beauty",
-    "Automotive",
-    "Food & Beverages",
-    "Other"
-  ];
-
-  // Handle the county value safely, ensuring we're always working with strings for the Select component
-  const getCountyValue = () => {
-    const county = form.getValues().county;
-    if (!county) return "_none";
-    
-    if (typeof county === 'object' && county !== null) {
-      // Safely access the name property with type assertion
-      return 'name' in county ? String(county.name) : "_none";
-    }
-    
-    return String(county);
-  };
-
   return (
     <FormField
       control={form.control}
@@ -118,62 +84,47 @@ export const ProductFormField = ({
               isCategoriesLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
+                <select
+                  {...field}
+                  className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-background dark:bg-gray-800 px-3 py-2 text-sm text-foreground dark:text-gray-200 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  onChange={(e) => {
+                    field.onChange(e);
                     setFormData({
                       ...formData,
-                      [name]: value as ProductCategory,
+                      [name]: e.target.value as ProductCategory,
                     });
                   }}
                 >
-                  <SelectTrigger className="h-10 w-full bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    {/* Use productCategories as fallback if API categories are empty */}
-                    {categories && categories.length > 0 
-                      ? categories.map((category) => (
-                          <SelectItem key={category.name} value={category.name}>
-                            {category.name}
-                          </SelectItem>
-                        ))
-                      : productCategories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))
-                    }
-                  </SelectContent>
-                </Select>
+                  <option value="">Select a category</option>
+                  {categories?.map((category) => (
+                    <option key={category.name} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               )
             ) : name === "county" ? (
               isCountiesLoading ? (
                 <Skeleton className="h-10 w-full" />
               ) : (
-                <Select
-                  value={getCountyValue()}
-                  onValueChange={(value) => {
-                    field.onChange(value);
+                <select
+                  {...field}
+                  className="flex h-10 w-full rounded-md border border-gray-300 dark:border-gray-600 bg-background dark:bg-gray-800 px-3 py-2 text-sm text-foreground dark:text-gray-200 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  onChange={(e) => {
+                    field.onChange(e);
                     setFormData({
                       ...formData,
-                      [name]: value,
+                      [name]: e.target.value,
                     });
                   }}
                 >
-                  <SelectTrigger className="h-10 w-full bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectValue placeholder="Select a county" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectItem value="_none">Select a county</SelectItem>
-                    {counties?.map((county) => (
-                      <SelectItem key={county.name} value={county.name}>
-                        {county.name} {county.state ? `(${county.state})` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <option value="">Select a county</option>
+                  {counties?.map((county) => (
+                    <option key={county.name} value={county.name}>
+                      {county.name} ({county.state})
+                    </option>
+                  ))}
+                </select>
               )
             ) : (
               <Input

@@ -2,7 +2,7 @@
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
-import { Product, ProductCategory, ProductFormData } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -22,18 +22,16 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     uploadImages,
   } = useProductImages(product.id);
 
-  const [formData, setFormData] = useState<ProductFormData>({
+  const [formData, setFormData] = useState({
     title: product?.title || "",
     description: product?.description || "",
-    price: product?.price?.toString() || "",
+    price: String(product?.price || ""),
     category: product?.category || "Other" as ProductCategory,
-    available_quantity: product?.available_quantity?.toString() || "0",
-    county: typeof product?.county === 'object' && product?.county !== null && 'name' in product.county
-      ? product.county.name
-      : (product?.county as string) || "",
+    available_quantity: String(product?.available_quantity || "0"),
+    county: product?.county || "",
   });
 
-  const handleSubmit = async (data: ProductFormData) => {
+  const handleSubmit = async (data: any) => {
     try {
       let mainImagePath = product.storage_path;
       let additionalImagePaths: string[] = [];
@@ -91,7 +89,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
 
       <ProductForm
         formData={formData}
-        setFormData={(data: ProductFormData) => setFormData(data)}
+        setFormData={setFormData}
         isLoading={isLoading}
         submitButtonText="Update Product"
         onSubmit={handleSubmit}
