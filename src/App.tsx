@@ -1,7 +1,7 @@
 
 import { useEffect } from "react";
 import "./App.css";
-import Routes from "./Routes";
+import { Routes } from "./Routes";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+      <ThemeProvider defaultTheme="system">
         <Routes />
         <Toaster richColors position="top-center" />
       </ThemeProvider>

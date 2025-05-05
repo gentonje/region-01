@@ -48,6 +48,22 @@ const MyProducts = () => {
     fetchProducts();
   }, [user]);
 
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId);
+      
+      if (error) throw error;
+      
+      // Remove the deleted product from the state
+      setProducts(products.filter(product => product.id !== productId));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background dark:bg-gray-900">
       <Navigation />
@@ -78,13 +94,15 @@ const MyProducts = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
         ) : products.length > 0 ? (
-          <UserProductGroup
-            title="All Products"
-            products={products}
-            emptyMessage="No products found"
-          >
-            <ModifyProductsList products={products} />
-          </UserProductGroup>
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">All Products</h2>
+            <ModifyProductsList 
+              products={products} 
+              isLoading={false} 
+              hasMore={false} 
+              onDelete={handleDeleteProduct} 
+            />
+          </div>
         ) : (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">No products found</h3>

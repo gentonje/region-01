@@ -19,6 +19,7 @@ export const SampleProductsButton = () => {
     try {
       const result = await addSampleProducts(user.id);
       if (result.success) {
+        toast.success(`Added ${result.count} sample products successfully!`);
         // Wait for the toast to be shown
         setTimeout(() => {
           window.location.href = "/my-products";
