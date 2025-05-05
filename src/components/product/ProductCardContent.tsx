@@ -32,7 +32,7 @@ export const ProductCardContent = ({
             {selectedCurrency} {formattedPrice}
           </p>
           
-          {view_count !== undefined && (
+          {typeof view_count === 'number' && (
             <Badge variant="outline" className="flex gap-1 items-center bg-blue-50 text-blue-700 border-blue-200">
               <Eye className="h-3 w-3" />
               <span>{view_count}</span>

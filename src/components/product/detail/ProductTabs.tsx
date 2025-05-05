@@ -44,7 +44,7 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
               </div>
               <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-muted-foreground">Rating</p>
-                <p className="text-sm font-medium">{product.average_rating?.toFixed(1) || 'No ratings'}</p>
+                <p className="text-sm font-medium">{product.average_rating ? product.average_rating.toFixed(1) : 'No ratings'}</p>
               </div>
               
               {/* County information - kept in the same style */}
@@ -70,7 +70,7 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <ProductReviews 
               productId={product.id} 
-              sellerId={product.seller_id || ''} 
+              sellerId={product.seller_id || product.user_id || ''}
             />
           </Suspense>
         </TabsContent>

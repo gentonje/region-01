@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -58,11 +58,11 @@ export const useProductDetail = (
   });
 
   // Increment view count when product detail is opened
-  useState(() => {
+  useEffect(() => {
     if (product.id) {
       incrementViewCountMutation.mutate(product.id);
     }
-  });
+  }, [product.id, incrementViewCountMutation]);
 
   // Add to cart handler
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -80,6 +80,6 @@ export const useProductDetail = (
     setActiveTab,
     similarProducts,
     handleAddToCart,
-    addToCartMutation,
+    addToCartMutation: addItemMutation,
   };
 };

@@ -18,6 +18,9 @@ export interface ProductImage {
   storage_path: string;
   product_id: string;
   created_at: string;
+  is_main?: boolean;
+  display_order?: number;
+  publicUrl?: string;
 }
 
 export interface Product {
@@ -31,6 +34,7 @@ export interface Product {
   available_quantity?: number;
   county?: string;
   user_id?: string;
+  seller_id?: string;
   created_at: string;
   updated_at?: string;
   product_status?: ProductStatus;
@@ -41,4 +45,17 @@ export interface Product {
     full_name: string | null;
   };
   view_count?: number;
+  average_rating?: number;
+  storage_path?: string;
+}
+
+// Add ProductFormData interface explicitly since it's imported in productService.ts
+export interface ProductFormData {
+  title: string;
+  description: string;
+  price: string;
+  category: ProductCategory;
+  available_quantity: string;
+  county: string;
+  shipping_info?: string;
 }
