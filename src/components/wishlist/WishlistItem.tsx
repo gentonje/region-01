@@ -29,6 +29,8 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
 
   const removeFromWishlist = useMutation({
     mutationFn: async () => {
+      console.log("Removing product from wishlist:", product.id);
+      
       // First, get the user's wishlist
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("You must be logged in");
@@ -57,6 +59,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
       // Invalidate all relevant queries
       queryClient.invalidateQueries({ queryKey: ["wishlist"] });
       queryClient.invalidateQueries({ queryKey: ["wishlist", product.id] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist_count"] });
       toast.success("Item removed from wishlist");
       if (onItemRemoved) {
         onItemRemoved();

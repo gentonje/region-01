@@ -15,13 +15,23 @@ export function useWishlistMutation(productId: string) {
       if (!session?.user) return false;
 
       try {
+        console.log(`Checking wishlist status for product ${productId}`);
+        
         const { data: wishlist, error } = await supabase
           .from('wishlists')
           .select('id')
           .eq('user_id', session.user.id)
           .maybeSingle();
 
-        if (error || !wishlist) return false;
+        if (error) {
+          console.error('Error fetching wishlist:', error);
+          return false;
+        }
+        
+        if (!wishlist) {
+          console.log('No wishlist found for user');
+          return false;
+        }
 
         const { data: wishlistItems, error: itemError } = await supabase
           .from('wishlist_items')
@@ -35,10 +45,9 @@ export function useWishlistMutation(productId: string) {
         }
         
         // Log the results for debugging
-        console.log(`Checking wishlist status for product ${productId}:`, 
-          wishlistItems && wishlistItems.length > 0);
-          
-        return wishlistItems && wishlistItems.length > 0;
+        const isInList = wishlistItems && wishlistItems.length > 0;
+        console.log(`Product ${productId} in wishlist: ${isInList}`);
+        return isInList;
       } catch (error) {
         console.error('Wishlist query error:', error);
         return false;
@@ -63,6 +72,11 @@ export function useWishlistMutation(productId: string) {
         .select('id')
         .eq('user_id', session.user.id)
         .maybeSingle();
+        
+      if (wishlistError) {
+        console.error('Error checking wishlist:', wishlistError);
+        throw wishlistError;
+      }
 
       let wishlistId;
       if (!existingWishlist) {
@@ -118,14 +132,16 @@ export function useWishlistMutation(productId: string) {
       console.log('Wishlist operation completed successfully');
     },
     onSuccess: () => {
-      // Force refetch wishlist data
+      // Force refetch wishlist data for immediate UI updates
       queryClient.invalidateQueries({ queryKey: ['wishlist'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist-items'] });
       queryClient.invalidateQueries({ queryKey: ['wishlist', productId, session?.user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['wishlist_count'] });
+      
       toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
     },
     onError: (error) => {
-      console.error("Wishlist error:", error);
+      console.error("Wishlist operation error:", error);
       toast.error("Wishlist operation failed. Please try again.");
     }
   });
