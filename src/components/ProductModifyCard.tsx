@@ -10,6 +10,7 @@ import { MapPin } from "lucide-react";
 import { Product } from "@/types/product";
 import { useEffect, useState } from "react";
 import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
+import { getStorageUrl } from "@/utils/storage";
 
 interface ProductModifyCardProps {
   product: Product;
@@ -45,9 +46,9 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
     updatePrice();
   }, [product.price, productCurrency, defaultCurrency]);
   
-  // Get the public URL for the first product image or use placeholder
-  const imageUrl = product.product_images?.[0]
-    ? supabase.storage.from('images').getPublicUrl(product.product_images[0].storage_path).data.publicUrl
+  // Get the proper image URL with better fallback handling
+  const imageUrl = product.product_images && product.product_images.length > 0 && product.product_images[0].storage_path
+    ? getStorageUrl(product.product_images[0].storage_path)
     : '/placeholder.svg';
 
   // Determine if we should show both prices
@@ -62,6 +63,8 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
           width={128}
           height={128}
+          priority={false}
+          fallbackSrc="/placeholder.svg"
         />
       </div>
       <div className="flex-1 min-w-0 space-y-1">
