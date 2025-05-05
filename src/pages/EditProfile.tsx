@@ -79,7 +79,7 @@ const EditProfile = () => {
         throw new Error("You must be logged in to update your profile");
       }
       
-      // Check if username is already taken
+      // Check if username is already taken (only if username has changed)
       if (data.username) {
         const { data: existingUser, error: usernameError } = await supabase
           .from("profiles")
@@ -95,22 +95,26 @@ const EditProfile = () => {
             type: "manual", 
             message: "This username is already taken" 
           });
+          setIsLoading(false);
           return;
         }
       }
       
+      // Clean up data before submitting to ensure valid values
+      const profileData = {
+        username: data.username,
+        full_name: data.full_name,
+        contact_email: data.contact_email || null,
+        phone_number: data.phone_number || null,
+        address: data.address,
+        shop_name: data.shop_name || null,
+        shop_description: data.shop_description || null,
+        updated_at: new Date().toISOString(),
+      };
+      
       const { error } = await supabase
         .from("profiles")
-        .update({
-          username: data.username,
-          full_name: data.full_name,
-          contact_email: data.contact_email,
-          phone_number: data.phone_number,
-          address: data.address,
-          shop_name: data.shop_name,
-          shop_description: data.shop_description,
-          updated_at: new Date().toISOString(),
-        })
+        .update(profileData)
         .eq("id", user.id);
       
       if (error) throw error;
@@ -119,11 +123,11 @@ const EditProfile = () => {
         title: "Success",
         description: "Your profile has been updated",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating profile:", error);
       toast({
         title: "Error",
-        description: "Failed to update profile",
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {

@@ -74,14 +74,12 @@ const EditProduct = () => {
       await updateProduct(id, formData);
       toast.success("Product updated successfully!");
       
-      // Ensure we're using a proper setTimeout to allow the toast to be displayed before navigation
-      setTimeout(() => {
-        navigate("/my-products");
-      }, 500);
+      // Navigate directly instead of using setTimeout
+      navigate("/my-products");
+      
     } catch (error: any) {
       console.error("Error updating product:", error);
       toast.error(error.message || "Failed to update product");
-    } finally {
       setIsSubmitting(false);
     }
   };

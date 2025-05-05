@@ -1,34 +1,19 @@
 
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { ProductFormData } from "./validation";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCategory } from "@/types/product";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { counties } from "@/data/counties";
+import { useForm } from "react-hook-form";
+import { ProductFormData } from "./validation";
 
 interface ProductFormFieldProps {
-  form: UseFormReturn<ProductFormData>;
+  form: ReturnType<typeof useForm<ProductFormData>>;
   name: keyof ProductFormData;
   label: string;
   type?: string;
   step?: string;
-  placeholder?: string;
   formData: ProductFormData;
   setFormData: (data: ProductFormData) => void;
 }
@@ -39,121 +24,97 @@ export const ProductFormField = ({
   label,
   type = "text",
   step,
-  placeholder,
   formData,
   setFormData,
 }: ProductFormFieldProps) => {
-  const { data: categories, isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("name")
-        .order("name");
-      
-      if (error) throw error;
-      return data;
-    },
-  });
+  // List of available product categories
+  const productCategories: ProductCategory[] = [
+    "Electronics",
+    "Clothing",
+    "Home & Garden",
+    "Books",
+    "Sports & Outdoors",
+    "Toys & Games",
+    "Health & Beauty",
+    "Automotive",
+    "Food & Beverages",
+    "Other"
+  ];
 
-  const { data: counties, isLoading: isCountiesLoading } = useQuery({
-    queryKey: ["counties"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("counties")
-        .select("name")
-        .order("name");
-      
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  const handleValueChange = (value: string) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const renderField = () => {
+    if (name === "description") {
+      return (
+        <Textarea
+          value={formData[name] || ""}
+          onChange={(e) => handleValueChange(e.target.value)}
+          className="resize-none h-32"
+        />
+      );
+    } else if (name === "category") {
+      return (
+        <Select
+          value={formData[name] || ""}
+          onValueChange={handleValueChange}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            {productCategories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    } else if (name === "county") {
+      return (
+        <Select
+          value={formData[name] || ""}
+          onValueChange={handleValueChange}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a county" />
+          </SelectTrigger>
+          <SelectContent>
+            {counties.map((county) => (
+              <SelectItem key={county.name} value={county.name}>
+                {county.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      );
+    } else {
+      return (
+        <Input
+          type={type}
+          step={step}
+          value={formData[name] || ""}
+          onChange={(e) => handleValueChange(e.target.value)}
+          className="dark:bg-gray-800"
+        />
+      );
+    }
+  };
 
   return (
     <FormField
       control={form.control}
       name={name}
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-foreground dark:text-gray-200">{label}</FormLabel>
-          <FormControl>
-            {name === "description" ? (
-              <Textarea
-                {...field}
-                placeholder={placeholder}
-                className="resize-none bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
-                onChange={(e) => {
-                  field.onChange(e);
-                  setFormData({ ...formData, [name]: e.target.value });
-                }}
-              />
-            ) : name === "category" ? (
-              isCategoriesLoading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : (
-                <Select
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setFormData({
-                      ...formData,
-                      [name]: value as ProductCategory,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories?.map((category) => (
-                      <SelectItem key={category.name} value={category.name}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )
-            ) : name === "county" ? (
-              isCountiesLoading ? (
-                <Skeleton className="h-10 w-full" />
-              ) : (
-                <Select 
-                  value={field.value}
-                  onValueChange={(value) => {
-                    field.onChange(value);
-                    setFormData({
-                      ...formData,
-                      [name]: value,
-                    });
-                  }}
-                >
-                  <SelectTrigger className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600">
-                    <SelectValue placeholder="Select a county" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {counties?.map((county) => (
-                      <SelectItem key={county.name} value={county.name}>
-                        {county.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )
-            ) : (
-              <Input
-                {...field}
-                type={type}
-                step={step}
-                placeholder={placeholder}
-                className="bg-background dark:bg-gray-800 text-foreground dark:text-gray-200 border-gray-300 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
-                onChange={(e) => {
-                  field.onChange(e);
-                  setFormData({ ...formData, [name]: e.target.value });
-                }}
-              />
-            )}
-          </FormControl>
-          <FormMessage className="text-red-500 dark:text-red-400" />
+      render={() => (
+        <FormItem className="space-y-2">
+          <FormLabel>{label}</FormLabel>
+          <FormControl>{renderField()}</FormControl>
+          <FormMessage />
         </FormItem>
       )}
     />
