@@ -132,7 +132,10 @@ const Login = () => {
               </label>
               <a 
                 href="#" 
-                onClick={(e) => { e.preventDefault(); toast.info("Password reset functionality will be added soon."); }} 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  toast.info("Password reset functionality will be added soon."); 
+                }} 
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Forgot password?
