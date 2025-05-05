@@ -44,10 +44,12 @@ export const ProductCardContent = memo(({
   // Check if we need to show both prices
   const showBothPrices = product.currency !== selectedCurrency && product.currency;
 
-  // Process county data - properly handle it regardless of whether it's a string or object
-  const countyDisplay = typeof product.county === 'object' && product.county !== null
-    ? product.county.name || 'Unknown County'
-    : product.county || '';
+  // Process county data with proper null checking
+  const countyDisplay = product.county
+    ? (typeof product.county === 'object' && product.county !== null
+      ? (product.county as { name: string }).name || 'Unknown County'
+      : product.county)
+    : '';
 
   return (
     <CardContent className="p-0 space-y-1">
