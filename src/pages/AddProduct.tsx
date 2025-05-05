@@ -8,7 +8,7 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { useState } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory } from "@/types/product";
+import { ProductCategory, ProductFormData } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -18,7 +18,7 @@ const AddProduct = () => {
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormData>({
     title: "",
     description: "",
     price: "",
@@ -27,7 +27,7 @@ const AddProduct = () => {
     county: "",
   });
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ProductFormData) => {
     if (!mainImage) {
       toast.error("Please upload a main product image");
       return;
@@ -133,7 +133,7 @@ const AddProduct = () => {
 
             <ProductForm
               formData={formData}
-              setFormData={setFormData}
+              setFormData={(data: ProductFormData) => setFormData(data)}
               isLoading={isLoading}
               submitButtonText="Add Product"
               onSubmit={handleSubmit}
