@@ -88,8 +88,9 @@ export const ProductFormField = ({
     const county = form.getValues().county;
     if (!county) return "_none";
     
-    if (typeof county === 'object' && county !== null && 'name' in county) {
-      return county.name;
+    if (typeof county === 'object' && county !== null) {
+      // Safely access the name property with type assertion
+      return 'name' in county ? String(county.name) : "_none";
     }
     
     return String(county);

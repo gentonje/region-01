@@ -1,3 +1,4 @@
+
 import { ProductForm } from "@/components/ProductForm";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { useProductImages } from "@/hooks/useProductImages";
@@ -29,7 +30,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     available_quantity: product?.available_quantity?.toString() || "0",
     county: typeof product?.county === 'object' && product?.county !== null && 'name' in product.county
       ? product.county.name
-      : product?.county || "",
+      : (product?.county as string) || "",
   });
 
   const handleSubmit = async (data: ProductFormData) => {
