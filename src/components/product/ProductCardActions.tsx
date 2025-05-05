@@ -25,14 +25,14 @@ export const ProductCardActions = ({
   return (
     <div className="px-4 pb-4 flex items-center justify-between">
       {isAdmin && (
-        <div className="flex gap-2 ml-auto">
+        <div className="flex gap-4 ml-auto">
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+            className="rounded-full hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 h-10 w-10 p-0"
             onClick={onDelete}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-5 h-5" />
           </Button>
           
           <Link 
@@ -43,19 +43,19 @@ export const ProductCardActions = ({
             <Button
               variant="ghost"
               size="sm"
-              className="rounded-full hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400"
+              className="rounded-full hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 h-10 w-10 p-0"
             >
-              <Edit className="w-4 h-4" />
+              <Edit className="w-5 h-5" />
             </Button>
           </Link>
           
           <Button
             variant="ghost"
             size="sm"
-            className="rounded-full hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/30 dark:hover:text-purple-400"
+            className="rounded-full hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-purple-900/30 dark:hover:text-purple-400 h-10 w-10 p-0"
             onClick={onClick}
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-5 h-5" />
           </Button>
         </div>
       )}

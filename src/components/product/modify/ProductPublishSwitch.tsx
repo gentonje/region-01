@@ -66,21 +66,26 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
   const isPublished = currentStatus === 'published';
 
   return (
-    <div className="flex items-center space-x-2 relative">
+    <div className="flex items-center space-x-3 relative p-1 bg-background/50 backdrop-blur-sm rounded-lg shadow-sm">
       <Switch
         id={`publish-${productId}`}
         checked={isPublished}
         onCheckedChange={handlePublishChange}
         disabled={isPublishing}
-        className={`${isPublished ? 'bg-green-500' : 'bg-red-500'}`}
+        className={`${isPublished ? 'bg-green-500' : 'bg-red-500'} h-6 w-12 relative`}
       />
-      {isPublished ? (
-        <ToggleRight className="h-4 w-4 text-green-500" />
-      ) : (
-        <ToggleLeft className="h-4 w-4 text-red-500" />
-      )}
+      <div className="flex items-center gap-1">
+        {isPublished ? (
+          <ToggleRight className="h-5 w-5 text-green-500" />
+        ) : (
+          <ToggleLeft className="h-5 w-5 text-red-500" />
+        )}
+        <span className="text-xs font-medium">
+          {isPublished ? 'Published' : 'Draft'}
+        </span>
+      </div>
       {isPublishing && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 absolute right-0 top-0 bottom-0 bg-background/80 backdrop-blur-sm rounded-r-lg px-2">
           <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
           <span className="text-sm text-gray-600">Updating...</span>
         </div>

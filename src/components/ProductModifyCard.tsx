@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductModifyHeader } from "./product/modify/ProductModifyHeader";
@@ -126,13 +125,15 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           )}
         </div>
       </div>
-      <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-start gap-1 mt-1 md:mt-0 space-x-1 space-y-1">
+      <div className="flex flex-row md:flex-col items-center md:items-end justify-start md:justify-between gap-4 mt-1 md:mt-0 p-2">
         <ProductModifyActions productId={product.id} onDelete={onDelete} />
         {isAdmin && (
-          <ProductPublishSwitch 
-            productId={product.id} 
-            initialStatus={status} 
-          />
+          <div className="mt-2 md:mt-4">
+            <ProductPublishSwitch 
+              productId={product.id} 
+              initialStatus={status} 
+            />
+          </div>
         )}
       </div>
     </div>

@@ -63,7 +63,7 @@ export const UserProductGroup = ({ username, products, onDelete }: UserProductGr
               className="bg-background/50 backdrop-blur-sm border-border rounded-lg shadow-sm text-sm md:text-base" 
             />
           </div>
-          <div className="grid gap-1 space-y-1">
+          <div className="grid gap-3 space-y-3">
             {filteredProducts.map((product) => (
               <div 
                 key={product.id} 
