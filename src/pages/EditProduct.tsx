@@ -88,7 +88,7 @@ const EditProduct = () => {
       <div className={styles.container}>
         <Navigation />
         <div className={styles.mainContent}>
-          <div className="text-center text-red-500">
+          <div className="text-center text-red-500 mx-1 my-1">
             {error instanceof Error ? error.message : "An error occurred"}
           </div>
         </div>
@@ -101,11 +101,11 @@ const EditProduct = () => {
       <div className={styles.container}>
         <Navigation />
         <div className={styles.mainContent}>
-          <div className={styles.formContainer}>
-            <Skeleton className="h-8 w-48 mb-6" />
-            <div className="space-y-6">
-              <Skeleton className="h-[400px]" />
-              <Skeleton className="h-[200px]" />
+          <div className="mx-1 my-1 px-1 py-1">
+            <Skeleton className="h-8 w-48 mb-1" />
+            <div className="space-y-1">
+              <Skeleton className="h-[300px]" />
+              <Skeleton className="h-[150px]" />
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ const EditProduct = () => {
     <div className={styles.container}>
       <Navigation />
       <div className={styles.mainContent}>
-        <div className={styles.formContainer}>
+        <div className="mx-1 my-1 px-1 py-1">
           <EditProductHeader title="Edit Product" />
           <EditProductForm
             product={product}

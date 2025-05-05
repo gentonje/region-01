@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -115,9 +114,9 @@ const AddProduct = () => {
     <div className="min-h-screen bg-background dark:bg-gray-900">
       <Navigation />
       
-      <div className="max-w-2xl mx-auto px-4 py-4 sm:px-6 lg:px-8 pb-20 mt-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 overflow-y-auto">
-          <div className="flex flex-col gap-4 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="max-w-2xl mx-1 px-1 py-1 sm:px-1 lg:px-1 pb-16 mt-1">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-1 overflow-y-auto">
+          <div className="flex flex-col gap-1 sticky top-0 bg-white dark:bg-gray-800 z-10 pb-1 border-b border-gray-200 dark:border-gray-700">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:font-bold">Add New Product</h1>
             <div className="flex justify-end">
               <Button 
@@ -130,7 +129,7 @@ const AddProduct = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-1">
             <ProductImageSection
               mainImage={mainImage}
               setMainImage={setMainImage}

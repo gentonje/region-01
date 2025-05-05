@@ -59,7 +59,7 @@ export const ProductForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-1">
         <ProductFormField
           form={form}
           name="title"

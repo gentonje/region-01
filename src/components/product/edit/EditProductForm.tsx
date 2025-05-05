@@ -84,7 +84,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     })) || [];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-1">
       <ProductImageSection
         mainImage={mainImage}
         setMainImage={setMainImage}

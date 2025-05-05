@@ -1,3 +1,4 @@
+
 import { ProductImageUpload } from "./ProductImageUpload";
 
 interface ProductImageSectionProps {
@@ -22,7 +23,7 @@ export const ProductImageSection = ({
   isLoading,
 }: ProductImageSectionProps) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       <ProductImageUpload
         label="Main Product Image"
         onChange={setMainImage}

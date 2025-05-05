@@ -136,8 +136,8 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-1 sm:mx-auto py-8">
-      <div className="flex items-center gap-2 mb-6">
+    <div className="max-w-2xl mx-1 py-1">
+      <div className="flex items-center gap-1 mb-1">
         <User className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Edit Profile</h1>
       </div>
@@ -147,20 +147,20 @@ const EditProfile = () => {
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 border">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-1">
               <ProfileFormFields form={form} />
               
-              <div className="pt-4 border-t flex justify-end">
+              <div className="pt-1 border-t flex justify-end">
                 <Button 
                   type="submit" 
                   disabled={!form.formState.isValid || form.formState.isSubmitting}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto mt-1"
                 >
                   {form.formState.isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                       Saving...
                     </>
                   ) : (
