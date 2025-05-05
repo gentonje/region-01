@@ -1,15 +1,17 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ImageLoader } from "@/components/ImageLoader";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Share2, ShoppingCart, Trash2, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getStorageUrl } from "@/utils/storage";
 import { motion, AnimatePresence } from "framer-motion";
+import { convertCurrency, SupportedCurrency } from "@/utils/currencyConverter";
 
 interface WishlistItemProps {
   item: {
@@ -23,8 +25,32 @@ interface WishlistItemProps {
 export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps) => {
   const [isSharing, setIsSharing] = useState(false);
   const [particles, setParticles] = useState<number[]>([]);
+  const [convertedPrice, setConvertedPrice] = useState<number>(0);
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  // Get converted price in USD when component mounts
+  useQuery({
+    queryKey: ["convert-currency", product.id, product.currency, "USD"],
+    queryFn: async () => {
+      if (!product.price) return 0;
+      
+      try {
+        const converted = await convertCurrency(
+          product.price,
+          (product.currency || "SSP") as SupportedCurrency,
+          "USD"
+        );
+        setConvertedPrice(converted);
+        return converted;
+      } catch (error) {
+        console.error("Error converting currency:", error);
+        return 0;
+      }
+    },
+    enabled: !!product.price && !!product.currency,
+  });
 
   const removeFromWishlist = useMutation({
     mutationFn: async () => {
@@ -144,6 +170,11 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
     }, 300);
   });
 
+  // Format large numbers with commas
+  const formatNumber = (num: number) => {
+    return num.toLocaleString();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -192,14 +223,26 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                 <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
                   {product.description}
                 </p>
-                <motion.p 
-                  className="text-lg font-medium text-orange-500"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  {product.currency} {Math.round(product.price || 0).toLocaleString()}
-                </motion.p>
+                
+                {/* Currency display - matching main product page style */}
+                <div className="flex flex-col items-start space-y-1 my-2">
+                  {/* Original SSP price - larger, orange text */}
+                  <motion.p 
+                    className="text-2xl font-bold text-orange-500"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    SSP {formatNumber(product.price || 0)}
+                  </motion.p>
+                  
+                  {/* USD converted price - smaller, in badge */}
+                  {convertedPrice > 0 && (
+                    <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium">
+                      USD {formatNumber(convertedPrice)}
+                    </span>
+                  )}
+                </div>
               </div>
               
               {/* Buttons container in a single row */}
