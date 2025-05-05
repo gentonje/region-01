@@ -13,6 +13,7 @@ interface ProductPublishSwitchProps {
 
 export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublishSwitchProps) => {
   const [isPublishing, setIsPublishing] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(initialStatus);
   const queryClient = useQueryClient();
 
   const updateStatusMutation = useMutation({
@@ -28,6 +29,9 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
     onMutate: async (newStatus) => {
       await queryClient.cancelQueries({ queryKey: ['users-products'] });
       const previousProducts = queryClient.getQueryData(['users-products']);
+      // Update optimistically
+      setCurrentStatus(newStatus);
+      
       queryClient.setQueryData(['users-products'], (old: any) => {
         return old?.map((user: any) => ({
           ...user,
@@ -39,6 +43,8 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
       return { previousProducts };
     },
     onError: (err, newStatus, context) => {
+      // Roll back to the previous state on error
+      setCurrentStatus(initialStatus);
       queryClient.setQueryData(['users-products'], context?.previousProducts);
       toast.error('Failed to update product status');
     },
@@ -53,11 +59,11 @@ export const ProductPublishSwitch = ({ productId, initialStatus }: ProductPublis
   
   const handlePublishChange = async () => {
     setIsPublishing(true);
-    const newStatus = initialStatus === 'published' ? 'draft' : 'published';
+    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
     updateStatusMutation.mutate(newStatus);
   };
 
-  const isPublished = initialStatus === 'published';
+  const isPublished = currentStatus === 'published';
 
   return (
     <div className="flex items-center space-x-2 relative">
