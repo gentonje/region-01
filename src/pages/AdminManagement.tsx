@@ -91,38 +91,38 @@ const AdminManagement = () => {
                 key={user.id}
                 className="border p-1 rounded-lg bg-gray-50 dark:bg-gray-900 my-1"
               >
-                <div className="flex justify-between items-center gap-1">
-                  <div>
-                    <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
-                  </div>
-                  <div className="flex items-center space-x-1">
+                <div className="flex flex-col gap-1">
+                  <h3 className="font-medium text-lg">{user.username || 'No username'}</h3>
+                  <div className="flex justify-between items-center gap-1">
                     <span className="text-xs font-medium px-1 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                       Role: {user.user_type}
                     </span>
-                    {user.user_type === "user" ? (
-                      <Button
-                        size="sm"
-                        className="h-8 flex items-center gap-1"
-                        onClick={() => handleUpdateUserRole(user.id, "admin")}
-                      >
-                        <UserCheck className="h-4 w-4" /> 
-                        <span>Make Admin</span>
-                      </Button>
-                    ) : user.user_type === "admin" ? (
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="h-8 flex items-center gap-1"
-                        onClick={() => handleUpdateUserRole(user.id, "user")}
-                      >
-                        <UserX className="h-4 w-4" /> 
-                        <span>Remove Admin</span>
-                      </Button>
-                    ) : (
-                      <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-1 py-1">
-                        Super Admin
-                      </span>
-                    )}
+                    <div className="flex items-center space-x-1">
+                      {user.user_type === "user" ? (
+                        <Button
+                          size="sm"
+                          className="h-8 flex items-center gap-1"
+                          onClick={() => handleUpdateUserRole(user.id, "admin")}
+                        >
+                          <UserCheck className="h-4 w-4" /> 
+                          <span>Make Admin</span>
+                        </Button>
+                      ) : user.user_type === "admin" ? (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="h-8 flex items-center gap-1"
+                          onClick={() => handleUpdateUserRole(user.id, "user")}
+                        >
+                          <UserX className="h-4 w-4" /> 
+                          <span>Remove Admin</span>
+                        </Button>
+                      ) : (
+                        <span className="text-xs bg-purple-100 text-purple-800 rounded-full px-1 py-1">
+                          Super Admin
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
