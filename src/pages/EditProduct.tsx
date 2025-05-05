@@ -70,6 +70,7 @@ const EditProduct = () => {
           category: formData.category,
           available_quantity: Number(formData.available_quantity),
           storage_path: formData.mainImagePath || product?.storage_path,
+          county: formData.county || "Juba" // Default to Juba if no county is selected
         })
         .eq("id", id);
 

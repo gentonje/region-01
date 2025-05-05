@@ -55,7 +55,7 @@ const AddProduct = () => {
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
           user_id: user.id,
-          county: data.county
+          county: data.county || "Juba" // Default to Juba if no county is selected
         })
         .select()
         .single();
