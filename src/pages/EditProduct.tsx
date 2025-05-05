@@ -60,6 +60,10 @@ const EditProduct = () => {
   const handleSubmit = async (formData: any) => {
     try {
       if (!id) throw new Error("Product ID is required");
+      if (!formData.county) {
+        toast.error("Please select a county");
+        return;
+      }
 
       const { error: updateError } = await supabase
         .from("products")
@@ -70,6 +74,7 @@ const EditProduct = () => {
           category: formData.category,
           available_quantity: Number(formData.available_quantity),
           storage_path: formData.mainImagePath || product?.storage_path,
+          county: formData.county,
         })
         .eq("id", id);
 

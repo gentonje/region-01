@@ -24,9 +24,15 @@ export const ProductForm = ({
   const form = useForm<ProductFormData>({
     defaultValues: formData,
     mode: "onChange",
+    resolver: undefined,
   });
 
   const handleSubmit = async (data: ProductFormData) => {
+    if (!data.county) {
+      toast.error("Please select a county");
+      return;
+    }
+    
     try {
       await onSubmit(data);
       toast.success("Product updated successfully!");
@@ -92,7 +98,7 @@ export const ProductForm = ({
 
         <ProductSubmitButton
           isLoading={isLoading}
-          isValid={form.formState.isValid}
+          isValid={form.formState.isValid && !!formData.county}
           submitButtonText={submitButtonText}
         />
       </form>

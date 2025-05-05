@@ -19,13 +19,13 @@ const AddProduct = () => {
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormData>({
     title: "",
     description: "",
     price: "",
     category: "Other" as ProductCategory,
     available_quantity: "0",
-    county: "Juba",
+    county: "",
   });
 
   const handleSubmit = async (data: ProductFormData) => {
@@ -36,6 +36,11 @@ const AddProduct = () => {
 
     if (!user?.id) {
       toast.error("You must be logged in to add a product");
+      return;
+    }
+
+    if (!data.county) {
+      toast.error("Please select a county");
       return;
     }
 
@@ -55,7 +60,7 @@ const AddProduct = () => {
           category: data.category,
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
-          county: data.county || "Juba",
+          county: data.county,
           user_id: user.id
         })
         .select()
@@ -134,13 +139,7 @@ const AddProduct = () => {
 
             <ProductForm
               formData={formData}
-              setFormData={(data: ProductFormData) => {
-                setFormData({
-                  ...formData,
-                  ...data,
-                  county: data.county || "Juba"
-                });
-              }}
+              setFormData={setFormData}
               isLoading={isLoading}
               submitButtonText="Add Product"
               onSubmit={handleSubmit}

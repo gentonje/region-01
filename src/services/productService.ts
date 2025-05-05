@@ -8,6 +8,11 @@ export const updateProduct = async (
   formData: ProductFormData & { mainImagePath?: string; additionalImagePaths?: string[] }
 ) => {
   console.log("Updating product with data:", { id, formData });
+  
+  if (!formData.county) {
+    throw new Error("County is required");
+  }
+  
   const updateData: any = {
     title: formData.title,
     description: formData.description,
@@ -15,7 +20,7 @@ export const updateProduct = async (
     category: formData.category,
     available_quantity: Number(formData.available_quantity),
     shipping_info: formData.shipping_info,
-    county: formData.county || "Juba",
+    county: formData.county,
   };
 
   // Update main image if provided
@@ -96,4 +101,3 @@ export const updateProductStatus = async (productId: string, status: 'draft' | '
     throw error;
   }
 };
-

@@ -10,7 +10,7 @@ export interface ProductFormData {
   category: ProductCategory;
   available_quantity: number;
   shipping_info?: string;
-  county?: string;
+  county: string;
 }
 
 export interface ProductImage {
@@ -50,5 +50,5 @@ export interface Product {
   currency: string | null;
   product_images: ProductImage[];
   profiles?: Profile;
-  county?: string | null;
+  county: string | null;
 }

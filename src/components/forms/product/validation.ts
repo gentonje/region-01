@@ -7,7 +7,7 @@ export interface ProductFormData {
   price: string;
   category: ProductCategory;
   available_quantity: string;
-  county?: string;
+  county: string;
 }
 
 export const productValidationRules = {

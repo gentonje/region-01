@@ -23,13 +23,13 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     uploadImages,
   } = useProductImages(product.id);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ProductFormData>({
     title: product?.title || "",
     description: product?.description || "",
     price: String(product?.price || ""),
     category: product?.category || "Other" as ProductCategory,
     available_quantity: String(product?.available_quantity || "0"),
-    county: product?.county || "Juba",
+    county: product?.county || "",
   });
 
   const handleSubmit = async (data: ProductFormData) => {
@@ -90,13 +90,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
 
       <ProductForm
         formData={formData}
-        setFormData={(data: ProductFormData) => {
-          setFormData({
-            ...formData,
-            ...data,
-            county: data.county || "Juba"
-          });
-        }}
+        setFormData={setFormData}
         isLoading={isLoading}
         submitButtonText="Update Product"
         onSubmit={handleSubmit}
