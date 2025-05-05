@@ -5,6 +5,7 @@ import ProductCard from "./ProductCard";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useInView } from "react-intersection-observer";
 import { Skeleton } from "./ui/skeleton";
+import { Loader } from "lucide-react";
 
 interface ProductListProps {
   products: Product[];
@@ -21,14 +22,13 @@ interface ProductListProps {
 }
 
 const ProductSkeleton = memo(() => (
-  <div className="space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
+  <div className="space-y-2 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2 shadow-sm">
     <Skeleton className="h-[200px] w-full rounded-lg" />
     <Skeleton className="h-6 w-2/3" />
     <Skeleton className="h-4 w-full" />
-    <Skeleton className="h-4 w-3/4" />
-    <div className="flex justify-between mt-1 space-x-1">
-      <Skeleton className="h-8 w-20 rounded-md" />
-      <Skeleton className="h-8 w-20 rounded-md" />
+    <div className="flex justify-between mt-2 space-x-2">
+      <Skeleton className="h-6 w-20 rounded-md" />
+      <Skeleton className="h-6 w-16 rounded-md" />
     </div>
   </div>
 ));
@@ -62,16 +62,20 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8 w-full">
-        <p className="text-base text-gray-500">Loading products...</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 w-full p-2">
+        {[...Array(8)].map((_, index) => (
+          <div key={index} className="p-1">
+            <ProductSkeleton />
+          </div>
+        ))}
       </div>
     );
   }
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-1 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full mx-1">
-        <div className="max-w-md mx-auto px-1 space-y-1">
+      <div className="text-center py-6 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full mx-2">
+        <div className="max-w-md mx-auto px-4 space-y-2">
           <h3 className="text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-300">{emptyMessage}</h3>
           <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filters to find what you're looking for</p>
         </div>
@@ -101,6 +105,7 @@ export const ProductList = ({
       
       {isFetchingNextPage && (
         <>
+          <div className="p-1"><ProductSkeleton /></div>
           <div className="p-1"><ProductSkeleton /></div>
           <div className="p-1"><ProductSkeleton /></div>
           <div className="p-1"><ProductSkeleton /></div>

@@ -9,23 +9,51 @@ import { Button } from "../ui/button";
 import { AspectRatio } from "../ui/aspect-ratio";
 import { useWishlistMutation } from "@/hooks/useWishlistMutation";
 import { useAuth } from "@/contexts/AuthContext";
-import { convertCurrency } from "@/utils/currencyConverter";
 import { ProductCardContent } from "./ProductCardContent";
+import { Skeleton } from "../ui/skeleton";
 
 interface ProductSimilarProps {
   products: Product[];
   getProductImageUrl: (product: Product) => string;
   onProductClick: (product: Product) => void;
   selectedCurrency: SupportedCurrency;
+  isLoading?: boolean;
 }
+
+const ProductSimilarSkeleton = () => (
+  <div className="p-1 mx-0">
+    <div className="space-y-2 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2 shadow-sm">
+      <Skeleton className="h-[150px] w-full rounded-lg" />
+      <Skeleton className="h-5 w-2/3" />
+      <Skeleton className="h-3 w-full" />
+      <div className="flex justify-between mt-2 space-x-2">
+        <Skeleton className="h-5 w-16 rounded-md" />
+        <Skeleton className="h-5 w-12 rounded-md" />
+      </div>
+    </div>
+  </div>
+);
 
 export const ProductSimilar = ({ 
   products, 
   getProductImageUrl, 
   onProductClick,
-  selectedCurrency 
+  selectedCurrency,
+  isLoading = false
 }: ProductSimilarProps) => {
   const { session } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="w-full mx-auto px-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0 mx-0 px-0">
+          {[...Array(5)].map((_, index) => (
+            <ProductSimilarSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!products?.length) return null;
 
