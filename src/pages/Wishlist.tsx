@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -109,8 +110,8 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="mx-1 my-1">
-      <div className="grid grid-cols-1 gap-1 space-y-1">
+    <div className="flex flex-col items-center w-full max-w-md mx-auto px-1 py-1">
+      <div className="w-full grid grid-cols-1 gap-1 space-y-1">
         {wishlistItems.map((product) => (
           <WishlistItem
             key={product.id}

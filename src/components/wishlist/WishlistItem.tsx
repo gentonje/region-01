@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -181,10 +182,10 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       exit={{ opacity: 0, height: 0 }}
-      className="w-full mx-1 my-1"
+      className="w-full"
     >
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full mx-1 my-1">
-        <CardContent className="p-1">
+      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+        <CardContent className="p-2">
           {/* New layout: Image first, full width */}
           <div className="flex flex-col space-y-1">
             {/* Image section - larger and full width */}
