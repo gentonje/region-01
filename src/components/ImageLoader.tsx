@@ -1,5 +1,6 @@
 
 import { useState, useEffect, memo, useCallback } from "react";
+import { Skeleton } from "./ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 
 interface ImageLoaderProps {
@@ -102,12 +103,10 @@ export const ImageLoader = memo(({
   return (
     <>
       {isLoading && (
-        <div 
-          className="flex items-center justify-center bg-gray-50 dark:bg-gray-800"
+        <Skeleton 
+          className={`${className} animate-none`}
           style={{ width, height }}
-        >
-          <div className="w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-        </div>
+        />
       )}
       <img
         src={imageSrc}
