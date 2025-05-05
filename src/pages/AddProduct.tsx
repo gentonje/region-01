@@ -61,6 +61,7 @@ const AddProduct = () => {
             setMainImage={setMainImage}
             additionalImages={additionalImages}
             setAdditionalImages={setAdditionalImages}
+            additionalImageUrls={[]}
             isLoading={isLoading}
           />
           
