@@ -197,38 +197,42 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
                   {product.currency} {Math.round(product.price || 0).toLocaleString()}
                 </motion.p>
               </div>
-              <div className="flex flex-wrap gap-1 mt-0">
+              
+              {/* New buttons container with all buttons in a single row */}
+              <div className="flex items-center justify-start gap-2 mt-1">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="default"
                     size="sm"
                     onClick={() => addToCart.mutate()}
                     disabled={!product.in_stock || addToCart.isPending}
-                    className="bg-violet-600 hover:bg-violet-700 text-white h-7 text-xs px-2"
+                    className="bg-violet-600 hover:bg-violet-700 text-white h-8 text-xs px-3"
                   >
                     <ShoppingCart className="w-3 h-3 mr-1 icon-glow" />
                     Add
                   </Button>
                 </motion.div>
+                
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={handleShare}
                     disabled={isSharing}
-                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 h-7 text-xs px-2"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 h-8 text-xs px-3"
                   >
                     <Share2 className="w-3 h-3 mr-1 icon-glow" />
                     Share
                   </Button>
                 </motion.div>
+                
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => removeFromWishlist.mutate()}
                     disabled={removeFromWishlist.isPending}
-                    className="h-7 text-xs px-2"
+                    className="h-8 text-xs px-3"
                   >
                     <Trash2 className="w-3 h-3 mr-1 icon-glow" />
                     Remove
