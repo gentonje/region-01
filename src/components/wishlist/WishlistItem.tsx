@@ -181,12 +181,12 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       exit={{ opacity: 0, height: 0 }}
-      className="w-full px-0"
+      className="w-full mx-1 my-1"
     >
-      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full mx-0 my-0">
-        <CardContent className="p-0">
+      <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full mx-1 my-1">
+        <CardContent className="p-1">
           {/* New layout: Image first, full width */}
-          <div className="flex flex-col">
+          <div className="flex flex-col space-y-1">
             {/* Image section - larger and full width */}
             <div className="w-full h-48 relative">
               <ImageLoader
@@ -217,15 +217,15 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
             </div>
             
             {/* Product info section */}
-            <div className="p-3 flex flex-col justify-between space-y-2">
+            <div className="p-1 flex flex-col justify-between space-y-1">
               <div>
                 <h3 className="text-base font-semibold mb-1 text-gray-800 dark:text-gray-100 line-clamp-1">{product.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-1">
                   {product.description}
                 </p>
                 
                 {/* Currency display - both badges on the same line */}
-                <div className="flex flex-row items-center gap-2 my-2">
+                <div className="flex flex-row items-center space-x-1 my-1">
                   {/* SSP price in orange badge */}
                   <Badge className="bg-orange-500 hover:bg-orange-600 text-white font-semibold">
                     SSP {formatNumber(product.price || 0)}
@@ -241,7 +241,7 @@ export const WishlistItem = ({ item, product, onItemRemoved }: WishlistItemProps
               </div>
               
               {/* Buttons container in a single row */}
-              <div className="flex items-center justify-between gap-2 mt-2">
+              <div className="flex items-center justify-between space-x-1 mt-1">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
                   <Button
                     variant="default"
