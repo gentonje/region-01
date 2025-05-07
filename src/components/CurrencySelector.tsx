@@ -32,9 +32,12 @@ export const CurrencySelector = ({
   onValueChange,
   variant = "default"
 }: CurrencySelectorProps) => {
+  // We'll use these as fallback only if the query fails
   const [fallbackCurrencies, setFallbackCurrencies] = useState<CurrencyData[]>([
     { code: "USD", name: "US Dollar", symbol: "$", rate: 1, status: 'active' },
-    { code: "SSP", name: "South Sudanese Pound", symbol: "SSP", rate: 625, status: 'active' },
+    { code: "KES", name: "Kenyan Shilling", symbol: "KSh", rate: 130, status: 'active' },
+    { code: "SSP", name: "South Sudanese Pound", symbol: "SSP", rate: 650, status: 'active' },
+    { code: "RWF", name: "Rwandan Franc", symbol: "RF", rate: 1200, status: 'active' },
   ]);
 
   const { data: currencies, isLoading, error } = useQuery({
@@ -56,6 +59,7 @@ export const CurrencySelector = ({
           return fallbackCurrencies;
         }
         
+        console.log('Fetched currencies:', data);
         return data as CurrencyData[];
       } catch (err) {
         console.error('Failed to fetch currencies:', err);
@@ -94,7 +98,7 @@ export const CurrencySelector = ({
           <SelectValue>{value}</SelectValue>
         </div>
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         {displayCurrencies.map((currency) => (
           <SelectItem key={currency.code} value={currency.code}>
             {currency.code} ({currency.symbol || currency.code})

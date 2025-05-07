@@ -64,7 +64,12 @@ export const CountrySelector = ({
         disabled={loading}
       >
         <SelectTrigger className="w-full md:w-40 bg-transparent border-none focus:ring-0">
-          {currentCountry ? (
+          {selectedCountry === "all" ? (
+            <span className="flex items-center">
+              <span className="mr-2">🌍</span>
+              <span>All Countries</span>
+            </span>
+          ) : currentCountry ? (
             <span className="flex items-center">
               <span className="mr-2 text-lg">{getFlagEmoji(currentCountry.code)}</span>
               <span>{currentCountry.name}</span>
@@ -72,11 +77,17 @@ export const CountrySelector = ({
           ) : (
             <span className="flex items-center">
               <span className="mr-2">🌍</span>
-              <span>All Countries</span>
+              <span>Select Country</span>
             </span>
           )}
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <SelectItem value="all" className="flex items-center">
+            <div className="flex items-center">
+              <span className="mr-2">🌍</span>
+              All Countries
+            </div>
+          </SelectItem>
           {countries.map((country) => (
             <SelectItem key={country.id} value={country.id.toString()}>
               <div className="flex items-center">

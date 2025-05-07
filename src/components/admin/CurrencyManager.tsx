@@ -35,16 +35,23 @@ export const CurrencyManager = () => {
   const { data: currencies, isLoading } = useQuery({
     queryKey: ['currencies'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('currencies')
-        .select('*')
-        .order('code');
-      
-      if (error) {
-        toast.error('Failed to load currencies');
+      try {
+        const { data, error } = await supabase
+          .from('currencies')
+          .select('*')
+          .order('code');
+        
+        if (error) {
+          toast.error('Failed to load currencies');
+          throw error;
+        }
+        
+        console.log('Fetched all currencies for admin:', data);
+        return data as Currency[];
+      } catch (error) {
+        console.error('Failed to fetch currencies:', error);
         throw error;
       }
-      return data as Currency[];
     },
   });
 
@@ -124,17 +131,17 @@ export const CurrencyManager = () => {
         className="relative flex cursor-pointer select-none items-center rounded-sm pl-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
       >
         <DollarSign className="mr-2 h-4 w-4" />
-        <span>Currencies</span>
+        <span>Currency Rates</span>
       </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent 
-          className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[425px]'}`}
+          className={`${isMobile ? 'w-[95vw] max-w-none' : 'sm:max-w-[500px]'}`}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle>Currency Management</DialogTitle>
+            <DialogTitle>Currency Rate Management</DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[60vh] rounded-md border">
             <div className="p-4">

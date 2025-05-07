@@ -11,10 +11,22 @@ export const uploadProductImage = async (file: File, countryId?: number, categor
     // Determine the appropriate folder path based on country and category
     let folderPath = 'products';
     
-    if (countryId === 1) {
-      folderPath += '/kenya';
-    } else if (countryId === 2) {
-      folderPath += '/southsudan';
+    // Get country code based on countryId
+    if (countryId) {
+      try {
+        const { data: countryData, error: countryError } = await supabase
+          .from('countries')
+          .select('code')
+          .eq('id', countryId)
+          .single();
+        
+        if (countryData && countryData.code) {
+          folderPath += `/${countryData.code.toLowerCase()}`;
+        }
+      } catch (error) {
+        console.error('Error getting country code:', error);
+        // Continue with upload even if country lookup fails
+      }
     }
     
     if (category) {

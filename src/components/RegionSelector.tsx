@@ -31,24 +31,29 @@ export const RegionSelector = ({
         setLoading(true);
         console.log("Fetching regions for country ID:", selectedCountry);
         
-        const { data, error } = await supabase
-          .from("regions")
-          .select("id, name, country_id, region_type")
-          .eq("country_id", Number(selectedCountry))
-          .order("name");
+        // Only fetch regions if a specific country is selected
+        if (selectedCountry && selectedCountry !== "all") {
+          const { data, error } = await supabase
+            .from("regions")
+            .select("id, name, country_id, region_type")
+            .eq("country_id", Number(selectedCountry))
+            .order("name");
 
-        if (error) {
-          console.error("Error fetching regions:", error);
-          return;
-        }
+          if (error) {
+            console.error("Error fetching regions:", error);
+            return;
+          }
 
-        console.log("Regions data:", data);
-        setRegions(data || []);
-        
-        // Set region type based on first region
-        if (data && data.length > 0) {
-          setRegionType(data[0].region_type);
-          console.log("Setting region type to:", data[0].region_type);
+          console.log("Regions data:", data);
+          setRegions(data || []);
+          
+          // Set region type based on first region
+          if (data && data.length > 0) {
+            setRegionType(data[0].region_type);
+            console.log("Setting region type to:", data[0].region_type);
+          }
+        } else {
+          setRegions([]);
         }
       } catch (error) {
         console.error("Failed to fetch regions:", error);
@@ -57,14 +62,9 @@ export const RegionSelector = ({
       }
     };
 
-    if (selectedCountry && selectedCountry !== "all") {
-      fetchRegions();
-      // Reset region selection when country changes
-      onRegionChange("all");
-    } else {
-      setRegions([]);
-      setLoading(false);
-    }
+    fetchRegions();
+    // Reset region selection when country changes
+    onRegionChange("all");
   }, [selectedCountry, onRegionChange]);
 
   // First letter uppercase for the region type label
@@ -82,11 +82,11 @@ export const RegionSelector = ({
             selectedCountry === "all" 
               ? "Select country first" 
               : loading
-                ? `Loading ${regionType}s...`
+                ? `Loading ${regionTypeLabel}s...`
                 : `Select ${regionTypeLabel}`
           } />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white dark:bg-gray-800">
           <SelectItem value="all">All {regionTypeLabel}s</SelectItem>
           {regions.map((region) => (
             <SelectItem key={region.id} value={region.name}>
