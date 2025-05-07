@@ -66,7 +66,7 @@ const Index = ({
       }
       
       if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory as ProductCategory | null);
+        query = query.eq("category", selectedCategory as ProductCategory);
       }
       
       if (effectiveCountry !== "all") {
@@ -75,7 +75,7 @@ const Index = ({
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as unknown as Product[];
+      return data as Product[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {

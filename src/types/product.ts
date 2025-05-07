@@ -53,7 +53,7 @@ export interface Product {
   product_images: ProductImage[];
   profiles?: Profile;
   county: string | null;
-  country: string | null; // Country name
+  country?: string | null; // Country name
   country_id: number | null; // Country ID reference
 }
 

@@ -47,7 +47,7 @@ const MyProducts = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as unknown as Product[];
+      return data as Product[];
     },
   });
 
