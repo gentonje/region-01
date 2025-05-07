@@ -120,7 +120,9 @@ const MyProducts = () => {
           <ModifyProductsList
             products={products}
             onDelete={handleDelete}
-            onEdit={handleEdit}
+            isLoading={false}
+            hasMore={false}
+            onLoadMore={() => {}}
           />
           <ModifyProductsPagination
             currentPage={currentPage}
