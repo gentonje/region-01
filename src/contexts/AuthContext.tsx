@@ -12,6 +12,7 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   user: null,
   loading: true,
+  signOut: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -77,6 +78,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setState(prev => ({ ...prev, loading: false }));
     }
   }, [state.retryCount]);
+
+  // Implement signOut method
+  const signOut = useCallback(async () => {
+    try {
+      console.log('Signing out...');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+      
+      // State will be updated via the auth state change listener
+      toast.success('Signed out successfully');
+    } catch (error) {
+      console.error('Error during sign out:', error);
+      toast.error('Failed to sign out. Please try again.');
+    }
+  }, []);
 
   useEffect(() => {
     console.log('Setting up auth state change listener');
@@ -155,7 +173,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     session: state.session,
     user: state.user,
     loading: state.loading,
-  }), [state.session, state.user, state.loading]);
+    signOut,
+  }), [state.session, state.user, state.loading, signOut]);
 
   return (
     <AuthContext.Provider value={value}>

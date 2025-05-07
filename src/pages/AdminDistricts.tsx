@@ -104,7 +104,7 @@ const AdminDistricts = () => {
         .order("name");
       
       if (filterCountry !== "all") {
-        query = query.eq("country_id", filterCountry);
+        query = query.eq("country_id", Number(filterCountry));
       }
       
       const { data, error } = await query;
