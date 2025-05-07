@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,7 +76,7 @@ const Index = ({
       const { data, error } = await query;
       if (error) throw error;
       
-      // Simplified type casting - avoid deep nesting
+      // Use proper type assertion
       return data as any[] as Product[];
     },
     initialPageParam: 0,

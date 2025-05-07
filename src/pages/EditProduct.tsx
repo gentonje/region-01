@@ -1,3 +1,4 @@
+
 import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { EditProductForm } from "@/components/product/edit/EditProductForm";
@@ -54,7 +55,7 @@ const EditProduct = () => {
           ...image,
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
         })),
-        county: product.county || null,
+        county: product.county || null
       };
 
       // Ensure country_id and country are properly handled for the form

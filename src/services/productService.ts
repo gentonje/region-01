@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ProductFormData } from "@/types/product";
 import { toast } from "sonner";
