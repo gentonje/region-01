@@ -20,67 +20,45 @@ export const CountiesFilter = ({
   onCountyChange,
   selectedCountry = "1", // Default to Kenya (id: 1)
 }: CountiesFilterProps) => {
-  const [regions, setRegions] = useState<{id: number, name: string, region_type: string}[]>([]);
+  const [districts, setDistricts] = useState<{id: number, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
-  const [regionType, setRegionType] = useState<string>("county");
-
-  // Define region type labels for each country
-  const countryRegionTypes: Record<string, string> = {
-    "1": "county",     // Kenya
-    "2": "district",   // Uganda
-    "3": "county",     // South Sudan
-    "4": "region",     // Ethiopia
-    "5": "province",   // Rwanda
-  };
 
   useEffect(() => {
-    const fetchRegions = async () => {
+    const fetchDistricts = async () => {
       try {
         setLoading(true);
         
         if (!selectedCountry || selectedCountry === "all") {
-          setRegions([]);
+          setDistricts([]);
           return;
         }
         
-        // Use regions table for all countries
+        // Use districts table for all countries
         const { data, error } = await supabase
-          .from("regions")
-          .select("id, name, region_type")
+          .from("districts")
+          .select("id, name")
           .eq("country_id", Number(selectedCountry))
           .order("name");
 
         if (error) {
-          console.error("Error fetching regions:", error);
+          console.error("Error fetching districts:", error);
           return;
         }
 
-        console.log("Fetched regions:", data);
-        setRegions(data || []);
-        
-        // Set region type based on country or first region
-        if (countryRegionTypes[selectedCountry]) {
-          setRegionType(countryRegionTypes[selectedCountry]);
-          console.log(`Setting region type to ${countryRegionTypes[selectedCountry]} for country ${selectedCountry}`);
-        } else if (data && data.length > 0) {
-          setRegionType(data[0].region_type);
-          console.log("Setting region type from data:", data[0].region_type);
-        }
+        console.log("Fetched districts:", data);
+        setDistricts(data || []);
       } catch (error) {
-        console.error("Failed to fetch regions:", error);
+        console.error("Failed to fetch districts:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRegions();
+    fetchDistricts();
     
     // Reset county selection when country changes
     onCountyChange("all");
   }, [selectedCountry, onCountyChange]);
-
-  // First letter uppercase for the region type label
-  const regionTypeLabel = regionType.charAt(0).toUpperCase() + regionType.slice(1);
 
   return (
     <div className="w-full max-w-xs">
@@ -95,16 +73,16 @@ export const CountiesFilter = ({
               !selectedCountry || selectedCountry === "all" 
                 ? "Select country first" 
                 : loading 
-                  ? `Loading ${regionTypeLabel}s...` 
-                  : `Select ${regionTypeLabel}`
+                  ? "Loading districts..." 
+                  : "Select district"
             } 
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All {regionTypeLabel}s</SelectItem>
-          {regions.map((region) => (
-            <SelectItem key={region.id} value={region.name}>
-              {region.name}
+          <SelectItem value="all">All Districts</SelectItem>
+          {districts.map((district) => (
+            <SelectItem key={district.id} value={district.name}>
+              {district.name}
             </SelectItem>
           ))}
         </SelectContent>

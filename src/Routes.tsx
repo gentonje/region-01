@@ -24,6 +24,7 @@ const AddProduct = lazy(() => import('./pages/AddProduct'));
 const EditProduct = lazy(() => import('./pages/EditProduct'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers'));
 const AdminManagement = lazy(() => import('./pages/AdminManagement'));
+const AdminDistricts = lazy(() => import('./pages/AdminDistricts'));
 const Cart = lazy(() => import('./pages/Cart'));
 const EditProfile = lazy(() => import('./pages/EditProfile'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
@@ -165,6 +166,17 @@ export const Routes = () => {
               <PrivateRoute>
                 <SuperAdminRoute>
                   <AdminManagement />
+                </SuperAdminRoute>
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/districts"
+            element={
+              <PrivateRoute>
+                <SuperAdminRoute>
+                  <AdminDistricts />
                 </SuperAdminRoute>
               </PrivateRoute>
             }

@@ -9,10 +9,6 @@ import { ProductFormData } from "./validation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-interface County {
-  name: string;
-}
-
 interface Country {
   id: number;
   name: string;
@@ -38,13 +34,11 @@ export const ProductFormField = ({
   formData,
   setFormData,
 }: ProductFormFieldProps) => {
-  const [counties, setCounties] = useState<County[]>([]);
-  const [isLoadingCounties, setIsLoadingCounties] = useState<boolean>(false);
+  const [districts, setDistricts] = useState<{id: number, name: string}[]>([]);
+  const [isLoadingDistricts, setIsLoadingDistricts] = useState<boolean>(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [isLoadingCountries, setIsLoadingCountries] = useState<boolean>(false);
   const [selectedCountry, setSelectedCountry] = useState<string>(formData.country || "1");
-  const [regions, setRegions] = useState<{id: number, name: string, region_type: string}[]>([]);
-  const [regionType, setRegionType] = useState<string>("county");
 
   // List of available product categories
   const productCategories: ProductCategory[] = [
@@ -59,15 +53,6 @@ export const ProductFormField = ({
     "Food & Beverages",
     "Other"
   ];
-  
-  // Define region type labels for each country
-  const countryRegionTypes: Record<string, string> = {
-    "1": "county",     // Kenya
-    "2": "district",   // Uganda
-    "3": "county",     // South Sudan
-    "4": "region",     // Ethiopia
-    "5": "province",   // Rwanda
-  };
 
   // Fetch countries
   useEffect(() => {
@@ -96,38 +81,31 @@ export const ProductFormField = ({
     }
   }, [name]);
 
-  // Fetch regions when country changes
+  // Fetch districts when country changes
   useEffect(() => {
     if (name === 'county' && formData.country) {
-      setIsLoadingCounties(true);
-      const fetchRegions = async () => {
+      setIsLoadingDistricts(true);
+      const fetchDistricts = async () => {
         try {
           const { data, error } = await supabase
-            .from('regions')
-            .select('id, name, region_type')
+            .from('districts')
+            .select('id, name')
             .eq('country_id', Number(formData.country))
             .order('name');
   
           if (error) {
-            console.error('Error fetching regions:', error);
+            console.error('Error fetching districts:', error);
           } else {
-            setRegions(data || []);
-            
-            // Set region type based on country or first region  
-            if (countryRegionTypes[formData.country]) {
-              setRegionType(countryRegionTypes[formData.country]);
-            } else if (data && data.length > 0) {
-              setRegionType(data[0].region_type);
-            }
+            setDistricts(data || []);
           }
         } catch (error) {
-          console.error('Failed to fetch regions:', error);
+          console.error('Failed to fetch districts:', error);
         } finally {
-          setIsLoadingCounties(false);
+          setIsLoadingDistricts(false);
         }
       };
       
-      fetchRegions();
+      fetchDistricts();
     }
   }, [name, formData.country]);
 
@@ -177,22 +155,19 @@ export const ProductFormField = ({
         </Select>
       );
     } else if (name === "county") {
-      // First letter uppercase for the region type label
-      const regionTypeLabel = regionType.charAt(0).toUpperCase() + regionType.slice(1);
-      
       return (
         <Select
           value={formData[name] || ""}
           onValueChange={handleValueChange}
-          disabled={isLoadingCounties || !formData.country}
+          disabled={isLoadingDistricts || !formData.country}
         >
           <SelectTrigger>
-            <SelectValue placeholder={isLoadingCounties ? `Loading ${regionTypeLabel}s...` : `Select ${regionTypeLabel}`} />
+            <SelectValue placeholder={isLoadingDistricts ? "Loading districts..." : "Select district"} />
           </SelectTrigger>
           <SelectContent>
-            {regions.map((region) => (
-              <SelectItem key={region.id} value={region.name}>
-                {region.name}
+            {districts.map((district) => (
+              <SelectItem key={district.id} value={district.name}>
+                {district.name}
               </SelectItem>
             ))}
           </SelectContent>

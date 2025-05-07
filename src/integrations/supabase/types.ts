@@ -140,6 +140,35 @@ export type Database = {
         }
         Relationships: []
       }
+      districts: {
+        Row: {
+          country_id: number
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          country_id: number
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          country_id?: number
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_progress: {
         Row: {
           completed_at: string | null

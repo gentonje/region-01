@@ -52,9 +52,9 @@ export interface Product {
   currency: string | null;
   product_images: ProductImage[];
   profiles?: Profile;
-  county: string | null;
+  county: string | null; // This is now district name
   country?: string | null; // Country name
-  country_id?: number | null; // Make country_id optional to match database structure
+  country_id?: number | null; // Country ID
 }
 
 export interface Country {
@@ -68,6 +68,12 @@ export interface Region {
   id: number;
   name: string;
   country_id: number;
-  region_type: string;
   created_at?: string;
+}
+
+export interface District {
+  id: number;
+  name: string;
+  country_id: number;
+  created_at: string;
 }
