@@ -1,50 +1,15 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2, Plus, Trash, Edit } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-
-interface District {
-  id: number;
-  name: string;
-  country_id: number;
-  created_at: string;
-  country_name?: string;
-}
-
-interface Country {
-  id: number;
-  name: string;
-  code: string;
-}
+import { Loader2 } from "lucide-react";
+import { DistrictsList } from "@/components/admin/districts/DistrictsList";
+import { DistrictForm } from "@/components/admin/districts/DistrictForm";
+import { DistrictFilters } from "@/components/admin/districts/DistrictFilters";
+import { District, Country } from "@/types/districts";
 
 const AdminDistricts = () => {
   const queryClient = useQueryClient();
@@ -133,10 +98,8 @@ const AdminDistricts = () => {
     },
     onSuccess: () => {
       toast.success("District added successfully");
-      setNewDistrict("");
-      setSelectedCountry("");
+      resetForm();
       queryClient.invalidateQueries({ queryKey: ["districts"] });
-      setIsDialogOpen(false);
     },
     onError: (error) => {
       toast.error(`Failed to add district: ${error.message}`);
@@ -158,11 +121,8 @@ const AdminDistricts = () => {
     },
     onSuccess: () => {
       toast.success("District updated successfully");
-      setEditingDistrict(null);
-      setNewDistrict("");
-      setSelectedCountry("");
+      resetForm();
       queryClient.invalidateQueries({ queryKey: ["districts"] });
-      setIsDialogOpen(false);
     },
     onError: (error) => {
       toast.error(`Failed to update district: ${error.message}`);
@@ -187,6 +147,14 @@ const AdminDistricts = () => {
       toast.error(`Failed to delete district: ${error.message}`);
     },
   });
+
+  // Reset form and close dialog
+  const resetForm = () => {
+    setEditingDistrict(null);
+    setNewDistrict("");
+    setSelectedCountry("");
+    setIsDialogOpen(false);
+  };
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -217,14 +185,6 @@ const AdminDistricts = () => {
     setNewDistrict(district.name);
     setSelectedCountry(district.country_id.toString());
     setIsDialogOpen(true);
-  };
-
-  // Handle dialog close
-  const handleDialogClose = () => {
-    setEditingDistrict(null);
-    setNewDistrict("");
-    setSelectedCountry("");
-    setIsDialogOpen(false);
   };
 
   // Handle delete district
@@ -264,154 +224,36 @@ const AdminDistricts = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <h1 className="text-2xl font-bold mb-4 md:mb-0">Districts Management</h1>
         
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <Select
-            value={filterCountry}
-            onValueChange={setFilterCountry}
-          >
-            <SelectTrigger className="w-full md:w-[200px]">
-              <SelectValue placeholder="Filter by country" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Countries</SelectItem>
-              {countries?.map((country) => (
-                <SelectItem key={country.id} value={country.id.toString()}>
-                  {country.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full sm:w-auto">
-                <Plus className="h-4 w-4 mr-2" />
-                Add District
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>
-                  {editingDistrict ? "Edit District" : "Add New District"}
-                </DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="grid gap-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="country" className="text-right">
-                      Country
-                    </label>
-                    <Select
-                      value={selectedCountry}
-                      onValueChange={setSelectedCountry}
-                      required
-                    >
-                      <SelectTrigger id="country" className="col-span-3">
-                        <SelectValue placeholder="Select a country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countries?.map((country) => (
-                          <SelectItem key={country.id} value={country.id.toString()}>
-                            {country.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <label htmlFor="name" className="text-right">
-                      District Name
-                    </label>
-                    <Input
-                      id="name"
-                      value={newDistrict}
-                      onChange={(e) => setNewDistrict(e.target.value)}
-                      className="col-span-3"
-                      required
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button type="button" variant="outline" onClick={handleDialogClose}>
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button 
-                    type="submit" 
-                    disabled={
-                      addDistrictMutation.isPending || 
-                      editDistrictMutation.isPending || 
-                      !newDistrict || 
-                      !selectedCountry
-                    }
-                  >
-                    {(addDistrictMutation.isPending || editDistrictMutation.isPending) && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {editingDistrict ? "Update District" : "Add District"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+        <DistrictFilters
+          filterCountry={filterCountry}
+          setFilterCountry={setFilterCountry}
+          countries={countries}
+          isDialogOpen={isDialogOpen}
+          setIsDialogOpen={setIsDialogOpen}
+        />
       </div>
 
-      {isLoadingDistricts || isLoadingCountries ? (
-        <div className="flex justify-center items-center h-64">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>District Name</TableHead>
-                <TableHead>Country</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {districts && districts.length > 0 ? (
-                districts.map((district) => (
-                  <TableRow key={district.id}>
-                    <TableCell>{district.name}</TableCell>
-                    <TableCell>{district.country_name}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleEditDistrict(district)}
-                        >
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleDeleteDistrict(district.id, district.name)}
-                          disabled={deleteDistrictMutation.isPending}
-                        >
-                          <Trash className="h-4 w-4" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center py-8">
-                    No districts found. Add your first district!
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+      {isDialogOpen && (
+        <DistrictForm
+          editingDistrict={editingDistrict}
+          countries={countries}
+          onSubmit={handleSubmit}
+          newDistrict={newDistrict}
+          setNewDistrict={setNewDistrict}
+          selectedCountry={selectedCountry}
+          setSelectedCountry={setSelectedCountry}
+          isPending={addDistrictMutation.isPending || editDistrictMutation.isPending}
+          onClose={resetForm}
+        />
       )}
+
+      <DistrictsList
+        districts={districts}
+        isLoading={isLoadingDistricts || isLoadingCountries}
+        onEdit={handleEditDistrict}
+        onDelete={handleDeleteDistrict}
+        deleteIsLoading={deleteDistrictMutation.isPending}
+      />
     </div>
   );
 };
