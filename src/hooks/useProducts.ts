@@ -56,9 +56,9 @@ export const useProducts = ({
       query = query.eq("county", selectedRegion);
     }
 
-    // Filter by country_id
+    // Filter by country_id - Convert string to number
     if (selectedCountry && selectedCountry !== "all") {
-      query = query.eq("country_id", selectedCountry);
+      query = query.eq("country_id", Number(selectedCountry)); // Cast string to number
     }
 
     if (showOnlyPublished) {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,13 +69,13 @@ const Index = ({
       }
       
       if (effectiveCountry !== "all") {
-        query = query.eq("country_id", effectiveCountry);
+        query = query.eq("country_id", Number(effectiveCountry)); // Ensure country_id is a number
       }
 
       const { data, error } = await query;
       if (error) throw error;
       
-      // Use proper type assertion with a direct cast to prevent deep instantiation
+      // Simplified type casting - avoid deep nesting
       return data as any[] as Product[];
     },
     initialPageParam: 0,

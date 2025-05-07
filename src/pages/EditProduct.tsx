@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { EditProductForm } from "@/components/product/edit/EditProductForm";
@@ -55,10 +54,10 @@ const EditProduct = () => {
           ...image,
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
         })),
-        county: product.county || null
+        county: product.county || null,
       };
 
-      // Ensure country_id exists in the returned object
+      // Ensure country_id and country are properly handled for the form
       const typedProduct = productWithUrls as Product;
       typedProduct.country_id = product.country_id || null;
       typedProduct.country = product.country_id ? String(product.country_id) : null;
@@ -76,7 +75,7 @@ const EditProduct = () => {
       console.log("Submitting form with county:", formData.county);
       console.log("Submitting form with country:", formData.country);
       
-      // Convert country to country_id
+      // Ensure country_id is properly converted to number
       const updatedData = {
         ...formData,
         country_id: formData.country ? Number(formData.country) : null,

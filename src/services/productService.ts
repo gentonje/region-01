@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ProductFormData } from "@/types/product";
 import { toast } from "sonner";
@@ -22,7 +21,7 @@ export const updateProduct = async (
     available_quantity: Number(formData.available_quantity),
     shipping_info: formData.shipping_info,
     county: formData.county,
-    country_id: formData.country ? Number(formData.country) : null // Ensure country_id is properly set
+    country_id: formData.country ? Number(formData.country) : null // Ensure country_id is a number
   };
 
   // Update main image if provided
