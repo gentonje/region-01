@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface ProductInfoProps {
   title: string;
@@ -10,6 +11,7 @@ interface ProductInfoProps {
   inStock: boolean;
   description: string;
   onBack: () => void;
+  productId?: string;
 }
 
 export const ProductInfo = ({
@@ -19,9 +21,18 @@ export const ProductInfo = ({
   inStock,
   description,
   onBack,
+  productId,
 }: ProductInfoProps) => {
   return (
     <div className="space-y-1 mt-1">
+      <BreadcrumbNav
+        items={[
+          { href: "/products", label: "Products" },
+          { href: "/products?category=" + encodeURIComponent(category), label: category },
+          { label: title, isCurrent: true }
+        ]}
+      />
+      
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"

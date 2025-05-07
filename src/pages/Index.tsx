@@ -10,6 +10,7 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { Product, ProductCategory } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
@@ -149,7 +150,14 @@ const Index = ({
 
   return (
     <div className="pb-16 mx-1 sm:mx-auto">
-      <div className="space-y-3">
+      <div className="space-y-1">
+        <BreadcrumbNav
+          items={[
+            { href: "/", label: "Home" },
+            { label: "Products", isCurrent: true }
+          ]}
+        />
+        
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <RegionSelector 
@@ -168,7 +176,7 @@ const Index = ({
         </div>
       </div>
       
-      <div className="mt-6">
+      <div className="mt-1">
         <ProductList
           products={products}
           getProductImageUrl={getProductImageUrl}

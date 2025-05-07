@@ -57,6 +57,17 @@ export const CountrySelector = ({
     fetchCountries();
   }, []);
 
+  // Get flag emoji function
+  const getFlagEmoji = (countryCode: string) => {
+    // Convert country code to flag emoji (each letter is converted to a regional indicator symbol)
+    const codePoints = countryCode
+      .toUpperCase()
+      .split('')
+      .map(char => 127397 + char.charCodeAt(0));
+    
+    return String.fromCodePoint(...codePoints);
+  };
+
   const handleCountryChange = (value: string) => {
     onCountryChange(value);
     
@@ -66,27 +77,39 @@ export const CountrySelector = ({
     }
   };
 
-  const selectedCountryName = countries.find(
+  const selectedCountry = countries.find(
     (c) => c.id === parseInt(selectedCountry)
-  )?.name || "Select Country";
+  );
 
   return (
-    <div className="flex items-center gap-2">
-      <Globe className="h-5 w-5 text-blue-500" />
+    <div className="flex items-center gap-1">
+      <Globe className="h-4 w-4 text-blue-500 hidden sm:block" />
       <Select
         value={selectedCountry}
         onValueChange={handleCountryChange}
         disabled={loading}
       >
-        <SelectTrigger className="min-w-[180px] h-9 px-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue placeholder={loading ? "Loading..." : selectedCountryName} />
+        <SelectTrigger className="min-w-[120px] max-w-[150px] h-8 px-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          {loading ? (
+            "Loading..."
+          ) : selectedCountry ? (
+            <div className="flex items-center space-x-1 truncate">
+              <span className="text-base">{getFlagEmoji(selectedCountry.code)}</span>
+              <span className="truncate hidden sm:block">{selectedCountry.name}</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-1">
+              <span>🌍</span>
+              <span className="truncate hidden sm:block">Select</span>
+            </div>
+          )}
         </SelectTrigger>
         <SelectContent>
           {countries.map((country) => (
             <SelectItem key={country.id} value={country.id.toString()}>
               <div className="flex items-center">
-                <span className="mr-2">{country.name}</span>
-                <span className="text-xs text-gray-500">({country.code})</span>
+                <span className="mr-2 text-base">{getFlagEmoji(country.code)}</span>
+                <span>{country.name}</span>
               </div>
             </SelectItem>
           ))}

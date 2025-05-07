@@ -130,7 +130,11 @@ const EditProduct = () => {
       <Navigation />
       <div className={styles.mainContent}>
         <div className="mx-1 my-1 px-1 py-1">
-          <EditProductHeader title="Edit Product" />
+          <EditProductHeader 
+            title="Edit Product" 
+            productId={id}
+            productTitle={product.title}
+          />
           <EditProductForm
             product={product}
             onSubmit={handleSubmit}

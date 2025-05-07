@@ -7,6 +7,7 @@ import { UserCheck, UserX } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { CurrencyManager } from "@/components/admin/CurrencyManager";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface User {
   id: string;
@@ -69,6 +70,14 @@ const AdminManagement = () => {
 
   return (
     <div className="mx-1 sm:mx-1 py-1 space-y-1">
+      <BreadcrumbNav
+        items={[
+          { href: "/products", label: "Home" },
+          { href: "/admin/users", label: "Admin" },
+          { label: "Management", isCurrent: true }
+        ]}
+      />
+      
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">Admin Management</h1>
 
       <div className="mb-1 flex w-full items-center space-x-1 mx-1">
