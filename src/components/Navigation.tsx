@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,7 @@ import { UserMenu } from "./navigation/UserMenu";
 import { CountrySelector } from "./navigation/CountrySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
+import { FloatingHomeButton } from "./navigation/FloatingHomeButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -132,6 +134,9 @@ export const Navigation = ({
           </div>
         </motion.div>
       </AnimatePresence>
+      
+      {/* Floating Home Button */}
+      <FloatingHomeButton />
       
       {session && (
         <BottomNav 

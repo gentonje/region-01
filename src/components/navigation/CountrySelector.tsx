@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Country } from "@/types/product";
@@ -56,32 +55,9 @@ export const CountrySelector = ({
 
   // Find the current country object
   const currentCountry = countries.find(c => c.id.toString() === selectedCountry);
-  
-  // Create the flag element that acts as a home link
-  const FlagElement = () => (
-    <Link to="/" className="flex items-center">
-      {selectedCountry === "all" ? (
-        <span className="flex items-center">
-          <span className="mr-2">🌍</span>
-          <span>All Countries</span>
-        </span>
-      ) : currentCountry ? (
-        <span className="flex items-center">
-          <span className="mr-2 text-lg">{getFlagEmoji(currentCountry.code)}</span>
-          <span>{currentCountry.name}</span>
-        </span>
-      ) : (
-        <span className="flex items-center">
-          <span className="mr-2">🌍</span>
-          <span>Select Country</span>
-        </span>
-      )}
-    </Link>
-  );
 
   return (
     <div className="w-full max-w-xs">
-      {!loading && <FlagElement />}
       <Select
         value={selectedCountry}
         onValueChange={onCountryChange}
