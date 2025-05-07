@@ -286,6 +286,7 @@ export type Database = {
           available_quantity: number | null
           average_rating: number | null
           category: Database["public"]["Enums"]["product_category"] | null
+          country_id: number | null
           county: string | null
           created_at: string
           currency: string | null
@@ -307,6 +308,7 @@ export type Database = {
           available_quantity?: number | null
           average_rating?: number | null
           category?: Database["public"]["Enums"]["product_category"] | null
+          country_id?: number | null
           county?: string | null
           created_at?: string
           currency?: string | null
@@ -328,6 +330,7 @@ export type Database = {
           available_quantity?: number | null
           average_rating?: number | null
           category?: Database["public"]["Enums"]["product_category"] | null
+          country_id?: number | null
           county?: string | null
           created_at?: string
           currency?: string | null
@@ -346,6 +349,13 @@ export type Database = {
           views?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_shop_id_fkey"
             columns: ["shop_id"]

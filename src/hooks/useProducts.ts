@@ -88,7 +88,8 @@ export const useProducts = ({
       throw error;
     }
 
-    return data as unknown as Product[];
+    // Use consistent type casting approach
+    return data as any[] as Product[];
   };
 
   const result = useInfiniteQuery({

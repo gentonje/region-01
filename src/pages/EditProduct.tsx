@@ -48,22 +48,22 @@ const EditProduct = () => {
 
       console.log("Fetched product from database:", product);
 
-      // Add publicUrl to each image and ensure type compatibility
+      // Transform product data to include image URLs and ensure proper typing
       const productWithUrls = {
         ...product,
         product_images: product.product_images.map((image) => ({
           ...image,
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
         })),
-        county: product.county || null,
-        // Make sure to handle country_id correctly - add explicit cast for TypeScript
+        county: product.county || null
       };
 
-      // Use type assertion to ensure TypeScript knows country_id exists
-      (productWithUrls as any).country_id = product.country_id || null;
-      (productWithUrls as any).country = product.country_id ? String(product.country_id) : null;
+      // Ensure country_id exists in the returned object
+      const typedProduct = productWithUrls as Product;
+      typedProduct.country_id = product.country_id || null;
+      typedProduct.country = product.country_id ? String(product.country_id) : null;
 
-      return productWithUrls as unknown as Product;
+      return typedProduct;
     },
     retry: 1
   });
