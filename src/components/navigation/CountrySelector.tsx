@@ -77,25 +77,32 @@ export const CountrySelector = ({
     }
   };
 
-  const selectedCountry = countries.find(
+  const handleHomeNavigation = () => {
+    navigate("/products");
+  };
+
+  const currentCountry = countries.find(
     (c) => c.id === parseInt(selectedCountry)
   );
 
   return (
     <div className="flex items-center gap-1">
-      <Globe className="h-4 w-4 text-blue-500 hidden sm:block" />
+      <Globe 
+        className="h-4 w-4 text-blue-500 hidden sm:block cursor-pointer" 
+        onClick={handleHomeNavigation}
+      />
       <Select
         value={selectedCountry}
         onValueChange={handleCountryChange}
         disabled={loading}
       >
-        <SelectTrigger className="min-w-[120px] max-w-[150px] h-8 px-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <SelectTrigger className="min-w-[90px] max-w-[120px] h-8 px-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           {loading ? (
             "Loading..."
-          ) : selectedCountry ? (
+          ) : currentCountry ? (
             <div className="flex items-center space-x-1 truncate">
-              <span className="text-base">{getFlagEmoji(selectedCountry.code)}</span>
-              <span className="truncate hidden sm:block">{selectedCountry.name}</span>
+              <span className="text-base">{getFlagEmoji(currentCountry.code)}</span>
+              <span className="truncate hidden sm:block">{currentCountry.name}</span>
             </div>
           ) : (
             <div className="flex items-center space-x-1">

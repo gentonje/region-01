@@ -159,7 +159,7 @@ const Index = ({
         />
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <div className="flex flex-row gap-2 w-full">
             <RegionSelector 
               selectedRegion={selectedRegion} 
               onRegionChange={handleRegionChange}
