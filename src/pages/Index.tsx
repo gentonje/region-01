@@ -75,7 +75,9 @@ const Index = ({
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Product[];
+      
+      // Cast as unknown first to avoid type mismatch
+      return (data as unknown) as Product[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {

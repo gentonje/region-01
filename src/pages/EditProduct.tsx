@@ -75,7 +75,7 @@ const EditProduct = () => {
       // Convert country to country_id
       const updatedData = {
         ...formData,
-        country_id: Number(formData.country),
+        country_id: Number(formData.country) || null,
       };
       
       await updateProduct(id, updatedData);

@@ -54,7 +54,7 @@ export interface Product {
   profiles?: Profile;
   county: string | null;
   country?: string | null; // Country name
-  country_id: number | null; // Country ID reference
+  country_id?: number | null; // Make country_id optional to match database structure
 }
 
 export interface Country {
