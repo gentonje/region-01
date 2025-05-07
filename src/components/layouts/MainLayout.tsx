@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useOutletContext } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -11,6 +11,11 @@ type MainLayoutProps = {
   children?: React.ReactNode;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+};
+
+// Define the type for our outlet context
+type LayoutContextType = {
+  selectedCountry: string;
 };
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -54,6 +59,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     document.documentElement.style.setProperty('--vh', `${vh}px`);
   };
 
+  // Create context value to pass to children
+  const contextValue: LayoutContextType = { selectedCountry };
+
   // Clone children with country context
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
@@ -81,7 +89,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       )}>
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 h-full">
           {childrenWithProps || (
-            <Outlet context={{ selectedCountry }} />
+            <Outlet context={contextValue} />
           )}
         </div>
       </div>

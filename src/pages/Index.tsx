@@ -8,6 +8,7 @@ import ProductDetail from "@/components/ProductDetail";
 import { CountiesFilter } from "@/components/CountiesFilter";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { useSelectedCountry } from "@/Routes";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
@@ -22,6 +23,11 @@ const Index = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCounty, setSelectedCounty] = useState("all");
   const pageSize = 12;
+  
+  // Get country from context if available
+  const countryContext = useSelectedCountry();
+  // Use context value if available, otherwise use prop
+  const effectiveCountry = countryContext?.selectedCountry || selectedCountry;
 
   // Fetch products with infinite scrolling
   const {
@@ -31,7 +37,7 @@ const Index = ({
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCounty, selectedCountry],
+    queryKey: ["products", searchQuery, selectedCounty, effectiveCountry],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -58,11 +64,9 @@ const Index = ({
       }
       
       // Once database is updated, uncomment this:
-      /*
-      if (selectedCountry !== "all") {
-        query = query.eq("country_id", selectedCountry);
+      if (effectiveCountry !== "all") {
+        query = query.eq("country_id", effectiveCountry);
       }
-      */
 
       const { data, error } = await query;
       if (error) throw error;
@@ -127,7 +131,7 @@ const Index = ({
           <CountiesFilter 
             selectedCounty={selectedCounty} 
             onCountyChange={handleCountyChange}
-            selectedCountry={selectedCountry}
+            selectedCountry={effectiveCountry}
           />
           
           <ProductFilters onSearchChange={handleSearchChange} />

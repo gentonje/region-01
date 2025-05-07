@@ -56,12 +56,10 @@ export const useProducts = ({
       query = query.eq("county", selectedCounty);
     }
 
-    // Once database is updated, uncomment this:
-    /*
+    // Filter by country_id
     if (selectedCountry && selectedCountry !== "all") {
       query = query.eq("country_id", selectedCountry);
     }
-    */
 
     if (showOnlyPublished) {
       query = query.eq('product_status', 'published');
