@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Product } from "@/types/product";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface UserStat {
   id: string;
@@ -134,6 +135,14 @@ const AdminUsers = () => {
 
   return (
     <div className="mx-1 py-1 space-y-1">
+      <BreadcrumbNav
+        items={[
+          { href: "/products", label: "Home" },
+          { href: "/admin/users", label: "Admin" },
+          { label: "User Management", isCurrent: true }
+        ]}
+      />
+      
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">User Management</h1>
       
       <div className="mb-1 flex w-full items-center space-x-1 mx-1">

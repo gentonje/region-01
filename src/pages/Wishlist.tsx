@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { getStorageUrl } from "@/utils/storage";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface WishlistItemWithProduct {
   id: string;
@@ -93,39 +93,46 @@ const Wishlist = () => {
     );
   }
 
-  if (wishlistItems.length === 0) {
-    return (
-      <div className="text-center py-8 px-2">
-        <p className="text-muted-foreground mb-4">
-          You haven't added any products to your wishlist yet.
-        </p>
-        <button
-          onClick={() => navigate("/products")}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
-        >
-          Browse Products
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto px-1 py-1">
-      <div className="w-full grid grid-cols-1 gap-1 space-y-1">
-        {wishlistItems.map((product) => (
-          <WishlistItem
-            key={product.id}
-            product={product}
-            item={{
-              id: "",
-              product_id: product.id
-            }}
-            onItemRemoved={() => {
-              setWishlistItems(prev => prev.filter(p => p.id !== product.id));
-            }}
-          />
-        ))}
+      <div className="w-full mb-4">
+        <BreadcrumbNav
+          items={[
+            { href: "/products", label: "Home" },
+            { label: "Wishlist", isCurrent: true }
+          ]}
+        />
       </div>
+      
+      {wishlistItems.length === 0 ? (
+        <div className="text-center py-8 px-2">
+          <p className="text-muted-foreground mb-4">
+            You haven't added any products to your wishlist yet.
+          </p>
+          <button
+            onClick={() => navigate("/products")}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+          >
+            Browse Products
+          </button>
+        </div>
+      ) : (
+        <div className="w-full grid grid-cols-1 gap-1 space-y-1">
+          {wishlistItems.map((product) => (
+            <WishlistItem
+              key={product.id}
+              product={product}
+              item={{
+                id: "",
+                product_id: product.id
+              }}
+              onItemRemoved={() => {
+                setWishlistItems(prev => prev.filter(p => p.id !== product.id));
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

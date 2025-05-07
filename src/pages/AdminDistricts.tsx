@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +30,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 interface District {
   id: number;
@@ -253,6 +253,14 @@ const AdminDistricts = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <BreadcrumbNav
+        items={[
+          { href: "/products", label: "Home" },
+          { href: "/admin/users", label: "Admin" },
+          { label: "Districts Management", isCurrent: true }
+        ]}
+      />
+      
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <h1 className="text-2xl font-bold mb-4 md:mb-0">Districts Management</h1>
         

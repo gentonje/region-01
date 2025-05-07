@@ -24,7 +24,7 @@ const Cart = () => {
       <BreadcrumbNav
         items={[
           { href: "/products", label: "Home" },
-          { label: "Cart" },
+          { label: "Cart", isCurrent: true }
         ]}
       />
 

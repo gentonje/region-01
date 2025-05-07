@@ -9,6 +9,7 @@ import { Loader2, User } from "lucide-react";
 import { ProfileFormFields } from "@/components/forms/profile/ProfileFormFields";
 import { profileFormSchema, ProfileFormData } from "@/components/forms/profile/validation";
 import { supabase } from "@/integrations/supabase/client";
+import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 
 const EditProfile = () => {
   const { toast } = useToast();
@@ -137,6 +138,16 @@ const EditProfile = () => {
 
   return (
     <div className="max-w-2xl mx-1 py-1">
+      <div className="mb-4">
+        <BreadcrumbNav
+          items={[
+            { href: "/products", label: "Home" },
+            { href: "/products", label: "Profile" },
+            { label: "Edit Profile", isCurrent: true }
+          ]}
+        />
+      </div>
+      
       <div className="flex items-center gap-1 mb-1">
         <User className="h-6 w-6" />
         <h1 className="text-2xl font-bold">Edit Profile</h1>
