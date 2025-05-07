@@ -38,7 +38,7 @@ export function BreadcrumbNav({ items }: BreadcrumbNavProps) {
               ) : (
                 <BreadcrumbPage>
                   {item.isCurrent ? (
-                    <Badge variant="secondary" className="font-normal">
+                    <Badge variant="secondary" className="font-normal bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {item.label}
                     </Badge>
                   ) : (
