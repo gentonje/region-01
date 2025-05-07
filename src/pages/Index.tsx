@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
-import { CountiesFilter } from "@/components/CountiesFilter";
+import { RegionSelector } from "@/components/RegionSelector";
+import { CategoryFilter } from "@/components/CategoryFilter";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
@@ -21,7 +22,8 @@ const Index = ({
 }: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedCounty, setSelectedCounty] = useState("all");
+  const [selectedRegion, setSelectedRegion] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const pageSize = 12;
   
   // Get country from context if available
@@ -37,7 +39,7 @@ const Index = ({
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCounty, effectiveCountry],
+    queryKey: ["products", searchQuery, selectedRegion, selectedCategory, effectiveCountry],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -59,18 +61,21 @@ const Index = ({
         query = query.ilike("title", `%${searchQuery}%`);
       }
 
-      if (selectedCounty !== "all") {
-        query = query.eq("county", selectedCounty);
+      if (selectedRegion !== "all") {
+        query = query.eq("county", selectedRegion);
       }
       
-      // Once database is updated, uncomment this:
+      if (selectedCategory !== "all") {
+        query = query.eq("category", selectedCategory);
+      }
+      
       if (effectiveCountry !== "all") {
         query = query.eq("country_id", effectiveCountry);
       }
 
       const { data, error } = await query;
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
@@ -92,8 +97,12 @@ const Index = ({
     setSearchQuery(search);
   };
 
-  const handleCountyChange = (county: string) => {
-    setSelectedCounty(county);
+  const handleRegionChange = (region: string) => {
+    setSelectedRegion(region);
+  };
+  
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
   };
 
   const getProductImageUrl = (product: Product) => {
@@ -128,11 +137,18 @@ const Index = ({
     <div className="pb-16 mx-1 sm:mx-auto">
       <div className="space-y-3">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <CountiesFilter 
-            selectedCounty={selectedCounty} 
-            onCountyChange={handleCountyChange}
-            selectedCountry={effectiveCountry}
-          />
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <RegionSelector 
+              selectedRegion={selectedRegion} 
+              onRegionChange={handleRegionChange}
+              selectedCountry={effectiveCountry}
+            />
+            
+            <CategoryFilter 
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+            />
+          </div>
           
           <ProductFilters onSearchChange={handleSearchChange} />
         </div>

@@ -21,19 +21,6 @@ export const CountrySelector = ({
     const fetchCountries = async () => {
       try {
         setLoading(true);
-        // For now, hardcode the countries until we set up the database table
-        const hardcodedCountries: Country[] = [
-          { id: 1, name: "Kenya", code: "KE" },
-          { id: 2, name: "Uganda", code: "UG" },
-          { id: 3, name: "South Sudan", code: "SS" },
-          { id: 4, name: "Ethiopia", code: "ET" },
-          { id: 5, name: "Rwanda", code: "RW" }
-        ];
-        
-        setCountries(hardcodedCountries);
-        
-        // Once the database table is set up, uncomment this:
-        /*
         const { data, error } = await supabase
           .from("countries")
           .select("id, name, code")
@@ -44,8 +31,7 @@ export const CountrySelector = ({
           return;
         }
 
-        setCountries(data);
-        */
+        setCountries(data || []);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
       } finally {

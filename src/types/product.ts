@@ -62,3 +62,11 @@ export interface Country {
   code: string;
   created_at?: string;
 }
+
+export interface Region {
+  id: number;
+  name: string;
+  country_id: number;
+  region_type: string;
+  created_at?: string;
+}

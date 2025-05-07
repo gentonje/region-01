@@ -7,7 +7,7 @@ import { useMemo } from "react";
 interface UseProductsProps {
   searchQuery: string;
   selectedCategory: string;
-  selectedCounty?: string;
+  selectedRegion?: string;
   selectedCountry?: string;
   sortOrder: string;
   showOnlyPublished?: boolean;
@@ -18,7 +18,7 @@ interface UseProductsProps {
 export const useProducts = ({ 
   searchQuery, 
   selectedCategory, 
-  selectedCounty = "all",
+  selectedRegion = "all",
   selectedCountry = "1", // Default to Kenya (id: 1)
   sortOrder,
   showOnlyPublished = false,
@@ -29,8 +29,8 @@ export const useProducts = ({
 
   // Memoize the queryKey to prevent unnecessary re-renders
   const queryKey = useMemo(() => 
-    ["products", searchQuery, selectedCategory, selectedCounty, selectedCountry, sortOrder, showOnlyPublished, userOnly],
-    [searchQuery, selectedCategory, selectedCounty, selectedCountry, sortOrder, showOnlyPublished, userOnly]
+    ["products", searchQuery, selectedCategory, selectedRegion, selectedCountry, sortOrder, showOnlyPublished, userOnly],
+    [searchQuery, selectedCategory, selectedRegion, selectedCountry, sortOrder, showOnlyPublished, userOnly]
   );
 
   const fetchProducts = async ({ pageParam = 0 }) => {
@@ -52,8 +52,8 @@ export const useProducts = ({
       query = query.eq("category", selectedCategory as ProductCategory);
     }
 
-    if (selectedCounty && selectedCounty !== "all") {
-      query = query.eq("county", selectedCounty);
+    if (selectedRegion && selectedRegion !== "all") {
+      query = query.eq("county", selectedRegion);
     }
 
     // Filter by country_id
@@ -88,7 +88,7 @@ export const useProducts = ({
       throw error;
     }
 
-    return data as Product[];
+    return data as unknown as Product[];
   };
 
   const result = useInfiniteQuery({

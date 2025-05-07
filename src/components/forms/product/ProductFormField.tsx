@@ -42,6 +42,9 @@ export const ProductFormField = ({
   const [isLoadingCounties, setIsLoadingCounties] = useState<boolean>(false);
   const [countries, setCountries] = useState<Country[]>([]);
   const [isLoadingCountries, setIsLoadingCountries] = useState<boolean>(false);
+  const [selectedCountry, setSelectedCountry] = useState<string>(formData.country || "1");
+  const [regions, setRegions] = useState<{id: number, name: string, region_type: string}[]>([]);
+  const [regionType, setRegionType] = useState<string>("county");
 
   // List of available product categories
   const productCategories: ProductCategory[] = [
@@ -57,56 +60,63 @@ export const ProductFormField = ({
     "Other"
   ];
 
-  // Fetch countries (hardcoded for now)
+  // Fetch countries
   useEffect(() => {
     if (name === 'country') {
       setIsLoadingCountries(true);
-      // Hardcoded countries until database is set up
-      const hardcodedCountries: Country[] = [
-        { id: 1, name: "Kenya", code: "KE" },
-        { id: 2, name: "Uganda", code: "UG" },
-        { id: 3, name: "South Sudan", code: "SS" },
-        { id: 4, name: "Ethiopia", code: "ET" },
-        { id: 5, name: "Rwanda", code: "RW" }
-      ];
-      setCountries(hardcodedCountries);
-      setIsLoadingCountries(false);
-    }
-  }, [name]);
-
-  // Fetch counties from Supabase
-  useEffect(() => {
-    const fetchCounties = async () => {
-      if (name !== 'county') return;
-      
-      setIsLoadingCounties(true);
-      try {
-        const { data, error } = await supabase
-          .from('counties')
-          .select('name')
-          .order('name');
-
-        if (error) {
-          console.error('Error fetching counties:', error);
-        } else {
-          setCounties(data || []);
+      const fetchCountries = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('countries')
+            .select('id, name, code')
+            .order('name');
+  
+          if (error) {
+            console.error('Error fetching countries:', error);
+          } else {
+            setCountries(data || []);
+          }
+        } catch (error) {
+          console.error('Failed to fetch countries:', error);
+        } finally {
+          setIsLoadingCountries(false);
         }
-      } catch (error) {
-        console.error('Failed to fetch counties:', error);
-      } finally {
-        setIsLoadingCounties(false);
-      }
-    };
-
-    fetchCounties();
+      };
+      
+      fetchCountries();
+    }
   }, [name]);
 
-  // Debug log for the county field
+  // Fetch regions when country changes
   useEffect(() => {
-    if (name === 'county') {
-      console.log('County value in field:', formData[name]);
+    if (name === 'county' && formData.country) {
+      setIsLoadingCounties(true);
+      const fetchRegions = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('regions')
+            .select('id, name, region_type')
+            .eq('country_id', Number(formData.country))
+            .order('name');
+  
+          if (error) {
+            console.error('Error fetching regions:', error);
+          } else {
+            setRegions(data || []);
+            if (data && data.length > 0) {
+              setRegionType(data[0].region_type);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch regions:', error);
+        } finally {
+          setIsLoadingCounties(false);
+        }
+      };
+      
+      fetchRegions();
     }
-  }, [formData, name]);
+  }, [name, formData.country]);
 
   const handleValueChange = (value: string) => {
     console.log(`Setting ${name} to:`, value);
@@ -114,6 +124,16 @@ export const ProductFormField = ({
       ...formData,
       [name]: value,
     });
+    
+    // If country changes, reset county
+    if (name === 'country') {
+      setSelectedCountry(value);
+      setFormData({
+        ...formData,
+        country: value,
+        county: "", // Reset county when country changes
+      });
+    }
   };
 
   const renderField = () => {
@@ -144,19 +164,22 @@ export const ProductFormField = ({
         </Select>
       );
     } else if (name === "county") {
+      // First letter uppercase for the region type label
+      const regionTypeLabel = regionType.charAt(0).toUpperCase() + regionType.slice(1);
+      
       return (
         <Select
           value={formData[name] || ""}
           onValueChange={handleValueChange}
-          disabled={isLoadingCounties}
+          disabled={isLoadingCounties || !formData.country}
         >
           <SelectTrigger>
-            <SelectValue placeholder={isLoadingCounties ? "Loading counties..." : "Select a county"} />
+            <SelectValue placeholder={isLoadingCounties ? `Loading ${regionType}s...` : `Select ${regionTypeLabel}`} />
           </SelectTrigger>
           <SelectContent>
-            {counties.map((county) => (
-              <SelectItem key={county.name} value={county.name}>
-                {county.name}
+            {regions.map((region) => (
+              <SelectItem key={region.id} value={region.name}>
+                {region.name}
               </SelectItem>
             ))}
           </SelectContent>

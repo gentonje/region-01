@@ -65,7 +65,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   // Clone children with country context
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, { selectedCountry });
+      return React.cloneElement(child, { selectedCountry } as any);
     }
     return child;
   });

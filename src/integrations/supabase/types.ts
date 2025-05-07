@@ -80,6 +80,27 @@ export type Database = {
         }
         Relationships: []
       }
+      countries: {
+        Row: {
+          code: string
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       currencies: {
         Row: {
           code: string
@@ -388,6 +409,38 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      regions: {
+        Row: {
+          country_id: number
+          created_at: string
+          id: number
+          name: string
+          region_type: string
+        }
+        Insert: {
+          country_id: number
+          created_at?: string
+          id?: number
+          name: string
+          region_type: string
+        }
+        Update: {
+          country_id?: number
+          created_at?: string
+          id?: number
+          name?: string
+          region_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regions_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       review_replies: {
         Row: {
