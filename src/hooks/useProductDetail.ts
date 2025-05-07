@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -72,7 +71,7 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
         .limit(4);
       
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
     },
     enabled: !!product.category,
   });

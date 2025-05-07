@@ -49,13 +49,15 @@ const EditProduct = () => {
       console.log("Fetched product from database:", product);
 
       // Add publicUrl to each image and ensure type compatibility
-      const productWithUrls: Product = {
+      const productWithUrls = {
         ...product,
         product_images: product.product_images.map((image) => ({
           ...image,
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
-        }))
-      };
+        })),
+        country: product.country || null,
+        country_id: product.country_id || null
+      } as Product;
 
       return productWithUrls;
     },

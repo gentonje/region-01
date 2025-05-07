@@ -11,7 +11,8 @@ export interface ProductFormData {
   available_quantity: number;
   shipping_info?: string;
   county: string;
-  country: string; // Add country field
+  country: string; // Country ID as string
+  country_id?: number; // Numeric country ID
 }
 
 export interface ProductImage {
@@ -52,8 +53,8 @@ export interface Product {
   product_images: ProductImage[];
   profiles?: Profile;
   county: string | null;
-  country: string | null; // Add country field
-  country_id: number | null; // Add country_id field
+  country: string | null; // Country name
+  country_id: number | null; // Country ID reference
 }
 
 export interface Country {

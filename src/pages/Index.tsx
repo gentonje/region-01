@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +6,7 @@ import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { RegionSelector } from "@/components/RegionSelector";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { Product } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
 
@@ -66,7 +65,7 @@ const Index = ({
       }
       
       if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory);
+        query = query.eq("category", selectedCategory as ProductCategory | null);
       }
       
       if (effectiveCountry !== "all") {

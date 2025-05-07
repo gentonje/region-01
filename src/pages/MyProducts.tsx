@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +46,7 @@ const MyProducts = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
     },
   });
 

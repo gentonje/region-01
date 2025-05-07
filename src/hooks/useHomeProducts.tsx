@@ -43,7 +43,7 @@ export const useHomeProducts = (
       const { data: products, error } = await query;
 
       if (error) throw error;
-      return products as Product[];
+      return products as unknown as Product[];
     },
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage || lastPage.length < (session ? 10 : PRODUCTS_PER_PAGE)) return undefined;
