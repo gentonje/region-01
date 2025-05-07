@@ -60,11 +60,16 @@ export const RegionSelector = ({
     onRegionChange("all");
   }, [selectedCountry, onRegionChange]);
 
+  const handleRegionChange = (value: string) => {
+    console.log("Region changed to:", value);
+    onRegionChange(value);
+  };
+
   return (
     <div className="w-full max-w-xs">
       <Select
         value={selectedRegion}
-        onValueChange={onRegionChange}
+        onValueChange={handleRegionChange}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

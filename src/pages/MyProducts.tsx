@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const MyProducts = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const pageSize = 10;
 
   // Query to fetch user's products
@@ -82,9 +84,10 @@ const MyProducts = () => {
     },
   });
 
-  const handleDelete = (productId: string) => {
+  // Fix: Update to return Promise<void>
+  const handleDelete = async (productId: string): Promise<void> => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      deleteProduct.mutate(productId);
+      await deleteProduct.mutate(productId);
     }
   };
 
@@ -123,6 +126,7 @@ const MyProducts = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
+            isMobile={isMobile}
           />
         </>
       ) : (

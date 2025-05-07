@@ -45,6 +45,8 @@ const Index = ({
   } = useInfiniteQuery({
     queryKey: ["products", searchQuery, selectedRegion, selectedCategory, effectiveCountry],
     queryFn: async ({ pageParam = 0 }) => {
+      console.log("Executing product query with region:", selectedRegion);
+      
       let query = supabase
         .from("products")
         .select(`
@@ -66,6 +68,7 @@ const Index = ({
       }
 
       if (selectedRegion !== "all") {
+        console.log("Adding region filter for:", selectedRegion);
         query = query.eq("county", selectedRegion);
       }
       
@@ -86,7 +89,18 @@ const Index = ({
         throw error;
       }
       
-      console.log("Fetched products:", data);
+      console.log("Fetched products:", data?.length || 0);
+      
+      // Add additional debugging if using region filter but getting no results
+      if (selectedRegion !== "all" && (!data || data.length === 0)) {
+        console.log("No products found with region filter. Checking database values...");
+        const { data: sampleData } = await supabase
+          .from("products")
+          .select("id, title, county")
+          .limit(5);
+          
+        console.log("Sample county values in database:", sampleData);
+      }
       
       // Use proper type assertion
       return data as any[] as Product[];

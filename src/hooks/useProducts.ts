@@ -60,8 +60,9 @@ export const useProducts = ({
       query = query.eq("category", selectedCategory as ProductCategory);
     }
 
-    // Filter by region (county/district) name
+    // Debug: Log before applying region filter
     if (selectedRegion && selectedRegion !== "all") {
+      console.log("Filtering by county/district:", selectedRegion);
       query = query.eq("county", selectedRegion);
     }
 
@@ -92,6 +93,7 @@ export const useProducts = ({
       query = query.order("created_at", { ascending: false });
     }
 
+    console.log("Final query built, executing...");
     const { data, error } = await query;
 
     if (error) {
@@ -100,6 +102,21 @@ export const useProducts = ({
     }
 
     console.log("Fetched products:", data?.length || 0);
+    
+    // Add additional logging to see what's in the database
+    if (selectedRegion && selectedRegion !== "all" && (!data || data.length === 0)) {
+      console.log("No products found for region:", selectedRegion);
+      
+      // Let's check if any products have county values at all
+      const { data: countyCheck, error: countyError } = await supabase
+        .from("products")
+        .select("id, title, county")
+        .limit(10);
+        
+      if (!countyError && countyCheck) {
+        console.log("Sample county values in database:", countyCheck.map(p => ({ id: p.id, title: p.title, county: p.county })));
+      }
+    }
 
     // Use consistent type casting approach
     return data as any[] as Product[];
