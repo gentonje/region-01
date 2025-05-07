@@ -56,11 +56,14 @@ const EditProduct = () => {
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
         })),
         county: product.county || null,
-        country_id: product.country_id || null, // Ensure country_id is present
-        country: product.country_id ? String(product.country_id) : null // Convert country_id to string for form
-      } as unknown as Product;
+        // Make sure to handle country_id correctly - add explicit cast for TypeScript
+      };
 
-      return productWithUrls;
+      // Use type assertion to ensure TypeScript knows country_id exists
+      (productWithUrls as any).country_id = product.country_id || null;
+      (productWithUrls as any).country = product.country_id ? String(product.country_id) : null;
+
+      return productWithUrls as unknown as Product;
     },
     retry: 1
   });

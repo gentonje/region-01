@@ -76,8 +76,8 @@ const Index = ({
       const { data, error } = await query;
       if (error) throw error;
       
-      // Use explicit type casting to avoid deep instantiation issues
-      return (data || []) as unknown as Product[];
+      // Simplified type casting - avoid deep nesting
+      return data as any[] as Product[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {

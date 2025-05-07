@@ -48,8 +48,8 @@ const MyProducts = () => {
 
       if (error) throw error;
       
-      // Use explicit type casting to avoid deep instantiation issues
-      return (data || []) as unknown as Product[];
+      // Simplified type casting - avoid deep nesting
+      return data as any[] as Product[];
     },
   });
 
