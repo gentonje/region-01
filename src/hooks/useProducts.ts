@@ -118,7 +118,6 @@ export const useProducts = ({
       }
     }
 
-    // Use consistent type casting approach
     return data as any[] as Product[];
   };
 

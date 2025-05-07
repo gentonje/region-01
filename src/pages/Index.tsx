@@ -42,6 +42,7 @@ const Index = ({
     hasNextPage,
     isFetchingNextPage,
     isLoading,
+    refetch,
   } = useInfiniteQuery({
     queryKey: ["products", searchQuery, selectedRegion, selectedCategory, effectiveCountry],
     queryFn: async ({ pageParam = 0 }) => {
@@ -69,6 +70,7 @@ const Index = ({
 
       if (selectedRegion !== "all") {
         console.log("Adding region filter for:", selectedRegion);
+        // Make sure we filter by county field, which contains the district name
         query = query.eq("county", selectedRegion);
       }
       
@@ -102,7 +104,6 @@ const Index = ({
         console.log("Sample county values in database:", sampleData);
       }
       
-      // Use proper type assertion
       return data as any[] as Product[];
     },
     initialPageParam: 0,
@@ -112,6 +113,11 @@ const Index = ({
         : undefined;
     },
   });
+
+  // Refresh products when filters change
+  useEffect(() => {
+    refetch();
+  }, [selectedRegion, selectedCategory, searchQuery, effectiveCountry, refetch]);
 
   const products = data?.pages.flat() || [];
 
