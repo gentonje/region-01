@@ -59,6 +59,15 @@ export const ProductFormField = ({
     "Food & Beverages",
     "Other"
   ];
+  
+  // Define region type labels for each country
+  const countryRegionTypes: Record<string, string> = {
+    "1": "county",     // Kenya
+    "2": "district",   // Uganda
+    "3": "county",     // South Sudan
+    "4": "region",     // Ethiopia
+    "5": "province",   // Rwanda
+  };
 
   // Fetch countries
   useEffect(() => {
@@ -103,7 +112,11 @@ export const ProductFormField = ({
             console.error('Error fetching regions:', error);
           } else {
             setRegions(data || []);
-            if (data && data.length > 0) {
+            
+            // Set region type based on country or first region  
+            if (countryRegionTypes[formData.country]) {
+              setRegionType(countryRegionTypes[formData.country]);
+            } else if (data && data.length > 0) {
               setRegionType(data[0].region_type);
             }
           }
@@ -174,7 +187,7 @@ export const ProductFormField = ({
           disabled={isLoadingCounties || !formData.country}
         >
           <SelectTrigger>
-            <SelectValue placeholder={isLoadingCounties ? `Loading ${regionType}s...` : `Select ${regionTypeLabel}`} />
+            <SelectValue placeholder={isLoadingCounties ? `Loading ${regionTypeLabel}s...` : `Select ${regionTypeLabel}`} />
           </SelectTrigger>
           <SelectContent>
             {regions.map((region) => (

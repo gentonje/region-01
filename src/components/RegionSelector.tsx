@@ -24,6 +24,15 @@ export const RegionSelector = ({
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
   const [regionType, setRegionType] = useState("county");
+  
+  // Define region type labels for each country
+  const countryRegionTypes: Record<string, string> = {
+    "1": "county",     // Kenya
+    "2": "district",   // Uganda
+    "3": "county",     // South Sudan
+    "4": "region",     // Ethiopia
+    "5": "province",   // Rwanda
+  };
 
   useEffect(() => {
     const fetchRegions = async () => {
@@ -47,10 +56,13 @@ export const RegionSelector = ({
           console.log("Regions data:", data);
           setRegions(data || []);
           
-          // Set region type based on first region
-          if (data && data.length > 0) {
+          // Set region type based on country or first region
+          if (countryRegionTypes[selectedCountry]) {
+            setRegionType(countryRegionTypes[selectedCountry]);
+            console.log(`Setting region type to ${countryRegionTypes[selectedCountry]} for country ${selectedCountry}`);
+          } else if (data && data.length > 0) {
             setRegionType(data[0].region_type);
-            console.log("Setting region type to:", data[0].region_type);
+            console.log("Setting region type from data:", data[0].region_type);
           }
         } else {
           setRegions([]);
