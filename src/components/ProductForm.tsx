@@ -42,10 +42,16 @@ export const ProductForm = ({
     // Debug validation before submission
     console.log("Form submission data:", data);
     console.log("County value:", data.county);
+    console.log("Country value:", data.country);
     
-    // Don't show toast error if county exists, even if empty string
-    if (formData.county === undefined || formData.county === null) {
+    // Validation checks
+    if (data.county === undefined || data.county === null || data.county === "") {
       toast.error("Please select a county");
+      return;
+    }
+    
+    if (data.country === undefined || data.country === null || data.country === "") {
+      toast.error("Please select a country");
       return;
     }
     
@@ -99,6 +105,14 @@ export const ProductForm = ({
           name="available_quantity"
           label="Available Quantity"
           type="number"
+          formData={formData}
+          setFormData={setFormData}
+        />
+
+        <ProductFormField
+          form={form}
+          name="country"
+          label="Country"
           formData={formData}
           setFormData={setFormData}
         />

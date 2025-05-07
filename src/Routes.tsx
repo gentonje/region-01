@@ -1,12 +1,20 @@
 
 import React, { lazy, Suspense, useState } from 'react';
-import { Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
+import { Routes as RouterRoutes, Route, Navigate, useOutletContext } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from './components/ui/skeleton';
 import { MainLayout } from '@/components/layouts/MainLayout';
+
+// Define outlet context type
+type OutletContextType = { selectedCountry: string };
+
+// Hook to use the country context
+export const useSelectedCountry = () => {
+  return useOutletContext<OutletContextType>();
+};
 
 // Lazy load pages for better performance
 const Index = lazy(() => import('./pages/Index'));

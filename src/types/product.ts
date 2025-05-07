@@ -10,7 +10,8 @@ export interface ProductFormData {
   category: ProductCategory;
   available_quantity: number;
   shipping_info?: string;
-  county: string; // Ensuring county is required here too
+  county: string;
+  country: string; // Add country field
 }
 
 export interface ProductImage {
@@ -51,4 +52,13 @@ export interface Product {
   product_images: ProductImage[];
   profiles?: Profile;
   county: string | null;
+  country: string | null; // Add country field
+  country_id: number | null; // Add country_id field
+}
+
+export interface Country {
+  id: number;
+  name: string;
+  code: string;
+  created_at?: string;
 }

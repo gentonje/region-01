@@ -12,11 +12,13 @@ import {
 interface CountiesFilterProps {
   selectedCounty: string;
   onCountyChange: (county: string) => void;
+  selectedCountry?: string; // Add this prop
 }
 
 export const CountiesFilter = ({
   selectedCounty,
   onCountyChange,
+  selectedCountry = "1", // Default to Kenya (id: 1)
 }: CountiesFilterProps) => {
   const [counties, setCounties] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +27,8 @@ export const CountiesFilter = ({
     const fetchCounties = async () => {
       try {
         setLoading(true);
+        // For now, we'll use the existing counties table structure
+        // Later, we'll update this to filter by country_id
         const { data, error } = await supabase
           .from("counties")
           .select("name")
@@ -38,6 +42,15 @@ export const CountiesFilter = ({
         // Extract unique counties
         const uniqueCounties = data.map(item => item.name);
         setCounties(uniqueCounties);
+        
+        // When database is updated, use this query instead:
+        /*
+        const { data, error } = await supabase
+          .from("counties")
+          .select("name")
+          .eq("country_id", selectedCountry)
+          .order("name");
+        */
       } catch (error) {
         console.error("Failed to fetch counties:", error);
       } finally {
@@ -46,7 +59,10 @@ export const CountiesFilter = ({
     };
 
     fetchCounties();
-  }, []);
+    
+    // Reset county selection when country changes
+    onCountyChange("all");
+  }, [selectedCountry, onCountyChange]);
 
   return (
     <div className="w-full max-w-xs">

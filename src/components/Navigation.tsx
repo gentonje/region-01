@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
-import { Logo } from "./navigation/Logo";
+import { CountrySelector } from "./navigation/CountrySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
 import { BottomNav } from "./navigation/BottomNav";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,11 +18,15 @@ import { cn } from "@/lib/utils";
 interface NavigationProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  selectedCountry?: string;
+  onCountryChange?: (country: string) => void;
 }
 
 export const Navigation = ({ 
   searchQuery = "", 
-  onSearchChange
+  onSearchChange,
+  selectedCountry = "1", // Default to Kenya (id: 1)
+  onCountryChange = () => {}
 }: NavigationProps) => {
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -109,7 +114,10 @@ export const Navigation = ({
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center h-14">
               <div className="flex justify-center">
-                <Logo />
+                <CountrySelector 
+                  selectedCountry={selectedCountry} 
+                  onCountryChange={onCountryChange} 
+                />
               </div>
 
               <div className="flex items-center gap-2">

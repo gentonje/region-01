@@ -11,9 +11,13 @@ import { SupportedCurrency } from "@/utils/currencyConverter";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
+  selectedCountry?: string; // Add country prop
 }
 
-const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
+const Index = ({ 
+  selectedCurrency = "USD",
+  selectedCountry = "1", // Default to Kenya (id: 1)
+}: IndexProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedCounty, setSelectedCounty] = useState("all");
@@ -27,7 +31,7 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
     isFetchingNextPage,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedCounty],
+    queryKey: ["products", searchQuery, selectedCounty, selectedCountry],
     queryFn: async ({ pageParam = 0 }) => {
       let query = supabase
         .from("products")
@@ -52,6 +56,13 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
       if (selectedCounty !== "all") {
         query = query.eq("county", selectedCounty);
       }
+      
+      // Once database is updated, uncomment this:
+      /*
+      if (selectedCountry !== "all") {
+        query = query.eq("country_id", selectedCountry);
+      }
+      */
 
       const { data, error } = await query;
       if (error) throw error;
@@ -115,7 +126,8 @@ const Index = ({ selectedCurrency = "USD" }: IndexProps) => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <CountiesFilter 
             selectedCounty={selectedCounty} 
-            onCountyChange={handleCountyChange} 
+            onCountyChange={handleCountyChange}
+            selectedCountry={selectedCountry}
           />
           
           <ProductFilters onSearchChange={handleSearchChange} />

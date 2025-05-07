@@ -68,9 +68,15 @@ const EditProduct = () => {
       if (!id) throw new Error("Product ID is required");
       
       console.log("Submitting form with county:", formData.county);
+      console.log("Submitting form with country:", formData.country);
       
-      // Don't perform county validation here, trust the form component
-      await updateProduct(id, formData);
+      // Convert country to country_id
+      const updatedData = {
+        ...formData,
+        country_id: Number(formData.country),
+      };
+      
+      await updateProduct(id, updatedData);
       toast.success("Product updated successfully!");
       
       // Navigate directly instead of using setTimeout

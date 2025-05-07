@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -11,12 +12,14 @@ import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
+import { useSelectedCountry } from "@/Routes";
 
 const AddProduct = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
+  const { selectedCountry = "1" } = useSelectedCountry() || {}; // Default to Kenya (id: 1)
   
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
@@ -25,6 +28,7 @@ const AddProduct = () => {
     category: "Other" as ProductCategory,
     available_quantity: "0",
     county: "",
+    country: selectedCountry, // Default to selected country
   });
 
   const handleSubmit = async (data: ProductFormData) => {
@@ -40,6 +44,11 @@ const AddProduct = () => {
 
     if (!data.county) {
       toast.error("Please select a county");
+      return;
+    }
+    
+    if (!data.country) {
+      toast.error("Please select a country");
       return;
     }
 
@@ -60,6 +69,7 @@ const AddProduct = () => {
           available_quantity: Number(data.available_quantity),
           storage_path: mainImagePath,
           county: data.county,
+          country_id: Number(data.country), // Store country_id instead of name
           user_id: user.id
         })
         .select()

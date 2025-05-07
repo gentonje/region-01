@@ -6,6 +6,7 @@ import { Product, ProductCategory } from "@/types/product";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ProductFormData } from "@/components/forms/product/validation";
+import { useSelectedCountry } from "@/Routes";
 
 interface EditProductFormProps {
   product: Product;
@@ -22,6 +23,8 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     handleDeleteImage,
     uploadImages,
   } = useProductImages(product.id);
+  
+  const { selectedCountry = "1" } = useSelectedCountry() || {}; // Default to Kenya (id: 1)
 
   // Log the product data to debug county value
   console.log("Product data in EditProductForm:", product);
@@ -33,6 +36,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
     category: product?.category || "Other" as ProductCategory,
     available_quantity: String(product?.available_quantity || "0"),
     county: product?.county || "",
+    country: product?.country_id?.toString() || selectedCountry, // Use country_id if available
   });
 
   // Log the initial form data to debug county value
@@ -64,6 +68,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
         ...data,
         mainImagePath,
         additionalImagePaths,
+        country_id: Number(data.country), // Ensure country_id is a number
       });
     } catch (error) {
       console.error("Error in handleSubmit:", error);

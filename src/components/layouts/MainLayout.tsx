@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
@@ -21,6 +21,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const { session } = useAuth();
   const isAuthenticated = !!session;
   const isMobile = useIsMobile();
+  const [selectedCountry, setSelectedCountry] = useState<string>("1"); // Default to Kenya (id: 1)
 
   // Handle mobile full screen mode
   useEffect(() => {
@@ -53,6 +54,14 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     document.documentElement.style.setProperty('--vh', `${vh}px`);
   };
 
+  // Clone children with country context
+  const childrenWithProps = React.Children.map(children, child => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child, { selectedCountry });
+    }
+    return child;
+  });
+
   return (
     <div className={cn(
       "min-h-screen w-full bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200",
@@ -61,6 +70,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
+        selectedCountry={selectedCountry}
+        onCountryChange={setSelectedCountry}
       />
       <div className={cn(
         "w-full pt-16", 
@@ -69,7 +80,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
         isMobile && "h-[calc(100%-64px)]" // Adjust content area for nav heights
       )}>
         <div className="max-w-7xl mx-auto px-1 sm:px-6 lg:px-8 h-full">
-          {children || <Outlet />}
+          {childrenWithProps || (
+            <Outlet context={{ selectedCountry }} />
+          )}
         </div>
       </div>
     </div>
