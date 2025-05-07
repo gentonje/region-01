@@ -4,6 +4,7 @@ import { ProductList } from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import { CountiesFilter } from "@/components/CountiesFilter";
 import { SupportedCurrency } from "@/utils/currencyConverter";
+import { useSelectedCountry } from "@/Routes";
 
 interface ProductListingSectionProps {
   products: Product[];
@@ -48,6 +49,9 @@ export const ProductListingSection = ({
   emptyMessage = "No products found",
   isLoading = false
 }: ProductListingSectionProps) => {
+  // Get country from context
+  const { selectedCountry } = useSelectedCountry() || { selectedCountry: "1" };
+  
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
   };
@@ -62,6 +66,7 @@ export const ProductListingSection = ({
         <CountiesFilter
           selectedCounty={selectedCounty}
           onCountyChange={handleCountyChange}
+          selectedCountry={selectedCountry}
         />
         <ProductFilters onSearchChange={handleSearchChange} />
       </div>

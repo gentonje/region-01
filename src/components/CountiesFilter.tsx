@@ -12,7 +12,7 @@ import {
 interface CountiesFilterProps {
   selectedCounty: string;
   onCountyChange: (county: string) => void;
-  selectedCountry?: string; // Add this prop
+  selectedCountry?: string; // Country ID
 }
 
 export const CountiesFilter = ({
@@ -20,65 +20,79 @@ export const CountiesFilter = ({
   onCountyChange,
   selectedCountry = "1", // Default to Kenya (id: 1)
 }: CountiesFilterProps) => {
-  const [counties, setCounties] = useState<string[]>([]);
+  const [regions, setRegions] = useState<{id: number, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
+  const [regionType, setRegionType] = useState<string>("county");
 
   useEffect(() => {
-    const fetchCounties = async () => {
+    const fetchRegions = async () => {
       try {
         setLoading(true);
-        // For now, we'll use the existing counties table structure
-        // Later, we'll update this to filter by country_id
+        
+        if (!selectedCountry || selectedCountry === "all") {
+          setRegions([]);
+          return;
+        }
+        
+        // Use regions table instead of counties
         const { data, error } = await supabase
-          .from("counties")
-          .select("name")
+          .from("regions")
+          .select("id, name, region_type")
+          .eq("country_id", Number(selectedCountry))
           .order("name");
 
         if (error) {
-          console.error("Error fetching counties:", error);
+          console.error("Error fetching regions:", error);
           return;
         }
 
-        // Extract unique counties
-        const uniqueCounties = data.map(item => item.name);
-        setCounties(uniqueCounties);
+        console.log("Fetched regions:", data);
+        setRegions(data || []);
         
-        // When database is updated, use this query instead:
-        /*
-        const { data, error } = await supabase
-          .from("counties")
-          .select("name")
-          .eq("country_id", selectedCountry)
-          .order("name");
-        */
+        // Set region type based on first region
+        if (data && data.length > 0) {
+          setRegionType(data[0].region_type);
+          console.log("Setting region type to:", data[0].region_type);
+        }
       } catch (error) {
-        console.error("Failed to fetch counties:", error);
+        console.error("Failed to fetch regions:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCounties();
+    fetchRegions();
     
     // Reset county selection when country changes
     onCountyChange("all");
   }, [selectedCountry, onCountyChange]);
+
+  // First letter uppercase for the region type label
+  const regionTypeLabel = regionType.charAt(0).toUpperCase() + regionType.slice(1);
 
   return (
     <div className="w-full max-w-xs">
       <Select
         value={selectedCounty}
         onValueChange={onCountyChange}
-        disabled={loading}
+        disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue placeholder={loading ? "Loading counties..." : "Select County"} />
+          <SelectValue 
+            placeholder={
+              !selectedCountry || selectedCountry === "all" 
+                ? "Select country first" 
+                : loading 
+                  ? `Loading ${regionTypeLabel}s...` 
+                  : `Select ${regionTypeLabel}`
+            } 
+          />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Counties</SelectItem>
-          {counties.map((county) => (
-            <SelectItem key={county} value={county}>
-              {county}
+          <SelectItem value="all">All {regionTypeLabel}s</SelectItem>
+          {regions.map((region) => (
+            <SelectItem key={region.id} value={region.name}>
+              {region.name}
             </SelectItem>
           ))}
         </SelectContent>

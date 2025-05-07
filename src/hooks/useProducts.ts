@@ -60,6 +60,7 @@ export const useProducts = ({
       query = query.eq("category", selectedCategory as ProductCategory);
     }
 
+    // Filter by region (county/district) name
     if (selectedRegion && selectedRegion !== "all") {
       query = query.eq("county", selectedRegion);
     }

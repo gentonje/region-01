@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Outlet, useOutletContext } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
@@ -16,6 +15,7 @@ type MainLayoutProps = {
 // Define the type for our outlet context
 type LayoutContextType = {
   selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
 };
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
@@ -60,7 +60,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   };
 
   // Create context value to pass to children
-  const contextValue: LayoutContextType = { selectedCountry };
+  const contextValue: LayoutContextType = { selectedCountry, setSelectedCountry };
 
   // Clone children with country context
   const childrenWithProps = React.Children.map(children, child => {

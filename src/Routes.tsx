@@ -1,6 +1,6 @@
 
 import React, { lazy, Suspense, useState } from 'react';
-import { Routes as RouterRoutes, Route, Navigate, useOutletContext } from 'react-router-dom';
+import { Routes as RouterRoutes, Route, Navigate, useOutletContext, createContext, useContext } from 'react-router-dom';
 import { PrivateRoute } from '@/components/PrivateRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
@@ -44,6 +44,8 @@ const PageLoader = () => (
 export const Routes = () => {
   const { session, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  // Default country for testing is Sudan (you'd fetch this from user preferences or IP detection)
+  const [selectedCountry, setSelectedCountry] = useState("1");
 
   if (loading) {
     return <PageLoader />;
@@ -70,6 +72,8 @@ export const Routes = () => {
             <MainLayout 
               searchQuery={searchQuery} 
               onSearchChange={setSearchQuery}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
             />
           } 
         >
@@ -83,7 +87,7 @@ export const Routes = () => {
             path="/products" 
             element={
               <PrivateRoute>
-                <Index />
+                <Index selectedCountry={selectedCountry} />
               </PrivateRoute>
             } 
           />
