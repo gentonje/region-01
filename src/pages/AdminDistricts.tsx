@@ -359,10 +359,8 @@ const AdminDistricts = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>District Name</TableHead>
                 <TableHead>Country</TableHead>
-                <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -370,12 +368,8 @@ const AdminDistricts = () => {
               {districts && districts.length > 0 ? (
                 districts.map((district) => (
                   <TableRow key={district.id}>
-                    <TableCell className="font-medium">{district.id}</TableCell>
                     <TableCell>{district.name}</TableCell>
                     <TableCell>{district.country_name}</TableCell>
-                    <TableCell>
-                      {new Date(district.created_at).toLocaleDateString()}
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
                         <Button
@@ -401,7 +395,7 @@ const AdminDistricts = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8">
+                  <TableCell colSpan={3} className="text-center py-8">
                     No districts found. Add your first district!
                   </TableCell>
                 </TableRow>

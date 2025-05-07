@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { User } from "lucide-react";
 
 export const UserMenu = () => {
   const { session, signOut } = useAuth();
@@ -75,13 +76,6 @@ export const UserMenu = () => {
   };
 
   const displayName = profile?.full_name || profile?.username || user?.email;
-  const initials = displayName
-    ? displayName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "U";
 
   return (
     <DropdownMenu>
@@ -92,7 +86,9 @@ export const UserMenu = () => {
               src={profile?.avatar_url || ""}
               alt={displayName || "User"}
             />
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback>
+              <User className="h-5 w-5" />
+            </AvatarFallback>
           </Avatar>
         </button>
       </DropdownMenuTrigger>
