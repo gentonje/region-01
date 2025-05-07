@@ -1,33 +1,45 @@
-import { supabase } from "@/integrations/supabase/client";
 
-export const uploadImage = async (
-  file: File | null,
-  productId: string,
-  isMain: boolean,
-  displayOrder: number
-): Promise<string> => {
-  if (!file) throw new Error("No file provided");
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
-  // Create a unique file name
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${productId}/${crypto.randomUUID()}.${fileExt}`;
+export const uploadProductImage = async (file: File, countryId?: number, category?: string) => {
+  try {
+    if (!file) {
+      throw new Error('No file provided');
+    }
 
-  // Upload the file to Supabase storage
-  const { error: uploadError } = await supabase.storage
-    .from("images")
-    .upload(fileName, file);
+    // Determine the appropriate folder path based on country and category
+    let folderPath = 'products';
+    
+    if (countryId === 1) {
+      folderPath += '/kenya';
+    } else if (countryId === 2) {
+      folderPath += '/southsudan';
+    }
+    
+    if (category) {
+      folderPath += `/${category.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+    }
+    
+    // Generate a unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${uuidv4().substring(0, 8)}.${fileExt}`;
+    const filePath = `${folderPath}/${fileName}`;
 
-  if (uploadError) throw uploadError;
+    // Upload file to supabase storage
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filePath, file);
 
-  // Insert the image record into the product_images table
-  const { error: dbError } = await supabase.from("product_images").insert({
-    product_id: productId,
-    storage_path: fileName,
-    is_main: isMain,
-    display_order: displayOrder,
-  });
+    if (uploadError) {
+      console.error('Error uploading image:', uploadError);
+      throw uploadError;
+    }
 
-  if (dbError) throw dbError;
-
-  return fileName;
+    console.log('Image uploaded successfully to:', filePath);
+    return filePath;
+  } catch (error) {
+    console.error('Error in uploadProductImage:', error);
+    throw error;
+  }
 };

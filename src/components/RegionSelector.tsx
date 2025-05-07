@@ -29,6 +29,8 @@ export const RegionSelector = ({
     const fetchRegions = async () => {
       try {
         setLoading(true);
+        console.log("Fetching regions for country ID:", selectedCountry);
+        
         const { data, error } = await supabase
           .from("regions")
           .select("id, name, country_id, region_type")
@@ -40,10 +42,13 @@ export const RegionSelector = ({
           return;
         }
 
+        console.log("Regions data:", data);
         setRegions(data || []);
         
+        // Set region type based on first region
         if (data && data.length > 0) {
           setRegionType(data[0].region_type);
+          console.log("Setting region type to:", data[0].region_type);
         }
       } catch (error) {
         console.error("Failed to fetch regions:", error);
@@ -52,10 +57,14 @@ export const RegionSelector = ({
       }
     };
 
-    fetchRegions();
-    
-    // Reset region selection when country changes
-    onRegionChange("all");
+    if (selectedCountry && selectedCountry !== "all") {
+      fetchRegions();
+      // Reset region selection when country changes
+      onRegionChange("all");
+    } else {
+      setRegions([]);
+      setLoading(false);
+    }
   }, [selectedCountry, onRegionChange]);
 
   // First letter uppercase for the region type label
@@ -66,10 +75,16 @@ export const RegionSelector = ({
       <Select
         value={selectedRegion}
         onValueChange={onRegionChange}
-        disabled={loading}
+        disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue placeholder={loading ? `Loading ${regionType}s...` : `Select ${regionTypeLabel}`} />
+          <SelectValue placeholder={
+            selectedCountry === "all" 
+              ? "Select country first" 
+              : loading
+                ? `Loading ${regionType}s...`
+                : `Select ${regionTypeLabel}`
+          } />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All {regionTypeLabel}s</SelectItem>

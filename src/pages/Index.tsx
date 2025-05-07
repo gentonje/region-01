@@ -31,6 +31,9 @@ const Index = ({
   // Use context value if available, otherwise use prop
   const effectiveCountry = countryContext?.selectedCountry || selectedCountry;
 
+  console.log("Current country selection:", effectiveCountry);
+  console.log("Current region selection:", selectedRegion);
+
   // Fetch products with infinite scrolling
   const {
     data,
@@ -69,12 +72,20 @@ const Index = ({
         query = query.eq("category", selectedCategory as ProductCategory);
       }
       
+      // Apply country filter only if a specific country is selected
       if (effectiveCountry !== "all") {
-        query = query.eq("country_id", Number(effectiveCountry)); // Ensure country_id is a number
+        query = query.eq("country_id", Number(effectiveCountry));
+        console.log("Filtering by country_id:", Number(effectiveCountry));
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
+      
+      console.log("Fetched products:", data);
       
       // Use proper type assertion
       return data as any[] as Product[];
@@ -100,6 +111,7 @@ const Index = ({
   };
 
   const handleRegionChange = (region: string) => {
+    console.log("Region changed to:", region);
     setSelectedRegion(region);
   };
   

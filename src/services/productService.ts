@@ -25,6 +25,11 @@ export const updateProduct = async (
     country_id: formData.country ? Number(formData.country) : null // Ensure country_id is a number
   };
 
+  console.log("Converting country to country_id:", {
+    originalValue: formData.country,
+    convertedValue: updateData.country_id
+  });
+
   // Update main image if provided
   if (formData.mainImagePath) {
     updateData.storage_path = formData.mainImagePath;

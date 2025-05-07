@@ -37,6 +37,14 @@ export const useProducts = ({
     const startRange = Number(pageParam) * limit;
     const endRange = startRange + (limit - 1);
 
+    console.log("Fetching products with filters:", {
+      searchQuery,
+      selectedCategory,
+      selectedRegion,
+      selectedCountry,
+      sortOrder
+    });
+
     // Build query with optimized filters
     let query = supabase
       .from("products")
@@ -58,7 +66,9 @@ export const useProducts = ({
 
     // Filter by country_id - Convert string to number
     if (selectedCountry && selectedCountry !== "all") {
-      query = query.eq("country_id", Number(selectedCountry)); // Cast string to number
+      const countryId = Number(selectedCountry);
+      query = query.eq("country_id", countryId);
+      console.log("Filtering by country_id:", countryId);
     }
 
     if (showOnlyPublished) {
@@ -87,6 +97,8 @@ export const useProducts = ({
       console.error("Error fetching products:", error);
       throw error;
     }
+
+    console.log("Fetched products:", data?.length || 0);
 
     // Use consistent type casting approach
     return data as any[] as Product[];

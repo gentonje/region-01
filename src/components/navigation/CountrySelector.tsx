@@ -30,6 +30,7 @@ export const CountrySelector = ({
           return;
         }
 
+        console.log("Fetched countries:", data);
         setCountries(data || []);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
@@ -52,6 +53,9 @@ export const CountrySelector = ({
     return String.fromCodePoint(...codePoints);
   };
 
+  // Find the current country object
+  const currentCountry = countries.find(c => c.id.toString() === selectedCountry);
+
   return (
     <div className="w-full max-w-xs">
       <Select
@@ -60,16 +64,17 @@ export const CountrySelector = ({
         disabled={loading}
       >
         <SelectTrigger className="w-full md:w-40 bg-transparent border-none focus:ring-0">
-          <div className="flex items-center">
-            {selectedCountry !== "all" && countries.find(c => c.id.toString() === selectedCountry) ? (
-              <span className="mr-2 text-lg">
-                {getFlagEmoji(countries.find(c => c.id.toString() === selectedCountry)?.code || "")}
-              </span>
-            ) : (
+          {currentCountry ? (
+            <span className="flex items-center">
+              <span className="mr-2 text-lg">{getFlagEmoji(currentCountry.code)}</span>
+              <span>{currentCountry.name}</span>
+            </span>
+          ) : (
+            <span className="flex items-center">
               <span className="mr-2">🌍</span>
-            )}
-            <SelectValue placeholder={loading ? "Loading..." : "Select Country"} />
-          </div>
+              <span>All Countries</span>
+            </span>
+          )}
         </SelectTrigger>
         <SelectContent>
           {countries.map((country) => (
