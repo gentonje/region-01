@@ -20,7 +20,7 @@ export const CountiesFilter = ({
   onCountyChange,
   selectedCountry = "1", // Default to Kenya (id: 1)
 }: CountiesFilterProps) => {
-  const [regions, setRegions] = useState<{id: number, name: string}[]>([]);
+  const [regions, setRegions] = useState<{id: number, name: string, region_type: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [regionType, setRegionType] = useState<string>("county");
 
@@ -34,7 +34,7 @@ export const CountiesFilter = ({
           return;
         }
         
-        // Use regions table instead of counties
+        // Use regions table for all countries
         const { data, error } = await supabase
           .from("regions")
           .select("id, name, region_type")

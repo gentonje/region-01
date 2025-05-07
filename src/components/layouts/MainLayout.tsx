@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Outlet, useOutletContext } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
@@ -10,6 +11,8 @@ type MainLayoutProps = {
   children?: React.ReactNode;
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
+  selectedCountry?: string;
+  setSelectedCountry?: (country: string) => void;
 };
 
 // Define the type for our outlet context
@@ -22,11 +25,17 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   searchQuery = '',
   onSearchChange,
+  selectedCountry = "1", // Default to Kenya (id: 1)
+  setSelectedCountry = () => {}, // Provide default empty function
 }) => {
   const { session } = useAuth();
   const isAuthenticated = !!session;
   const isMobile = useIsMobile();
-  const [selectedCountry, setSelectedCountry] = useState<string>("1"); // Default to Kenya (id: 1)
+  const [internalSelectedCountry, setInternalSelectedCountry] = useState<string>(selectedCountry);
+  
+  // Use the prop if provided, otherwise use internal state
+  const effectiveSelectedCountry = selectedCountry || internalSelectedCountry;
+  const effectiveSetSelectedCountry = setSelectedCountry || setInternalSelectedCountry;
 
   // Handle mobile full screen mode
   useEffect(() => {
@@ -60,12 +69,15 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   };
 
   // Create context value to pass to children
-  const contextValue: LayoutContextType = { selectedCountry, setSelectedCountry };
+  const contextValue: LayoutContextType = { 
+    selectedCountry: effectiveSelectedCountry, 
+    setSelectedCountry: effectiveSetSelectedCountry 
+  };
 
   // Clone children with country context
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, { selectedCountry } as any);
+      return React.cloneElement(child, { selectedCountry: effectiveSelectedCountry } as any);
     }
     return child;
   });
@@ -78,8 +90,8 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       <Navigation 
         searchQuery={searchQuery} 
         onSearchChange={onSearchChange}
-        selectedCountry={selectedCountry}
-        onCountryChange={setSelectedCountry}
+        selectedCountry={effectiveSelectedCountry}
+        onCountryChange={effectiveSetSelectedCountry}
       />
       <div className={cn(
         "w-full pt-16", 
