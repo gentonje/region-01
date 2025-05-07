@@ -76,8 +76,8 @@ const Index = ({
       const { data, error } = await query;
       if (error) throw error;
       
-      // Cast as unknown first to avoid type mismatch
-      return (data as unknown) as Product[];
+      // Use explicit type casting to avoid deep instantiation issues
+      return (data || []) as unknown as Product[];
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {

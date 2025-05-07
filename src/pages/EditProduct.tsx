@@ -56,8 +56,9 @@ const EditProduct = () => {
           publicUrl: supabase.storage.from('images').getPublicUrl(image.storage_path).data.publicUrl
         })),
         county: product.county || null,
-        country_id: product.country_id || null
-      } as Product;
+        country_id: product.country_id || null, // Ensure country_id is present
+        country: product.country_id ? String(product.country_id) : null // Convert country_id to string for form
+      } as unknown as Product;
 
       return productWithUrls;
     },
@@ -75,7 +76,7 @@ const EditProduct = () => {
       // Convert country to country_id
       const updatedData = {
         ...formData,
-        country_id: Number(formData.country) || null,
+        country_id: formData.country ? Number(formData.country) : null,
       };
       
       await updateProduct(id, updatedData);
