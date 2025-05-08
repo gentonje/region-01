@@ -53,10 +53,13 @@ export const useShoppingAssistant = () => {
       
       console.log("Message history for context:", messageHistory);
       
-      // Call our edge function
+      // Call our edge function with better error handling
       console.log("Invoking chat-assistant edge function...");
       const { data, error: fnError } = await supabase.functions.invoke('chat-assistant', {
-        body: { query: content, messageHistory }
+        body: { 
+          query: content, 
+          messageHistory 
+        }
       });
       
       console.log("Edge function response:", data);

@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Minimize } from 'lucide-react';
+import { MessageCircle, X, Send, Minimize, User, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useScrollDirection, ScrollDirection } from '@/hooks/useScrollDirection';
 import { useShoppingAssistant, Message } from '@/hooks/useShoppingAssistant';
@@ -77,7 +77,7 @@ export const ChatBubble = () => {
       <button
         onClick={toggleChat}
         className={cn(
-          "fixed z-50 bottom-24 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300",
+          "fixed z-50 bottom-10 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300",
           "bg-sky-500 hover:bg-sky-600 text-white",
           isOpen && "scale-0 opacity-0"
         )}
@@ -139,12 +139,16 @@ export const ChatBubble = () => {
                 )}
               >
                 <Avatar className={cn(
-                  "h-8 w-8",
+                  "h-8 w-8 flex items-center justify-center",
                   message.role === 'user' 
                     ? "bg-sky-100 text-sky-600" 
                     : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                 )}>
-                  <span className="text-xs font-semibold">{message.role === 'user' ? 'You' : 'AI'}</span>
+                  {message.role === 'user' ? (
+                    <User className="h-4 w-4" />
+                  ) : (
+                    <Bot className="h-4 w-4" />
+                  )}
                 </Avatar>
                 <div
                   className={cn(
@@ -161,8 +165,8 @@ export const ChatBubble = () => {
           )}
           {isLoading && (
             <div className="flex gap-2 max-w-[90%] mr-auto">
-              <Avatar className="h-8 w-8 bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                <span className="text-xs font-semibold">AI</span>
+              <Avatar className="h-8 w-8 bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300 flex items-center justify-center">
+                <Bot className="h-4 w-4" />
               </Avatar>
               <div className="rounded-2xl px-3 py-2 bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                 <div className="flex space-x-1">

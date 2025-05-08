@@ -7,8 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// We're using Gemini API now, not "gemini-pro" which was causing the 404
 const GEMINI_API_KEY = 'AIzaSyCj6SIxmupgV2Fg0mlUB_-joeU7L44jpDI';
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent";
+const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 serve(async (req) => {
   // Handle CORS
@@ -128,7 +129,7 @@ serve(async (req) => {
       ]
     };
 
-    // Call the Gemini API
+    // Call the Gemini API with the correct model name
     console.log("Calling Gemini API...");
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
@@ -142,7 +143,7 @@ serve(async (req) => {
       const errorResponse = await response.text();
       console.error("Gemini API error:", errorResponse);
       return new Response(
-        JSON.stringify({ error: "Failed to generate response from Gemini" }),
+        JSON.stringify({ error: "Failed to generate response from Gemini API" }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
       );
     }
@@ -150,6 +151,7 @@ serve(async (req) => {
     const result = await response.json();
     console.log("Gemini API response received");
     
+    // The text is located in a different path in the newer Gemini API
     const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
     console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
 
