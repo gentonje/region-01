@@ -1,6 +1,7 @@
-import React, { Suspense } from 'react';
+
+import React, { Suspense, createContext, useContext } from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import MainLayout from '@/layouts/MainLayout';
+import { MainLayout } from '@/components/layouts/MainLayout';
 import { SuperAdminRoute } from '@/components/SuperAdminRoute';
 import AdminUsers from '@/pages/AdminUsers';
 import Products from '@/pages/Products';
@@ -17,7 +18,19 @@ import Home from '@/pages/Home';
 import Districts from '@/pages/Districts';
 import AdminCategories from '@/pages/AdminCategories';
 
+// Create a context for selected country
+export const SelectedCountryContext = createContext<{
+  selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
+}>({
+  selectedCountry: "1",
+  setSelectedCountry: () => {}
+});
+
+export const useSelectedCountry = () => useContext(SelectedCountryContext);
+
 const Routes = () => {
+  // Initial country state (will be managed by MainLayout)
   return (
     <BrowserRouter>
       <MainLayout>
