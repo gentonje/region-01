@@ -21,16 +21,39 @@ export const ChatBubble = () => {
   const { session } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isFocused, setIsFocused] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Only show on main products page
   const shouldShowBubble = location.pathname === '/products';
 
-  // Auto-minimize during scroll down
+  // Focus the input when chat is opened
   useEffect(() => {
-    if (scrollDirection === ScrollDirection.DOWN && isOpen) {
+    if (isOpen && inputRef.current && !isFocused) {
+      // Delay focus to ensure the animation is complete
+      const timer = setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          setIsFocused(true);
+        }
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, isFocused]);
+
+  // Reset focused state when chat is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setIsFocused(false);
+    }
+  }, [isOpen]);
+
+  // Only minimize during scroll down if not focused on input
+  useEffect(() => {
+    if (scrollDirection === ScrollDirection.DOWN && isOpen && !isFocused) {
       setIsOpen(false);
     }
-  }, [scrollDirection, isOpen]);
+  }, [scrollDirection, isOpen, isFocused]);
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -42,6 +65,20 @@ export const ChatBubble = () => {
       });
     }
   }, [error]);
+
+  // Handle viewport height changes for mobile (iOS issue)
+  useEffect(() => {
+    const handleResize = () => {
+      if (isOpen && chatContainerRef.current) {
+        // Force layout recalculation
+        document.documentElement.style.height = `${window.innerHeight}px`;
+        chatContainerRef.current.style.height = `${window.innerHeight}px`;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isOpen]);
 
   const handleSend = () => {
     if (messageInput.trim() && !isLoading) {
@@ -61,6 +98,14 @@ export const ChatBubble = () => {
   const toggleChat = () => {
     console.log("Chat toggled, new state:", !isOpen);
     setIsOpen(prev => !prev);
+    // Reset focus state
+    if (!isOpen && inputRef.current) {
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+        }
+      }, 400);
+    }
   };
   
   const handleClearChat = () => {
@@ -87,7 +132,6 @@ export const ChatBubble = () => {
         setIsOpen(false);
         
         // Navigate to product detail
-        // You would need to implement this navigation in your app
         navigate(`/products/${productId}`);
         
         toast({
@@ -126,12 +170,14 @@ export const ChatBubble = () => {
 
       {/* Full Screen Chat Window */}
       <div
+        ref={chatContainerRef}
         className={cn(
           "fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-900 transition-all duration-300 ease-in-out",
           isOpen 
             ? "translate-y-0 opacity-100" 
             : "translate-y-full opacity-0 pointer-events-none"
         )}
+        style={{ height: isOpen ? '100%' : 'auto' }}
       >
         <ChatHeader onClose={toggleChat} onClear={handleClearChat} />
         <ChatMessages 
@@ -146,7 +192,9 @@ export const ChatBubble = () => {
           onKeyDown={handleKeyDown}
           onSend={handleSend}
           isLoading={isLoading}
-          autoFocus={false}
+          autoFocus={isOpen}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
         />
       </div>
     </>

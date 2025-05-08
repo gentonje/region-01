@@ -21,7 +21,7 @@ interface RegionSelectorProps {
 export const RegionSelector = ({
   selectedRegion,
   onRegionChange,
-  selectedCountry = "1", // Default to Kenya (id: 1)
+  selectedCountry = "all", // Default to "all"
 }: RegionSelectorProps) => {
   const [districts, setDistricts] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);

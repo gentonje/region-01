@@ -24,7 +24,7 @@ interface CountrySelectorProps {
 }
 
 export const CountrySelector = ({
-  selectedCountry = "all", // Changed default to "all"
+  selectedCountry = "all", // Default to "all"
   onCountryChange,
 }: CountrySelectorProps) => {
   const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});

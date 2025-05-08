@@ -20,7 +20,7 @@ interface IndexProps {
 
 const Index = ({ 
   selectedCurrency = "USD",
-  selectedCountry = "all", // Changed default to "all"
+  selectedCountry = "all", // Default to "all"
 }: IndexProps) => {
   // Initialize currency fix
   const { isFixing } = useCurrencyFix();

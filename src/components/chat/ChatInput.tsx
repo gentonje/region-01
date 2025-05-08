@@ -11,6 +11,8 @@ interface ChatInputProps {
   onSend: () => void;
   isLoading: boolean;
   autoFocus?: boolean;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 export const ChatInput = forwardRef(({ 
@@ -19,7 +21,9 @@ export const ChatInput = forwardRef(({
   onKeyDown, 
   onSend, 
   isLoading,
-  autoFocus = false
+  autoFocus = false,
+  onFocus,
+  onBlur
 }: ChatInputProps, ref: ForwardedRef<HTMLInputElement>) => {
   return (
     <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -33,6 +37,8 @@ export const ChatInput = forwardRef(({
           className="flex-1 rounded-full"
           disabled={isLoading}
           autoFocus={autoFocus}
+          onFocus={onFocus}
+          onBlur={onBlur}
         />
         <Button
           onClick={onSend}

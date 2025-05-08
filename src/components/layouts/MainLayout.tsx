@@ -24,7 +24,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   searchQuery = '',
   onSearchChange,
-  selectedCountry = "1", // Default to Kenya (id: 1)
+  selectedCountry = "all", // Default to "all"
   setSelectedCountry = () => {}, // Provide default empty function
 }) => {
   const { session } = useAuth();
@@ -107,4 +107,3 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     </div>
   );
 };
-
