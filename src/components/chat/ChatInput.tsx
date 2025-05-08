@@ -10,6 +10,7 @@ interface ChatInputProps {
   onKeyDown: (e: React.KeyboardEvent) => void;
   onSend: () => void;
   isLoading: boolean;
+  autoFocus?: boolean;
 }
 
 export const ChatInput = forwardRef(({ 
@@ -17,7 +18,8 @@ export const ChatInput = forwardRef(({
   onChange, 
   onKeyDown, 
   onSend, 
-  isLoading 
+  isLoading,
+  autoFocus = false
 }: ChatInputProps, ref: ForwardedRef<HTMLInputElement>) => {
   return (
     <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -30,6 +32,7 @@ export const ChatInput = forwardRef(({
           placeholder="Ask about products, prices, locations..."
           className="flex-1 rounded-full"
           disabled={isLoading}
+          autoFocus={autoFocus}
         />
         <Button
           onClick={onSend}

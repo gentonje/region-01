@@ -30,14 +30,8 @@ export const ChatBubble = () => {
     }
   }, [scrollDirection, isOpen]);
 
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
-    }
-  }, [isOpen]);
+  // Remove auto-focus when chat opens - we'll let the user click the input when they want to type
+  // No more auto-focus code here
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -68,13 +62,6 @@ export const ChatBubble = () => {
   const toggleChat = () => {
     console.log("Chat toggled, new state:", !isOpen);
     setIsOpen(prev => !prev);
-    
-    // Reset any potential stuck state
-    if (!isOpen && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
-    }
   };
   
   const handleClearChat = () => {
@@ -122,6 +109,7 @@ export const ChatBubble = () => {
           onKeyDown={handleKeyDown}
           onSend={handleSend}
           isLoading={isLoading}
+          autoFocus={false} // Explicitly set to false to prevent auto-focus
         />
       </div>
     </>
