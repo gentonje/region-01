@@ -8,6 +8,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
+import { ImageLoader } from '@/components/ImageLoader';
 
 export const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,14 +32,8 @@ export const ChatBubble = () => {
     }
   }, [messages, isOpen]);
 
-  // Focus input when chat opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300);
-    }
-  }, [isOpen]);
+  // Focus input only when explicitly clicking in the input field
+  // Removed automatic focus when opening chat to prevent mobile keyboard popup
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -159,6 +154,26 @@ export const ChatBubble = () => {
                   )}
                 >
                   {message.content}
+                  
+                  {/* Image display section */}
+                  {message.images && message.images.length > 0 && (
+                    <div className={cn(
+                      "mt-2 grid gap-2",
+                      message.images.length > 1 ? "grid-cols-2" : "grid-cols-1"
+                    )}>
+                      {message.images.map((imageUrl, index) => (
+                        <div key={`${message.id}-image-${index}`} className="relative overflow-hidden rounded-lg">
+                          <ImageLoader
+                            src={imageUrl}
+                            alt={`Product image ${index + 1}`}
+                            className="w-full h-auto object-cover rounded-lg"
+                            width={message.images && message.images.length > 1 ? 120 : 240}
+                            height={message.images && message.images.length > 1 ? 120 : 160}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ))
@@ -206,4 +221,3 @@ export const ChatBubble = () => {
     </>
   );
 };
-

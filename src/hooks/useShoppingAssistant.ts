@@ -8,6 +8,7 @@ export type Message = {
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
+  images?: string[]; // Add support for images array
 };
 
 export const useShoppingAssistant = () => {
@@ -88,7 +89,18 @@ export const useShoppingAssistant = () => {
       // Add assistant response
       if (data?.response) {
         console.log("Assistant response:", data.response);
-        addMessage({ content: data.response, role: 'assistant' });
+        
+        // Check if response includes images
+        if (data.images && Array.isArray(data.images)) {
+          console.log("Images included in response:", data.images);
+          addMessage({ 
+            content: data.response, 
+            role: 'assistant',
+            images: data.images 
+          });
+        } else {
+          addMessage({ content: data.response, role: 'assistant' });
+        }
       } else if (data?.error) {
         console.error("Data error:", data.error);
         setError(data.error);

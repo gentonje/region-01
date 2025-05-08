@@ -86,14 +86,34 @@ const extractSearchCriteria = (query) => {
   return { minPrice, maxPrice, currency, country, category };
 };
 
+// Helper function to get image URL from storage path
+const getImageUrl = (supabaseClient, storagePath) => {
+  if (!storagePath) return null;
+  
+  try {
+    const { data } = supabaseClient.storage
+      .from("images")
+      .getPublicUrl(storagePath);
+    
+    return data?.publicUrl || null;
+  } catch (error) {
+    console.error("Error getting image URL:", error);
+    return null;
+  }
+};
+
 // Function to format product results into a nice response
-const formatProductResults = (products, originalCurrency) => {
+const formatProductResults = (supabaseClient, products, originalCurrency) => {
   if (!products || products.length === 0) {
-    return "I couldn't find any products matching your criteria. Could you try a different search or provide more details?";
+    return { 
+      text: "I couldn't find any products matching your criteria. Could you try a different search or provide more details?",
+      images: []
+    };
   }
   
   // Start building a formatted response
-  let response = `I found ${products.length} products matching your criteria:\n\n`;
+  let response = `I found ${products.length} products matching your criteria:`;
+  const imageUrls = [];
   
   products.forEach((product, index) => {
     // Format price based on the product's currency
@@ -103,27 +123,44 @@ const formatProductResults = (products, originalCurrency) => {
       maximumFractionDigits: 0
     }).format(product.price);
     
-    response += `**${product.title}**\n`;
+    response += `\n\n${product.title}`;
     if (product.description) {
-      response += `${product.description}\n`;
+      response += `\n${product.description}`;
     }
-    response += `Price: ${formattedPrice}\n`;
+    response += `\nPrice: ${formattedPrice}`;
     if (product.category) {
-      response += `Category: ${product.category}\n`;
+      response += `\nCategory: ${product.category}`;
     }
     if (product.shipping_info) {
-      response += `Shipping: ${product.shipping_info}\n`;
+      response += `\nShipping: ${product.shipping_info}`;
     }
     if (product.average_rating) {
-      response += `Rating: ${product.average_rating} stars\n`;
+      response += `\nRating: ${product.average_rating} stars`;
     }
     
     // Add availability info
-    response += product.in_stock ? "Status: In Stock\n" : "Status: Out of Stock\n";
+    response += product.in_stock ? "\nStatus: In Stock" : "\nStatus: Out of Stock";
+    
+    // Get product image if available
+    if (product.product_images && product.product_images.length > 0) {
+      const mainImages = product.product_images
+        .filter(img => img.is_main || img.display_order === 0)
+        .sort((a, b) => (a.display_order || 99) - (b.display_order || 99));
+      
+      // Get the main image or first image
+      const imageToShow = mainImages.length > 0 ? mainImages[0] : product.product_images[0];
+      
+      if (imageToShow?.storage_path) {
+        const imageUrl = getImageUrl(supabaseClient, imageToShow.storage_path);
+        if (imageUrl) {
+          imageUrls.push(imageUrl);
+        }
+      }
+    }
     
     // Add separator between products except for the last one
     if (index < products.length - 1) {
-      response += "\n---\n\n";
+      response += "\n---";
     }
   });
   
@@ -132,7 +169,10 @@ const formatProductResults = (products, originalCurrency) => {
     response += "\n\nWould you like more information about any of these products?";
   }
   
-  return response;
+  return { 
+    text: response,
+    images: imageUrls
+  };
 };
 
 serve(async (req) => {
@@ -175,7 +215,8 @@ serve(async (req) => {
     const productSearchPatterns = [
       /car/i, /product/i, /item/i, /buy/i, /price/i, /cost/i, /how much/i, 
       /looking for/i, /search/i, /find/i, /where/i, /available/i, /stock/i,
-      /between.*and/i, /under/i, /below/i, /cheaper/i, /expensive/i
+      /between.*and/i, /under/i, /below/i, /cheaper/i, /expensive/i,
+      /show me/i, /display/i, /pictures?/i, /images?/i, /photos?/i
     ];
     
     const isProductSearch = productSearchPatterns.some(pattern => pattern.test(query));
@@ -201,7 +242,13 @@ serve(async (req) => {
           average_rating,
           in_stock,
           currency,
-          country_id
+          country_id,
+          product_images (
+            id,
+            storage_path,
+            is_main,
+            display_order
+          )
         `)
         .eq("product_status", "published");
       
@@ -259,12 +306,20 @@ serve(async (req) => {
       
       console.log(`Fetched ${products?.length || 0} matching products`);
       
-      // Format the products into a nice response
-      const formattedResponse = formatProductResults(products, currency);
+      // Format the products into a nice response with images
+      const formattedResponse = formatProductResults(supabaseClient, products, currency);
       
-      // Return the formatted response directly
+      console.log("Formatted response with images:", {
+        textLength: formattedResponse.text.length,
+        imagesCount: formattedResponse.images.length
+      });
+      
+      // Return the formatted response with images
       return new Response(
-        JSON.stringify({ response: formattedResponse }),
+        JSON.stringify({ 
+          response: formattedResponse.text,
+          images: formattedResponse.images 
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
       );
     }
@@ -284,7 +339,13 @@ serve(async (req) => {
         shipping_info, 
         average_rating,
         currency,
-        country_id
+        country_id,
+        product_images (
+          id,
+          storage_path,
+          is_main,
+          display_order
+        )
       `)
       .limit(15);
       
@@ -334,6 +395,12 @@ serve(async (req) => {
       // Get country name if available
       const countryName = countries?.find(c => c.id === p.country_id)?.name || 'Unknown location';
       
+      // Get image URL if available
+      const hasImages = p.product_images && p.product_images.length > 0;
+      const imageInfo = hasImages ? 
+        `Image URL: ${getImageUrl(supabaseClient, p.product_images[0].storage_path)}` : 
+        'No image available';
+      
       return `
       Product: ${p.title}
       Description: ${p.description || 'No description available'}
@@ -341,6 +408,7 @@ serve(async (req) => {
       Category: ${p.category}
       Country: ${countryName}
       Rating: ${p.average_rating || 'No ratings yet'}
+      ${imageInfo}
     `}).join('\n\n');
     
     const categoriesContext = categories ? 
@@ -365,6 +433,7 @@ serve(async (req) => {
             {
               text: `You are a helpful shopping assistant for our e-commerce marketplace. 
               Use ONLY the following product information to answer customer questions.
+              If the user asks to see products or images, make sure to mention specific products from the list so they will be shown.
               If you don't know the answer based on the given product information, say "I don't have enough information about that".
               
               YOUR GOAL: Always provide beautifully formatted responses with clear product details, properly aligned text, and good organization. DO NOT use markdown, just use clean text formatting with proper spacing and separators.
@@ -383,7 +452,8 @@ serve(async (req) => {
               
               USER QUERY: ${query}
               
-              Remember to format your response beautifully, without using markdown syntax!`
+              Remember to format your response beautifully, without using markdown syntax!
+              If the user is asking about specific products, mention the exact product names so that I can display their images.`
             }
           ],
           role: "user"
@@ -417,8 +487,38 @@ serve(async (req) => {
     const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
     console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
 
+    // Extract product names from the response to find relevant images
+    const productNames = productData.map(p => p.title?.toLowerCase());
+    const responseImages = [];
+    
+    // Check if any product names are mentioned in the response
+    for (const product of productData) {
+      if (!product.title || !product.product_images || product.product_images.length === 0) continue;
+      
+      if (assistantResponse.toLowerCase().includes(product.title.toLowerCase())) {
+        // Get main images first, fallback to any image
+        const mainImages = product.product_images.filter(img => img.is_main || img.display_order === 0);
+        const imageToUse = mainImages.length > 0 ? mainImages[0] : product.product_images[0];
+        
+        if (imageToUse?.storage_path) {
+          const imageUrl = getImageUrl(supabaseClient, imageToUse.storage_path);
+          if (imageUrl && !responseImages.includes(imageUrl)) {
+            responseImages.push(imageUrl);
+            
+            // Limit to 4 images maximum
+            if (responseImages.length >= 4) break;
+          }
+        }
+      }
+    }
+    
+    console.log(`Found ${responseImages.length} relevant product images to include in response`);
+
     return new Response(
-      JSON.stringify({ response: assistantResponse }),
+      JSON.stringify({ 
+        response: assistantResponse,
+        images: responseImages.length > 0 ? responseImages : undefined
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
     );
 
