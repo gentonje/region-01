@@ -17,14 +17,37 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Chat assistant function called");
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { query, messageHistory } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+      console.log("Request body:", JSON.stringify(body));
+    } catch (parseError) {
+      console.error("Error parsing request body:", parseError);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
+      );
+    }
+    
+    const { query, messageHistory } = body;
+    
+    if (!query || typeof query !== 'string') {
+      console.error("Invalid query in request:", query);
+      return new Response(
+        JSON.stringify({ error: "Query is required and must be a string" }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
+      );
+    }
     
     // Get relevant product data from Supabase
+    console.log("Fetching product data from Supabase...");
     const { data: productData, error: productsError } = await supabaseClient
       .from("products")
       .select(`
@@ -46,6 +69,8 @@ serve(async (req) => {
       );
     }
     
+    console.log(`Fetched ${productData?.length || 0} products`);
+    
     // Get categories for context
     const { data: categories, error: categoriesError } = await supabaseClient
       .from("categories")
@@ -54,6 +79,8 @@ serve(async (req) => {
     
     if (categoriesError) {
       console.error("Error fetching categories:", categoriesError);
+    } else {
+      console.log(`Fetched ${categories?.length || 0} categories`);
     }
 
     // Create context from the product data
@@ -75,6 +102,7 @@ serve(async (req) => {
       '';
 
     // Create the prompt for Gemini
+    console.log("Preparing prompt for Gemini...");
     const prompt = {
       contents: [
         {
@@ -101,6 +129,7 @@ serve(async (req) => {
     };
 
     // Call the Gemini API
+    console.log("Calling Gemini API...");
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
@@ -119,7 +148,10 @@ serve(async (req) => {
     }
 
     const result = await response.json();
+    console.log("Gemini API response received");
+    
     const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+    console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
 
     return new Response(
       JSON.stringify({ response: assistantResponse }),
@@ -129,7 +161,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Function error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error.message || "An unknown error occurred" }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
     );
   }

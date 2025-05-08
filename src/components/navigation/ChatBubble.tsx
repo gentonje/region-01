@@ -7,11 +7,12 @@ import { useShoppingAssistant, Message } from '@/hooks/useShoppingAssistant';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
 
 export const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { scrollDirection } = useScrollDirection();
-  const { messages, isLoading, sendMessage } = useShoppingAssistant();
+  const { messages, isLoading, sendMessage, error } = useShoppingAssistant();
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -39,8 +40,20 @@ export const ChatBubble = () => {
     }
   }, [isOpen]);
 
+  // Show error toast if there's an error
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Chat Error",
+        description: error,
+        variant: "destructive",
+      });
+    }
+  }, [error]);
+
   const handleSend = () => {
     if (messageInput.trim() && !isLoading) {
+      console.log("Sending message:", messageInput);
       sendMessage(messageInput);
       setMessageInput('');
     }
@@ -53,15 +66,18 @@ export const ChatBubble = () => {
     }
   };
 
-  const toggleChat = () => setIsOpen(prev => !prev);
+  const toggleChat = () => {
+    console.log("Chat toggled, new state:", !isOpen);
+    setIsOpen(prev => !prev);
+  };
 
   return (
     <>
-      {/* Bubble Button */}
+      {/* Bubble Button - positioning adjusted to be lower */}
       <button
         onClick={toggleChat}
         className={cn(
-          "fixed z-50 bottom-20 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300",
+          "fixed z-50 bottom-24 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300",
           "bg-sky-500 hover:bg-sky-600 text-white",
           isOpen && "scale-0 opacity-0"
         )}
@@ -73,7 +89,7 @@ export const ChatBubble = () => {
       {/* Chat Window */}
       <div
         className={cn(
-          "fixed bottom-20 right-4 z-50 w-80 sm:w-96 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700",
+          "fixed bottom-24 right-4 z-50 w-80 sm:w-96 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700",
           "flex flex-col transition-all duration-300 ease-in-out",
           "max-h-[500px]",
           isOpen 

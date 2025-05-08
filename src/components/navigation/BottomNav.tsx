@@ -74,7 +74,7 @@ export const BottomNav = ({
         </div>
       </motion.nav>
       
-      {/* Add ChatBubble component */}
+      {/* Make sure ChatBubble is always rendered regardless of shouldShow */}
       <ChatBubble />
     </>
   );
