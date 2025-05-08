@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
@@ -24,6 +24,7 @@ export const CountiesFilter = ({
 }: CountiesFilterProps) => {
   const [districts, setDistricts] = useState<{id: number, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
+  const previousCountry = useRef(selectedCountry);
 
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -60,8 +61,11 @@ export const CountiesFilter = ({
 
     fetchDistricts();
     
-    // Reset county selection when country changes
-    onCountyChange("all");
+    // Only reset county selection when country changes
+    if (previousCountry.current !== selectedCountry) {
+      onCountyChange("all");
+      previousCountry.current = selectedCountry;
+    }
   }, [selectedCountry, onCountyChange]);
 
   const renderTriggerContent = () => {
@@ -77,14 +81,16 @@ export const CountiesFilter = ({
     }
   };
 
+  const handleDistrictChange = (value: string) => {
+    console.log("District changed to:", value);
+    onCountyChange(value);
+  };
+
   return (
     <div className="w-full max-w-xs">
       <Select
         value={selectedCounty}
-        onValueChange={(value) => {
-          console.log("District changed to:", value);
-          onCountyChange(value);
-        }}
+        onValueChange={handleDistrictChange}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

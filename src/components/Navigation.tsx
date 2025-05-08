@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +5,6 @@ import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { CountrySelector } from "./navigation/CountrySelector";
-import { ThemeToggle } from "./navigation/ThemeToggle";
 import { ChatBubble } from "./navigation/ChatBubble";
 import { NotificationIcon } from "./navigation/NotificationIcon";
 import { useAuth } from "@/contexts/AuthContext";
@@ -128,7 +126,6 @@ export const Navigation = ({
                     <CartIndicator />
                   </>
                 )}
-                <ThemeToggle />
                 <UserMenu />
               </div>
             </div>

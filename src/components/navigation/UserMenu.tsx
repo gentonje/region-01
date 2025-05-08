@@ -13,12 +13,14 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { User } from "lucide-react";
+import { User, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export const UserMenu = () => {
   const { session, signOut } = useAuth();
   const navigate = useNavigate();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const user = session?.user;
 
@@ -75,6 +77,10 @@ export const UserMenu = () => {
     navigate("/login");
   };
 
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
+
   const displayName = profile?.full_name || profile?.username || user?.email;
 
   return (
@@ -95,6 +101,23 @@ export const UserMenu = () => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        
+        <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
+          {theme === "dark" ? (
+            <div className="flex items-center w-full">
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light Mode</span>
+            </div>
+          ) : (
+            <div className="flex items-center w-full">
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark Mode</span>
+            </div>
+          )}
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
           <Link to="/edit-profile">Profile</Link>
         </DropdownMenuItem>

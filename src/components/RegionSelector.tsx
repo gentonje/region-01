@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
@@ -25,6 +25,7 @@ export const RegionSelector = ({
 }: RegionSelectorProps) => {
   const [districts, setDistricts] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
+  const previousCountry = useRef(selectedCountry);
   
   useEffect(() => {
     const fetchDistricts = async () => {
@@ -60,8 +61,12 @@ export const RegionSelector = ({
     };
 
     fetchDistricts();
-    // Reset region selection when country changes to prevent invalid selections
-    onRegionChange("all");
+    
+    // Only reset region selection when country changes
+    if (previousCountry.current !== selectedCountry) {
+      onRegionChange("all");
+      previousCountry.current = selectedCountry;
+    }
   }, [selectedCountry, onRegionChange]);
 
   const renderTriggerContent = () => {
@@ -77,14 +82,16 @@ export const RegionSelector = ({
     }
   };
 
+  const handleRegionChange = (value: string) => {
+    console.log("Region changed to:", value);
+    onRegionChange(value);
+  };
+
   return (
     <div className="w-full max-w-xs">
       <Select
         value={selectedRegion}
-        onValueChange={(value) => {
-          console.log("Region changed to:", value);
-          onRegionChange(value);
-        }}
+        onValueChange={handleRegionChange}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">

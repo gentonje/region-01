@@ -69,15 +69,17 @@ export const CountrySelector = ({
     setCountryFlags(flags);
   }, [countries]);
 
+  const handleCountryChange = (value: string) => {
+    console.log("Country changed to:", value);
+    onCountryChange(value);
+  };
+
   return (
     <Select
       value={selectedCountry}
-      onValueChange={(value) => {
-        console.log("Country changed to:", value);
-        onCountryChange(value);
-      }}
+      onValueChange={handleCountryChange}
     >
-      <SelectTrigger className="w-[120px] h-10 sm:w-[180px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+      <SelectTrigger className="w-[180px] h-10 sm:w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <SelectValue>
           {selectedCountry === "all" ? (
             <div className="flex items-center">
