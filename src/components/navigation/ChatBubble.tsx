@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { ImageLoader } from '@/components/ImageLoader';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 export const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +20,11 @@ export const ChatBubble = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { session } = useAuth();
+  const location = useLocation();
   const user = session?.user;
+
+  // Only show on main products page
+  const shouldShowBubble = location.pathname === '/products';
 
   // Auto-minimize during scroll down
   useEffect(() => {
@@ -34,6 +39,15 @@ export const ChatBubble = () => {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
+
+  // Focus input when chat opens
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+    }
+  }, [isOpen]);
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -64,6 +78,13 @@ export const ChatBubble = () => {
   const toggleChat = () => {
     console.log("Chat toggled, new state:", !isOpen);
     setIsOpen(prev => !prev);
+    
+    // Reset any potential stuck state
+    if (!isOpen && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300);
+    }
   };
   
   const handleClearChat = () => {
@@ -74,24 +95,24 @@ export const ChatBubble = () => {
     });
   };
 
-  // Render function for product details with images
+  // Render function for product details with images - improved styling
   const renderProductDetails = (message: Message) => {
     if (!message.images || message.images.length === 0) return null;
     
     return (
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 space-y-4 w-full">
         {message.images.map((imageUrl, index) => {
           const productDetail = message.productDetails?.[index] || null;
           return (
             <div 
               key={`${message.id}-image-${index}`} 
-              className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+              className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md w-full"
             >
-              <div className="relative aspect-video w-full overflow-hidden">
+              <div className="relative w-full overflow-hidden">
                 <ImageLoader
                   src={imageUrl}
                   alt={productDetail?.title || `Product image ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-auto object-cover"
                   width={0}
                   height={0}
                   priority={index < 2} // Prioritize first two images
@@ -100,13 +121,13 @@ export const ChatBubble = () => {
               
               {productDetail && (
                 <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-lg mb-1">
                     {productDetail.title}
                   </h4>
                   
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-green-600 dark:text-green-400 font-medium">
+                  <div className="flex flex-wrap items-center justify-between">
+                    <div className="mb-2 sm:mb-0">
+                      <span className="text-green-600 dark:text-green-400 font-medium text-xl">
                         {productDetail.currency} {productDetail.price.toLocaleString()}
                       </span>
                     </div>
@@ -133,6 +154,10 @@ export const ChatBubble = () => {
       </div>
     );
   };
+
+  if (!shouldShowBubble) {
+    return null;
+  }
 
   return (
     <>
@@ -208,16 +233,16 @@ export const ChatBubble = () => {
               <div
                 key={message.id}
                 className={cn(
-                  "flex max-w-[90%]",
-                  message.role === 'user' ? 'ml-auto' : 'mr-auto'
+                  "flex w-full",
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 )}
               >
                 <div className={cn(
-                  "flex gap-2",
+                  "flex gap-2 max-w-[85%]",
                   message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                 )}>
                   <Avatar className={cn(
-                    "h-8 w-8 flex items-center justify-center shrink-0",
+                    "h-8 w-8 flex items-center justify-center shrink-0 mt-1",
                     message.role === 'user' 
                       ? "bg-sky-100 text-sky-600" 
                       : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
@@ -234,13 +259,13 @@ export const ChatBubble = () => {
                       message.role === 'user'
                         ? "bg-sky-500 text-white"
                         : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
-                      message.images && message.images.length > 0 ? "max-w-[80vw]" : ""
+                      (message.images && message.images.length > 0) ? "max-w-full" : ""
                     )}
                   >
                     {/* Message text content */}
                     <div className="whitespace-pre-wrap">{message.content}</div>
                     
-                    {/* Product details with images */}
+                    {/* Product details with images - full width */}
                     {renderProductDetails(message)}
                   </div>
                 </div>

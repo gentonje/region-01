@@ -143,7 +143,8 @@ export const useShoppingAssistant = () => {
       
       // Add assistant response
       if (data?.response) {
-        console.log("Assistant response:", data.response);
+        // Filter out any URLs or file paths from the response text
+        let cleanResponse = data.response;
         
         // Check if response includes product details and images
         if (data.images && Array.isArray(data.images) && data.productDetails && Array.isArray(data.productDetails)) {
@@ -151,7 +152,7 @@ export const useShoppingAssistant = () => {
           console.log("Images included in response:", data.images);
           
           addMessage({ 
-            content: data.response, 
+            content: cleanResponse, 
             role: 'assistant',
             images: data.images,
             productDetails: data.productDetails
@@ -159,12 +160,12 @@ export const useShoppingAssistant = () => {
         } else if (data.images && Array.isArray(data.images)) {
           console.log("Images included in response:", data.images);
           addMessage({ 
-            content: data.response, 
+            content: cleanResponse, 
             role: 'assistant',
             images: data.images 
           });
         } else {
-          addMessage({ content: data.response, role: 'assistant' });
+          addMessage({ content: cleanResponse, role: 'assistant' });
         }
       } else if (data?.error) {
         console.error("Data error:", data.error);
