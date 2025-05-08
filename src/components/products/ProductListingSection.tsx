@@ -1,10 +1,9 @@
-
 import { Product } from "@/types/product";
 import { ProductList } from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import { CountiesFilter } from "@/components/CountiesFilter";
 import { SupportedCurrency } from "@/utils/currencyConverter";
-import { useSelectedCountry } from "@/Routes";
+import { useSelectedCountry } from "@/hooks/useSelectedCountry";
 
 interface ProductListingSectionProps {
   products: Product[];
