@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Region } from "@/types/product";
+import { toast } from "sonner";
 
 interface RegionSelectorProps {
   selectedRegion: string;
@@ -40,6 +41,7 @@ export const RegionSelector = ({
 
           if (error) {
             console.error("Error fetching districts:", error);
+            toast.error("Failed to load districts");
             return;
           }
 
@@ -50,6 +52,7 @@ export const RegionSelector = ({
         }
       } catch (error) {
         console.error("Failed to fetch districts:", error);
+        toast.error("Failed to load districts");
       } finally {
         setLoading(false);
       }
@@ -64,7 +67,10 @@ export const RegionSelector = ({
     <div className="w-full max-w-xs">
       <Select
         value={selectedRegion}
-        onValueChange={onRegionChange}
+        onValueChange={(value) => {
+          console.log("Region changed to:", value);
+          onRegionChange(value);
+        }}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -76,7 +82,7 @@ export const RegionSelector = ({
                 : "Select district"
           } />
         </SelectTrigger>
-        <SelectContent className="bg-white dark:bg-gray-800">
+        <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <SelectItem value="all">All Districts</SelectItem>
           {districts.map((district) => (
             <SelectItem key={district.id} value={district.name}>

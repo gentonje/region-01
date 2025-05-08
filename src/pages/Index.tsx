@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +10,7 @@ import { Product, ProductCategory } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { useCurrencyFix } from "@/hooks/useCurrencyFix";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
@@ -21,6 +21,9 @@ const Index = ({
   selectedCurrency = "USD",
   selectedCountry = "1", // Default to Kenya (id: 1)
 }: IndexProps) => {
+  // Initialize currency fix
+  const { isFixing } = useCurrencyFix();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedRegion, setSelectedRegion] = useState("all");

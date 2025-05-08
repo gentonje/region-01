@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
 interface CountiesFilterProps {
   selectedCounty: string;
@@ -42,6 +43,7 @@ export const CountiesFilter = ({
 
         if (error) {
           console.error("Error fetching districts:", error);
+          toast.error("Failed to load districts");
           return;
         }
 
@@ -49,6 +51,7 @@ export const CountiesFilter = ({
         setDistricts(data || []);
       } catch (error) {
         console.error("Failed to fetch districts:", error);
+        toast.error("Failed to load districts");
       } finally {
         setLoading(false);
       }
@@ -64,7 +67,10 @@ export const CountiesFilter = ({
     <div className="w-full max-w-xs">
       <Select
         value={selectedCounty}
-        onValueChange={onCountyChange}
+        onValueChange={(value) => {
+          console.log("District changed to:", value);
+          onCountyChange(value);
+        }}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
@@ -78,7 +84,7 @@ export const CountiesFilter = ({
             } 
           />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <SelectItem value="all">All Districts</SelectItem>
           {districts.map((district) => (
             <SelectItem key={district.id} value={district.name}>

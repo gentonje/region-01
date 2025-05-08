@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useState } from "react";
 import { updateProduct } from "@/services/productService";
+import { getCurrencyForCountry } from "@/utils/countryToCurrency";
 
 const EditProduct = () => {
   const navigate = useNavigate();
@@ -76,10 +77,15 @@ const EditProduct = () => {
       console.log("Submitting form with county:", formData.county);
       console.log("Submitting form with country:", formData.country);
       
-      // Ensure country_id is properly converted to number
+      // Get the appropriate currency for the selected country (in case country changed)
+      const currency = getCurrencyForCountry(formData.country);
+      console.log(`Using currency ${currency} for country ID ${formData.country}`);
+      
+      // Ensure country_id is properly converted to number and include currency
       const updatedData = {
         ...formData,
         country_id: formData.country ? Number(formData.country) : null,
+        currency: currency, // Update currency based on country
       };
       
       await updateProduct(id, updatedData);

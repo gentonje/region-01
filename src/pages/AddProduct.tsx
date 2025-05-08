@@ -5,7 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { ProductForm } from "@/components/ProductForm";
 import { toast } from "sonner";
 import { useProductImages } from "@/hooks/useProductImages";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
 import { ProductCategory } from "@/types/product";
@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
 import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
+import { getCurrencyForCountry } from "@/utils/countryToCurrency";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -31,6 +32,14 @@ const AddProduct = () => {
     county: "",
     country: selectedCountry, // Default to selected country
   });
+
+  // Update form currency when country changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      country: selectedCountry
+    }));
+  }, [selectedCountry]);
 
   const handleSubmit = async (data: ProductFormData) => {
     if (!mainImage) {
@@ -59,6 +68,10 @@ const AddProduct = () => {
       const { mainImagePath, additionalImagePaths } = await uploadImages(mainImage, additionalImages);
       console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
 
+      // Get the appropriate currency for the selected country
+      const currency = getCurrencyForCountry(data.country);
+      console.log(`Using currency ${currency} for country ID ${data.country}`);
+
       console.log("Creating product...");
       const { data: productData, error: productError } = await supabase
         .from("products")
@@ -71,6 +84,7 @@ const AddProduct = () => {
           storage_path: mainImagePath,
           county: data.county,
           country_id: Number(data.country), // Store country_id instead of name
+          currency: currency, // Set currency based on country
           user_id: user.id
         })
         .select()
