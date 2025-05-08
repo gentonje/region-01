@@ -15,6 +15,16 @@ export const useShoppingAssistant = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize with a welcome message if no messages exist
+  useEffect(() => {
+    if (messages.length === 0) {
+      addMessage({ 
+        content: "Hello! I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations.", 
+        role: 'assistant' 
+      });
+    }
+  }, []);
+
   // Log any errors that occur
   useEffect(() => {
     if (error) {
@@ -112,7 +122,13 @@ export const useShoppingAssistant = () => {
   const clearMessages = useCallback(() => {
     setMessages([]);
     setError(null);
-  }, []);
+    
+    // Add welcome message back
+    addMessage({ 
+      content: "Hello! I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations.", 
+      role: 'assistant' 
+    });
+  }, [addMessage]);
 
   return {
     messages,
