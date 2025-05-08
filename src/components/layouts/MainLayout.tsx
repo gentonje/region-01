@@ -4,7 +4,6 @@ import { Outlet, useOutletContext } from 'react-router-dom';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { BottomNav } from '@/components/navigation/BottomNav';
 import { cn } from "@/lib/utils";
 
 type MainLayoutProps = {
@@ -95,7 +94,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
       />
       <div className={cn(
         "w-full pt-16", 
-        isMobile ? "pb-16" : "pb-4", 
+        "pb-4", 
         "sm:pt-16 max-w-none",
         isMobile && "h-[calc(100%-64px)]" // Adjust content area for nav heights
       )}>
@@ -108,3 +107,4 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
     </div>
   );
 };
+

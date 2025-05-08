@@ -73,7 +73,7 @@ export const ChatBubble = () => {
 
   return (
     <>
-      {/* Bubble Button - positioning adjusted to be lower */}
+      {/* Bubble Button - positioned at bottom-10 */}
       <button
         onClick={toggleChat}
         className={cn(
@@ -206,3 +206,4 @@ export const ChatBubble = () => {
     </>
   );
 };
+

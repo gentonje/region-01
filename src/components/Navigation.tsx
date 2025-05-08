@@ -6,7 +6,7 @@ import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
 import { CountrySelector } from "./navigation/CountrySelector";
 import { ThemeToggle } from "./navigation/ThemeToggle";
-import { BottomNav } from "./navigation/BottomNav";
+import { ChatBubble } from "./navigation/ChatBubble";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -132,13 +132,8 @@ export const Navigation = ({
           </div>
         </motion.div>
       </AnimatePresence>
-      
-      {session && (
-        <BottomNav 
-          isAuthenticated={!!session} 
-          shouldShow={scrollDirection === ScrollDirection.UP}
-        />
-      )}
+
+      {session && <ChatBubble />}
     </>
   );
 };

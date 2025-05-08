@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -168,7 +169,7 @@ const Index = ({
   }
 
   return (
-    <div className="pb-16 mx-1 sm:mx-auto">
+    <div className="mx-1 sm:mx-auto">
       <div className="space-y-1">
         <BreadcrumbNav
           items={[
