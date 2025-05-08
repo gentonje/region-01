@@ -1,22 +1,13 @@
 
-import React, { Suspense, createContext, useContext } from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import React, { Suspense, createContext, useContext, useState } from 'react';
+import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layouts/MainLayout';
-import { SuperAdminRoute } from '@/components/SuperAdminRoute';
+import { AdminRoute } from '@/components/routes/AdminRoute';
+import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
 import AdminUsers from '@/pages/AdminUsers';
-import Products from '@/pages/Products';
-import ProductDetails from '@/pages/ProductDetails';
-import CreateProduct from '@/pages/CreateProduct';
-import EditProduct from '@/pages/EditProduct';
-import Profile from '@/pages/Profile';
-import Settings from '@/pages/Settings';
-import Shops from '@/pages/Shops';
-import ShopDetails from '@/pages/ShopDetails';
-import CreateShop from '@/pages/CreateShop';
-import EditShop from '@/pages/EditShop';
 import Home from '@/pages/Home';
-import Districts from '@/pages/Districts';
 import AdminCategories from '@/pages/AdminCategories';
+import Districts from '@/pages/Districts';
 
 // Create a context for selected country
 export const SelectedCountryContext = createContext<{
@@ -29,65 +20,53 @@ export const SelectedCountryContext = createContext<{
 
 export const useSelectedCountry = () => useContext(SelectedCountryContext);
 
-const Routes = () => {
-  // Initial country state (will be managed by MainLayout)
+const AppRoutes = () => {
+  const [selectedCountry, setSelectedCountry] = useState("1");
+  
   return (
     <BrowserRouter>
-      <MainLayout>
-        <Suspense fallback={<div>Loading...</div>}>
-          <Switch>
-            <Route exact path="/">
-              <Home />
-            </Route>
-            <Route exact path="/products">
-              <Products />
-            </Route>
-            <Route path="/products/:id">
-              <ProductDetails />
-            </Route>
-            <Route path="/profile/:id">
-              <Profile />
-            </Route>
-            <Route path="/settings">
-              <Settings />
-            </Route>
-            <Route exact path="/shops">
-              <Shops />
-            </Route>
-            <Route path="/shops/:id">
-              <ShopDetails />
-            </Route>
-            <Route path="/create-product">
-              <CreateProduct />
-            </Route>
-            <Route path="/edit-product/:id">
-              <EditProduct />
-            </Route>
-            <Route path="/create-shop">
-              <CreateShop />
-            </Route>
-            <Route path="/edit-shop/:id">
-              <EditShop />
-            </Route>
-            <SuperAdminRoute path="/admin/users">
-              <AdminUsers />
-            </SuperAdminRoute>
-            
-            <SuperAdminRoute path="/admin/categories">
-              <AdminCategories />
-            </SuperAdminRoute>
-            
-            <SuperAdminRoute path="/admin/districts">
-              <Districts />
-            </SuperAdminRoute>
-            <Route path="*">
-              <Redirect to="/" />
-            </Route>
-          </Switch>
-        </Suspense>
-      </MainLayout>
+      <SelectedCountryContext.Provider value={{ selectedCountry, setSelectedCountry }}>
+        <MainLayout>
+          <Suspense fallback={<div>Loading...</div>}>
+            <RouterRoutes>
+              <Route path="/" element={<Home />} />
+              
+              {/* Admin routes */}
+              <Route 
+                path="/admin/users" 
+                element={
+                  <SuperAdminRoute>
+                    <AdminUsers />
+                  </SuperAdminRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/categories" 
+                element={
+                  <SuperAdminRoute>
+                    <AdminCategories />
+                  </SuperAdminRoute>
+                } 
+              />
+              
+              <Route 
+                path="/admin/districts" 
+                element={
+                  <SuperAdminRoute>
+                    <Districts />
+                  </SuperAdminRoute>
+                } 
+              />
+              
+              {/* Catch all route */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </RouterRoutes>
+          </Suspense>
+        </MainLayout>
+      </SelectedCountryContext.Provider>
     </BrowserRouter>
   );
 };
 
-export default Routes;
+export default AppRoutes;
