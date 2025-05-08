@@ -10,10 +10,11 @@ import { CategoriesList } from "@/components/admin/categories/CategoriesList";
 import { CategoryForm } from "@/components/admin/categories/CategoryForm";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ProductCategory } from "@/types/product";
 
 interface Category {
-  id: number;
-  name: string;
+  id: string;
+  name: ProductCategory;
 }
 
 const AdminCategories = () => {
@@ -21,7 +22,7 @@ const AdminCategories = () => {
   const { session } = useAuth();
   
   // State for category form
-  const [categoryName, setCategoryName] = useState("");
+  const [categoryName, setCategoryName] = useState<ProductCategory | "">("");
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -61,7 +62,7 @@ const AdminCategories = () => {
 
   // Add category mutation
   const addCategoryMutation = useMutation({
-    mutationFn: async (category: { name: string }) => {
+    mutationFn: async (category: { name: ProductCategory }) => {
       const { data, error } = await supabase
         .from("categories")
         .insert(category)
@@ -83,7 +84,7 @@ const AdminCategories = () => {
 
   // Edit category mutation
   const editCategoryMutation = useMutation({
-    mutationFn: async (category: { id: number, name: string }) => {
+    mutationFn: async (category: { id: string, name: ProductCategory }) => {
       const { data, error } = await supabase
         .from("categories")
         .update({ name: category.name })
@@ -106,7 +107,7 @@ const AdminCategories = () => {
 
   // Delete category mutation
   const deleteCategoryMutation = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       const { error } = await supabase
         .from("categories")
         .delete()
@@ -134,8 +135,8 @@ const AdminCategories = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!categoryName.trim()) {
-      toast.error("Please enter a category name");
+    if (!categoryName) {
+      toast.error("Please select a category");
       return;
     }
     
@@ -159,7 +160,7 @@ const AdminCategories = () => {
   };
 
   // Handle delete category
-  const handleDeleteCategory = async (id: number, name: string) => {
+  const handleDeleteCategory = async (id: string, name: ProductCategory) => {
     if (confirm(`Are you sure you want to delete the category "${name}"?`)) {
       deleteCategoryMutation.mutate(id);
     }

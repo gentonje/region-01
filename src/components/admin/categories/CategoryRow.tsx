@@ -2,16 +2,17 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Edit, Trash } from "lucide-react";
+import { ProductCategory } from "@/types/product";
 
 interface Category {
-  id: number;
-  name: string;
+  id: string;
+  name: ProductCategory;
 }
 
 interface CategoryRowProps {
   category: Category;
   onEdit: (category: Category) => void;
-  onDelete: (id: number, name: string) => void;
+  onDelete: (id: string, name: ProductCategory) => void;
   deleteIsLoading: boolean;
 }
 

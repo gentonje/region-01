@@ -9,17 +9,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { CategoryRow } from "./CategoryRow";
+import { ProductCategory } from "@/types/product";
 
 interface Category {
-  id: number;
-  name: string;
+  id: string;
+  name: ProductCategory;
 }
 
 interface CategoriesListProps {
   categories: Category[] | undefined;
   isLoading: boolean;
   onEdit: (category: Category) => void;
-  onDelete: (id: number, name: string) => void;
+  onDelete: (id: string, name: ProductCategory) => void;
   deleteIsLoading: boolean;
 }
 
