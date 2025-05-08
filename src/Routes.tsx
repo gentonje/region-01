@@ -1,72 +1,191 @@
 
-import React, { Suspense, createContext, useContext, useState } from 'react';
-import { BrowserRouter, Routes as RouterRoutes, Route, Navigate } from 'react-router-dom';
-import { MainLayout } from '@/components/layouts/MainLayout';
+import React, { lazy, Suspense, useState, createContext, useContext } from 'react';
+import { Routes as RouterRoutes, Route, Navigate, useOutletContext } from 'react-router-dom';
+import { PrivateRoute } from '@/components/PrivateRoute';
 import { AdminRoute } from '@/components/routes/AdminRoute';
 import { SuperAdminRoute } from '@/components/routes/SuperAdminRoute';
-import AdminUsers from '@/pages/AdminUsers';
-import Home from '@/pages/Home';
-import AdminCategories from '@/pages/AdminCategories';
-import Districts from '@/pages/Districts';
+import { useAuth } from '@/contexts/AuthContext';
+import { Skeleton } from './components/ui/skeleton';
+import { MainLayout } from '@/components/layouts/MainLayout';
 
-// Create a context for selected country
-export const SelectedCountryContext = createContext<{
-  selectedCountry: string;
-  setSelectedCountry: (country: string) => void;
-}>({
-  selectedCountry: "1",
-  setSelectedCountry: () => {}
-});
+// Define outlet context type
+type OutletContextType = { selectedCountry: string };
 
-export const useSelectedCountry = () => useContext(SelectedCountryContext);
-
-const AppRoutes = () => {
-  const [selectedCountry, setSelectedCountry] = useState("1");
-  
-  return (
-    <BrowserRouter>
-      <SelectedCountryContext.Provider value={{ selectedCountry, setSelectedCountry }}>
-        <MainLayout>
-          <Suspense fallback={<div>Loading...</div>}>
-            <RouterRoutes>
-              <Route path="/" element={<Home />} />
-              
-              {/* Admin routes */}
-              <Route 
-                path="/admin/users" 
-                element={
-                  <SuperAdminRoute>
-                    <AdminUsers />
-                  </SuperAdminRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/categories" 
-                element={
-                  <SuperAdminRoute>
-                    <AdminCategories />
-                  </SuperAdminRoute>
-                } 
-              />
-              
-              <Route 
-                path="/admin/districts" 
-                element={
-                  <SuperAdminRoute>
-                    <Districts />
-                  </SuperAdminRoute>
-                } 
-              />
-              
-              {/* Catch all route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </RouterRoutes>
-          </Suspense>
-        </MainLayout>
-      </SelectedCountryContext.Provider>
-    </BrowserRouter>
-  );
+// Hook to use the country context
+export const useSelectedCountry = () => {
+  return useOutletContext<OutletContextType>();
 };
 
-export default AppRoutes;
+// Lazy load pages for better performance
+const Index = lazy(() => import('./pages/Index'));
+const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const AddProduct = lazy(() => import('./pages/AddProduct'));
+const EditProduct = lazy(() => import('./pages/EditProduct'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminManagement = lazy(() => import('./pages/AdminManagement'));
+const AdminDistricts = lazy(() => import('./pages/AdminDistricts'));
+const Cart = lazy(() => import('./pages/Cart'));
+const EditProfile = lazy(() => import('./pages/EditProfile'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const MyProducts = lazy(() => import('./pages/MyProducts'));
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="container mx-auto p-4 mt-20">
+    <Skeleton className="h-12 w-full mb-4" />
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {[...Array(8)].map((_, i) => (
+        <Skeleton key={i} className="h-48 w-full" />
+      ))}
+    </div>
+  </div>
+);
+
+export const Routes = () => {
+  const { session, loading } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  // Default country for testing is Sudan (you'd fetch this from user preferences or IP detection)
+  const [selectedCountry, setSelectedCountry] = useState("1");
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <RouterRoutes>
+        {/* Public Routes */}
+        <Route 
+          path="/" 
+          element={session ? <Navigate to="/products" replace /> : <Navigate to="/login" replace />} 
+        />
+
+        {/* Login route - no layout */}
+        <Route 
+          path="/login" 
+          element={session ? <Navigate to="/products" replace /> : <Login />} 
+        />
+
+        {/* Routes with Main Layout */}
+        <Route 
+          element={
+            <MainLayout 
+              searchQuery={searchQuery} 
+              onSearchChange={setSearchQuery}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+            />
+          } 
+        >
+          <Route
+            path="/home"
+            element={<Home />}
+          />
+
+          {/* Protected Routes */}
+          <Route 
+            path="/products" 
+            element={
+              <PrivateRoute>
+                <Index selectedCountry={selectedCountry} />
+              </PrivateRoute>
+            } 
+          />
+          
+          <Route
+            path="/my-products"
+            element={
+              <PrivateRoute>
+                <MyProducts />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/add-product"
+            element={
+              <PrivateRoute>
+                <AddProduct />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/edit-product/:id"
+            element={
+              <PrivateRoute>
+                <EditProduct />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/cart"
+            element={
+              <PrivateRoute>
+                <Cart />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/wishlist"
+            element={
+              <PrivateRoute>
+                <Wishlist />
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/edit-profile"
+            element={
+              <PrivateRoute>
+                <EditProfile />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin/users"
+            element={
+              <PrivateRoute>
+                <AdminRoute>
+                  <AdminUsers />
+                </AdminRoute>
+              </PrivateRoute>
+            }
+          />
+
+          {/* Super Admin Routes */}
+          <Route
+            path="/admin/manage"
+            element={
+              <PrivateRoute>
+                <SuperAdminRoute>
+                  <AdminManagement />
+                </SuperAdminRoute>
+              </PrivateRoute>
+            }
+          />
+          
+          <Route
+            path="/admin/districts"
+            element={
+              <PrivateRoute>
+                <SuperAdminRoute>
+                  <AdminDistricts />
+                </SuperAdminRoute>
+              </PrivateRoute>
+            }
+          />
+        </Route>
+
+        {/* Fallback Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </RouterRoutes>
+    </Suspense>
+  );
+};
