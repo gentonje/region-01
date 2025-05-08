@@ -10,17 +10,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 button-glow-primary",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-glow",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 button-glow-destructive",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-glow-red",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground button-glow-outline",
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 button-glow",
-        ghost: "hover:bg-accent hover:text-accent-foreground button-shadow-none",
-        link: "text-primary underline-offset-4 hover:underline button-shadow-none",
-        amber: "bg-amber-500 text-white hover:bg-amber-600 button-glow-amber",
-        violet: "bg-violet-600 text-white hover:bg-violet-700 button-glow-violet",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-glow",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+        amber: "bg-amber-500 text-white hover:bg-amber-600 shadow-glow-amber",
+        violet: "bg-violet-600 text-white hover:bg-violet-700 shadow-glow-violet",
+        blue: "bg-blue-500 text-white hover:bg-blue-600 shadow-glow-blue",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -28,10 +29,16 @@ const buttonVariants = cva(
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
       },
+      glow: {
+        default: "animate-glow-pulse",
+        none: "",
+        strong: "shadow-glow-lg",
+      }
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      glow: "none",
     },
   }
 )
@@ -43,11 +50,11 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, glow, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, glow, className }))}
         ref={ref}
         {...props}
       />

@@ -8,14 +8,15 @@ import { Message } from '@/hooks/useShoppingAssistant';
 
 interface ChatMessageProps {
   message: Message;
+  onProductClick: (productId: string) => void;
 }
 
-export const ChatMessage = ({ message }: ChatMessageProps) => {
+export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
   const renderProductDetails = (message: Message) => {
     if (!message.images || message.images.length === 0) return null;
     
     return (
-      <div className="mt-4 space-y-4 w-full">
+      <div className="mt-4 grid grid-cols-2 gap-2 w-full">
         {message.images.map((imageUrl, index) => {
           const productDetail = message.productDetails?.[index] || null;
           return (
@@ -24,6 +25,11 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
               imageUrl={imageUrl}
               productDetail={productDetail}
               index={index}
+              onClick={() => {
+                if (productDetail?.id) {
+                  onProductClick(productDetail.id);
+                }
+              }}
             />
           );
         })}
@@ -39,7 +45,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
       )}
     >
       <div className={cn(
-        "flex gap-2 max-w-[85%]",
+        "flex gap-2 max-w-[95%]", // Expanded width for images
         message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
       )}>
         <Avatar className={cn(
@@ -56,7 +62,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
         </Avatar>
         <div
           className={cn(
-            "rounded-2xl px-3 py-2 text-sm",
+            "rounded-xl px-3 py-2 text-sm",
             message.role === 'user'
               ? "bg-sky-500 text-white"
               : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",

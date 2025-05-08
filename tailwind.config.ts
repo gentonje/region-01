@@ -80,9 +80,15 @@ export default {
           "50%": { boxShadow: "0 0 15px rgba(99, 102, 241, 0.8)" },
           "100%": { boxShadow: "0 0 5px rgba(99, 102, 241, 0.5)" },
         },
+        "image-glow": {
+          "0%": { boxShadow: "0 0 4px rgba(14, 165, 233, 0.6)" },
+          "50%": { boxShadow: "0 0 8px rgba(14, 165, 233, 0.8)" },
+          "100%": { boxShadow: "0 0 4px rgba(14, 165, 233, 0.6)" },
+        },
       },
       animation: {
         "glow-pulse": "glow-pulse 2s infinite ease-in-out",
+        "image-glow": "image-glow 2s infinite ease-in-out",
       },
     },
   },

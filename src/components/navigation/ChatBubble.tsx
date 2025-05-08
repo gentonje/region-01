@@ -5,11 +5,12 @@ import { cn } from '@/lib/utils';
 import { useScrollDirection, ScrollDirection } from '@/hooks/useScrollDirection';
 import { useShoppingAssistant } from '@/hooks/useShoppingAssistant';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { ChatHeader } from '../chat/ChatHeader';
 import { ChatMessages } from '../chat/ChatMessages';
 import { ChatInput } from '../chat/ChatInput';
+import { supabase } from '@/integrations/supabase/client';
 
 export const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +20,7 @@ export const ChatBubble = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { session } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Only show on main products page
   const shouldShowBubble = location.pathname === '/products';
@@ -29,9 +31,6 @@ export const ChatBubble = () => {
       setIsOpen(false);
     }
   }, [scrollDirection, isOpen]);
-
-  // Remove auto-focus when chat opens - we'll let the user click the input when they want to type
-  // No more auto-focus code here
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -72,6 +71,40 @@ export const ChatBubble = () => {
     });
   };
 
+  const handleProductClick = async (productId: string) => {
+    try {
+      // Fetch the product details
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
+
+      if (error) throw error;
+      
+      if (data) {
+        // Close chat
+        setIsOpen(false);
+        
+        // Navigate to product detail
+        // You would need to implement this navigation in your app
+        navigate(`/products/${productId}`);
+        
+        toast({
+          title: "Opening product",
+          description: `Loading ${data.title}...`,
+        });
+      }
+    } catch (err) {
+      console.error('Error opening product:', err);
+      toast({
+        title: "Error",
+        description: "Could not open the product. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!shouldShowBubble) {
     return null;
   }
@@ -83,7 +116,7 @@ export const ChatBubble = () => {
         onClick={toggleChat}
         className={cn(
           "fixed z-50 bottom-10 right-4 w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all duration-300",
-          "bg-sky-500 hover:bg-sky-600 text-white",
+          "bg-sky-500 hover:bg-sky-600 text-white button-glow-blue",
           isOpen && "scale-0 opacity-0"
         )}
         aria-label="Shopping Assistant"
@@ -101,7 +134,11 @@ export const ChatBubble = () => {
         )}
       >
         <ChatHeader onClose={toggleChat} onClear={handleClearChat} />
-        <ChatMessages messages={messages} isLoading={isLoading} />
+        <ChatMessages 
+          messages={messages} 
+          isLoading={isLoading} 
+          onProductClick={handleProductClick}
+        />
         <ChatInput
           ref={inputRef}
           value={messageInput}
@@ -109,7 +146,7 @@ export const ChatBubble = () => {
           onKeyDown={handleKeyDown}
           onSend={handleSend}
           isLoading={isLoading}
-          autoFocus={false} // Explicitly set to false to prevent auto-focus
+          autoFocus={false}
         />
       </div>
     </>

@@ -1,25 +1,25 @@
+
 import { useState, useEffect, useCallback } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { RegionSelector } from "@/components/RegionSelector";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { Product, ProductCategory } from "@/types/product";
+import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useCurrencyFix } from "@/hooks/useCurrencyFix";
+import { useProducts } from "@/hooks/useProducts";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
-  selectedCountry?: string; // Add country prop
+  selectedCountry?: string;
 }
 
 const Index = ({ 
   selectedCurrency = "USD",
-  selectedCountry = "1", // Default to Kenya (id: 1)
+  selectedCountry = "all", // Changed default to "all"
 }: IndexProps) => {
   // Initialize currency fix
   const { isFixing } = useCurrencyFix();
@@ -28,104 +28,35 @@ const Index = ({
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const pageSize = 12;
+  const [sortOrder, setSortOrder] = useState("newest");
   
   // Get country from context if available
   const countryContext = useSelectedCountry();
   // Use context value if available, otherwise use prop
   const effectiveCountry = countryContext?.selectedCountry || selectedCountry;
 
-  console.log("Current country selection:", effectiveCountry);
-  console.log("Current region selection:", selectedRegion);
-
-  // Fetch products with infinite scrolling
+  // Use our hook to fetch products with infinite scrolling
   const {
     data,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     isLoading,
-    refetch,
-  } = useInfiniteQuery({
-    queryKey: ["products", searchQuery, selectedRegion, selectedCategory, effectiveCountry],
-    queryFn: async ({ pageParam = 0 }) => {
-      console.log("Executing product query with region:", selectedRegion);
-      
-      let query = supabase
-        .from("products")
-        .select(`
-          *,
-          product_images (
-            id,
-            storage_path,
-            is_main,
-            display_order
-          )
-        `)
-        .eq("product_status", "published")
-        .eq("in_stock", true)
-        .range(pageParam as number, (pageParam as number) + pageSize - 1)
-        .order("created_at", { ascending: false });
-
-      if (searchQuery) {
-        query = query.ilike("title", `%${searchQuery}%`);
-      }
-
-      if (selectedRegion !== "all") {
-        console.log("Adding region filter for:", selectedRegion);
-        // Make sure we filter by county field, which contains the district name
-        query = query.eq("county", selectedRegion);
-      }
-      
-      if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory as ProductCategory);
-      }
-      
-      // Apply country filter only if a specific country is selected
-      if (effectiveCountry !== "all") {
-        query = query.eq("country_id", Number(effectiveCountry));
-        console.log("Filtering by country_id:", Number(effectiveCountry));
-      }
-
-      const { data, error } = await query;
-      
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-      
-      console.log("Fetched products:", data?.length || 0);
-      
-      // Add additional debugging if using region filter but getting no results
-      if (selectedRegion !== "all" && (!data || data.length === 0)) {
-        console.log("No products found with region filter. Checking database values...");
-        const { data: sampleData } = await supabase
-          .from("products")
-          .select("id, title, county")
-          .limit(5);
-          
-        console.log("Sample county values in database:", sampleData);
-      }
-      
-      return data as any[] as Product[];
-    },
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === pageSize
-        ? allPages.length * pageSize
-        : undefined;
-    },
+  } = useProducts({
+    searchQuery,
+    selectedCategory,
+    selectedRegion,
+    selectedCountry: effectiveCountry,
+    sortOrder,
+    showOnlyPublished: true,
+    limit: 20 // Set a limit of 20 items per page
   });
-
-  // Refresh products when filters change
-  useEffect(() => {
-    refetch();
-  }, [selectedRegion, selectedCategory, searchQuery, effectiveCountry, refetch]);
 
   const products = data?.pages.flat() || [];
 
-  const loadMoreProducts = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) {
+  const loadMoreProducts = useCallback((node?: Element | null) => {
+    if (node && hasNextPage && !isFetchingNextPage) {
+      console.log("Loading more products...");
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);

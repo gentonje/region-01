@@ -93,7 +93,7 @@ export const ImageLoader = memo(({
   }, [src, loadImage, fallbackSrc]);
 
   // Add glow classes if requested
-  const imageClasses = `${className} ${glowEffect ? 'image-glow' : ''} ${glowSelected ? 'image-glow-selected' : ''}`;
+  const imageClasses = `${className} ${glowEffect ? 'animate-image-glow rounded-md' : ''} ${glowSelected ? 'shadow-glow-blue-lg rounded-md' : ''}`;
 
   // If we already know there's an error, show fallback immediately
   if (error) {

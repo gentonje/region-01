@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ArrowLeft, Minimize, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Trash2, X } from 'lucide-react';
 
 interface ChatHeaderProps {
   onClose: () => void;
@@ -9,7 +9,7 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ onClose, onClear }: ChatHeaderProps) => {
   return (
-    <div className="flex justify-between items-center px-4 py-3 bg-sky-500 text-white">
+    <div className="sticky top-0 z-10 flex justify-between items-center p-4 bg-sky-500 text-white shadow-md">
       <div className="flex items-center gap-2">
         <button 
           onClick={onClose}
@@ -27,13 +27,6 @@ export const ChatHeader = ({ onClose, onClear }: ChatHeaderProps) => {
           aria-label="Clear chat"
         >
           <Trash2 className="h-4 w-4" />
-        </button>
-        <button 
-          onClick={onClose}
-          className="p-1 rounded-full hover:bg-sky-600 transition-colors"
-          aria-label="Minimize chat"
-        >
-          <Minimize className="h-4 w-4" />
         </button>
         <button 
           onClick={onClose}

@@ -24,7 +24,7 @@ interface CountrySelectorProps {
 }
 
 export const CountrySelector = ({
-  selectedCountry = "1", 
+  selectedCountry = "all", // Changed default to "all"
   onCountryChange,
 }: CountrySelectorProps) => {
   const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});
@@ -78,6 +78,7 @@ export const CountrySelector = ({
     <Select
       value={selectedCountry}
       onValueChange={handleCountryChange}
+      defaultValue="all"
     >
       <SelectTrigger className="w-[180px] h-10 sm:w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <SelectValue>
