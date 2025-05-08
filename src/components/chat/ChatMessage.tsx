@@ -45,7 +45,7 @@ export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
       )}
     >
       <div className={cn(
-        "flex gap-2 max-w-[95%]", // Expanded width for images
+        "flex gap-2 max-w-[95%]", 
         message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
       )}>
         <Avatar className={cn(

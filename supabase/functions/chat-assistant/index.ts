@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
@@ -185,19 +184,8 @@ const getImageUrl = (supabaseClient, storagePath) => {
 // Function to format product results into a nice response with detailed product information
 const formatProductResults = (supabaseClient, products, originalCurrency, countryName = null) => {
   if (!products || products.length === 0) {
-    // Provide more helpful and specific responses when no products are found
-    let noResultsMessage = "I couldn't find any products matching your criteria.";
-    
-    if (originalCurrency) {
-      noResultsMessage += ` We don't currently have products in that price range (${originalCurrency}).`;
-    }
-    
-    if (countryName) {
-      noResultsMessage += ` We might not have products available in ${countryName} yet.`;
-    }
-    
-    noResultsMessage += " Could you try a different search or provide more details?";
-    
+    // Provide brief response when no products are found
+    let noResultsMessage = "No matching products found.";
     return { 
       text: noResultsMessage,
       images: [],
@@ -205,60 +193,21 @@ const formatProductResults = (supabaseClient, products, originalCurrency, countr
     };
   }
   
-  // Start building a formatted response
-  let response = `I found ${products.length} product${products.length > 1 ? 's' : ''} matching your criteria:`;
+  // Start building a formatted response - now much more concise
+  let response = `Found ${products.length} products:`;
   const imageUrls = [];
   const productDetails = [];
   
-  products.forEach((product, index) => {
-    // Format price based on the product's currency
-    const formattedPrice = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: product.currency || 'USD',
-      maximumFractionDigits: 0
-    }).format(product.price);
-    
-    // Get country information
-    let locationInfo = "Unknown location";
-    if (product.country_id) {
-      locationInfo = product.country_name || `Country ID: ${product.country_id}`;
-    }
-    
-    // Build product details object
+  products.forEach((product) => {
+    // Build product details object for the UI to use
     const productDetail = {
       id: product.id,
       title: product.title || "Unnamed product",
       price: product.price || 0,
       currency: product.currency || "USD",
-      location: product.country_name || locationInfo,
+      location: product.country_name || "Unknown location",
       inStock: product.in_stock !== false
     };
-    
-    response += `\n\n${product.title}`;
-    if (product.description) {
-      // Limit description length
-      const shortDescription = product.description.length > 100 
-        ? product.description.substring(0, 100) + '...'
-        : product.description;
-      response += `\n${shortDescription}`;
-    }
-    response += `\nPrice: ${formattedPrice}`;
-    if (product.category) {
-      response += `\nCategory: ${product.category}`;
-    }
-    
-    // Add location info
-    response += `\nLocation: ${locationInfo}`;
-    
-    if (product.shipping_info) {
-      response += `\nShipping: ${product.shipping_info}`;
-    }
-    if (product.average_rating) {
-      response += `\nRating: ${product.average_rating} stars`;
-    }
-    
-    // Add availability info
-    response += product.in_stock ? "\nStatus: In Stock" : "\nStatus: Out of Stock";
     
     // Get product image if available (just the main image)
     if (product.product_images && product.product_images.length > 0) {
@@ -277,16 +226,11 @@ const formatProductResults = (supabaseClient, products, originalCurrency, countr
         }
       }
     }
-    
-    // Add separator between products except for the last one
-    if (index < products.length - 1) {
-      response += "\n---";
-    }
   });
   
-  // Add a final note if we found products
+  // Add very brief final note
   if (products.length > 0) {
-    response += "\n\nWould you like more information about any of these products?";
+    response += " Click on any product to see details.";
   }
   
   return { 
@@ -577,23 +521,25 @@ serve(async (req) => {
         `The user's name is ${userInfo.userName}. Always refer to them by name in a friendly manner when appropriate.` :
         '';
 
-      // Create the prompt for Gemini
+      // Create the prompt for Gemini with instructions to keep responses brief
       console.log("Preparing prompt for Gemini...");
       const prompt = {
         contents: [
           {
             parts: [
               {
-                text: `You are a helpful, friendly and professional shopping assistant for our e-commerce marketplace. 
-                Use ONLY the following product information to answer customer questions.
-                If the user asks to see products or images, make sure to mention specific products from the list so they will be shown.
-                If you don't know the answer based on the given product information, be honest and say "I don't have enough information about that, but I'll be happy to help you find what you're looking for".
+                text: `You are a helpful, friendly and professional shopping assistant. 
+                Use ONLY the product information provided to answer customer questions.
+                If the user asks to see products or images, mention specific products from the list.
                 
                 ${userGreeting}
                 
-                YOUR GOAL: Always provide beautifully formatted responses with clear product details, properly aligned text, and good organization. DO NOT use markdown, just use clean text formatting with proper spacing and separators.
-                
-                IMPORTANT: Always display prices in the product's original currency, not converted.
+                VERY IMPORTANT INSTRUCTIONS:
+                1. Keep your responses EXTREMELY brief - under 100 tokens (about 25 words).
+                2. Focus on showing products rather than explaining them in detail.
+                3. Always display prices in the product's original currency.
+                4. Don't use markdown formatting, just simple text.
+                5. If you don't know something, just say briefly "I don't have that information."
                 
                 PRODUCT INFORMATION:
                 ${productContext}
@@ -607,13 +553,8 @@ serve(async (req) => {
                 
                 USER QUERY: ${query}
                 
-                Remember to format your response beautifully, without using markdown syntax!
-                If the user is asking about specific products, mention the exact product names so that I can display their images.
-                
-                For price ranges, understand formats like "between X and Y currency", "under X currency", or "above X currency".
-                If asked about products not in our inventory, politely explain we don't have them but suggest alternatives if available.
-                If asked about shipping to locations we don't serve, politely explain our shipping limitations.
-                Always be professional, friendly, and helpful, focusing on being a great customer service agent.`
+                Remember to keep your response under 100 tokens / 25 words.
+                If mentioning products, use their exact names so I can display them.`
               }
             ],
             role: "user"
@@ -641,7 +582,13 @@ serve(async (req) => {
       console.log("Gemini API response received");
       
       // The text is located in a different path in the newer Gemini API
-      const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+      let assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+      
+      // Enforce the token limit by truncating if needed (roughly 100 tokens)
+      if (assistantResponse.length > 200) {
+        assistantResponse = assistantResponse.substring(0, 200) + "...";
+      }
+      
       console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
 
       // Extract product names from the response to find relevant images and build product details

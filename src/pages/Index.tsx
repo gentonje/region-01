@@ -11,7 +11,7 @@ import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useCurrencyFix } from "@/hooks/useCurrencyFix";
 import { useProducts } from "@/hooks/useProducts";
-import { supabase } from "@/integrations/supabase/client"; // Added missing import
+import { supabase } from "@/integrations/supabase/client";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
