@@ -112,7 +112,7 @@ export const ChatBubble = () => {
                 <ImageLoader
                   src={imageUrl}
                   alt={productDetail?.title || `Product image ${index + 1}`}
-                  className="w-full h-auto object-cover"
+                  className="w-full h-auto object-cover max-h-64" // Added max height to prevent overly large images
                   width={0}
                   height={0}
                   priority={index < 2} // Prioritize first two images
@@ -121,18 +121,18 @@ export const ChatBubble = () => {
               
               {productDetail && (
                 <div className="p-3 border-t border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-lg mb-1">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 text-lg mb-1 line-clamp-2">
                     {productDetail.title}
                   </h4>
                   
-                  <div className="flex flex-wrap items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="mb-2 sm:mb-0">
                       <span className="text-green-600 dark:text-green-400 font-medium text-xl">
                         {productDetail.currency} {productDetail.price.toLocaleString()}
                       </span>
                     </div>
                     
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm text-gray-500 dark:text-gray-400">
                         {productDetail.location}
                       </span>
@@ -259,7 +259,7 @@ export const ChatBubble = () => {
                       message.role === 'user'
                         ? "bg-sky-500 text-white"
                         : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
-                      (message.images && message.images.length > 0) ? "max-w-full" : ""
+                      (message.images && message.images.length > 0) ? "max-w-full w-full" : ""
                     )}
                   >
                     {/* Message text content */}
