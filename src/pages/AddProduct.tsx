@@ -12,7 +12,7 @@ import { ProductCategory } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
-import { useSelectedCountry } from "@/hooks/useSelectedCountry";
+import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { getCurrencyForCountry } from "@/utils/countryToCurrency";
 
