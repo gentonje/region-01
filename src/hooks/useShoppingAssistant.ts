@@ -3,29 +3,16 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMessageHistory, Message, MessageBase } from './useMessageHistory';
 
-export type Message = {
-  id: string;
-  content: string;
-  role: 'user' | 'assistant';
-  timestamp: Date;
-  images?: string[];
-  productDetails?: {
-    id: string;
-    title: string;
-    price: number;
-    currency: string;
-    location: string;
-    inStock: boolean;
-  }[];
-};
+export type { Message } from './useMessageHistory';
 
 export const useShoppingAssistant = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { session } = useAuth();
   const user = session?.user;
+  const { messages, addMessage, clearMessages: clearMessageHistory } = useMessageHistory();
 
   // Get user profile for personalization
   const [userProfile, setUserProfile] = useState<{
@@ -72,7 +59,7 @@ export const useShoppingAssistant = () => {
         role: 'assistant' 
       });
     }
-  }, [userProfile]);
+  }, [userProfile, addMessage, messages.length]);
 
   // Log any errors that occur
   useEffect(() => {
@@ -80,17 +67,6 @@ export const useShoppingAssistant = () => {
       console.error("Shopping Assistant Error:", error);
     }
   }, [error]);
-
-  const addMessage = useCallback((message: Omit<Message, 'id' | 'timestamp'>) => {
-    const newMessage: Message = {
-      ...message,
-      id: crypto.randomUUID(),
-      timestamp: new Date(),
-    };
-    console.log("Adding message:", newMessage);
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  }, []);
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim()) return;
@@ -198,7 +174,7 @@ export const useShoppingAssistant = () => {
   }, [messages, addMessage, userProfile, user?.id]);
 
   const clearMessages = useCallback(() => {
-    setMessages([]);
+    clearMessageHistory();
     setError(null);
     
     // Add personalized welcome message back
@@ -209,7 +185,7 @@ export const useShoppingAssistant = () => {
       content: `${greeting}I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations. For example, try asking about "mobile phones in Kenya between 10,000 and 20,000 KES"`, 
       role: 'assistant' 
     });
-  }, [addMessage, userProfile]);
+  }, [addMessage, userProfile, clearMessageHistory]);
 
   return {
     messages,

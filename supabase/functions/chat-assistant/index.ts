@@ -8,134 +8,139 @@ const corsHeaders = {
 };
 
 // We're using Gemini API now
-const GEMINI_API_KEY = 'AIzaSyCj6SIxmupgV2Fg0mlUB_-joeU7L44jpDI';
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyCj6SIxmupgV2Fg0mlUB_-joeU7L44jpDI';
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 // Function to extract search criteria from user query with improved price range detection
 const extractSearchCriteria = (query) => {
   console.log("Extracting search criteria from query:", query);
   
-  // Enhanced price range extraction
-  // Standard range: "between X and Y"
-  let priceRangePattern = /between\s+(\d+,?\d*)\s+and\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
-  let priceRangeMatch = query.match(priceRangePattern);
-  
-  // Handle "below X" or "under X" pattern
-  const belowPricePattern = /(below|under|less than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
-  const belowPriceMatch = query.match(belowPricePattern);
-  
-  // Handle "above X" or "over X" or "more than X" pattern
-  const abovePricePattern = /(above|over|more than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
-  const abovePriceMatch = query.match(abovePricePattern);
-  
-  let minPrice = null;
-  let maxPrice = null;
-  let currency = null;
-  
-  if (priceRangeMatch) {
-    // Regular price range
-    minPrice = parseFloat(priceRangeMatch[1].replace(/,/g, ''));
-    maxPrice = parseFloat(priceRangeMatch[2].replace(/,/g, ''));
-    currency = normalizeCurrency(priceRangeMatch[3]);
-  } else if (belowPriceMatch) {
-    // Below a certain price
-    minPrice = 0; // Start from zero
-    maxPrice = parseFloat(belowPriceMatch[2].replace(/,/g, ''));
-    currency = normalizeCurrency(belowPriceMatch[3]);
-  } else if (abovePriceMatch) {
-    // Above a certain price
-    minPrice = parseFloat(abovePriceMatch[2].replace(/,/g, ''));
-    maxPrice = 9999999; // A very high upper limit
-    currency = normalizeCurrency(abovePriceMatch[3]);
-  }
-  
-  // Country/location extraction
-  const countryPattern = /in\s+([a-zA-Z\s]+?)(?:\s+between|\s+under|\s+over|$|\s+from|\s+with|\s+that|\s+and|\s+which)/i;
-  const countryMatch = query.match(countryPattern);
-  let country = null;
-  
-  if (countryMatch) {
-    country = countryMatch[1].trim().toLowerCase();
-    // Map common country names to our country IDs
-    if (country.includes('kenya')) {
-      country = '1'; // Kenya country_id
-    } else if (country.includes('uganda')) {
-      country = '2'; // Uganda country_id
-    } else if (country.includes('south sudan')) {
-      country = '3'; // South Sudan country_id
-    } else if (country.includes('ethiopia')) {
-      country = '4'; // Ethiopia country_id 
-    } else if (country.includes('rwanda')) {
-      country = '5'; // Rwanda country_id
+  try {
+    // Enhanced price range extraction
+    // Standard range: "between X and Y"
+    let priceRangePattern = /between\s+(\d+,?\d*)\s+and\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+    let priceRangeMatch = query.match(priceRangePattern);
+    
+    // Handle "below X" or "under X" pattern
+    const belowPricePattern = /(below|under|less than|lee than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+    const belowPriceMatch = query.match(belowPricePattern);
+    
+    // Handle "above X" or "over X" or "more than X" pattern
+    const abovePricePattern = /(above|over|more than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+    const abovePriceMatch = query.match(abovePricePattern);
+    
+    let minPrice = null;
+    let maxPrice = null;
+    let currency = null;
+    
+    if (priceRangeMatch) {
+      // Regular price range
+      minPrice = parseFloat(priceRangeMatch[1].replace(/,/g, ''));
+      maxPrice = parseFloat(priceRangeMatch[2].replace(/,/g, ''));
+      currency = normalizeCurrency(priceRangeMatch[3]);
+    } else if (belowPriceMatch) {
+      // Below a certain price
+      minPrice = 0; // Start from zero
+      maxPrice = parseFloat(belowPriceMatch[2].replace(/,/g, ''));
+      currency = normalizeCurrency(belowPriceMatch[3]);
+    } else if (abovePriceMatch) {
+      // Above a certain price
+      minPrice = parseFloat(abovePriceMatch[2].replace(/,/g, ''));
+      maxPrice = 9999999; // A very high upper limit
+      currency = normalizeCurrency(abovePriceMatch[3]);
     }
-  }
-  
-  // Enhanced category extraction with multiple categories
-  const categoryMapping = {
-    'electronics': 'Electronics',
-    'mobile': 'Electronics',
-    'phone': 'Electronics',
-    'smartphone': 'Electronics',
-    'laptop': 'Electronics',
-    'computer': 'Electronics',
-    'tablet': 'Electronics',
-    'tv': 'Electronics',
-    'television': 'Electronics',
-    'clothing': 'Clothing',
-    'clothes': 'Clothing',
-    'fashion': 'Clothing',
-    'shoes': 'Clothing',
-    'apparel': 'Clothing',
-    'home': 'Home & Garden',
-    'furniture': 'Home & Garden',
-    'garden': 'Home & Garden',
-    'kitchen': 'Home & Garden',
-    'books': 'Books',
-    'book': 'Books',
-    'sports': 'Sports & Outdoors',
-    'outdoor': 'Sports & Outdoors',
-    'toys': 'Toys & Games',
-    'games': 'Toys & Games',
-    'health': 'Health & Beauty',
-    'beauty': 'Health & Beauty',
-    'personal care': 'Health & Beauty',
-    'car': 'Automotive',
-    'cars': 'Automotive',
-    'vehicle': 'Automotive',
-    'vehicles': 'Automotive',
-    'automotive': 'Automotive',
-    'food': 'Food & Beverages',
-    'grocery': 'Food & Beverages',
-    'drink': 'Food & Beverages',
-    'beverage': 'Food & Beverages'
-  };
-  
-  let category = null;
-  
-  // Check query words against our category mapping
-  const queryWords = query.toLowerCase().split(' ');
-  for (const word of queryWords) {
-    if (categoryMapping[word]) {
-      category = categoryMapping[word];
-      break;
+    
+    // Country/location extraction
+    const countryPattern = /in\s+([a-zA-Z\s]+?)(?:\s+between|\s+under|\s+over|$|\s+from|\s+with|\s+that|\s+and|\s+which)/i;
+    const countryMatch = query.match(countryPattern);
+    let country = null;
+    
+    if (countryMatch) {
+      country = countryMatch[1].trim().toLowerCase();
+      // Map common country names to our country IDs
+      if (country.includes('kenya')) {
+        country = '1'; // Kenya country_id
+      } else if (country.includes('uganda')) {
+        country = '2'; // Uganda country_id
+      } else if (country.includes('south sudan') || country === 'juba') {
+        country = '3'; // South Sudan country_id
+      } else if (country.includes('ethiopia')) {
+        country = '4'; // Ethiopia country_id 
+      } else if (country.includes('rwanda')) {
+        country = '5'; // Rwanda country_id
+      }
     }
-  }
-  
-  // If no direct match found, try more complex phrases
-  if (!category) {
-    for (const [key, value] of Object.entries(categoryMapping)) {
-      if (query.toLowerCase().includes(key)) {
-        category = value;
+    
+    // Enhanced category extraction with multiple categories
+    const categoryMapping = {
+      'electronics': 'Electronics',
+      'mobile': 'Electronics',
+      'phone': 'Electronics',
+      'smartphone': 'Electronics',
+      'laptop': 'Electronics',
+      'computer': 'Electronics',
+      'tablet': 'Electronics',
+      'tv': 'Electronics',
+      'television': 'Electronics',
+      'clothing': 'Clothing',
+      'clothes': 'Clothing',
+      'fashion': 'Clothing',
+      'shoes': 'Clothing',
+      'apparel': 'Clothing',
+      'home': 'Home & Garden',
+      'furniture': 'Home & Garden',
+      'garden': 'Home & Garden',
+      'kitchen': 'Home & Garden',
+      'books': 'Books',
+      'book': 'Books',
+      'sports': 'Sports & Outdoors',
+      'outdoor': 'Sports & Outdoors',
+      'toys': 'Toys & Games',
+      'games': 'Toys & Games',
+      'health': 'Health & Beauty',
+      'beauty': 'Health & Beauty',
+      'personal care': 'Health & Beauty',
+      'car': 'Automotive',
+      'cars': 'Automotive',
+      'vehicle': 'Automotive',
+      'vehicles': 'Automotive',
+      'automotive': 'Automotive',
+      'food': 'Food & Beverages',
+      'grocery': 'Food & Beverages',
+      'drink': 'Food & Beverages',
+      'beverage': 'Food & Beverages'
+    };
+    
+    let category = null;
+    
+    // Check query words against our category mapping
+    const queryWords = query.toLowerCase().split(' ');
+    for (const word of queryWords) {
+      if (categoryMapping[word]) {
+        category = categoryMapping[word];
         break;
       }
     }
+    
+    // If no direct match found, try more complex phrases
+    if (!category) {
+      for (const [key, value] of Object.entries(categoryMapping)) {
+        if (query.toLowerCase().includes(key)) {
+          category = value;
+          break;
+        }
+      }
+    }
+    
+    console.log("Extracted search criteria:", { 
+      minPrice, maxPrice, currency, country, category 
+    });
+    
+    return { minPrice, maxPrice, currency, country, category };
+  } catch (error) {
+    console.error("Error extracting search criteria:", error);
+    return { minPrice: null, maxPrice: null, currency: null, country: null, category: null };
   }
-  
-  console.log("Extracted search criteria:", { 
-    minPrice, maxPrice, currency, country, category 
-  });
-  
-  return { minPrice, maxPrice, currency, country, category };
 };
 
 // Helper function to normalize currency codes
@@ -334,6 +339,7 @@ serve(async (req) => {
     
     if (countriesError) {
       console.error("Error fetching countries:", countriesError);
+      // Continue with the process even if countries fetch fails
     }
     
     // Check if this is a product search query
@@ -342,7 +348,8 @@ serve(async (req) => {
       /looking for/i, /search/i, /find/i, /where/i, /available/i, /stock/i,
       /between.*and/i, /under/i, /below/i, /cheaper/i, /expensive/i,
       /show me/i, /display/i, /picture/i, /image/i, /photo/i,
-      /car/i, /mobile/i, /phone/i, /tv/i, /laptop/i, /electronics/i
+      /car/i, /mobile/i, /phone/i, /tv/i, /laptop/i, /electronics/i,
+      /less than/i, /lee than/i, /juba/i
     ];
     
     const isProductSearch = productSearchPatterns.some(pattern => pattern.test(query));
@@ -361,9 +368,130 @@ serve(async (req) => {
         countryName = countryObj?.name;
       }
       
-      // Start building the Supabase query
-      console.log("Fetching product data from Supabase based on extracted criteria...");
-      let productQuery = supabaseClient
+      try {
+        // Start building the Supabase query
+        console.log("Fetching product data from Supabase based on extracted criteria...");
+        let productQuery = supabaseClient
+          .from("products")
+          .select(`
+            id, 
+            title, 
+            description, 
+            price, 
+            category, 
+            shipping_info, 
+            average_rating,
+            in_stock,
+            currency,
+            country_id,
+            product_images (
+              id,
+              storage_path,
+              is_main,
+              display_order
+            )
+          `)
+          .eq("product_status", "published");
+        
+        // Apply filters based on extracted criteria
+        if (category) {
+          productQuery = productQuery.eq("category", category);
+        }
+        
+        // Search for "Juba" specifically - common use case
+        if (query.toLowerCase().includes('juba')) {
+          productQuery = productQuery.eq("country_id", 3); // South Sudan ID
+        } else if (country) {
+          productQuery = productQuery.eq("country_id", parseInt(country));
+        }
+        
+        // Handle price filtering (use original price in product's currency)
+        if (minPrice !== null && maxPrice !== null && currency) {
+          if (currency === 'USD') {
+            // We need to convert USD range to the product's local currency for comparison
+            const { data: currencyRates } = await supabaseClient
+              .from('currencies')
+              .select('code, rate')
+              .eq('status', 'active');
+            
+            if (currencyRates && currencyRates.length > 0) {
+              // Get USD rate
+              const usdRate = currencyRates.find(c => c.code === 'USD')?.rate || 1;
+              
+              // Find products with prices in the range based on comparison in their native currency
+              // This is a simplified approach - ideally we would do currency conversion properly
+              productQuery = productQuery
+                .gte('price', minPrice / (usdRate || 1) * 0.8) // Adding buffer for conversion variations
+                .lte('price', maxPrice / (usdRate || 1) * 1.2);
+            } else {
+              // Fallback if we can't get rates
+              productQuery = productQuery
+                .gte('price', minPrice * 0.8)
+                .lte('price', maxPrice * 1.2);
+            }
+          } else {
+            // Direct comparison if using local currency
+            productQuery = productQuery
+              .gte('price', minPrice)
+              .lte('price', maxPrice);
+          }
+        }
+        
+        // Get the matching products
+        let { data: products, error: productsError } = await productQuery.limit(10);
+        
+        if (productsError) {
+          throw productsError;
+        }
+        
+        // Add country names for better display
+        if (products && products.length > 0 && countries) {
+          products = products.map(product => {
+            const country = countries.find(c => c.id === product.country_id);
+            return {
+              ...product,
+              country_name: country?.name || null
+            };
+          });
+        }
+        
+        console.log(`Fetched ${products?.length || 0} matching products`);
+        
+        // Format the products into a nice response with images and product details
+        const formattedResponse = formatProductResults(supabaseClient, products, currency, countryName);
+        
+        console.log("Formatted response:", {
+          textLength: formattedResponse.text.length,
+          imagesCount: formattedResponse.images.length,
+          detailsCount: formattedResponse.productDetails.length
+        });
+        
+        // Return the formatted response with images
+        return new Response(
+          JSON.stringify({ 
+            response: formattedResponse.text,
+            images: formattedResponse.images,
+            productDetails: formattedResponse.productDetails
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
+        );
+      } catch (err) {
+        console.error("Error processing product search:", err);
+        return new Response(
+          JSON.stringify({
+            response: "I'm having trouble finding products right now. Could you try again later or rephrase your question?",
+            error: err.message || "Unknown error processing search"
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
+        );
+      }
+    }
+    
+    // For non-product search queries, proceed with Gemini API
+    try {
+      // Get relevant product data from Supabase
+      console.log("Fetching product data from Supabase...");
+      const { data: productData, error: productsError } = await supabaseClient
         .from("products")
         .select(`
           id, 
@@ -373,7 +501,6 @@ serve(async (req) => {
           category, 
           shipping_info, 
           average_rating,
-          in_stock,
           currency,
           country_id,
           product_images (
@@ -383,309 +510,205 @@ serve(async (req) => {
             display_order
           )
         `)
-        .eq("product_status", "published");
-      
-      // Apply filters based on extracted criteria
-      if (category) {
-        productQuery = productQuery.eq("category", category);
+        .limit(15);
+        
+      if (productsError) {
+        throw productsError;
       }
       
-      if (country) {
-        productQuery = productQuery.eq("country_id", parseInt(country));
-      }
+      console.log(`Fetched ${productData?.length || 0} products`);
       
-      // Handle price filtering (use original price in product's currency)
-      if (minPrice !== null && maxPrice !== null && currency) {
-        if (currency === 'USD') {
-          // We need to convert USD range to the product's local currency for comparison
-          const { data: currencyRates } = await supabaseClient
-            .from('currencies')
-            .select('code, rate')
-            .eq('status', 'active');
-          
-          if (currencyRates && currencyRates.length > 0) {
-            // Get USD rate
-            const usdRate = currencyRates.find(c => c.code === 'USD')?.rate || 1;
-            
-            // Find products with prices in the range based on comparison in their native currency
-            // This is a simplified approach - ideally we would do currency conversion properly
-            productQuery = productQuery
-              .gte('price', minPrice / (usdRate || 1) * 0.8) // Adding buffer for conversion variations
-              .lte('price', maxPrice / (usdRate || 1) * 1.2);
-          } else {
-            // Fallback if we can't get rates
-            productQuery = productQuery
-              .gte('price', minPrice * 0.8)
-              .lte('price', maxPrice * 1.2);
+      // Get categories for context
+      const { data: categories, error: categoriesError } = await supabaseClient
+        .from("categories")
+        .select("name")
+        .limit(10);
+      
+      if (categoriesError) {
+        console.error("Error fetching categories:", categoriesError);
+        // Continue even if categories fail
+      } else {
+        console.log(`Fetched ${categories?.length || 0} categories`);
+      }
+
+      // Create context from the product data
+      const productContext = productData.map(p => {
+        // Format price with the product's native currency
+        const formattedPrice = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: p.currency || 'SSP',
+          maximumFractionDigits: 0
+        }).format(p.price);
+        
+        // Get country name if available
+        const countryName = countries?.find(c => c.id === p.country_id)?.name || 'Unknown location';
+        
+        // Get image URL if available
+        const hasImages = p.product_images && p.product_images.length > 0;
+        const imageInfo = hasImages ? 
+          `Image URL: ${getImageUrl(supabaseClient, p.product_images[0].storage_path)}` : 
+          'No image available';
+        
+        return `
+        Product: ${p.title}
+        Description: ${p.description || 'No description available'}
+        Price: ${formattedPrice}
+        Category: ${p.category}
+        Country: ${countryName}
+        Rating: ${p.average_rating || 'No ratings yet'}
+        ${imageInfo}
+      `}).join('\n\n');
+      
+      const categoriesContext = categories ? 
+        `Available categories: ${categories.map(c => c.name).join(', ')}` : 
+        '';
+        
+      const countriesContext = countries ?
+        `Available countries: ${countries.map(c => c.name).join(', ')}` :
+        '';
+
+      // Prepare chat history context
+      const historyContext = messageHistory && messageHistory.length > 0 ? 
+        messageHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n') : 
+        '';
+
+      // Add user greeting if available
+      const userGreeting = userInfo && userInfo.userName ? 
+        `The user's name is ${userInfo.userName}. Always refer to them by name in a friendly manner when appropriate.` :
+        '';
+
+      // Create the prompt for Gemini
+      console.log("Preparing prompt for Gemini...");
+      const prompt = {
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are a helpful, friendly and professional shopping assistant for our e-commerce marketplace. 
+                Use ONLY the following product information to answer customer questions.
+                If the user asks to see products or images, make sure to mention specific products from the list so they will be shown.
+                If you don't know the answer based on the given product information, be honest and say "I don't have enough information about that, but I'll be happy to help you find what you're looking for".
+                
+                ${userGreeting}
+                
+                YOUR GOAL: Always provide beautifully formatted responses with clear product details, properly aligned text, and good organization. DO NOT use markdown, just use clean text formatting with proper spacing and separators.
+                
+                IMPORTANT: Always display prices in the product's original currency, not converted.
+                
+                PRODUCT INFORMATION:
+                ${productContext}
+                
+                ${categoriesContext}
+                
+                ${countriesContext}
+                
+                PREVIOUS CONVERSATION:
+                ${historyContext}
+                
+                USER QUERY: ${query}
+                
+                Remember to format your response beautifully, without using markdown syntax!
+                If the user is asking about specific products, mention the exact product names so that I can display their images.
+                
+                For price ranges, understand formats like "between X and Y currency", "under X currency", or "above X currency".
+                If asked about products not in our inventory, politely explain we don't have them but suggest alternatives if available.
+                If asked about shipping to locations we don't serve, politely explain our shipping limitations.
+                Always be professional, friendly, and helpful, focusing on being a great customer service agent.`
+              }
+            ],
+            role: "user"
           }
-        } else {
-          // Direct comparison if using local currency
-          productQuery = productQuery
-            .gte('price', minPrice)
-            .lte('price', maxPrice);
+        ]
+      };
+
+      // Call the Gemini API with the correct model name
+      console.log("Calling Gemini API...");
+      const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(prompt)
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.text();
+        console.error("Gemini API error:", errorResponse);
+        throw new Error("Failed to generate response from Gemini API: " + errorResponse);
+      }
+
+      const result = await response.json();
+      console.log("Gemini API response received");
+      
+      // The text is located in a different path in the newer Gemini API
+      const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
+      console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
+
+      // Extract product names from the response to find relevant images and build product details
+      const productNames = productData.map(p => p.title?.toLowerCase());
+      const responseImages = [];
+      const responseProductDetails = [];
+      
+      // Check if any product names are mentioned in the response
+      for (const product of productData) {
+        if (!product.title || !product.product_images || product.product_images.length === 0) continue;
+        
+        if (assistantResponse.toLowerCase().includes(product.title.toLowerCase())) {
+          // Get main images first, fallback to any image
+          const mainImages = product.product_images.filter(img => img.is_main || img.display_order === 0);
+          const imageToUse = mainImages.length > 0 ? mainImages[0] : product.product_images[0];
+          
+          if (imageToUse?.storage_path) {
+            const imageUrl = getImageUrl(supabaseClient, imageToUse.storage_path);
+            if (imageUrl && !responseImages.includes(imageUrl)) {
+              responseImages.push(imageUrl);
+              
+              // Add product details
+              const countryName = countries?.find(c => c.id === product.country_id)?.name || 'Unknown location';
+              
+              responseProductDetails.push({
+                id: product.id,
+                title: product.title,
+                price: product.price || 0,
+                currency: product.currency || "USD", 
+                location: countryName,
+                inStock: product.in_stock !== false
+              });
+              
+              // Limit to 4 images maximum
+              if (responseImages.length >= 4) break;
+            }
+          }
         }
       }
       
-      // Get the matching products
-      let { data: products, error: productsError } = await productQuery.limit(10);
-      
-      if (productsError) {
-        console.error("Error fetching products:", productsError);
-        return new Response(
-          JSON.stringify({ error: "Failed to fetch product data" }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
-        );
-      }
-      
-      // Add country names for better display
-      if (products && products.length > 0 && countries) {
-        products = products.map(product => {
-          const country = countries.find(c => c.id === product.country_id);
-          return {
-            ...product,
-            country_name: country?.name || null
-          };
-        });
-      }
-      
-      console.log(`Fetched ${products?.length || 0} matching products`);
-      
-      // Format the products into a nice response with images and product details
-      const formattedResponse = formatProductResults(supabaseClient, products, currency, countryName);
-      
-      console.log("Formatted response:", {
-        textLength: formattedResponse.text.length,
-        imagesCount: formattedResponse.images.length,
-        detailsCount: formattedResponse.productDetails.length
-      });
-      
-      // Return the formatted response with images
+      console.log(`Found ${responseImages.length} relevant product images to include in response`);
+
       return new Response(
         JSON.stringify({ 
-          response: formattedResponse.text,
-          images: formattedResponse.images,
-          productDetails: formattedResponse.productDetails
+          response: assistantResponse,
+          images: responseImages.length > 0 ? responseImages : undefined,
+          productDetails: responseProductDetails.length > 0 ? responseProductDetails : undefined
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
+      );
+    } catch (err) {
+      console.error("Error in Gemini API process:", err);
+      return new Response(
+        JSON.stringify({ 
+          response: "I'm sorry, but I'm having trouble connecting to my knowledge base right now. Could you try asking again in a moment?",
+          error: err.message || "Error processing with Gemini API" 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
       );
     }
-    
-    // For non-product search queries, proceed with Gemini API as before
-    
-    // Get relevant product data from Supabase
-    console.log("Fetching product data from Supabase...");
-    const { data: productData, error: productsError } = await supabaseClient
-      .from("products")
-      .select(`
-        id, 
-        title, 
-        description, 
-        price, 
-        category, 
-        shipping_info, 
-        average_rating,
-        currency,
-        country_id,
-        product_images (
-          id,
-          storage_path,
-          is_main,
-          display_order
-        )
-      `)
-      .limit(15);
-      
-    if (productsError) {
-      console.error("Error fetching products:", productsError);
-      return new Response(
-        JSON.stringify({ error: "Failed to fetch product data" }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
-      );
-    }
-    
-    console.log(`Fetched ${productData?.length || 0} products`);
-    
-    // Get categories for context
-    const { data: categories, error: categoriesError } = await supabaseClient
-      .from("categories")
-      .select("name")
-      .limit(10);
-    
-    if (categoriesError) {
-      console.error("Error fetching categories:", categoriesError);
-    } else {
-      console.log(`Fetched ${categories?.length || 0} categories`);
-    }
-
-    // Create context from the product data
-    const productContext = productData.map(p => {
-      // Format price with the product's native currency
-      const formattedPrice = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: p.currency || 'SSP',
-        maximumFractionDigits: 0
-      }).format(p.price);
-      
-      // Get country name if available
-      const countryName = countries?.find(c => c.id === p.country_id)?.name || 'Unknown location';
-      
-      // Get image URL if available
-      const hasImages = p.product_images && p.product_images.length > 0;
-      const imageInfo = hasImages ? 
-        `Image URL: ${getImageUrl(supabaseClient, p.product_images[0].storage_path)}` : 
-        'No image available';
-      
-      return `
-      Product: ${p.title}
-      Description: ${p.description || 'No description available'}
-      Price: ${formattedPrice}
-      Category: ${p.category}
-      Country: ${countryName}
-      Rating: ${p.average_rating || 'No ratings yet'}
-      ${imageInfo}
-    `}).join('\n\n');
-    
-    const categoriesContext = categories ? 
-      `Available categories: ${categories.map(c => c.name).join(', ')}` : 
-      '';
-      
-    const countriesContext = countries ?
-      `Available countries: ${countries.map(c => c.name).join(', ')}` :
-      '';
-
-    // Prepare chat history context
-    const historyContext = messageHistory && messageHistory.length > 0 ? 
-      messageHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n') : 
-      '';
-
-    // Add user greeting if available
-    const userGreeting = userInfo && userInfo.userName ? 
-      `The user's name is ${userInfo.userName}. Always refer to them by name in a friendly manner when appropriate.` :
-      '';
-
-    // Create the prompt for Gemini
-    console.log("Preparing prompt for Gemini...");
-    const prompt = {
-      contents: [
-        {
-          parts: [
-            {
-              text: `You are a helpful, friendly and professional shopping assistant for our e-commerce marketplace. 
-              Use ONLY the following product information to answer customer questions.
-              If the user asks to see products or images, make sure to mention specific products from the list so they will be shown.
-              If you don't know the answer based on the given product information, be honest and say "I don't have enough information about that, but I'll be happy to help you find what you're looking for".
-              
-              ${userGreeting}
-              
-              YOUR GOAL: Always provide beautifully formatted responses with clear product details, properly aligned text, and good organization. DO NOT use markdown, just use clean text formatting with proper spacing and separators.
-              
-              IMPORTANT: Always display prices in the product's original currency, not converted.
-              
-              PRODUCT INFORMATION:
-              ${productContext}
-              
-              ${categoriesContext}
-              
-              ${countriesContext}
-              
-              PREVIOUS CONVERSATION:
-              ${historyContext}
-              
-              USER QUERY: ${query}
-              
-              Remember to format your response beautifully, without using markdown syntax!
-              If the user is asking about specific products, mention the exact product names so that I can display their images.
-              
-              For price ranges, understand formats like "between X and Y currency", "under X currency", or "above X currency".
-              If asked about products not in our inventory, politely explain we don't have them but suggest alternatives if available.
-              If asked about shipping to locations we don't serve, politely explain our shipping limitations.
-              Always be professional, friendly, and helpful, focusing on being a great customer service agent.`
-            }
-          ],
-          role: "user"
-        }
-      ]
-    };
-
-    // Call the Gemini API with the correct model name
-    console.log("Calling Gemini API...");
-    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(prompt)
-    });
-
-    if (!response.ok) {
-      const errorResponse = await response.text();
-      console.error("Gemini API error:", errorResponse);
-      return new Response(
-        JSON.stringify({ error: "Failed to generate response from Gemini API" }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
-      );
-    }
-
-    const result = await response.json();
-    console.log("Gemini API response received");
-    
-    // The text is located in a different path in the newer Gemini API
-    const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
-    console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
-
-    // Extract product names from the response to find relevant images and build product details
-    const productNames = productData.map(p => p.title?.toLowerCase());
-    const responseImages = [];
-    const responseProductDetails = [];
-    
-    // Check if any product names are mentioned in the response
-    for (const product of productData) {
-      if (!product.title || !product.product_images || product.product_images.length === 0) continue;
-      
-      if (assistantResponse.toLowerCase().includes(product.title.toLowerCase())) {
-        // Get main images first, fallback to any image
-        const mainImages = product.product_images.filter(img => img.is_main || img.display_order === 0);
-        const imageToUse = mainImages.length > 0 ? mainImages[0] : product.product_images[0];
-        
-        if (imageToUse?.storage_path) {
-          const imageUrl = getImageUrl(supabaseClient, imageToUse.storage_path);
-          if (imageUrl && !responseImages.includes(imageUrl)) {
-            responseImages.push(imageUrl);
-            
-            // Add product details
-            const countryName = countries?.find(c => c.id === product.country_id)?.name || 'Unknown location';
-            
-            responseProductDetails.push({
-              id: product.id,
-              title: product.title,
-              price: product.price || 0,
-              currency: product.currency || "USD", 
-              location: countryName,
-              inStock: product.in_stock !== false
-            });
-            
-            // Limit to 4 images maximum
-            if (responseImages.length >= 4) break;
-          }
-        }
-      }
-    }
-    
-    console.log(`Found ${responseImages.length} relevant product images to include in response`);
-
-    return new Response(
-      JSON.stringify({ 
-        response: assistantResponse,
-        images: responseImages.length > 0 ? responseImages : undefined,
-        productDetails: responseProductDetails.length > 0 ? responseProductDetails : undefined
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
-    );
-
   } catch (error) {
     console.error("Function error:", error);
     return new Response(
-      JSON.stringify({ error: error.message || "An unknown error occurred" }),
+      JSON.stringify({ 
+        response: "I'm sorry, I encountered an unexpected error. Please try again later.",
+        error: error.message || "An unknown error occurred" 
+      }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
     );
   }
