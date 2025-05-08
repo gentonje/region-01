@@ -65,6 +65,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
             width={800}
             height={600}
             priority={true}
+            glowEffect={true}
           />
         </div>
       </div>
@@ -73,7 +74,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
 
   return (
     <div className="space-y-1">
-      <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
+      <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
         <ImageLoader
           src={mainImageUrl}
           alt={title}
@@ -82,6 +83,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
           height={600}
           priority={true}
           fallbackSrc="/placeholder.svg"
+          glowEffect={true}
         />
       </div>
       {images.length > 1 && (
@@ -89,8 +91,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
           {images.map((image, index) => (
             <div
               key={index}
-              className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all border hover:opacity-90 ${
-                selectedImage === image.storage_path ? 'ring-1 ring-primary border-primary' : 'border-gray-200 dark:border-gray-700'
+              className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all border-0 hover:opacity-90 ${
+                selectedImage === image.storage_path ? 'ring-1 ring-primary' : 'border-gray-200 dark:border-gray-700'
               }`}
               onClick={() => onImageSelect(image.storage_path)}
             >
@@ -102,6 +104,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
                 height={60}
                 priority={false}
                 fallbackSrc="/placeholder.svg"
+                glowEffect={true}
+                glowSelected={selectedImage === image.storage_path}
               />
             </div>
           ))}

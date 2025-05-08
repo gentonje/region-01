@@ -11,6 +11,8 @@ interface ImageLoaderProps {
   height?: number;
   priority?: boolean;
   fallbackSrc?: string;
+  glowEffect?: boolean;
+  glowSelected?: boolean;
 }
 
 const preloadImage = (src: string): Promise<void> => {
@@ -34,7 +36,9 @@ export const ImageLoader = memo(({
   width,
   height,
   priority = false,
-  fallbackSrc = "/placeholder.svg"
+  fallbackSrc = "/placeholder.svg",
+  glowEffect = false,
+  glowSelected = false
 }: ImageLoaderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -88,6 +92,9 @@ export const ImageLoader = memo(({
     loadImage();
   }, [src, loadImage, fallbackSrc]);
 
+  // Add glow classes if requested
+  const imageClasses = `${className} ${glowEffect ? 'image-glow' : ''} ${glowSelected ? 'image-glow-selected' : ''}`;
+
   // If we already know there's an error, show fallback immediately
   if (error) {
     return (
@@ -95,7 +102,7 @@ export const ImageLoader = memo(({
         <img 
           src={fallbackSrc} 
           alt={alt || "Placeholder image"} 
-          className={className}
+          className={imageClasses}
           width={width}
           height={height}
         />
@@ -107,14 +114,14 @@ export const ImageLoader = memo(({
     <>
       {isLoading && (
         <Skeleton 
-          className={`${className} animate-pulse`}
+          className={`${imageClasses} animate-pulse`}
           style={{ width, height }}
         />
       )}
       <img
         src={imageSrc}
         alt={alt || "Product image"}
-        className={`${className} ${isLoading ? 'hidden' : 'block'}`}
+        className={`${imageClasses} ${isLoading ? 'hidden' : 'block'}`}
         width={width}
         height={height}
         loading={priority ? "eager" : "lazy"}

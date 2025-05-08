@@ -71,17 +71,18 @@ export const ProductCardImage = memo(({
           width={400}
           height={300}
           priority={false}
+          glowEffect={true}
         />
       </AspectRatio>
       
       {/* Display category and county in the same row */}
       <div className="absolute bottom-1 left-1 flex flex-row gap-1 max-w-[95%]">
-        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate">
+        <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/90 text-white font-medium truncate button-glow">
           {product.category}
         </span>
         
         {product.county && (
-          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/90 text-white font-medium truncate flex items-center">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/90 text-white font-medium truncate flex items-center button-glow">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
               <circle cx="12" cy="10" r="3"/>
@@ -95,8 +96,8 @@ export const ProductCardImage = memo(({
       <span 
         className={`absolute top-2 right-2 text-xs px-2 py-0.5 rounded-full ${
           product.in_stock 
-            ? 'bg-green-500/90 text-white' 
-            : 'bg-red-500/90 text-white'
+            ? 'bg-green-500/90 text-white button-glow' 
+            : 'bg-red-500/90 text-white button-glow-destructive'
         } m-1`}
       >
         {product.in_stock ? 'In Stock' : 'Out of Stock'}
@@ -106,8 +107,8 @@ export const ProductCardImage = memo(({
       {showStatus && (
         <span className={`absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full ${
           product.product_status === 'published' 
-            ? 'bg-green-500/90 text-white' 
-            : 'bg-yellow-500/90 text-white'
+            ? 'bg-green-500/90 text-white button-glow' 
+            : 'bg-yellow-500/90 text-white button-glow-amber'
         } m-1`}>
           {product.product_status === 'published' ? 'Published' : 'Unpublished'}
         </span>
@@ -119,7 +120,7 @@ export const ProductCardImage = memo(({
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70"
+            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 button-shadow-none"
             onClick={handleWishlistClick}
             disabled={isPending}
             aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}

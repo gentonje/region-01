@@ -14,13 +14,19 @@ export function CartEmpty() {
       transition={{ duration: 0.5 }}
       className="text-center py-8 space-y-4"
     >
-      <ShoppingBag className="h-16 w-16 mx-auto text-gray-400" />
+      <ShoppingBag className="h-16 w-16 mx-auto text-gray-400 icon-glow" />
       <h2 className="text-xl font-medium">Your cart is empty</h2>
       <p className="text-gray-500">
         Looks like you haven't added anything to your cart yet.
       </p>
       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-        <Button onClick={() => navigate("/products")}>Start Shopping</Button>
+        <Button 
+          onClick={() => navigate("/products")} 
+          variant="violet"
+          className="pulse-glow"
+        >
+          Start Shopping
+        </Button>
       </motion.div>
     </motion.div>
   );

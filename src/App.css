@@ -1,3 +1,4 @@
+
 /* Base styles */
 #root {
   max-width: 1280px;
@@ -237,4 +238,123 @@ video {
 
 .text-glow-orange {
   text-shadow: 0 0 8px rgba(249, 115, 22, 0.4);
+}
+
+/* New glow effects for buttons and images */
+.button-glow {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  border: none !important;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.button-glow:hover, .button-glow:focus {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+  transform: translateY(-1px);
+}
+
+.button-glow-primary {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+  border: none !important;
+}
+
+.button-glow-primary:hover, .button-glow-primary:focus {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+}
+
+.button-glow-violet {
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.6);
+  border: none !important;
+}
+
+.button-glow-violet:hover, .button-glow-violet:focus {
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.8);
+}
+
+.button-glow-amber {
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+  border: none !important;
+}
+
+.button-glow-amber:hover, .button-glow-amber:focus {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.7);
+}
+
+.button-glow-destructive {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+  border: none !important;
+}
+
+.button-glow-destructive:hover, .button-glow-destructive:focus {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+}
+
+.button-glow-outline {
+  box-shadow: 0 0 6px rgba(156, 163, 175, 0.3);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.button-glow-outline:hover, .button-glow-outline:focus {
+  box-shadow: 0 0 10px rgba(156, 163, 175, 0.5);
+}
+
+.image-glow {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+  border-radius: 0.5rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.image-glow:hover {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+}
+
+.image-glow-selected {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.7);
+  border: 2px solid rgba(99, 102, 241, 0.7);
+}
+
+.button-shadow-none {
+  box-shadow: none !important;
+}
+
+/* Add pulse glow animation for certain elements */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+.pulse-glow-amber {
+  animation: pulse-glow-amber 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow-amber {
+  0% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+  }
+}
+
+/* Chat bubble with glow */
+.chat-bubble-glow {
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+  border: none !important;
+}
+
+.tab-glow.active {
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
 }
