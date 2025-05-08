@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Minimize, User, Bot } from 'lucide-react';
+import { MessageCircle, X, Send, Minimize, User, Bot, ArrowLeft, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useScrollDirection, ScrollDirection } from '@/hooks/useScrollDirection';
 import { useShoppingAssistant, Message } from '@/hooks/useShoppingAssistant';
@@ -9,14 +9,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from '@/hooks/use-toast';
 import { ImageLoader } from '@/components/ImageLoader';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const ChatBubble = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { scrollDirection } = useScrollDirection();
-  const { messages, isLoading, sendMessage, error } = useShoppingAssistant();
+  const { messages, isLoading, sendMessage, error, clearMessages } = useShoppingAssistant();
   const [messageInput, setMessageInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { session } = useAuth();
+  const user = session?.user;
 
   // Auto-minimize during scroll down
   useEffect(() => {
@@ -31,9 +34,6 @@ export const ChatBubble = () => {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
-
-  // Focus input only when explicitly clicking in the input field
-  // Removed automatic focus when opening chat to prevent mobile keyboard popup
 
   // Show error toast if there's an error
   useEffect(() => {
@@ -65,10 +65,78 @@ export const ChatBubble = () => {
     console.log("Chat toggled, new state:", !isOpen);
     setIsOpen(prev => !prev);
   };
+  
+  const handleClearChat = () => {
+    clearMessages();
+    toast({
+      title: "Chat Cleared",
+      description: "All messages have been cleared.",
+    });
+  };
+
+  // Render function for product details with images
+  const renderProductDetails = (message: Message) => {
+    if (!message.images || message.images.length === 0) return null;
+    
+    return (
+      <div className="mt-4 space-y-4">
+        {message.images.map((imageUrl, index) => {
+          const productDetail = message.productDetails?.[index] || null;
+          return (
+            <div 
+              key={`${message.id}-image-${index}`} 
+              className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+            >
+              <div className="relative aspect-video w-full overflow-hidden">
+                <ImageLoader
+                  src={imageUrl}
+                  alt={productDetail?.title || `Product image ${index + 1}`}
+                  className="w-full h-full object-cover"
+                  width={0}
+                  height={0}
+                  priority={index < 2} // Prioritize first two images
+                />
+              </div>
+              
+              {productDetail && (
+                <div className="p-3 border-t border-gray-200 dark:border-gray-700">
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                    {productDetail.title}
+                  </h4>
+                  
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-green-600 dark:text-green-400 font-medium">
+                        {productDetail.currency} {productDetail.price.toLocaleString()}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {productDetail.location}
+                      </span>
+                      <span className={cn(
+                        "py-1 px-2 text-xs rounded-full",
+                        productDetail.inStock 
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100" 
+                          : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+                      )}>
+                        {productDetail.inStock ? "In Stock" : "Out of Stock"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <>
-      {/* Bubble Button - positioned at bottom-10 */}
+      {/* Bubble Button - only visible when chat is closed */}
       <button
         onClick={toggleChat}
         className={cn(
@@ -81,12 +149,10 @@ export const ChatBubble = () => {
         <MessageCircle className="h-6 w-6" />
       </button>
 
-      {/* Chat Window */}
+      {/* Full Screen Chat Window */}
       <div
         className={cn(
-          "fixed bottom-24 right-4 z-50 w-80 sm:w-96 rounded-xl overflow-hidden bg-white dark:bg-gray-800 shadow-xl border border-gray-200 dark:border-gray-700",
-          "flex flex-col transition-all duration-300 ease-in-out",
-          "max-h-[500px]",
+          "fixed inset-0 z-50 flex flex-col bg-white dark:bg-gray-900 transition-all duration-300 ease-in-out",
           isOpen 
             ? "translate-y-0 opacity-100" 
             : "translate-y-full opacity-0 pointer-events-none"
@@ -95,10 +161,23 @@ export const ChatBubble = () => {
         {/* Chat Header */}
         <div className="flex justify-between items-center px-4 py-3 bg-sky-500 text-white">
           <div className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
+            <button 
+              onClick={toggleChat}
+              className="p-1 rounded-full hover:bg-sky-600 transition-colors"
+              aria-label="Back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
             <h3 className="font-medium">Shopping Assistant</h3>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-2">
+            <button 
+              onClick={handleClearChat}
+              className="p-1 rounded-full hover:bg-sky-600 transition-colors"
+              aria-label="Clear chat"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
             <button 
               onClick={toggleChat}
               className="p-1 rounded-full hover:bg-sky-600 transition-colors"
@@ -116,64 +195,54 @@ export const ChatBubble = () => {
           </div>
         </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[300px] max-h-[350px]">
+        {/* Messages Area - takes all available space */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 py-8">
               <MessageCircle className="h-10 w-10 mb-3 text-sky-500" />
               <p className="font-medium">Shopping Assistant</p>
-              <p className="text-sm mt-2">Ask me about products, categories, or how to shop!</p>
+              <p className="text-sm mt-2">Ask me about products, prices, or how to shop!</p>
             </div>
           ) : (
             messages.map((message: Message) => (
               <div
                 key={message.id}
                 className={cn(
-                  "flex gap-2 max-w-[90%]",
-                  message.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'
+                  "flex max-w-[90%]",
+                  message.role === 'user' ? 'ml-auto' : 'mr-auto'
                 )}
               >
-                <Avatar className={cn(
-                  "h-8 w-8 flex items-center justify-center",
-                  message.role === 'user' 
-                    ? "bg-sky-100 text-sky-600" 
-                    : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                <div className={cn(
+                  "flex gap-2",
+                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                 )}>
-                  {message.role === 'user' ? (
-                    <User className="h-4 w-4" />
-                  ) : (
-                    <Bot className="h-4 w-4" />
-                  )}
-                </Avatar>
-                <div
-                  className={cn(
-                    "rounded-2xl px-3 py-2 text-sm",
-                    message.role === 'user'
-                      ? "bg-sky-500 text-white"
-                      : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                  )}
-                >
-                  {message.content}
-                  
-                  {/* Image display section */}
-                  {message.images && message.images.length > 0 && (
-                    <div className={cn(
-                      "mt-2 grid gap-2",
-                      message.images.length > 1 ? "grid-cols-2" : "grid-cols-1"
-                    )}>
-                      {message.images.map((imageUrl, index) => (
-                        <div key={`${message.id}-image-${index}`} className="relative overflow-hidden rounded-lg">
-                          <ImageLoader
-                            src={imageUrl}
-                            alt={`Product image ${index + 1}`}
-                            className="w-full h-auto object-cover rounded-lg"
-                            width={message.images && message.images.length > 1 ? 120 : 240}
-                            height={message.images && message.images.length > 1 ? 120 : 160}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <Avatar className={cn(
+                    "h-8 w-8 flex items-center justify-center shrink-0",
+                    message.role === 'user' 
+                      ? "bg-sky-100 text-sky-600" 
+                      : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  )}>
+                    {message.role === 'user' ? (
+                      <User className="h-4 w-4" />
+                    ) : (
+                      <Bot className="h-4 w-4" />
+                    )}
+                  </Avatar>
+                  <div
+                    className={cn(
+                      "rounded-2xl px-3 py-2 text-sm",
+                      message.role === 'user'
+                        ? "bg-sky-500 text-white"
+                        : "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200",
+                      message.images && message.images.length > 0 ? "max-w-[80vw]" : ""
+                    )}
+                  >
+                    {/* Message text content */}
+                    <div className="whitespace-pre-wrap">{message.content}</div>
+                    
+                    {/* Product details with images */}
+                    {renderProductDetails(message)}
+                  </div>
                 </div>
               </div>
             ))
@@ -195,15 +264,15 @@ export const ChatBubble = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area */}
+        {/* Input Area - fixed at bottom */}
         <div className="p-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <div className="flex gap-2">
+          <div className="flex gap-2 max-w-4xl mx-auto">
             <Input
               ref={inputRef}
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask about products..."
+              placeholder="Ask about products, prices, locations..."
               className="flex-1 rounded-full"
               disabled={isLoading}
             />

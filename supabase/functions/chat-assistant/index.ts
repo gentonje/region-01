@@ -11,33 +11,46 @@ const corsHeaders = {
 const GEMINI_API_KEY = 'AIzaSyCj6SIxmupgV2Fg0mlUB_-joeU7L44jpDI';
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-// Function to extract search criteria from user query
+// Function to extract search criteria from user query with improved price range detection
 const extractSearchCriteria = (query) => {
   console.log("Extracting search criteria from query:", query);
   
-  // Price extraction
-  const pricePattern = /between\s+(\d+,?\d*)\s+and\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes)/i;
-  const priceMatch = query.match(pricePattern);
+  // Enhanced price range extraction
+  // Standard range: "between X and Y"
+  let priceRangePattern = /between\s+(\d+,?\d*)\s+and\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+  let priceRangeMatch = query.match(priceRangePattern);
+  
+  // Handle "below X" or "under X" pattern
+  const belowPricePattern = /(below|under|less than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+  const belowPriceMatch = query.match(belowPricePattern);
+  
+  // Handle "above X" or "over X" or "more than X" pattern
+  const abovePricePattern = /(above|over|more than)\s+(\d+,?\d*)\s+([A-Z]{3}|dollars|usd|kes|ksh|ssp|etb|rwf|ugx)/i;
+  const abovePriceMatch = query.match(abovePricePattern);
+  
   let minPrice = null;
   let maxPrice = null;
   let currency = null;
   
-  if (priceMatch) {
-    minPrice = parseFloat(priceMatch[1].replace(/,/g, ''));
-    maxPrice = parseFloat(priceMatch[2].replace(/,/g, ''));
-    
-    // Normalize currency
-    if (priceMatch[3].toLowerCase() === 'dollars' || priceMatch[3].toLowerCase() === 'usd') {
-      currency = 'USD';
-    } else if (priceMatch[3].toLowerCase() === 'kes') {
-      currency = 'KES';
-    } else {
-      currency = priceMatch[3].toUpperCase();
-    }
+  if (priceRangeMatch) {
+    // Regular price range
+    minPrice = parseFloat(priceRangeMatch[1].replace(/,/g, ''));
+    maxPrice = parseFloat(priceRangeMatch[2].replace(/,/g, ''));
+    currency = normalizeCurrency(priceRangeMatch[3]);
+  } else if (belowPriceMatch) {
+    // Below a certain price
+    minPrice = 0; // Start from zero
+    maxPrice = parseFloat(belowPriceMatch[2].replace(/,/g, ''));
+    currency = normalizeCurrency(belowPriceMatch[3]);
+  } else if (abovePriceMatch) {
+    // Above a certain price
+    minPrice = parseFloat(abovePriceMatch[2].replace(/,/g, ''));
+    maxPrice = 9999999; // A very high upper limit
+    currency = normalizeCurrency(abovePriceMatch[3]);
   }
   
   // Country/location extraction
-  const countryPattern = /in\s+([a-zA-Z\s]+?)(?:\s+between|\s+under|\s+over|$)/i;
+  const countryPattern = /in\s+([a-zA-Z\s]+?)(?:\s+between|\s+under|\s+over|$|\s+from|\s+with|\s+that|\s+and|\s+which)/i;
   const countryMatch = query.match(countryPattern);
   let country = null;
   
@@ -46,36 +59,75 @@ const extractSearchCriteria = (query) => {
     // Map common country names to our country IDs
     if (country.includes('kenya')) {
       country = '1'; // Kenya country_id
-    } else if (country.includes('rwanda')) {
-      country = '2'; // Rwanda country_id
+    } else if (country.includes('uganda')) {
+      country = '2'; // Uganda country_id
     } else if (country.includes('south sudan')) {
       country = '3'; // South Sudan country_id
-    } else if (country.includes('uganda')) {
-      country = '4'; // Uganda country_id
+    } else if (country.includes('ethiopia')) {
+      country = '4'; // Ethiopia country_id 
+    } else if (country.includes('rwanda')) {
+      country = '5'; // Rwanda country_id
     }
   }
   
-  // Category extraction
-  const categories = [
-    'electronics', 'clothing', 'home & garden', 'books', 'sports & outdoors', 
-    'toys & games', 'health & beauty', 'automotive', 'food & beverages', 'cars', 'vehicles'
-  ];
+  // Enhanced category extraction with multiple categories
+  const categoryMapping = {
+    'electronics': 'Electronics',
+    'mobile': 'Electronics',
+    'phone': 'Electronics',
+    'smartphone': 'Electronics',
+    'laptop': 'Electronics',
+    'computer': 'Electronics',
+    'tablet': 'Electronics',
+    'tv': 'Electronics',
+    'television': 'Electronics',
+    'clothing': 'Clothing',
+    'clothes': 'Clothing',
+    'fashion': 'Clothing',
+    'shoes': 'Clothing',
+    'apparel': 'Clothing',
+    'home': 'Home & Garden',
+    'furniture': 'Home & Garden',
+    'garden': 'Home & Garden',
+    'kitchen': 'Home & Garden',
+    'books': 'Books',
+    'book': 'Books',
+    'sports': 'Sports & Outdoors',
+    'outdoor': 'Sports & Outdoors',
+    'toys': 'Toys & Games',
+    'games': 'Toys & Games',
+    'health': 'Health & Beauty',
+    'beauty': 'Health & Beauty',
+    'personal care': 'Health & Beauty',
+    'car': 'Automotive',
+    'cars': 'Automotive',
+    'vehicle': 'Automotive',
+    'vehicles': 'Automotive',
+    'automotive': 'Automotive',
+    'food': 'Food & Beverages',
+    'grocery': 'Food & Beverages',
+    'drink': 'Food & Beverages',
+    'beverage': 'Food & Beverages'
+  };
   
   let category = null;
   
-  // Check for categories in the query
-  for (const cat of categories) {
-    if (query.toLowerCase().includes(cat)) {
-      // Map common category variations
-      if (cat === 'cars' || cat === 'vehicles') {
-        category = 'Automotive';
-      } else {
-        // Capitalize first letter of each word
-        category = cat.split(' ').map(word => 
-          word.charAt(0).toUpperCase() + word.slice(1)
-        ).join(' ');
-      }
+  // Check query words against our category mapping
+  const queryWords = query.toLowerCase().split(' ');
+  for (const word of queryWords) {
+    if (categoryMapping[word]) {
+      category = categoryMapping[word];
       break;
+    }
+  }
+  
+  // If no direct match found, try more complex phrases
+  if (!category) {
+    for (const [key, value] of Object.entries(categoryMapping)) {
+      if (query.toLowerCase().includes(key)) {
+        category = value;
+        break;
+      }
     }
   }
   
@@ -84,6 +136,29 @@ const extractSearchCriteria = (query) => {
   });
   
   return { minPrice, maxPrice, currency, country, category };
+};
+
+// Helper function to normalize currency codes
+const normalizeCurrency = (currencyStr) => {
+  if (!currencyStr) return null;
+  
+  const normalized = currencyStr.toLowerCase();
+  
+  if (normalized === 'dollars' || normalized === 'usd') {
+    return 'USD';
+  } else if (normalized === 'kes' || normalized === 'ksh') {
+    return 'KES';
+  } else if (normalized === 'ssp') {
+    return 'SSP';
+  } else if (normalized === 'etb') {
+    return 'ETB';
+  } else if (normalized === 'rwf') {
+    return 'RWF';
+  } else if (normalized === 'ugx') {
+    return 'UGX';
+  }
+  
+  return currencyStr.toUpperCase();
 };
 
 // Helper function to get image URL from storage path
@@ -102,18 +177,33 @@ const getImageUrl = (supabaseClient, storagePath) => {
   }
 };
 
-// Function to format product results into a nice response
-const formatProductResults = (supabaseClient, products, originalCurrency) => {
+// Function to format product results into a nice response with detailed product information
+const formatProductResults = (supabaseClient, products, originalCurrency, countryName = null) => {
   if (!products || products.length === 0) {
+    // Provide more helpful and specific responses when no products are found
+    let noResultsMessage = "I couldn't find any products matching your criteria.";
+    
+    if (originalCurrency) {
+      noResultsMessage += ` We don't currently have products in that price range (${originalCurrency}).`;
+    }
+    
+    if (countryName) {
+      noResultsMessage += ` We might not have products available in ${countryName} yet.`;
+    }
+    
+    noResultsMessage += " Could you try a different search or provide more details?";
+    
     return { 
-      text: "I couldn't find any products matching your criteria. Could you try a different search or provide more details?",
-      images: []
+      text: noResultsMessage,
+      images: [],
+      productDetails: []
     };
   }
   
   // Start building a formatted response
-  let response = `I found ${products.length} products matching your criteria:`;
+  let response = `I found ${products.length} product${products.length > 1 ? 's' : ''} matching your criteria:`;
   const imageUrls = [];
+  const productDetails = [];
   
   products.forEach((product, index) => {
     // Format price based on the product's currency
@@ -123,14 +213,38 @@ const formatProductResults = (supabaseClient, products, originalCurrency) => {
       maximumFractionDigits: 0
     }).format(product.price);
     
+    // Get country information
+    let locationInfo = "Unknown location";
+    if (product.country_id) {
+      locationInfo = product.country_name || `Country ID: ${product.country_id}`;
+    }
+    
+    // Build product details object
+    const productDetail = {
+      id: product.id,
+      title: product.title || "Unnamed product",
+      price: product.price || 0,
+      currency: product.currency || "USD",
+      location: product.country_name || locationInfo,
+      inStock: product.in_stock !== false
+    };
+    
     response += `\n\n${product.title}`;
     if (product.description) {
-      response += `\n${product.description}`;
+      // Limit description length
+      const shortDescription = product.description.length > 100 
+        ? product.description.substring(0, 100) + '...'
+        : product.description;
+      response += `\n${shortDescription}`;
     }
     response += `\nPrice: ${formattedPrice}`;
     if (product.category) {
       response += `\nCategory: ${product.category}`;
     }
+    
+    // Add location info
+    response += `\nLocation: ${locationInfo}`;
+    
     if (product.shipping_info) {
       response += `\nShipping: ${product.shipping_info}`;
     }
@@ -141,7 +255,7 @@ const formatProductResults = (supabaseClient, products, originalCurrency) => {
     // Add availability info
     response += product.in_stock ? "\nStatus: In Stock" : "\nStatus: Out of Stock";
     
-    // Get product image if available
+    // Get product image if available (just the main image)
     if (product.product_images && product.product_images.length > 0) {
       const mainImages = product.product_images
         .filter(img => img.is_main || img.display_order === 0)
@@ -154,6 +268,7 @@ const formatProductResults = (supabaseClient, products, originalCurrency) => {
         const imageUrl = getImageUrl(supabaseClient, imageToShow.storage_path);
         if (imageUrl) {
           imageUrls.push(imageUrl);
+          productDetails.push(productDetail);
         }
       }
     }
@@ -171,7 +286,8 @@ const formatProductResults = (supabaseClient, products, originalCurrency) => {
   
   return { 
     text: response,
-    images: imageUrls
+    images: imageUrls,
+    productDetails: productDetails
   };
 };
 
@@ -201,7 +317,7 @@ serve(async (req) => {
       );
     }
     
-    const { query, messageHistory } = body;
+    const { query, messageHistory, userInfo } = body;
     
     if (!query || typeof query !== 'string') {
       console.error("Invalid query in request:", query);
@@ -211,12 +327,22 @@ serve(async (req) => {
       );
     }
     
+    // Get countries data for better context and display
+    const { data: countries, error: countriesError } = await supabaseClient
+      .from("countries")
+      .select("id, name, code");
+    
+    if (countriesError) {
+      console.error("Error fetching countries:", countriesError);
+    }
+    
     // Check if this is a product search query
     const productSearchPatterns = [
-      /car/i, /product/i, /item/i, /buy/i, /price/i, /cost/i, /how much/i, 
+      /product/i, /item/i, /buy/i, /price/i, /cost/i, /how much/i, 
       /looking for/i, /search/i, /find/i, /where/i, /available/i, /stock/i,
       /between.*and/i, /under/i, /below/i, /cheaper/i, /expensive/i,
-      /show me/i, /display/i, /pictures?/i, /images?/i, /photos?/i
+      /show me/i, /display/i, /picture/i, /image/i, /photo/i,
+      /car/i, /mobile/i, /phone/i, /tv/i, /laptop/i, /electronics/i
     ];
     
     const isProductSearch = productSearchPatterns.some(pattern => pattern.test(query));
@@ -227,6 +353,13 @@ serve(async (req) => {
       
       // Extract search criteria from the query
       const { minPrice, maxPrice, currency, country, category } = extractSearchCriteria(query);
+      
+      // Get country name for better error messages
+      let countryName = null;
+      if (country && countries) {
+        const countryObj = countries.find(c => c.id.toString() === country);
+        countryName = countryObj?.name;
+      }
       
       // Start building the Supabase query
       console.log("Fetching product data from Supabase based on extracted criteria...");
@@ -294,7 +427,7 @@ serve(async (req) => {
       }
       
       // Get the matching products
-      const { data: products, error: productsError } = await productQuery.limit(5);
+      let { data: products, error: productsError } = await productQuery.limit(10);
       
       if (productsError) {
         console.error("Error fetching products:", productsError);
@@ -304,21 +437,34 @@ serve(async (req) => {
         );
       }
       
+      // Add country names for better display
+      if (products && products.length > 0 && countries) {
+        products = products.map(product => {
+          const country = countries.find(c => c.id === product.country_id);
+          return {
+            ...product,
+            country_name: country?.name || null
+          };
+        });
+      }
+      
       console.log(`Fetched ${products?.length || 0} matching products`);
       
-      // Format the products into a nice response with images
-      const formattedResponse = formatProductResults(supabaseClient, products, currency);
+      // Format the products into a nice response with images and product details
+      const formattedResponse = formatProductResults(supabaseClient, products, currency, countryName);
       
-      console.log("Formatted response with images:", {
+      console.log("Formatted response:", {
         textLength: formattedResponse.text.length,
-        imagesCount: formattedResponse.images.length
+        imagesCount: formattedResponse.images.length,
+        detailsCount: formattedResponse.productDetails.length
       });
       
       // Return the formatted response with images
       return new Response(
         JSON.stringify({ 
           response: formattedResponse.text,
-          images: formattedResponse.images 
+          images: formattedResponse.images,
+          productDetails: formattedResponse.productDetails
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
       );
@@ -371,18 +517,6 @@ serve(async (req) => {
       console.log(`Fetched ${categories?.length || 0} categories`);
     }
 
-    // Get country information
-    const { data: countries, error: countriesError } = await supabaseClient
-      .from("countries")
-      .select("id, name, code")
-      .limit(10);
-    
-    if (countriesError) {
-      console.error("Error fetching countries:", countriesError);
-    } else {
-      console.log(`Fetched ${countries?.length || 0} countries`);
-    }
-
     // Create context from the product data
     const productContext = productData.map(p => {
       // Format price with the product's native currency
@@ -424,6 +558,11 @@ serve(async (req) => {
       messageHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n') : 
       '';
 
+    // Add user greeting if available
+    const userGreeting = userInfo && userInfo.userName ? 
+      `The user's name is ${userInfo.userName}. Always refer to them by name in a friendly manner when appropriate.` :
+      '';
+
     // Create the prompt for Gemini
     console.log("Preparing prompt for Gemini...");
     const prompt = {
@@ -431,10 +570,12 @@ serve(async (req) => {
         {
           parts: [
             {
-              text: `You are a helpful shopping assistant for our e-commerce marketplace. 
+              text: `You are a helpful, friendly and professional shopping assistant for our e-commerce marketplace. 
               Use ONLY the following product information to answer customer questions.
               If the user asks to see products or images, make sure to mention specific products from the list so they will be shown.
-              If you don't know the answer based on the given product information, say "I don't have enough information about that".
+              If you don't know the answer based on the given product information, be honest and say "I don't have enough information about that, but I'll be happy to help you find what you're looking for".
+              
+              ${userGreeting}
               
               YOUR GOAL: Always provide beautifully formatted responses with clear product details, properly aligned text, and good organization. DO NOT use markdown, just use clean text formatting with proper spacing and separators.
               
@@ -453,7 +594,12 @@ serve(async (req) => {
               USER QUERY: ${query}
               
               Remember to format your response beautifully, without using markdown syntax!
-              If the user is asking about specific products, mention the exact product names so that I can display their images.`
+              If the user is asking about specific products, mention the exact product names so that I can display their images.
+              
+              For price ranges, understand formats like "between X and Y currency", "under X currency", or "above X currency".
+              If asked about products not in our inventory, politely explain we don't have them but suggest alternatives if available.
+              If asked about shipping to locations we don't serve, politely explain our shipping limitations.
+              Always be professional, friendly, and helpful, focusing on being a great customer service agent.`
             }
           ],
           role: "user"
@@ -487,9 +633,10 @@ serve(async (req) => {
     const assistantResponse = result.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I couldn't generate a response.";
     console.log("Assistant response:", assistantResponse.substring(0, 100) + "...");
 
-    // Extract product names from the response to find relevant images
+    // Extract product names from the response to find relevant images and build product details
     const productNames = productData.map(p => p.title?.toLowerCase());
     const responseImages = [];
+    const responseProductDetails = [];
     
     // Check if any product names are mentioned in the response
     for (const product of productData) {
@@ -505,6 +652,18 @@ serve(async (req) => {
           if (imageUrl && !responseImages.includes(imageUrl)) {
             responseImages.push(imageUrl);
             
+            // Add product details
+            const countryName = countries?.find(c => c.id === product.country_id)?.name || 'Unknown location';
+            
+            responseProductDetails.push({
+              id: product.id,
+              title: product.title,
+              price: product.price || 0,
+              currency: product.currency || "USD", 
+              location: countryName,
+              inStock: product.in_stock !== false
+            });
+            
             // Limit to 4 images maximum
             if (responseImages.length >= 4) break;
           }
@@ -517,7 +676,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         response: assistantResponse,
-        images: responseImages.length > 0 ? responseImages : undefined
+        images: responseImages.length > 0 ? responseImages : undefined,
+        productDetails: responseProductDetails.length > 0 ? responseProductDetails : undefined
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
     );

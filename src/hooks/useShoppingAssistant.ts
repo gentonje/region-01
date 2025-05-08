@@ -2,29 +2,77 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export type Message = {
   id: string;
   content: string;
   role: 'user' | 'assistant';
   timestamp: Date;
-  images?: string[]; // Add support for images array
+  images?: string[];
+  productDetails?: {
+    id: string;
+    title: string;
+    price: number;
+    currency: string;
+    location: string;
+    inStock: boolean;
+  }[];
 };
 
 export const useShoppingAssistant = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useAuth();
+  const user = session?.user;
 
-  // Initialize with a welcome message if no messages exist
+  // Get user profile for personalization
+  const [userProfile, setUserProfile] = useState<{
+    full_name?: string | null;
+    username?: string | null;
+  } | null>(null);
+
+  // Fetch user profile for personalization
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const { data, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name, username')
+          .eq('id', user.id)
+          .single();
+          
+        if (profileError) {
+          console.error("Error fetching user profile:", profileError);
+          return;
+        }
+        
+        if (data) {
+          setUserProfile(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+      }
+    };
+    
+    fetchUserProfile();
+  }, [user?.id]);
+
+  // Initialize with a personalized welcome message if no messages exist
   useEffect(() => {
     if (messages.length === 0) {
+      const userName = userProfile?.full_name || userProfile?.username || '';
+      const greeting = userName ? `Hello ${userName}! ` : "Hello! ";
+      
       addMessage({ 
-        content: "Hello! I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations.", 
+        content: `${greeting}I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations. For example, try asking about "mobile phones in Kenya between 10,000 and 20,000 KES"`, 
         role: 'assistant' 
       });
     }
-  }, []);
+  }, [userProfile]);
 
   // Log any errors that occur
   useEffect(() => {
@@ -64,12 +112,19 @@ export const useShoppingAssistant = () => {
       
       console.log("Message history for context:", messageHistory);
       
+      // Add user info for personalization if available
+      const userInfo = userProfile ? {
+        userName: userProfile.full_name || userProfile.username || undefined,
+        userId: user?.id
+      } : undefined;
+      
       // Call our edge function with better error handling
       console.log("Invoking chat-assistant edge function...");
       const { data, error: fnError } = await supabase.functions.invoke('chat-assistant', {
         body: { 
           query: content, 
-          messageHistory 
+          messageHistory,
+          userInfo
         }
       });
       
@@ -90,8 +145,18 @@ export const useShoppingAssistant = () => {
       if (data?.response) {
         console.log("Assistant response:", data.response);
         
-        // Check if response includes images
-        if (data.images && Array.isArray(data.images)) {
+        // Check if response includes product details and images
+        if (data.images && Array.isArray(data.images) && data.productDetails && Array.isArray(data.productDetails)) {
+          console.log("Product details included in response:", data.productDetails);
+          console.log("Images included in response:", data.images);
+          
+          addMessage({ 
+            content: data.response, 
+            role: 'assistant',
+            images: data.images,
+            productDetails: data.productDetails
+          });
+        } else if (data.images && Array.isArray(data.images)) {
           console.log("Images included in response:", data.images);
           addMessage({ 
             content: data.response, 
@@ -129,18 +194,21 @@ export const useShoppingAssistant = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [messages, addMessage]);
+  }, [messages, addMessage, userProfile, user?.id]);
 
   const clearMessages = useCallback(() => {
     setMessages([]);
     setError(null);
     
-    // Add welcome message back
+    // Add personalized welcome message back
+    const userName = userProfile?.full_name || userProfile?.username || '';
+    const greeting = userName ? `Hello ${userName}! ` : "Hello! ";
+    
     addMessage({ 
-      content: "Hello! I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations.", 
+      content: `${greeting}I'm your shopping assistant. How can I help you today? You can ask me about products, prices, or availability in different locations. For example, try asking about "mobile phones in Kenya between 10,000 and 20,000 KES"`, 
       role: 'assistant' 
     });
-  }, [addMessage]);
+  }, [addMessage, userProfile]);
 
   return {
     messages,
