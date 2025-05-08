@@ -13,7 +13,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { User, Sun, Moon } from "lucide-react";
+import { User, Sun, Moon, List } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export const UserMenu = () => {
@@ -143,6 +143,12 @@ export const UserMenu = () => {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/admin/districts">Districts Management</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/categories">
+                <List className="mr-2 h-4 w-4" />
+                <span>Categories Management</span>
+              </Link>
             </DropdownMenuItem>
           </>
         )}
