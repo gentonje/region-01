@@ -169,6 +169,63 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          link: string | null
+          read: boolean
+          related_product_id: string | null
+          related_review_id: string | null
+          thumbnail_url: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          related_product_id?: string | null
+          related_review_id?: string | null
+          thumbnail_url?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          link?: string | null
+          read?: boolean
+          related_product_id?: string | null
+          related_review_id?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_related_product_id_fkey"
+            columns: ["related_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_review_id_fkey"
+            columns: ["related_review_id"]
+            isOneToOne: false
+            referencedRelation: "reviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_progress: {
         Row: {
           completed_at: string | null
@@ -663,6 +720,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      count_unread_notifications: {
+        Args: { user_id_input: string }
+        Returns: number
+      }
       get_or_create_default_shop: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -689,6 +750,7 @@ export type Database = {
       }
     }
     Enums: {
+      notification_type: "review_comment" | "review_reply" | "product_message"
       onboarding_step: "profile_complete" | "shop_created" | "first_product"
       product_category:
         | "Electronics"
@@ -830,6 +892,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      notification_type: ["review_comment", "review_reply", "product_message"],
       onboarding_step: ["profile_complete", "shop_created", "first_product"],
       product_category: [
         "Electronics",
