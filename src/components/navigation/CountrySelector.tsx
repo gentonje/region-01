@@ -1,6 +1,6 @@
 
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Globe } from "lucide-react";
 import {
@@ -10,11 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface CountrySelectorProps {
-  selectedCountry: string;
-  onCountryChange: (country: string) => void;
-}
+import { toast } from "sonner";
 
 interface Country {
   id: number;
@@ -22,19 +18,21 @@ interface Country {
   code: string;
 }
 
+interface CountrySelectorProps {
+  selectedCountry: string;
+  onCountryChange: (country: string) => void;
+}
+
 export const CountrySelector = ({
-  selectedCountry,
+  selectedCountry = "1", 
   onCountryChange,
 }: CountrySelectorProps) => {
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});
 
-  useEffect(() => {
-    const fetchCountries = async () => {
+  const { data: countries, isLoading } = useQuery({
+    queryKey: ['countries'],
+    queryFn: async () => {
       try {
-        setLoading(true);
         const { data, error } = await supabase
           .from("countries")
           .select("id, name, code")
@@ -42,86 +40,74 @@ export const CountrySelector = ({
 
         if (error) {
           console.error("Error fetching countries:", error);
-          return;
+          toast.error("Failed to load countries");
+          return [];
         }
 
-        setCountries(data || []);
         console.log("Fetched countries:", data);
+        return data as Country[];
       } catch (error) {
         console.error("Failed to fetch countries:", error);
-      } finally {
-        setLoading(false);
+        toast.error("Failed to load countries");
+        return [];
       }
-    };
+    },
+  });
 
-    fetchCountries();
-  }, []);
-
-  // Get flag emoji function
-  const getFlagEmoji = (countryCode: string) => {
-    // Convert country code to flag emoji (each letter is converted to a regional indicator symbol)
-    const codePoints = countryCode
-      .toUpperCase()
-      .split('')
-      .map(char => 127397 + char.charCodeAt(0));
-    
-    return String.fromCodePoint(...codePoints);
-  };
-
-  const handleCountryChange = (value: string) => {
-    onCountryChange(value);
-    
-    // Navigate to home if not already there
-    if (location.pathname !== "/home" && location.pathname !== "/products") {
-      navigate("/products");
-    }
-  };
-
-  const handleHomeNavigation = () => {
-    navigate("/products");
-  };
-
-  const currentCountry = countries.find(
-    (c) => c.id === parseInt(selectedCountry)
-  );
+  useEffect(() => {
+    // Map country codes to flag emojis
+    const flags: Record<string, JSX.Element> = {};
+    countries?.forEach((country) => {
+      // Convert country code to flag emoji (each letter is converted to regional indicator symbol)
+      const flagEmoji = String.fromCodePoint(...[...country.code.toUpperCase()].map(
+        (char) => char.charCodeAt(0) + 127397
+      ));
+      flags[country.id.toString()] = (
+        <span className="mr-2">{flagEmoji}</span>
+      );
+    });
+    setCountryFlags(flags);
+  }, [countries]);
 
   return (
-    <div className="flex items-center gap-1">
-      <Globe 
-        className="h-4 w-4 text-blue-500 hidden sm:block cursor-pointer" 
-        onClick={handleHomeNavigation}
-      />
-      <Select
-        value={selectedCountry}
-        onValueChange={handleCountryChange}
-        disabled={loading}
-      >
-        <SelectTrigger className="min-w-[90px] max-w-[120px] h-8 px-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          {loading ? (
-            "Loading..."
-          ) : currentCountry ? (
-            <div className="flex items-center space-x-1 truncate">
-              <span className="text-base">{getFlagEmoji(currentCountry.code)}</span>
-              <span className="truncate hidden sm:block">{currentCountry.name}</span>
+    <Select
+      value={selectedCountry}
+      onValueChange={(value) => {
+        console.log("Country changed to:", value);
+        onCountryChange(value);
+      }}
+    >
+      <SelectTrigger className="w-[120px] h-10 sm:w-[180px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <SelectValue>
+          {selectedCountry === "all" ? (
+            <div className="flex items-center">
+              <Globe className="w-4 h-4 mr-2" />
+              <span>All Countries</span>
             </div>
           ) : (
-            <div className="flex items-center space-x-1">
-              <span>🌍</span>
-              <span className="truncate hidden sm:block">Select</span>
+            <div className="flex items-center">
+              {countryFlags[selectedCountry] || <span className="w-4 h-4 mr-2"></span>}
+              {countries?.find(c => c.id.toString() === selectedCountry)?.name || "Loading..."}
             </div>
           )}
-        </SelectTrigger>
-        <SelectContent>
-          {countries.map((country) => (
-            <SelectItem key={country.id} value={country.id.toString()}>
-              <div className="flex items-center">
-                <span className="mr-2 text-base">{getFlagEmoji(country.code)}</span>
-                <span>{country.name}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+        </SelectValue>
+      </SelectTrigger>
+      <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <SelectItem value="all">
+          <div className="flex items-center">
+            <Globe className="w-4 h-4 mr-2" />
+            <span>All Countries</span>
+          </div>
+        </SelectItem>
+        {countries?.map((country) => (
+          <SelectItem key={country.id} value={country.id.toString()}>
+            <div className="flex items-center">
+              {countryFlags[country.id.toString()]}
+              {country.name}
+            </div>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Region } from "@/types/product";
 import { toast } from "sonner";
+import { MapPin } from "lucide-react";
 
 interface RegionSelectorProps {
   selectedRegion: string;
@@ -63,6 +64,19 @@ export const RegionSelector = ({
     onRegionChange("all");
   }, [selectedCountry, onRegionChange]);
 
+  const renderTriggerContent = () => {
+    if (selectedRegion === "all") {
+      return (
+        <div className="flex items-center">
+          <MapPin className="w-4 h-4 mr-2" />
+          <span>All Districts</span>
+        </div>
+      );
+    } else {
+      return selectedRegion;
+    }
+  };
+
   return (
     <div className="w-full max-w-xs">
       <Select
@@ -73,17 +87,24 @@ export const RegionSelector = ({
         }}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
-        <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue placeholder={
-            selectedCountry === "all" 
-              ? "Select country first" 
-              : loading
-                ? "Loading districts..."
-                : "Select district"
-          } />
+        <SelectTrigger className="w-full h-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <SelectValue>
+            {selectedCountry === "all" ? (
+              "Select country first"
+            ) : loading ? (
+              "Loading districts..."
+            ) : (
+              renderTriggerContent()
+            )}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectItem value="all">All Districts</SelectItem>
+          <SelectItem value="all">
+            <div className="flex items-center">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span>All Districts</span>
+            </div>
+          </SelectItem>
           {districts.map((district) => (
             <SelectItem key={district.id} value={district.name}>
               {district.name}

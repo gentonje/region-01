@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { MapPin } from "lucide-react";
 
 interface CountiesFilterProps {
   selectedCounty: string;
@@ -63,6 +64,19 @@ export const CountiesFilter = ({
     onCountyChange("all");
   }, [selectedCountry, onCountyChange]);
 
+  const renderTriggerContent = () => {
+    if (selectedCounty === "all") {
+      return (
+        <div className="flex items-center">
+          <MapPin className="w-4 h-4 mr-2" />
+          <span>All Districts</span>
+        </div>
+      );
+    } else {
+      return selectedCounty;
+    }
+  };
+
   return (
     <div className="w-full max-w-xs">
       <Select
@@ -74,18 +88,23 @@ export const CountiesFilter = ({
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectValue 
-            placeholder={
-              !selectedCountry || selectedCountry === "all" 
-                ? "Select country first" 
-                : loading 
-                  ? "Loading districts..." 
-                  : "Select district"
-            } 
-          />
+          <SelectValue>
+            {!selectedCountry || selectedCountry === "all" ? (
+              "Select country first"
+            ) : loading ? (
+              "Loading districts..."
+            ) : (
+              renderTriggerContent()
+            )}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectItem value="all">All Districts</SelectItem>
+          <SelectItem value="all">
+            <div className="flex items-center">
+              <MapPin className="w-4 h-4 mr-2" />
+              <span>All Districts</span>
+            </div>
+          </SelectItem>
           {districts.map((district) => (
             <SelectItem key={district.id} value={district.name}>
               {district.name}
