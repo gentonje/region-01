@@ -37,6 +37,11 @@ WHERE country_id IS NULL;
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS account_type VARCHAR(20) DEFAULT 'basic' NOT NULL;
 
+-- Update existing profiles to have 'basic' account_type
+UPDATE public.profiles
+SET account_type = 'basic'
+WHERE account_type IS NULL;
+
 -- Add custom_product_limit to profiles table
 ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS custom_product_limit INTEGER DEFAULT NULL;
@@ -68,3 +73,4 @@ INSERT INTO public.counties (name, country_id) VALUES
 ('Kisumu', (SELECT id FROM public.countries WHERE code = 'KE'))
 ON CONFLICT DO NOTHING;
 */
+

@@ -14,6 +14,20 @@ export enum ProductCategory {
   Other = "OTHER"
 }
 
+// Mapping between database enum values and our internal ProductCategory
+export const productCategoryMapping = {
+  "Electronics": ProductCategory.Electronics,
+  "Clothing": ProductCategory.Clothing,
+  "Home & Garden": ProductCategory.Home,
+  "Books": ProductCategory.Books,
+  "Sports & Outdoors": ProductCategory.Sports,
+  "Toys & Games": ProductCategory.Other,
+  "Health & Beauty": ProductCategory.Beauty,
+  "Automotive": ProductCategory.Automotive,
+  "Food & Beverages": ProductCategory.Other,
+  "Other": ProductCategory.Other
+};
+
 export interface ProductFormData {
   title: string;
   description: string;

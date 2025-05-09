@@ -28,7 +28,7 @@ export const useProductValidity = (productId: string | undefined) => {
         }
         
         // Calculate days remaining
-        if (data.expires_at) {
+        if (data && data.expires_at) {
           const expiresAt = new Date(data.expires_at);
           const now = new Date();
           const diffTime = expiresAt.getTime() - now.getTime();
