@@ -27,7 +27,7 @@ interface CountrySelectorProps {
 export const CountrySelector = ({
   selectedCountry = "all", // Default to "all"
   onCountryChange,
-  renderAsSelectItems = true,
+  renderAsSelectItems = false, // Changed default to false
 }: CountrySelectorProps) => {
   const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});
 
@@ -76,13 +76,16 @@ export const CountrySelector = ({
     onCountryChange(value);
   };
 
-  // IMPORTANT FIX: Never render SelectItems directly outside of a Select component
+  // Only return content for dropdown item rendering when specifically requested
   if (renderAsSelectItems && countries) {
-    // Instead of returning SelectItems directly, return a React fragment with the content
     return (
       <>
         {countries.map((country) => (
-          <div key={country.id} className="flex items-center cursor-pointer px-2 py-1.5 hover:bg-accent rounded-sm" onClick={() => onCountryChange(country.id.toString())}>
+          <div 
+            key={country.id} 
+            className="flex items-center cursor-pointer px-2 py-1.5 hover:bg-accent rounded-sm"
+            onClick={() => onCountryChange(country.id.toString())}
+          >
             {countryFlags[country.id.toString()]}
             {country.name}
           </div>
