@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { AccountLimits } from "@/types/product";
 
@@ -13,34 +12,34 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
     <div className="p-4 border rounded-lg bg-white dark:bg-gray-800">
       <h3 className="text-md font-semibold mb-2">Product Upload Limits</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-1 m-1">
+        <div className="space-y-1">
           <label className="text-sm font-medium">Basic Account</label>
           <Input
             type="number"
             value={accountLimits?.basic || 5}
             onChange={(e) => onLimitUpdate('basic', parseInt(e.target.value))}
-            className="w-full"
+            className="w-full m-1 p-1"
           />
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-1">
           <label className="text-sm font-medium">Starter Account</label>
           <Input
             type="number"
             value={accountLimits?.starter || 15}
             onChange={(e) => onLimitUpdate('starter', parseInt(e.target.value))}
-            className="w-full"
+            className="w-full m-1 p-1"
           />
         </div>
         
-        <div className="space-y-2">
+        <div className="space-y-1">
           <label className="text-sm font-medium">Premium Account</label>
           <Input
             type="number"
             value={accountLimits?.premium || 30}
             onChange={(e) => onLimitUpdate('premium', parseInt(e.target.value))}
-            className="w-full"
+            className="w-full m-1 p-1"
           />
         </div>
       </div>
