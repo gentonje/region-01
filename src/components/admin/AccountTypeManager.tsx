@@ -15,6 +15,14 @@ import {
 import { AccountType } from "@/types/profile";
 import { AccountLimits, DEFAULT_ACCOUNT_LIMITS } from "@/types/product";
 
+interface User {
+  id: string;
+  username: string;
+  full_name: string;
+  account_type: AccountType;
+  custom_product_limit: number | null;
+}
+
 export const AccountTypeManager = () => {
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -24,7 +32,7 @@ export const AccountTypeManager = () => {
   const [accountLimits, setAccountLimits] = useState<AccountLimits>(DEFAULT_ACCOUNT_LIMITS);
 
   // Fetch users
-  const { data: users, isLoading: loadingUsers } = useQuery({
+  const { data: users = [], isLoading: loadingUsers } = useQuery({
     queryKey: ["users", searchQuery],
     queryFn: async () => {
       try {
@@ -46,22 +54,22 @@ export const AccountTypeManager = () => {
         }
         
         // Ensure each user has at least basic properties
-        return data?.map(user => ({
+        return (data || []).map(user => ({
           id: user.id,
           username: user.username || '',
           full_name: user.full_name || '',
           account_type: (user.account_type as AccountType) || 'basic',
           custom_product_limit: user.custom_product_limit
-        })) || [];
+        })) as User[];
       } catch (err) {
         console.error("Error in users query:", err);
-        return [];
+        return [] as User[];
       }
     }
   });
 
   // Get product counts for each user
-  const { data: productCounts } = useQuery({
+  const { data: productCounts = {} } = useQuery({
     queryKey: ["user-product-counts"],
     queryFn: async () => {
       if (!users?.length) return {};
@@ -101,8 +109,7 @@ export const AccountTypeManager = () => {
         throw new Error("No user selected");
       }
       
-      // Make sure to use RLS-compatible fields based on Supabase profiles table
-      const updateData: Record<string, any> = {
+      const updateData = {
         account_type: selectedAccountType,
         custom_product_limit: selectedAccountType === "enterprise" ? customLimit : null
       };

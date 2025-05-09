@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -30,13 +29,29 @@ const AddProduct = () => {
     queryFn: async () => {
       if (!user) return null;
       
-      const { data } = await supabase
-        .from("profiles")
-        .select("account_type, custom_product_limit")
-        .eq("id", user.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("account_type, custom_product_limit")
+          .eq("id", user.id)
+          .single();
         
-      return data;
+        if (error) {
+          console.error("Error fetching user profile:", error);
+          return {
+            account_type: "basic",
+            custom_product_limit: null
+          };
+        }
+          
+        return data;
+      } catch (error) {
+        console.error("Error in profile query:", error);
+        return {
+          account_type: "basic",
+          custom_product_limit: null
+        };
+      }
     },
     enabled: !!user,
   });

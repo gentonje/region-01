@@ -12,6 +12,7 @@ export const useProductData = (id: string | undefined) => {
     price: "",
     category: ProductCategory.Other,
     available_quantity: "0",
+    validity_period: "day" as "day" | "week" | "month",
   });
   const [mainImageUrl, setMainImageUrl] = useState<string>();
   const [additionalImageUrls, setAdditionalImageUrls] = useState<{ url: string; id: string; }[]>([]);
@@ -43,6 +44,7 @@ export const useProductData = (id: string | undefined) => {
           price: product.price?.toString() || "",
           category: product.category as ProductCategory || ProductCategory.Other,
           available_quantity: product.available_quantity?.toString() || "0",
+          validity_period: product.validity_period as "day" | "week" | "month" || "day",
         });
 
         // Process images

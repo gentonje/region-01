@@ -1,7 +1,7 @@
 
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductCategory } from "@/types/product";
+import { Product } from "@/types/product";
 
 export const useSession = () => {
   return useQuery({

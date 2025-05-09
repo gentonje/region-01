@@ -37,18 +37,7 @@ export const CategoryFilter = ({
         }
 
         // Pre-defined categories if the table doesn't have data yet
-        const productCategories = [
-          ProductCategory.Electronics,
-          ProductCategory.Clothing,
-          ProductCategory.Home,
-          ProductCategory.Books,
-          ProductCategory.Sports,
-          ProductCategory.Toys,
-          ProductCategory.Beauty,
-          ProductCategory.Automotive,
-          ProductCategory.Food,
-          ProductCategory.Other
-        ];
+        const productCategories = Object.values(ProductCategory);
         
         setCategories(data?.map(c => c.name) || productCategories);
       } catch (error) {

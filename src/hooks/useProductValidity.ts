@@ -67,7 +67,7 @@ export const checkExpiredProducts = async () => {
     return;
   }
   
-  if (data.length > 0) {
+  if (data && data.length > 0) {
     // Update status of expired products to unpublished
     const productIds = data.map(product => product.id);
     const { error: updateError } = await supabase
