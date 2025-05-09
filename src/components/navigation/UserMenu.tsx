@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
+import { AccountTypeBadge } from "./AccountTypeBadge";
 
 export const UserMenu = () => {
   const { session, signOut } = useAuth();
@@ -55,7 +56,7 @@ export const UserMenu = () => {
     enabled: !!user,
   });
 
-  // Get user's avatar URL
+  // Get user's avatar URL and account type
   const { data: profile } = useQuery({
     queryKey: ["userProfile", user?.id],
     queryFn: async () => {
@@ -63,7 +64,7 @@ export const UserMenu = () => {
 
       const { data } = await supabase
         .from("profiles")
-        .select("avatar_url, username, full_name")
+        .select("avatar_url, username, full_name, account_type")
         .eq("id", user.id)
         .single();
 
@@ -99,7 +100,11 @@ export const UserMenu = () => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+        <div className="flex items-center justify-between px-2">
+          <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+          {profile?.account_type && <AccountTypeBadge accountType={profile.account_type} />}
+        </div>
+        
         <DropdownMenuSeparator />
         
         <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">

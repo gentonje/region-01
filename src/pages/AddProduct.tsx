@@ -8,13 +8,14 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { useState, useEffect } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory } from "@/types/product";
+import { ProductCategory, VALIDITY_PERIODS } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
 import { useSelectedCountry } from "@/Routes";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { getCurrencyForCountry } from "@/utils/countryToCurrency";
+import { useQuery } from "@tanstack/react-query";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -22,6 +23,52 @@ const AddProduct = () => {
   const { mainImage, setMainImage, additionalImages, setAdditionalImages, uploadImages } = useProductImages();
   const { user } = useAuth();
   const { selectedCountry = "1" } = useSelectedCountry() || {}; // Default to Kenya (id: 1)
+  
+  // Get user's account type and product count
+  const { data: userProfile } = useQuery({
+    queryKey: ["userProfile", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      
+      const { data } = await supabase
+        .from("profiles")
+        .select("account_type, custom_product_limit")
+        .eq("id", user.id)
+        .single();
+        
+      return data;
+    },
+    enabled: !!user,
+  });
+  
+  // Get count of user's products
+  const { data: productCount } = useQuery({
+    queryKey: ["userProductCount", user?.id],
+    queryFn: async () => {
+      if (!user) return 0;
+      
+      const { count } = await supabase
+        .from("products")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id);
+        
+      return count || 0;
+    },
+    enabled: !!user,
+  });
+  
+  // Default validity period based on account type
+  const getDefaultValidityPeriod = () => {
+    const accountType = userProfile?.account_type || 'basic';
+    switch (accountType) {
+      case 'premium':
+        return 'month';
+      case 'starter':
+        return 'week';
+      default:
+        return 'day';
+    }
+  };
   
   const [formData, setFormData] = useState<ProductFormData>({
     title: "",
@@ -31,7 +78,18 @@ const AddProduct = () => {
     available_quantity: "0",
     county: "",
     country: selectedCountry, // Default to selected country
+    validity_period: getDefaultValidityPeriod(),
   });
+  
+  // Update form data when userProfile loads
+  useEffect(() => {
+    if (userProfile) {
+      setFormData(prev => ({
+        ...prev,
+        validity_period: getDefaultValidityPeriod()
+      }));
+    }
+  }, [userProfile]);
 
   // Update form currency when country changes
   useEffect(() => {
@@ -40,6 +98,26 @@ const AddProduct = () => {
       country: selectedCountry
     }));
   }, [selectedCountry]);
+  
+  // Check if user has reached product limit
+  const getProductLimit = () => {
+    if (!userProfile) return 5; // Default basic limit
+    
+    // Custom limit for enterprise accounts
+    if (userProfile.custom_product_limit) {
+      return userProfile.custom_product_limit;
+    }
+    
+    // Standard limits based on account type
+    switch (userProfile.account_type) {
+      case 'premium':
+        return 30;
+      case 'starter':
+        return 15;
+      default:
+        return 5; // Basic account
+    }
+  };
 
   const handleSubmit = async (data: ProductFormData) => {
     if (!mainImage) {
@@ -61,6 +139,13 @@ const AddProduct = () => {
       toast.error("Please select a country");
       return;
     }
+    
+    // Check if user has reached product limit
+    const limit = getProductLimit();
+    if (productCount && productCount >= limit) {
+      toast.error(`You've reached your product limit (${limit}). Upgrade your account to add more products.`);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -71,6 +156,12 @@ const AddProduct = () => {
       // Get the appropriate currency for the selected country
       const currency = getCurrencyForCountry(data.country);
       console.log(`Using currency ${currency} for country ID ${data.country}`);
+      
+      // Calculate expiration date based on validity period
+      const validityPeriod = data.validity_period || getDefaultValidityPeriod();
+      const daysToAdd = VALIDITY_PERIODS[validityPeriod];
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + daysToAdd);
 
       console.log("Creating product...");
       const { data: productData, error: productError } = await supabase
@@ -85,7 +176,10 @@ const AddProduct = () => {
           county: data.county,
           country_id: Number(data.country), // Store country_id instead of name
           currency: currency, // Set currency based on country
-          user_id: user.id
+          user_id: user.id,
+          product_status: 'published', // Start as published
+          expires_at: expiresAt.toISOString(), // Set expiration date
+          validity_period: validityPeriod // Store the validity period
         })
         .select()
         .single();
@@ -151,6 +245,13 @@ const AddProduct = () => {
             />
             
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 dark:font-bold">Add New Product</h1>
+            
+            {productCount !== undefined && (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Products: {productCount} / {getProductLimit()}
+              </div>
+            )}
+            
             <div className="flex justify-end">
               <Button 
                 variant="outline" 

@@ -33,8 +33,8 @@ const Index = ({
   
   // Get country from context if available
   const countryContext = useSelectedCountry();
-  // Use context value if available, otherwise use prop
-  const effectiveCountry = countryContext?.selectedCountry || selectedCountry;
+  // Use context value if available, otherwise use "all" as default
+  const effectiveCountry = countryContext?.selectedCountry || "all";
 
   // Use our hook to fetch products with infinite scrolling
   const {

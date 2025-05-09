@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductModifyHeader } from "./product/modify/ProductModifyHeader";
 import { ProductModifyActions } from "./product/modify/ProductModifyActions";
 import { ProductPublishSwitch } from "./product/modify/ProductPublishSwitch";
+import { ProductValidityBadge } from "./product/modify/ProductValidityBadge";
 import { Badge } from "./ui/badge";
 import { ImageLoader } from "./ImageLoader";
 import { MapPin } from "lucide-react";
@@ -112,6 +113,10 @@ export const ProductModifyCard = ({ product, onDelete, isAdmin }: ProductModifyC
           <Badge variant={status === 'published' ? "default" : "secondary"} className="rounded-full text-xs">
             {status === 'published' ? 'Published' : 'Draft'}
           </Badge>
+          
+          {/* Validity badge */}
+          <ProductValidityBadge productId={product.id} />
+          
           {product.category && (
             <Badge variant="outline" className="rounded-full text-xs">
               {product.category}

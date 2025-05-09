@@ -1,221 +1,181 @@
-
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import React, { useState } from "react";
+import { useController, useFormContext } from "react-hook-form";
+import {
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+  FormField,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CountiesFilter } from "@/components/CountiesFilter";
+import { CountrySelector } from "@/components/CountrySelector";
 import { ProductCategory } from "@/types/product";
-import { useForm } from "react-hook-form";
-import { ProductFormData } from "./validation";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-
-interface Country {
-  id: number;
-  name: string;
-  code: string;
-}
 
 interface ProductFormFieldProps {
-  form: ReturnType<typeof useForm<ProductFormData>>;
-  name: keyof ProductFormData;
+  form: any;
+  name: string;
   label: string;
   type?: string;
   step?: string;
-  formData: ProductFormData;
-  setFormData: (data: ProductFormData) => void;
+  formData: any;
+  setFormData: (data: any) => void;
+  disabled?: boolean;
 }
 
-export const ProductFormField = ({
-  form,
-  name,
-  label,
-  type = "text",
-  step,
-  formData,
-  setFormData,
-}: ProductFormFieldProps) => {
-  const [districts, setDistricts] = useState<{id: number, name: string}[]>([]);
-  const [isLoadingDistricts, setIsLoadingDistricts] = useState<boolean>(false);
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [isLoadingCountries, setIsLoadingCountries] = useState<boolean>(false);
-  const [selectedCountry, setSelectedCountry] = useState<string>(formData.country || "1");
+const formatCategoryName = (category: string) => {
+  return category
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+};
 
-  // List of available product categories
-  const productCategories: ProductCategory[] = [
-    "Electronics",
-    "Clothing",
-    "Home & Garden",
-    "Books",
-    "Sports & Outdoors",
-    "Toys & Games",
-    "Health & Beauty",
-    "Automotive",
-    "Food & Beverages",
-    "Other"
-  ];
-
-  // Fetch countries
-  useEffect(() => {
-    if (name === 'country') {
-      setIsLoadingCountries(true);
-      const fetchCountries = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('countries')
-            .select('id, name, code')
-            .order('name');
+const ProductFormField = ({ form, name, label, type = "text", step, formData, setFormData, disabled = false }: ProductFormFieldProps) => {
+  const { field } = useController({ name, control: form.control });
+  const [countryId, setCountryId] = useState<string>(formData.country || "1");
   
-          if (error) {
-            console.error('Error fetching countries:', error);
-          } else {
-            setCountries(data || []);
-          }
-        } catch (error) {
-          console.error('Failed to fetch countries:', error);
-        } finally {
-          setIsLoadingCountries(false);
-        }
-      };
-      
-      fetchCountries();
-    }
-  }, [name]);
-
-  // Fetch districts when country changes
-  useEffect(() => {
-    if (name === 'county' && formData.country) {
-      setIsLoadingDistricts(true);
-      const fetchDistricts = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('districts')
-            .select('id, name')
-            .eq('country_id', Number(formData.country))
-            .order('name');
-  
-          if (error) {
-            console.error('Error fetching districts:', error);
-          } else {
-            setDistricts(data || []);
-          }
-        } catch (error) {
-          console.error('Failed to fetch districts:', error);
-        } finally {
-          setIsLoadingDistricts(false);
-        }
-      };
-      
-      fetchDistricts();
-    }
-  }, [name, formData.country]);
-
-  const handleValueChange = (value: string) => {
-    console.log(`Setting ${name} to:`, value);
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+  // Handle form value changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
     
-    // If country changes, reset county
-    if (name === 'country') {
-      setSelectedCountry(value);
-      setFormData({
-        ...formData,
-        country: value,
-        county: "", // Reset county when country changes
-      });
+    if (name === 'country' && value) {
+      setCountryId(value);
     }
   };
 
+  // Render different field types based on the name
   const renderField = () => {
-    if (name === "description") {
-      return (
-        <Textarea
-          value={formData[name] || ""}
-          onChange={(e) => handleValueChange(e.target.value)}
-          className="resize-none h-32"
-        />
-      );
-    } else if (name === "category") {
-      return (
-        <Select
-          value={formData[name] || ""}
-          onValueChange={handleValueChange}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select a category" />
-          </SelectTrigger>
-          <SelectContent>
-            {productCategories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    } else if (name === "county") {
-      return (
-        <Select
-          value={formData[name] || ""}
-          onValueChange={handleValueChange}
-          disabled={isLoadingDistricts || !formData.country}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={isLoadingDistricts ? "Loading districts..." : "Select district"} />
-          </SelectTrigger>
-          <SelectContent>
-            {districts.map((district) => (
-              <SelectItem key={district.id} value={district.name}>
-                {district.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    } else if (name === "country") {
-      return (
-        <Select
-          value={formData[name] || ""}
-          onValueChange={handleValueChange}
-          disabled={isLoadingCountries}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder={isLoadingCountries ? "Loading countries..." : "Select a country"} />
-          </SelectTrigger>
-          <SelectContent>
-            {countries.map((country) => (
-              <SelectItem key={country.id} value={country.id.toString()}>
-                {country.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    } else {
-      return (
-        <Input
-          type={type}
-          step={step}
-          value={formData[name] || ""}
-          onChange={(e) => handleValueChange(e.target.value)}
-          className="dark:bg-gray-800"
-        />
-      );
+    switch (name) {
+      case "description":
+        return (
+          <Textarea
+            {...field}
+            name={name}
+            placeholder={`Enter ${label.toLowerCase()}`}
+            className="rounded-md border h-32"
+            value={formData.description}
+            onChange={handleChange}
+            disabled={disabled}
+          />
+        );
+      
+      case "category":
+        return (
+          <Select
+            value={formData.category}
+            onValueChange={(value) => {
+              setFormData({ ...formData, category: value as ProductCategory });
+            }}
+            disabled={disabled}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select category" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.values(ProductCategory).map((category) => (
+                <SelectItem key={category} value={category}>
+                  {formatCategoryName(category)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        );
+      
+      case "county":
+        return (
+          <CountiesFilter
+            selectedCountry={countryId}
+            selectedCounty={formData.county || ""}
+            onCountyChange={(county) => setFormData({ ...formData, county })}
+            disabled={disabled}
+          />
+        );
+      
+      case "country":
+        return (
+          <Select
+            value={formData.country}
+            onValueChange={(value) => {
+              setFormData({ ...formData, country: value, county: "" });
+              setCountryId(value);
+            }}
+            disabled={disabled}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select country" />
+            </SelectTrigger>
+            <SelectContent>
+              <CountrySelector 
+                selectedCountry={formData.country}
+                onCountryChange={() => {}}
+                showAll={false}
+                renderAsSelectItems={true}
+              />
+            </SelectContent>
+          </Select>
+        );
+
+      case "validity_period":
+        return (
+          <Select
+            value={formData.validity_period || "day"}
+            onValueChange={(value) => {
+              setFormData({ ...formData, validity_period: value as 'day' | 'week' | 'month' });
+            }}
+            disabled={disabled}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select validity period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">1 Day</SelectItem>
+              <SelectItem value="week">1 Week</SelectItem>
+              <SelectItem value="month">1 Month</SelectItem>
+            </SelectContent>
+          </Select>
+        );
+        
+      default:
+        return (
+          <Input
+            {...field}
+            name={name}
+            type={type}
+            step={step}
+            placeholder={`Enter ${label.toLowerCase()}`}
+            className="rounded-md"
+            value={formData[name as keyof any] || ""}
+            onChange={handleChange}
+            disabled={disabled}
+          />
+        );
     }
   };
 
   return (
-    <FormField
-      control={form.control}
-      name={name}
-      render={() => (
-        <FormItem className="space-y-2">
-          <FormLabel>{label}</FormLabel>
-          <FormControl>{renderField()}</FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div className="space-y-2">
+      <FormField
+        control={form.control}
+        name={name}
+        render={({ field: formField }) => (
+          <FormItem>
+            <FormLabel>{label}</FormLabel>
+            <FormControl>{renderField()}</FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 };
+
+export { ProductFormField };

@@ -13,6 +13,7 @@ export interface ProductFormData {
   county: string;
   country: string; // Country ID as string
   country_id?: number; // Numeric country ID
+  validity_period?: 'day' | 'week' | 'month';
 }
 
 export interface ProductImage {
@@ -29,6 +30,7 @@ export interface Profile {
   username?: string | null;
   full_name?: string | null;
   avatar_url?: string | null;
+  account_type?: string;
 }
 
 export interface Product {
@@ -55,6 +57,8 @@ export interface Product {
   county: string | null; // This is now district name
   country?: string | null; // Country name
   country_id?: number | null; // Country ID
+  expires_at?: string | null; // New field for expiration date
+  validity_period?: 'day' | 'week' | 'month';
 }
 
 export interface Country {
@@ -76,4 +80,26 @@ export interface District {
   name: string;
   country_id: number;
   created_at: string;
+}
+
+export interface AccountLimits {
+  basic: number;
+  starter: number;
+  premium: number;
+  enterprise: number | null; // Configurable for enterprise
+}
+
+// Default account limits
+export const DEFAULT_ACCOUNT_LIMITS: AccountLimits = {
+  basic: 5,
+  starter: 15,
+  premium: 30,
+  enterprise: null // Configurable
+}
+
+// Default validity periods in days
+export const VALIDITY_PERIODS = {
+  day: 1,
+  week: 7,
+  month: 30
 }
