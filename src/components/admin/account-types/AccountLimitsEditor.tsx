@@ -9,10 +9,10 @@ interface AccountLimitsEditorProps {
 
 export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLimitsEditorProps) => {
   return (
-    <div className="p-4 border rounded-lg bg-white dark:bg-gray-800">
-      <h3 className="text-md font-semibold mb-2">Product Upload Limits</h3>
+    <div className="p-1 border rounded-lg bg-white dark:bg-gray-800 w-full">
+      <h3 className="text-md font-semibold m-1">Product Upload Limits</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1 m-1">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 m-1">
         <div className="space-y-1">
           <label className="text-sm font-medium">Basic Account</label>
           <Input

@@ -61,11 +61,11 @@ export const UserAccountCard = ({
   const displayName = user.full_name || user.username || "Unknown User";
 
   return (
-    <Card className="p-4 border bg-gray-50 dark:bg-gray-700">
+    <Card className="p-1 border bg-gray-50 dark:bg-gray-700 w-full">
       <div className="flex flex-col space-y-1">
         <div className="flex justify-between items-center">
           <h4 className="font-medium text-lg">{displayName}</h4>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <span className="inline-flex items-center px-1 py-1 rounded-full text-xs font-medium capitalize bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
             {user.account_type}
           </span>
         </div>
@@ -88,20 +88,21 @@ export const UserAccountCard = ({
           <Button 
             onClick={() => setIsEditing(true)}
             className="mt-1 w-full"
+            size="sm"
           >
             Manage Account
           </Button>
         ) : (
-          <div className="mt-2 space-y-4 p-1">
+          <div className="mt-1 space-y-1 p-1">
             <h4 className="font-medium text-base">Update Account Type</h4>
             
-            <div className="space-y-2">
+            <div className="space-y-1">
               <label className="block text-sm font-medium">Account Type</label>
               <Select
                 value={accountType}
                 onValueChange={(value) => setAccountType(value as AccountType)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="p-1">
                   <SelectValue placeholder="Select account type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -126,7 +127,7 @@ export const UserAccountCard = ({
               </div>
             )}
             
-            <div className="flex justify-end gap-1 mt-2">
+            <div className="flex justify-end gap-1 mt-1">
               <Button 
                 variant="outline" 
                 onClick={() => {
@@ -135,6 +136,7 @@ export const UserAccountCard = ({
                   setIsEditing(false);
                 }}
                 className="m-1 p-1"
+                size="sm"
               >
                 Cancel
               </Button>
@@ -142,9 +144,10 @@ export const UserAccountCard = ({
                 onClick={handleSaveChanges}
                 disabled={updateAccountType.isPending}
                 className="m-1 p-1"
+                size="sm"
               >
                 <Check className="h-4 w-4 mr-1" />
-                Update Account Type
+                Update
               </Button>
             </div>
           </div>

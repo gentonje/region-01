@@ -24,8 +24,8 @@ export const AccountTypeManager = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Account Types & Limits</h2>
+    <div className="space-y-1 p-1 w-full">
+      <h2 className="text-lg font-semibold m-1">Account Types & Limits</h2>
       
       {/* Account type limits management */}
       <AccountLimitsEditor 

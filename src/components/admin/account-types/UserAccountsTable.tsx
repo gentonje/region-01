@@ -31,10 +31,10 @@ export const UserAccountsTable = ({
   onSearchChange
 }: UserAccountsTableProps) => {
   return (
-    <Card className="p-4 border rounded-lg bg-white dark:bg-gray-800">
-      <h3 className="text-md font-semibold mb-4">User Account Management</h3>
+    <Card className="p-1 border rounded-lg bg-white dark:bg-gray-800 w-full">
+      <h3 className="text-md font-semibold m-1">User Account Management</h3>
       
-      <div className="mb-4">
+      <div className="m-1">
         <Input
           placeholder="Search users..."
           value={searchQuery}
@@ -43,11 +43,11 @@ export const UserAccountsTable = ({
         />
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-1 m-1">
         {loadingUsers ? (
-          <div className="text-center py-4">Loading users...</div>
+          <div className="text-center py-1">Loading users...</div>
         ) : !users?.length ? (
-          <div className="text-center py-4">No users found</div>
+          <div className="text-center py-1">No users found</div>
         ) : (
           users.map((user) => (
             <UserAccountCard
