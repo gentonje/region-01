@@ -76,16 +76,16 @@ export const CountrySelector = ({
     onCountryChange(value);
   };
 
-  if (renderAsSelectItems) {
+  // IMPORTANT FIX: Never render SelectItems directly outside of a Select component
+  if (renderAsSelectItems && countries) {
+    // Instead of returning SelectItems directly, return a React fragment with the content
     return (
       <>
-        {countries?.map((country) => (
-          <SelectItem key={country.id} value={country.id.toString()}>
-            <div className="flex items-center">
-              {countryFlags[country.id.toString()]}
-              {country.name}
-            </div>
-          </SelectItem>
+        {countries.map((country) => (
+          <div key={country.id} className="flex items-center cursor-pointer px-2 py-1.5 hover:bg-accent rounded-sm" onClick={() => onCountryChange(country.id.toString())}>
+            {countryFlags[country.id.toString()]}
+            {country.name}
+          </div>
         ))}
       </>
     );

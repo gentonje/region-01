@@ -1,6 +1,7 @@
+
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product, ProductCategory } from "@/types/product";
+import { Product } from "@/types/product";
 import { useMemo } from "react";
 
 interface UseProductsProps {
@@ -56,7 +57,7 @@ export const useProducts = ({
     }
 
     if (selectedCategory !== "all") {
-      // Use category directly as string
+      // Use direct string comparison for category
       query = query.eq("category", selectedCategory);
     }
 
