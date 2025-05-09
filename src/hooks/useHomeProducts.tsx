@@ -37,8 +37,8 @@ export const useHomeProducts = (
       }
 
       if (selectedCategory !== "all") {
-        // Handle category as a simple string comparison
-        query = query.eq("category", selectedCategory);
+        // Cast the category to any to avoid type error with enum
+        query = query.eq("category", selectedCategory as any);
       }
 
       const { data: products, error } = await query;

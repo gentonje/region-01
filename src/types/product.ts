@@ -1,4 +1,3 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 export enum ProductCategory {
@@ -40,7 +39,7 @@ export interface ProductFormData {
   county: string;
   country: string; // Country ID as string
   country_id?: number; // Numeric country ID
-  validity_period?: ValidityPeriod;
+  validity_period?: ValidityPeriod | string;
 }
 
 export interface ProductImage {
@@ -88,7 +87,7 @@ export interface Product {
   country?: string | null; // Country name
   country_id?: number | null; // Country ID
   expires_at?: string | null; // New field for expiration date
-  validity_period?: ValidityPeriod | string; // Allow both enum and string
+  validity_period?: string | null; // Store as string for flexibility
 }
 
 export interface Country {

@@ -67,9 +67,9 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
       const { data, error } = await supabase
         .from('products')
         .select('*, product_images(*)')
-        .eq('category', product.category)  // Use category string directly
-        .eq('product_status', 'published')  // Only get published products
-        .eq('in_stock', true)  // Only get in-stock products
+        .eq('category', product.category as any)  // Cast to any to avoid type error with enum
+        .eq('product_status', 'published')
+        .eq('in_stock', true)
         .neq('id', product.id)
         .limit(4);
       

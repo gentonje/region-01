@@ -1,4 +1,3 @@
-
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -57,8 +56,8 @@ export const useProducts = ({
     }
 
     if (selectedCategory !== "all") {
-      // Use direct string comparison for category
-      query = query.eq("category", selectedCategory);
+      // Cast category to any to avoid type errors with enum
+      query = query.eq("category", selectedCategory as any);
     }
 
     // Debug: Log before applying region filter

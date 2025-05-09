@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -7,7 +8,7 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { useState, useEffect } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory, VALIDITY_PERIODS, ValidityPeriod } from "@/types/product";
+import { ProductCategory, VALIDITY_PERIODS } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
@@ -174,18 +175,18 @@ const AddProduct = () => {
       
       // Calculate expiration date based on validity period
       const validityPeriod = data.validity_period || getDefaultValidityPeriod();
-      const daysToAdd = VALIDITY_PERIODS[validityPeriod as ValidityPeriod];
+      const daysToAdd = VALIDITY_PERIODS[validityPeriod as "day" | "week" | "month"];
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + daysToAdd);
 
       console.log("Creating product...");
       
-      // Create product data object with proper type casting
+      // Create product data object with proper type casting for database
       const productData = {
         title: data.title,
         description: data.description,
         price: Number(data.price),
-        category: data.category as string, // Cast category to string for database
+        category: data.category as any, // Cast to any to avoid type issues with the database
         available_quantity: Number(data.available_quantity),
         storage_path: mainImagePath,
         county: data.county,
@@ -194,7 +195,7 @@ const AddProduct = () => {
         user_id: user!.id,
         product_status: 'published',
         expires_at: expiresAt.toISOString(),
-        validity_period: validityPeriod as string // Cast validity_period to string for database
+        validity_period: validityPeriod as string
       };
       
       const { data: insertedProduct, error: productError } = await supabase
