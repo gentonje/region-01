@@ -377,6 +377,7 @@ export type Database = {
           created_at: string
           currency: string | null
           description: string | null
+          expires_at: string | null
           id: string
           in_stock: boolean | null
           likes: number | null
@@ -388,6 +389,7 @@ export type Database = {
           storage_path: string
           title: string | null
           user_id: string
+          validity_period: string | null
           views: number | null
         }
         Insert: {
@@ -399,6 +401,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
           in_stock?: boolean | null
           likes?: number | null
@@ -410,6 +413,7 @@ export type Database = {
           storage_path: string
           title?: string | null
           user_id: string
+          validity_period?: string | null
           views?: number | null
         }
         Update: {
@@ -421,6 +425,7 @@ export type Database = {
           created_at?: string
           currency?: string | null
           description?: string | null
+          expires_at?: string | null
           id?: string
           in_stock?: boolean | null
           likes?: number | null
@@ -432,6 +437,7 @@ export type Database = {
           storage_path?: string
           title?: string | null
           user_id?: string
+          validity_period?: string | null
           views?: number | null
         }
         Relationships: [
@@ -460,10 +466,12 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string
           address: string | null
           avatar_url: string | null
           contact_email: string | null
           created_at: string
+          custom_product_limit: number | null
           full_name: string | null
           id: string
           is_active: boolean | null
@@ -475,10 +483,12 @@ export type Database = {
           username: string | null
         }
         Insert: {
+          account_type?: string
           address?: string | null
           avatar_url?: string | null
           contact_email?: string | null
           created_at?: string
+          custom_product_limit?: number | null
           full_name?: string | null
           id: string
           is_active?: boolean | null
@@ -490,10 +500,12 @@ export type Database = {
           username?: string | null
         }
         Update: {
+          account_type?: string
           address?: string | null
           avatar_url?: string | null
           contact_email?: string | null
           created_at?: string
+          custom_product_limit?: number | null
           full_name?: string | null
           id?: string
           is_active?: boolean | null

@@ -1,56 +1,39 @@
 
-import { Badge } from "../ui/badge";
-import { Profile } from "@/types/profile";
-import { Crown, Star, VerifiedIcon } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AccountType } from "@/types/profile";
 
 interface AccountTypeBadgeProps {
-  accountType?: string;
+  accountType: AccountType;
   className?: string;
 }
 
-export const AccountTypeBadge = ({ accountType, className }: AccountTypeBadgeProps) => {
-  if (!accountType || accountType === 'basic') {
-    return null; // Don't show badge for basic accounts
-  }
-
-  const getBadgeContent = () => {
-    switch(accountType) {
+export const AccountTypeBadge = ({ accountType, className = "" }: AccountTypeBadgeProps) => {
+  // Define styling based on account type
+  const getStyle = () => {
+    switch (accountType) {
+      case 'basic':
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
       case 'starter':
-        return {
-          label: 'Starter',
-          icon: <Star className="h-3 w-3 mr-1" />,
-          variant: 'secondary' as const,
-          className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-        };
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
       case 'premium':
-        return {
-          label: 'Premium',
-          icon: <Crown className="h-3 w-3 mr-1" />,
-          variant: 'default' as const,
-          className: 'bg-amber-500 text-white'
-        };
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300";
       case 'enterprise':
-        return {
-          label: 'Enterprise',
-          icon: <VerifiedIcon className="h-3 w-3 mr-1" />,
-          variant: 'default' as const,
-          className: 'bg-purple-600 text-white'
-        };
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300";
       default:
-        return null;
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
 
-  const badgeContent = getBadgeContent();
-  if (!badgeContent) return null;
+  const getLabel = () => {
+    return accountType.charAt(0).toUpperCase() + accountType.slice(1);
+  };
 
   return (
     <Badge 
-      variant={badgeContent.variant} 
-      className={`text-xs flex items-center ${badgeContent.className} ${className}`}
+      variant="outline" 
+      className={`rounded-full text-xs ${getStyle()} ${className}`}
     >
-      {badgeContent.icon}
-      {badgeContent.label}
+      {getLabel()}
     </Badge>
   );
 };

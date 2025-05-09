@@ -10,7 +10,10 @@ export const productSchema = z.object({
     z.string().min(1, "Price is required"), 
     z.number().positive("Price must be positive")
   ]),
-  category: z.nativeEnum(ProductCategory),
+  category: z.union([
+    z.string(),
+    z.nativeEnum(ProductCategory)
+  ]),
   available_quantity: z.union([
     z.string().min(1, "Quantity is required"),
     z.number().int().nonnegative("Quantity must be 0 or positive")
