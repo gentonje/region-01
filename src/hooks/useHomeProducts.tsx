@@ -37,8 +37,8 @@ export const useHomeProducts = (
       }
 
       if (selectedCategory !== "all") {
-        // Type assertion for category to ensure it matches ProductCategory
-        query = query.eq("category", selectedCategory as ProductCategory);
+        // Handle category as a string directly
+        query = query.eq("category", selectedCategory);
       }
 
       const { data: products, error } = await query;

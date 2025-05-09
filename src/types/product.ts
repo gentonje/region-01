@@ -40,7 +40,7 @@ export interface ProductFormData {
   county: string;
   country: string; // Country ID as string
   country_id?: number; // Numeric country ID
-  validity_period?: 'day' | 'week' | 'month';
+  validity_period?: ValidityPeriod;
 }
 
 export interface ProductImage {
@@ -68,7 +68,7 @@ export interface Product {
   title: string | null;
   description: string | null;
   price: number | null;
-  category: string | ProductCategory | null;
+  category: string | null;
   user_id?: string | null;
   seller_id?: string | null;
   shop_id?: string | null;
@@ -88,7 +88,7 @@ export interface Product {
   country?: string | null; // Country name
   country_id?: number | null; // Country ID
   expires_at?: string | null; // New field for expiration date
-  validity_period?: ValidityPeriod; // Updated type definition
+  validity_period?: ValidityPeriod | string; // Allow both enum and string
 }
 
 export interface Country {

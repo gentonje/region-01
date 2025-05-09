@@ -62,12 +62,23 @@ const MyProducts = () => {
       if (error) throw error;
       
       // Transform data to ensure validity_period is properly typed
-      const typedProducts = (data || []).map(product => ({
-        ...product,
-        validity_period: (product.validity_period || 'day') as ValidityPeriod
-      })) as Product[];
+      const typedProducts = (data || []).map(product => {
+        // Ensure validity_period is a valid enum value
+        let validityPeriod: ValidityPeriod = 'day';
+        
+        if (product.validity_period === 'day' || 
+            product.validity_period === 'week' || 
+            product.validity_period === 'month') {
+          validityPeriod = product.validity_period as ValidityPeriod;
+        }
+        
+        return {
+          ...product,
+          validity_period: validityPeriod
+        };
+      });
       
-      return typedProducts;
+      return typedProducts as Product[];
     },
   });
 

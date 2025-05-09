@@ -16,6 +16,7 @@ import { User, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AccountTypeBadge } from "./AccountTypeBadge";
 import { toast } from "sonner";
+import { AccountType } from "@/types/profile";
 
 export const UserMenu = () => {
   const { session, signOut } = useAuth();

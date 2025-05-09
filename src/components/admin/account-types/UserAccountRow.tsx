@@ -16,7 +16,7 @@ interface UserAccountRowProps {
   user: User;
   productCount: number;
   isSelected: boolean;
-  accountLimits: AccountLimits; // Changed from Record<string, number | null>
+  accountLimits: AccountLimits;
   onSelectUser: (userId: string) => void;
 }
 
@@ -33,8 +33,19 @@ export const UserAccountRow = ({
       return user.custom_product_limit;
     }
     
-    // Type assertion to allow string indexing of AccountLimits
-    return (accountLimits as Record<string, number | null>)[type] || 'Unknown';
+    // Safely access AccountLimits by explicitly handling each account type
+    switch (type) {
+      case 'basic':
+        return accountLimits.basic;
+      case 'starter':
+        return accountLimits.starter;
+      case 'premium':
+        return accountLimits.premium;
+      case 'enterprise':
+        return accountLimits.enterprise || 'Custom';
+      default:
+        return 'Unknown';
+    }
   };
 
   return (

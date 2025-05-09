@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Product } from "@/types/product";
+import { Product, ProductCategory } from "@/types/product";
 import { SupportedCurrency, convertCurrency } from "@/utils/currencyConverter";
 import { toast } from "sonner";
 
@@ -67,7 +66,7 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
       const { data, error } = await supabase
         .from('products')
         .select('*, product_images(*)')
-        .eq('category', product.category as ProductCategory)  // Type assertion here
+        .eq('category', product.category)  // Use category directly as string
         .eq('product_status', 'published')  // Only get published products
         .eq('in_stock', true)  // Only get in-stock products
         .neq('id', product.id)

@@ -7,7 +7,7 @@ import { useProductImages } from "@/hooks/useProductImages";
 import { useState, useEffect } from "react";
 import { ProductImageSection } from "@/components/ProductImageSection";
 import { productPageStyles as styles } from "@/styles/productStyles";
-import { ProductCategory, VALIDITY_PERIODS } from "@/types/product";
+import { ProductCategory, VALIDITY_PERIODS, ValidityPeriod } from "@/types/product";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ProductFormData } from "@/components/forms/product/validation";
@@ -185,7 +185,7 @@ const AddProduct = () => {
         title: data.title,
         description: data.description,
         price: Number(data.price),
-        category: data.category as ProductCategory,
+        category: data.category as string, // Cast category to string for database
         available_quantity: Number(data.available_quantity),
         storage_path: mainImagePath,
         county: data.county,
@@ -194,7 +194,7 @@ const AddProduct = () => {
         user_id: user!.id,
         product_status: 'published',
         expires_at: expiresAt.toISOString(),
-        validity_period: validityPeriod as ValidityPeriod
+        validity_period: validityPeriod as string // Cast validity_period to string for database
       };
       
       const { data: insertedProduct, error: productError } = await supabase
