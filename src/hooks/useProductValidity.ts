@@ -1,6 +1,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface ProductValidity {
+  expires_at?: string | null;
+  validity_period?: 'day' | 'week' | 'month' | null;
+  daysRemaining?: number;
+}
 
 export const useProductValidity = (productId: string | undefined) => {
   return useQuery({
@@ -8,28 +15,37 @@ export const useProductValidity = (productId: string | undefined) => {
     queryFn: async () => {
       if (!productId) return null;
       
-      const { data, error } = await supabase
-        .from("products")
-        .select("expires_at, validity_period")
-        .eq("id", productId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("expires_at, validity_period")
+          .eq("id", productId)
+          .single();
+          
+        if (error) {
+          console.error("Error fetching product validity:", error);
+          return { daysRemaining: 0 } as ProductValidity;
+        }
         
-      if (error) throw error;
-      
-      // Calculate days remaining
-      if (data.expires_at) {
-        const expiresAt = new Date(data.expires_at);
-        const now = new Date();
-        const diffTime = expiresAt.getTime() - now.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // Calculate days remaining
+        if (data.expires_at) {
+          const expiresAt = new Date(data.expires_at);
+          const now = new Date();
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          return {
+            expires_at: data.expires_at,
+            validity_period: data.validity_period,
+            daysRemaining: Math.max(0, diffDays)
+          } as ProductValidity;
+        }
         
-        return {
-          ...data,
-          daysRemaining: Math.max(0, diffDays)
-        };
+        return data as ProductValidity;
+      } catch (err) {
+        console.error("Error in product validity query:", err);
+        return { daysRemaining: 0 } as ProductValidity;
       }
-      
-      return data;
     },
     enabled: !!productId
   });

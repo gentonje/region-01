@@ -13,21 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AccountType } from "@/types/profile";
-
-// Define default account limits
-interface AccountLimits {
-  basic: number;
-  starter: number;
-  premium: number;
-  enterprise: number | null; // Configurable for enterprise
-}
-
-const DEFAULT_ACCOUNT_LIMITS: AccountLimits = {
-  basic: 5,
-  starter: 15,
-  premium: 30,
-  enterprise: null // Configurable
-};
+import { AccountLimits, DEFAULT_ACCOUNT_LIMITS } from "@/types/product";
 
 export const AccountTypeManager = () => {
   const queryClient = useQueryClient();
@@ -41,17 +27,29 @@ export const AccountTypeManager = () => {
   const { data: users, isLoading: loadingUsers } = useQuery({
     queryKey: ["users", searchQuery],
     queryFn: async () => {
-      let query = supabase
-        .from("profiles")
-        .select("id, username, full_name, account_type, custom_product_limit")
-        .order("username");
-      
-      if (searchQuery) {
-        query = query.ilike("username", `%${searchQuery}%`);
+      try {
+        let query = supabase
+          .from("profiles")
+          .select("id, username, full_name, account_type, custom_product_limit")
+          .order("username");
+        
+        if (searchQuery) {
+          query = query.ilike("username", `%${searchQuery}%`);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error("Error fetching users:", error);
+          toast.error("Failed to load users");
+          return [];
+        }
+        
+        return data || [];
+      } catch (err) {
+        console.error("Error in users query:", err);
+        return [];
       }
-      
-      const { data } = await query;
-      return data || [];
     }
   });
 
@@ -61,20 +59,30 @@ export const AccountTypeManager = () => {
     queryFn: async () => {
       if (!users?.length) return {};
       
-      const counts: Record<string, number> = {};
-      
-      await Promise.all(
-        users.map(async (user) => {
-          const { count } = await supabase
-            .from("products")
-            .select("*", { count: 'exact', head: true })
-            .eq("user_id", user.id);
-            
-          counts[user.id] = count || 0;
-        })
-      );
-      
-      return counts;
+      try {
+        const counts: Record<string, number> = {};
+        
+        await Promise.all(
+          users.map(async (user) => {
+            const { count, error } = await supabase
+              .from("products")
+              .select("*", { count: 'exact', head: true })
+              .eq("user_id", user.id);
+              
+            if (error) {
+              console.error(`Error getting product count for user ${user.id}:`, error);
+              counts[user.id] = 0;
+            } else {
+              counts[user.id] = count || 0;
+            }
+          })
+        );
+        
+        return counts;
+      } catch (err) {
+        console.error("Error in product counts query:", err);
+        return {};
+      }
     },
     enabled: !!users?.length
   });
@@ -86,12 +94,23 @@ export const AccountTypeManager = () => {
         throw new Error("No user selected");
       }
       
+      const updateData: { 
+        account_type: AccountType;
+        custom_product_limit?: number | null;
+      } = {
+        account_type: selectedAccountType
+      };
+      
+      // Only set custom_product_limit for enterprise accounts
+      if (selectedAccountType === "enterprise") {
+        updateData.custom_product_limit = customLimit;
+      } else {
+        updateData.custom_product_limit = null;
+      }
+      
       const { error } = await supabase
         .from("profiles")
-        .update({ 
-          account_type: selectedAccountType,
-          custom_product_limit: selectedAccountType === "enterprise" ? customLimit : null 
-        })
+        .update(updateData)
         .eq("id", selectedUserId);
         
       if (error) throw error;

@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { User, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { AccountTypeBadge } from "./AccountTypeBadge";
+import { toast } from "sonner";
 
 export const UserMenu = () => {
   const { session, signOut } = useAuth();
@@ -62,13 +63,34 @@ export const UserMenu = () => {
     queryFn: async () => {
       if (!user) return null;
 
-      const { data } = await supabase
-        .from("profiles")
-        .select("avatar_url, username, full_name, account_type")
-        .eq("id", user.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("avatar_url, username, full_name, account_type")
+          .eq("id", user.id)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching profile:", error);
+          toast.error("Failed to load user profile");
+          return {
+            avatar_url: null,
+            username: null,
+            full_name: null,
+            account_type: "basic" as const
+          };
+        }
 
-      return data;
+        return data;
+      } catch (err) {
+        console.error("Error in profile query:", err);
+        return {
+          avatar_url: null,
+          username: null,
+          full_name: null,
+          account_type: "basic" as const
+        };
+      }
     },
     enabled: !!user,
   });

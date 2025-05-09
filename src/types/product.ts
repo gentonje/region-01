@@ -1,14 +1,25 @@
 
 import { Database } from "@/integrations/supabase/types";
 
-export type ProductCategory = Database["public"]["Enums"]["product_category"];
+export enum ProductCategory {
+  Electronics = "ELECTRONICS",
+  Clothing = "CLOTHING",
+  Home = "HOME",
+  Beauty = "BEAUTY",
+  Sports = "SPORTS",
+  Books = "BOOKS",
+  Automotive = "AUTOMOTIVE",
+  Jewelry = "JEWELRY",
+  Garden = "GARDEN",
+  Other = "OTHER"
+}
 
 export interface ProductFormData {
   title: string;
   description: string;
-  price: number;
+  price: number | string;
   category: ProductCategory;
-  available_quantity: number;
+  available_quantity: number | string;
   shipping_info?: string;
   county: string;
   country: string; // Country ID as string

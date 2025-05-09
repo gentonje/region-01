@@ -21,11 +21,13 @@ interface Country {
 interface CountrySelectorProps {
   selectedCountry: string;
   onCountryChange: (country: string) => void;
+  renderAsSelectItems?: boolean;
 }
 
 export const CountrySelector = ({
   selectedCountry = "all", // Default to "all"
   onCountryChange,
+  renderAsSelectItems = true,
 }: CountrySelectorProps) => {
   const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});
 
@@ -73,6 +75,21 @@ export const CountrySelector = ({
     console.log("Country changed to:", value);
     onCountryChange(value);
   };
+
+  if (renderAsSelectItems) {
+    return (
+      <>
+        {countries?.map((country) => (
+          <SelectItem key={country.id} value={country.id.toString()}>
+            <div className="flex items-center">
+              {countryFlags[country.id.toString()]}
+              {country.name}
+            </div>
+          </SelectItem>
+        ))}
+      </>
+    );
+  }
 
   return (
     <Select

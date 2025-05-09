@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import {
@@ -73,7 +74,7 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
           <Select
             value={formData.category}
             onValueChange={(value) => {
-              setFormData({ ...formData, category: value as ProductCategory });
+              setFormData({ ...formData, category: value });
             }}
             disabled={disabled}
           >
@@ -96,7 +97,6 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
             selectedCountry={countryId}
             selectedCounty={formData.county || ""}
             onCountyChange={(county) => setFormData({ ...formData, county })}
-            disabled={disabled}
           />
         );
       
@@ -117,8 +117,6 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
               <CountrySelector 
                 selectedCountry={formData.country}
                 onCountryChange={() => {}}
-                showAll={false}
-                renderAsSelectItems={true}
               />
             </SelectContent>
           </Select>
@@ -153,7 +151,7 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
             step={step}
             placeholder={`Enter ${label.toLowerCase()}`}
             className="rounded-md"
-            value={formData[name as keyof any] || ""}
+            value={formData[name as keyof typeof formData] || ""}
             onChange={handleChange}
             disabled={disabled}
           />

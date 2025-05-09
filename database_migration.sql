@@ -20,10 +20,26 @@ ON CONFLICT (code) DO NOTHING;
 ALTER TABLE public.products 
 ADD COLUMN IF NOT EXISTS country_id INTEGER REFERENCES public.countries(id);
 
+-- Add expires_at to products table
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS expires_at TIMESTAMP WITH TIME ZONE;
+
+-- Add validity_period to products table
+ALTER TABLE public.products
+ADD COLUMN IF NOT EXISTS validity_period VARCHAR(10);
+
 -- Update existing products to default to Kenya (id: 1)
 UPDATE public.products 
 SET country_id = 1
 WHERE country_id IS NULL;
+
+-- Add account_type to profiles table
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS account_type VARCHAR(20) DEFAULT 'basic' NOT NULL;
+
+-- Add custom_product_limit to profiles table
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS custom_product_limit INTEGER DEFAULT NULL;
 
 -- For future: Modify counties table to reference countries
 -- This is left as a comment to avoid breaking existing data
