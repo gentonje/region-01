@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -170,6 +171,9 @@ export const UserMenu = () => {
           <>
             <DropdownMenuItem asChild>
               <Link to="/admin/manage">Admin Management</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/accounts">Account Management</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to="/admin/districts">Districts Management</Link>

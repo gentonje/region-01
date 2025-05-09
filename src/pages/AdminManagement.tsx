@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { CurrencyManager } from "@/components/admin/CurrencyManager";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
-import { AccountTypeManager } from "@/components/admin/AccountTypeManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface User {
@@ -82,10 +81,9 @@ const AdminManagement = () => {
       
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">Admin Management</h1>
 
-      <Tabs defaultValue="accounts" className="w-full">
+      <Tabs defaultValue="users" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="users">Admin Users</TabsTrigger>
-          <TabsTrigger value="accounts">Account Management</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
         
@@ -148,12 +146,6 @@ const AdminManagement = () => {
                 ))}
               </div>
             )}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="accounts" className="space-y-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 border mx-1">
-            <AccountTypeManager />
           </div>
         </TabsContent>
         
