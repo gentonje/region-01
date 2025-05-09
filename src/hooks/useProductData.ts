@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStorageUrl } from "@/utils/storage";
@@ -9,7 +10,7 @@ export const useProductData = (id: string | undefined) => {
     title: "",
     description: "",
     price: "",
-    category: "Other" as ProductCategory,
+    category: ProductCategory.Other,
     available_quantity: "0",
   });
   const [mainImageUrl, setMainImageUrl] = useState<string>();
@@ -40,7 +41,7 @@ export const useProductData = (id: string | undefined) => {
           title: product.title || "",
           description: product.description || "",
           price: product.price?.toString() || "",
-          category: product.category || "Other",
+          category: product.category as ProductCategory || ProductCategory.Other,
           available_quantity: product.available_quantity?.toString() || "0",
         });
 

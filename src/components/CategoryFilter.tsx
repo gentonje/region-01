@@ -19,7 +19,7 @@ export const CategoryFilter = ({
   selectedCategory = "all",
   onCategoryChange,
 }: CategoryFilterProps) => {
-  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,17 +37,17 @@ export const CategoryFilter = ({
         }
 
         // Pre-defined categories if the table doesn't have data yet
-        const productCategories: ProductCategory[] = [
-          "Electronics",
-          "Clothing",
-          "Home & Garden",
-          "Books",
-          "Sports & Outdoors",
-          "Toys & Games",
-          "Health & Beauty",
-          "Automotive",
-          "Food & Beverages",
-          "Other"
+        const productCategories = [
+          ProductCategory.Electronics,
+          ProductCategory.Clothing,
+          ProductCategory.Home,
+          ProductCategory.Books,
+          ProductCategory.Sports,
+          ProductCategory.Toys,
+          ProductCategory.Beauty,
+          ProductCategory.Automotive,
+          ProductCategory.Food,
+          ProductCategory.Other
         ];
         
         setCategories(data?.map(c => c.name) || productCategories);

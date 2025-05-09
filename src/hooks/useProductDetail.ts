@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +62,8 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
   const { data: similarProducts, isLoading: isLoadingSimilar } = useQuery({
     queryKey: ['similar-products', product.id, product.category],
     queryFn: async () => {
+      if (!product.category) return [];
+      
       const { data, error } = await supabase
         .from('products')
         .select('*, product_images(*)')

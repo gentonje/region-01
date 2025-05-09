@@ -45,7 +45,14 @@ export const AccountTypeManager = () => {
           return [];
         }
         
-        return data || [];
+        // Ensure each user has at least basic properties
+        return data?.map(user => ({
+          id: user.id,
+          username: user.username || '',
+          full_name: user.full_name || '',
+          account_type: (user.account_type as AccountType) || 'basic',
+          custom_product_limit: user.custom_product_limit
+        })) || [];
       } catch (err) {
         console.error("Error in users query:", err);
         return [];
@@ -94,19 +101,11 @@ export const AccountTypeManager = () => {
         throw new Error("No user selected");
       }
       
-      const updateData: { 
-        account_type: AccountType;
-        custom_product_limit?: number | null;
-      } = {
-        account_type: selectedAccountType
+      // Make sure to use RLS-compatible fields based on Supabase profiles table
+      const updateData: Record<string, any> = {
+        account_type: selectedAccountType,
+        custom_product_limit: selectedAccountType === "enterprise" ? customLimit : null
       };
-      
-      // Only set custom_product_limit for enterprise accounts
-      if (selectedAccountType === "enterprise") {
-        updateData.custom_product_limit = customLimit;
-      } else {
-        updateData.custom_product_limit = null;
-      }
       
       const { error } = await supabase
         .from("profiles")

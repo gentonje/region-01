@@ -37,7 +37,7 @@ export const useHomeProducts = (
       }
 
       if (selectedCategory !== "all") {
-        query = query.eq("category", selectedCategory as ProductCategory);
+        query = query.eq("category", selectedCategory);
       }
 
       const { data: products, error } = await query;

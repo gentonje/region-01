@@ -1,17 +1,18 @@
-
 import { Database } from "@/integrations/supabase/types";
 
 export enum ProductCategory {
-  Electronics = "ELECTRONICS",
-  Clothing = "CLOTHING",
-  Home = "HOME",
-  Beauty = "BEAUTY",
-  Sports = "SPORTS",
-  Books = "BOOKS",
-  Automotive = "AUTOMOTIVE",
-  Jewelry = "JEWELRY",
-  Garden = "GARDEN",
-  Other = "OTHER"
+  Electronics = "Electronics",
+  Clothing = "Clothing",
+  Home = "Home & Garden",
+  Beauty = "Health & Beauty",
+  Sports = "Sports & Outdoors",
+  Books = "Books",
+  Automotive = "Automotive",
+  Jewelry = "Jewelry",
+  Garden = "Garden",
+  Toys = "Toys & Games",
+  Food = "Food & Beverages",
+  Other = "Other"
 }
 
 // Mapping between database enum values and our internal ProductCategory
@@ -21,10 +22,10 @@ export const productCategoryMapping = {
   "Home & Garden": ProductCategory.Home,
   "Books": ProductCategory.Books,
   "Sports & Outdoors": ProductCategory.Sports,
-  "Toys & Games": ProductCategory.Other,
+  "Toys & Games": ProductCategory.Toys,
   "Health & Beauty": ProductCategory.Beauty,
   "Automotive": ProductCategory.Automotive,
-  "Food & Beverages": ProductCategory.Other,
+  "Food & Beverages": ProductCategory.Food,
   "Other": ProductCategory.Other
 };
 

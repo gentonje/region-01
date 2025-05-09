@@ -33,10 +33,7 @@ interface ProductFormFieldProps {
 }
 
 const formatCategoryName = (category: string) => {
-  return category
-    .split("_")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
+  return category;
 };
 
 const ProductFormField = ({ form, name, label, type = "text", step, formData, setFormData, disabled = false }: ProductFormFieldProps) => {

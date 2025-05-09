@@ -74,3 +74,14 @@ INSERT INTO public.counties (name, country_id) VALUES
 ON CONFLICT DO NOTHING;
 */
 
+
+-- Set default values for products that are missing validity_period
+UPDATE public.products
+SET validity_period = 'day'
+WHERE validity_period IS NULL AND expires_at IS NOT NULL;
+
+-- Set default values for new columns in profiles if not set
+-- This ensures compatibility with existing code that expects these columns
+UPDATE public.profiles
+SET account_type = 'basic'
+WHERE account_type IS NULL;
