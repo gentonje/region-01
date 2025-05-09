@@ -82,7 +82,7 @@ const AdminManagement = () => {
       
       <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mx-1">Admin Management</h1>
 
-      <Tabs defaultValue="users" className="w-full">
+      <Tabs defaultValue="accounts" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="users">Admin Users</TabsTrigger>
           <TabsTrigger value="accounts">Account Management</TabsTrigger>
