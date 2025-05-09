@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CountiesFilter } from "@/components/CountiesFilter";
-import { CountrySelector } from "@/components/CountrySelector";
+import { CountrySelector } from "@/components/navigation/CountrySelector";
 import { ProductCategory } from "@/types/product";
 
 interface ProductFormFieldProps {

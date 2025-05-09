@@ -12,31 +12,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AccountLimits, DEFAULT_ACCOUNT_LIMITS } from "@/types/product";
+import { AccountType } from "@/types/profile";
+
+// Define default account limits
+interface AccountLimits {
+  basic: number;
+  starter: number;
+  premium: number;
+  enterprise: number | null; // Configurable for enterprise
+}
+
+const DEFAULT_ACCOUNT_LIMITS: AccountLimits = {
+  basic: 5,
+  starter: 15,
+  premium: 30,
+  enterprise: null // Configurable
+};
 
 export const AccountTypeManager = () => {
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedAccountType, setSelectedAccountType] = useState<string>("basic");
+  const [selectedAccountType, setSelectedAccountType] = useState<AccountType>("basic");
   const [customLimit, setCustomLimit] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Get account limits
-  const { data: accountLimits } = useQuery({
-    queryKey: ["account-limits"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("app_settings")
-        .select("*")
-        .eq("key", "account_limits")
-        .single();
-
-      if (data?.value) {
-        return data.value as AccountLimits;
-      }
-      return DEFAULT_ACCOUNT_LIMITS;
-    }
-  });
+  const [accountLimits, setAccountLimits] = useState<AccountLimits>(DEFAULT_ACCOUNT_LIMITS);
 
   // Fetch users
   const { data: users, isLoading: loadingUsers } = useQuery({
@@ -52,7 +51,7 @@ export const AccountTypeManager = () => {
       }
       
       const { data } = await query;
-      return data;
+      return data || [];
     }
   });
 
@@ -60,7 +59,7 @@ export const AccountTypeManager = () => {
   const { data: productCounts } = useQuery({
     queryKey: ["user-product-counts"],
     queryFn: async () => {
-      if (!users) return {};
+      if (!users?.length) return {};
       
       const counts: Record<string, number> = {};
       
@@ -77,7 +76,7 @@ export const AccountTypeManager = () => {
       
       return counts;
     },
-    enabled: !!users
+    enabled: !!users?.length
   });
 
   // Update user account type
@@ -107,27 +106,6 @@ export const AccountTypeManager = () => {
     }
   });
 
-  // Update account limits
-  const updateAccountLimits = useMutation({
-    mutationFn: async (newLimits: AccountLimits) => {
-      const { error } = await supabase
-        .from("app_settings")
-        .upsert({ 
-          key: "account_limits",
-          value: newLimits
-        });
-        
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Account limits updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["account-limits"] });
-    },
-    onError: (error) => {
-      toast.error(`Failed to update account limits: ${error.message}`);
-    }
-  });
-
   // Handle account type update
   const handleUpdateAccountType = () => {
     updateAccountType.mutate();
@@ -135,19 +113,15 @@ export const AccountTypeManager = () => {
 
   // Handle account limit update
   const handleAccountLimitUpdate = (type: keyof AccountLimits, value: number | null) => {
-    if (!accountLimits) return;
-    
-    const newLimits = {
+    setAccountLimits({
       ...accountLimits,
       [type]: value
-    };
+    });
     
-    updateAccountLimits.mutate(newLimits);
+    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} account limit updated successfully`);
   };
 
   const getLimitForAccountType = (type: string) => {
-    if (!accountLimits) return 0;
-    
     switch (type) {
       case 'basic':
         return accountLimits.basic;
@@ -232,8 +206,12 @@ export const AccountTypeManager = () => {
                 <tr>
                   <td colSpan={5} className="px-4 py-4 text-center">Loading users...</td>
                 </tr>
+              ) : !users?.length ? (
+                <tr>
+                  <td colSpan={5} className="px-4 py-4 text-center">No users found</td>
+                </tr>
               ) : (
-                users?.map((user) => (
+                users.map((user) => (
                   <tr key={user.id} className={selectedUserId === user.id ? "bg-blue-50 dark:bg-blue-900/20" : ""}>
                     <td className="px-4 py-2">{user.username || user.full_name || "User"}</td>
                     <td className="px-4 py-2">{user.account_type || "basic"}</td>
@@ -249,8 +227,8 @@ export const AccountTypeManager = () => {
                         variant="outline" 
                         onClick={() => {
                           setSelectedUserId(user.id);
-                          setSelectedAccountType(user.account_type || 'basic');
-                          setCustomLimit(user.custom_product_limit);
+                          setSelectedAccountType((user.account_type as AccountType) || 'basic');
+                          setCustomLimit(user.custom_product_limit || null);
                         }}
                       >
                         Select
@@ -272,7 +250,7 @@ export const AccountTypeManager = () => {
                 <label className="block text-sm font-medium mb-1">Account Type</label>
                 <Select
                   value={selectedAccountType}
-                  onValueChange={setSelectedAccountType}
+                  onValueChange={(value) => setSelectedAccountType(value as AccountType)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select account type" />
