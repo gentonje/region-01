@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { AccountType } from "@/types/profile";
 import { AccountTypeBadge } from "@/components/navigation/AccountTypeBadge";
+import { AccountLimits } from "@/types/product";
 
 interface User {
   id: string;
@@ -15,7 +16,7 @@ interface UserAccountRowProps {
   user: User;
   productCount: number;
   isSelected: boolean;
-  accountLimits: Record<string, number | null>;
+  accountLimits: AccountLimits; // Changed from Record<string, number | null>
   onSelectUser: (userId: string) => void;
 }
 
@@ -31,7 +32,9 @@ export const UserAccountRow = ({
     if (type === 'enterprise' && user.custom_product_limit) {
       return user.custom_product_limit;
     }
-    return accountLimits[type] || 'Unknown';
+    
+    // Type assertion to allow string indexing of AccountLimits
+    return (accountLimits as Record<string, number | null>)[type] || 'Unknown';
   };
 
   return (

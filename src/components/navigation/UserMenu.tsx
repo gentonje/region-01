@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -81,14 +80,17 @@ export const UserMenu = () => {
           };
         }
 
-        return data;
+        return {
+          ...data,
+          account_type: (data.account_type || 'basic') as AccountType
+        };
       } catch (err) {
         console.error("Error in profile query:", err);
         return {
           avatar_url: null,
           username: null,
           full_name: null,
-          account_type: "basic" as const
+          account_type: "basic" as AccountType
         };
       }
     },
@@ -124,7 +126,7 @@ export const UserMenu = () => {
       <DropdownMenuContent align="end" className="w-56">
         <div className="flex items-center justify-between px-2">
           <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
-          {profile?.account_type && <AccountTypeBadge accountType={profile.account_type} />}
+          {profile?.account_type && <AccountTypeBadge accountType={profile.account_type as AccountType} />}
         </div>
         
         <DropdownMenuSeparator />

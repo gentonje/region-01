@@ -67,7 +67,7 @@ export const useProductDetail = (product: Product, selectedCurrency: SupportedCu
       const { data, error } = await supabase
         .from('products')
         .select('*, product_images(*)')
-        .eq('category', product.category)
+        .eq('category', product.category as ProductCategory)  // Type assertion here
         .eq('product_status', 'published')  // Only get published products
         .eq('in_stock', true)  // Only get in-stock products
         .neq('id', product.id)

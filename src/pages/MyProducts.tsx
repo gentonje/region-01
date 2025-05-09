@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,6 +9,7 @@ import { Plus, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Product, ValidityPeriod } from "@/types/product";
 
 const MyProducts = () => {
   const navigate = useNavigate();
@@ -60,7 +60,14 @@ const MyProducts = () => {
         .range((currentPage - 1) * pageSize, currentPage * pageSize - 1);
 
       if (error) throw error;
-      return data;
+      
+      // Transform data to ensure validity_period is properly typed
+      const typedProducts = (data || []).map(product => ({
+        ...product,
+        validity_period: (product.validity_period || 'day') as ValidityPeriod
+      })) as Product[];
+      
+      return typedProducts;
     },
   });
 

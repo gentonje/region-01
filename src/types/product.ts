@@ -61,6 +61,8 @@ export interface Profile {
   custom_product_limit?: number | null;
 }
 
+export type ValidityPeriod = 'day' | 'week' | 'month';
+
 export interface Product {
   id: string;
   title: string | null;
@@ -86,7 +88,7 @@ export interface Product {
   country?: string | null; // Country name
   country_id?: number | null; // Country ID
   expires_at?: string | null; // New field for expiration date
-  validity_period?: 'day' | 'week' | 'month';
+  validity_period?: ValidityPeriod; // Updated type definition
 }
 
 export interface Country {

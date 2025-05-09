@@ -174,28 +174,32 @@ const AddProduct = () => {
       
       // Calculate expiration date based on validity period
       const validityPeriod = data.validity_period || getDefaultValidityPeriod();
-      const daysToAdd = VALIDITY_PERIODS[validityPeriod];
+      const daysToAdd = VALIDITY_PERIODS[validityPeriod as ValidityPeriod];
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + daysToAdd);
 
       console.log("Creating product...");
-      const { data: productData, error: productError } = await supabase
+      
+      // Create product data object with proper type casting
+      const productData = {
+        title: data.title,
+        description: data.description,
+        price: Number(data.price),
+        category: data.category as ProductCategory,
+        available_quantity: Number(data.available_quantity),
+        storage_path: mainImagePath,
+        county: data.county,
+        country_id: Number(data.country),
+        currency: currency,
+        user_id: user!.id,
+        product_status: 'published',
+        expires_at: expiresAt.toISOString(),
+        validity_period: validityPeriod as ValidityPeriod
+      };
+      
+      const { data: insertedProduct, error: productError } = await supabase
         .from("products")
-        .insert({
-          title: data.title,
-          description: data.description,
-          price: Number(data.price),
-          category: data.category,
-          available_quantity: Number(data.available_quantity),
-          storage_path: mainImagePath,
-          county: data.county,
-          country_id: Number(data.country), // Store country_id instead of name
-          currency: currency, // Set currency based on country
-          user_id: user.id,
-          product_status: 'published', // Start as published
-          expires_at: expiresAt.toISOString(), // Set expiration date
-          validity_period: validityPeriod // Store the validity period
-        })
+        .insert(productData)
         .select()
         .single();
 
@@ -205,7 +209,7 @@ const AddProduct = () => {
       const { error: mainImageError } = await supabase
         .from("product_images")
         .insert({
-          product_id: productData.id,
+          product_id: insertedProduct.id,
           storage_path: mainImagePath,
           is_main: true,
           display_order: 0
@@ -216,7 +220,7 @@ const AddProduct = () => {
       // Insert additional images into product_images table
       if (additionalImagePaths.length > 0) {
         const additionalImagesData = additionalImagePaths.map((path, index) => ({
-          product_id: productData.id,
+          product_id: insertedProduct.id,
           storage_path: path,
           is_main: false,
           display_order: index + 1
