@@ -71,6 +71,7 @@ export interface Product {
   user_id?: string | null;
   seller_id?: string | null;
   shop_id?: string | null;
+  shop_name?: string | null; // Added shop_name property
   available_quantity: number | null;
   storage_path: string;
   created_at: string;
