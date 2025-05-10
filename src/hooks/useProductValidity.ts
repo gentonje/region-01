@@ -1,12 +1,16 @@
 
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductValidity {
   expires_at?: string | null;
   validity_period?: 'day' | 'week' | 'month' | null;
   daysRemaining?: number;
+  title?: string;
+  product_id?: string;
 }
 
 export const useProductValidity = (productId: string | undefined) => {
@@ -18,7 +22,7 @@ export const useProductValidity = (productId: string | undefined) => {
       try {
         const { data, error } = await supabase
           .from("products")
-          .select("expires_at, validity_period")
+          .select("id, title, expires_at, validity_period")
           .eq("id", productId)
           .single();
           
@@ -37,7 +41,9 @@ export const useProductValidity = (productId: string | undefined) => {
           return {
             expires_at: data.expires_at,
             validity_period: data.validity_period,
-            daysRemaining: Math.max(0, diffDays)
+            daysRemaining: Math.max(0, diffDays),
+            title: data.title,
+            product_id: data.id
           } as ProductValidity;
         }
         
@@ -49,6 +55,79 @@ export const useProductValidity = (productId: string | undefined) => {
     },
     enabled: !!productId
   });
+};
+
+// Hook to monitor product expiration and send notifications
+export const useProductExpiryNotifications = () => {
+  const { session } = useAuth();
+  
+  useEffect(() => {
+    if (!session?.user) return;
+    
+    const checkExpiringProducts = async () => {
+      try {
+        // Get user's products that are published and have expiry dates
+        const { data: products, error } = await supabase
+          .from("products")
+          .select("id, title, expires_at, validity_period")
+          .eq("user_id", session.user.id)
+          .eq("product_status", "published")
+          .not("expires_at", "is", null);
+          
+        if (error) throw error;
+        
+        if (!products || products.length === 0) return;
+        
+        const now = new Date();
+        const productsToNotify: {id: string, title: string, daysLeft: number}[] = [];
+        
+        // Check each product for expiration windows (1, 3, 5 days left)
+        products.forEach(product => {
+          if (!product.expires_at) return;
+          
+          const expiresAt = new Date(product.expires_at);
+          const diffTime = expiresAt.getTime() - now.getTime();
+          const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          // Only notify for 5, 3, or 1 days remaining
+          if ([5, 3, 1].includes(daysLeft)) {
+            productsToNotify.push({
+              id: product.id,
+              title: product.title || "Your product",
+              daysLeft
+            });
+          }
+        });
+        
+        // Create notifications for expiring products
+        for (const product of productsToNotify) {
+          const { error: notifError } = await supabase
+            .from("notifications")
+            .insert({
+              user_id: session.user.id,
+              type: "product_expiry",
+              title: `Product expires soon: ${product.title}`,
+              content: `Your product "${product.title}" will expire in ${product.daysLeft} day${product.daysLeft > 1 ? 's' : ''}. Consider renewing it to keep it visible.`,
+              related_product_id: product.id,
+              link: `/products/${product.id}`
+            });
+            
+          if (notifError) console.error("Error creating notification:", notifError);
+        }
+        
+      } catch (err) {
+        console.error("Error checking expiring products:", err);
+      }
+    };
+    
+    // Check once when component mounts
+    checkExpiringProducts();
+    
+    // Setup interval to check daily
+    const interval = setInterval(checkExpiringProducts, 24 * 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [session]);
 };
 
 // This can be used in a supabase edge function with cron scheduling to check and unpublish expired products

@@ -1,4 +1,3 @@
-
 /* Base styles */
 #root {
   max-width: 1280px;
@@ -357,4 +356,70 @@ video {
 
 .tab-glow.active {
   box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+
+/* Remove focus outline and replace with glow */
+button:focus, 
+a:focus,
+[role="button"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+}
+
+/* Remove default outline on buttons and links */
+button:focus-visible,
+a:focus-visible {
+  outline: none !important;
+}
+
+/* Glow effect for active/focus states instead of outline */
+.active-glow {
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.6) !important;
+  border: none !important;
+}
+
+.active-glow-amber {
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6) !important;
+  border: none !important;
+}
+
+.active-glow-blue {
+  box-shadow: 0 0 8px rgba(14, 165, 233, 0.6) !important;
+  border: none !important;
+}
+
+/* Styling for nav icons and similar UI elements - replace thick borders with glows */
+button.active, 
+a.active,
+[role="button"].active {
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.7) !important;
+  border-color: transparent !important;
+  outline: none !important;
+}
+
+/* Notification image fixes */
+.notification-image {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+/* Improve focus states for accessibility without thick borders */
+:focus {
+  outline: none;
+}
+
+/* Remove thick black borders from navigation elements */
+.navigation-item {
+  border: none !important;
+}
+
+/* Override browser default focus styles */
+*:focus {
+  outline: none !important;
+}
+
+*:focus-visible {
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4) !important;
+  outline: none !important;
 }

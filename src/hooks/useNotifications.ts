@@ -3,21 +3,10 @@ import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { Notification } from '@/types/notification';
 
-export interface Notification {
-  id: string;
-  user_id: string;
-  type: 'review_comment' | 'review_reply' | 'product_message';
-  title: string;
-  content: string;
-  related_product_id: string | null;
-  related_review_id: string | null;
-  read: boolean;
-  created_at: string;
-  link: string | null;
-  thumbnail_url: string | null;
-}
+export { type Notification } from '@/types/notification';
 
 export function useNotifications() {
   const { session } = useAuth();
@@ -80,11 +69,7 @@ export function useNotifications() {
       queryClient.invalidateQueries({ queryKey: ['unreadNotificationsCount'] });
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to mark notification as read",
-        variant: "destructive",
-      });
+      toast.error("Failed to mark notification as read");
       console.error('Error marking notification as read:', error);
     }
   });
@@ -105,17 +90,10 @@ export function useNotifications() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['unreadNotificationsCount'] });
-      toast({
-        title: "Success",
-        description: "All notifications marked as read",
-      });
+      toast.success("All notifications marked as read");
     },
     onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to mark all notifications as read",
-        variant: "destructive",
-      });
+      toast.error("Failed to mark all notifications as read");
       console.error('Error marking all notifications as read:', error);
     }
   });

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { Check, Bell } from 'lucide-react';
+import { ImageLoader } from '@/components/ImageLoader';
 
 interface NotificationListProps {
   onClose?: () => void;
@@ -24,6 +25,17 @@ export const NotificationList = ({ onClose = () => {} }: NotificationListProps) 
       navigate(notification.link);
       onClose();
     }
+  };
+
+  // Helper to generate image URL from storage path
+  const getImageUrl = (path: string | null) => {
+    if (!path) return null;
+    
+    if (path.startsWith('http')) return path;
+    
+    return supabase.storage
+      .from('images')
+      .getPublicUrl(path).data.publicUrl;
   };
 
   return (
@@ -53,7 +65,7 @@ export const NotificationList = ({ onClose = () => {} }: NotificationListProps) 
             <Bell className="h-10 w-10 text-muted-foreground/50 mb-2" />
             <p className="text-sm text-muted-foreground">No notifications yet</p>
             <p className="text-xs text-muted-foreground">
-              You'll see notifications for reviews and replies here
+              You'll see notifications for reviews and product updates here
             </p>
           </div>
         ) : (
@@ -70,15 +82,23 @@ export const NotificationList = ({ onClose = () => {} }: NotificationListProps) 
                 <div className="flex-shrink-0 mt-0.5">
                   {notification.thumbnail_url ? (
                     <div className="h-10 w-10 rounded overflow-hidden bg-muted">
-                      <img 
-                        src={notification.thumbnail_url} 
-                        alt="" 
+                      <ImageLoader 
+                        src={getImageUrl(notification.thumbnail_url) || '/placeholder.svg'}
+                        alt=""
                         className="h-full w-full object-cover"
+                        width={40}
+                        height={40}
                       />
                     </div>
                   ) : (
                     <div className="h-10 w-10 rounded flex items-center justify-center bg-sky-100 dark:bg-sky-900">
-                      <Bell className="h-5 w-5 text-sky-500" />
+                      {notification.type === 'product_expiry' ? (
+                        <Bell className="h-5 w-5 text-amber-500" />
+                      ) : notification.type === 'similar_product' ? (
+                        <Bell className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <Bell className="h-5 w-5 text-sky-500" />
+                      )}
                     </div>
                   )}
                 </div>

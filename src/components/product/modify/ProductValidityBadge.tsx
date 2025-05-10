@@ -18,14 +18,14 @@ export const ProductValidityBadge = ({ productId }: ProductValidityBadgeProps) =
   const daysRemaining = validity.daysRemaining;
   
   // Determine badge styling based on days remaining
-  let badgeStyle = "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+  let badgeStyle = "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 shadow-glow-blue";
   let icon = <Clock className="h-3 w-3 mr-1" />;
   
   if (daysRemaining <= 3) {
-    badgeStyle = "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+    badgeStyle = "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 shadow-glow-red";
     icon = <AlertCircle className="h-3 w-3 mr-1" />;
   } else if (daysRemaining <= 7) {
-    badgeStyle = "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200";
+    badgeStyle = "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 shadow-glow-amber";
   }
   
   const validityLabel = validity.validity_period === 'day' ? '1 Day' : 
@@ -37,7 +37,7 @@ export const ProductValidityBadge = ({ productId }: ProductValidityBadgeProps) =
         <TooltipTrigger asChild>
           <Badge 
             variant="outline" 
-            className={`rounded-full text-xs ${badgeStyle} flex items-center`}
+            className={`rounded-full text-xs ${badgeStyle} flex items-center animate-pulse`}
           >
             {icon}
             {daysRemaining} days left

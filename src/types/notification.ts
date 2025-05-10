@@ -2,7 +2,7 @@
 export interface Notification {
   id: string;
   user_id: string;
-  type: 'review_comment' | 'review_reply' | 'product_message';
+  type: 'review_comment' | 'review_reply' | 'product_message' | 'product_expiry' | 'similar_product';
   title: string;
   content: string;
   related_product_id: string | null;

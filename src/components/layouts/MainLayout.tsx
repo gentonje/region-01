@@ -5,6 +5,7 @@ import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from "@/lib/utils";
+import { useProductExpiryNotifications } from '@/hooks/useProductValidity';
 
 type MainLayoutProps = {
   children?: React.ReactNode;
@@ -31,6 +32,9 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   const isAuthenticated = !!session;
   const isMobile = useIsMobile();
   const [internalSelectedCountry, setInternalSelectedCountry] = useState<string>(selectedCountry);
+  
+  // Initialize product expiry notifications
+  useProductExpiryNotifications();
   
   // Use the prop if provided, otherwise use internal state
   const effectiveSelectedCountry = selectedCountry || internalSelectedCountry;
