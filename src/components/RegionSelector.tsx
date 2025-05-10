@@ -11,6 +11,7 @@ import {
 import { Region } from "@/types/product";
 import { toast } from "sonner";
 import { MapPin } from "lucide-react";
+import { District } from "@/types/districts";
 
 interface RegionSelectorProps {
   selectedRegion: string;
@@ -23,7 +24,7 @@ export const RegionSelector = ({
   onRegionChange,
   selectedCountry = "all", // Default to "all"
 }: RegionSelectorProps) => {
-  const [districts, setDistricts] = useState<Region[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
   const [loading, setLoading] = useState(true);
   const previousCountry = useRef(selectedCountry);
   

@@ -35,6 +35,7 @@ export const CountiesFilter = ({
         
         if (!selectedCountry || selectedCountry === "all") {
           setDistricts([]);
+          setLoading(false);
           return;
         }
         
@@ -73,7 +74,7 @@ export const CountiesFilter = ({
     // Reset county selection when country changes
     if (previousCountry.current !== selectedCountry) {
       console.log("Country changed from", previousCountry.current, "to", selectedCountry, "- resetting county");
-      onCountyChange("");
+      onCountyChange(showAllOption ? "all" : "");
       previousCountry.current = selectedCountry;
     }
   }, [selectedCountry, onCountyChange, selectedCounty, showAllOption]);
@@ -99,7 +100,7 @@ export const CountiesFilter = ({
   return (
     <div className="w-full max-w-xs">
       <Select
-        value={selectedCounty || ""}
+        value={selectedCounty || (showAllOption ? "all" : "")}
         onValueChange={handleDistrictChange}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >

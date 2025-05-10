@@ -13,6 +13,7 @@ import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useCurrencyFix } from "@/hooks/useCurrencyFix";
 import { useProducts } from "@/hooks/useProducts";
 import { supabase } from "@/integrations/supabase/client";
+import { CountrySelector } from "@/components/navigation/CountrySelector";
 
 interface IndexProps {
   selectedCurrency?: SupportedCurrency;
@@ -21,7 +22,7 @@ interface IndexProps {
 
 const Index = ({ 
   selectedCurrency = "USD",
-  selectedCountry = "all", // Default to "all"
+  selectedCountry: propSelectedCountry = "all", // Default to "all"
 }: IndexProps) => {
   // Initialize currency fix
   const { isFixing } = useCurrencyFix();
@@ -31,12 +32,23 @@ const Index = ({
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
+  const [localSelectedCountry, setLocalSelectedCountry] = useState(propSelectedCountry);
   const location = useLocation();
   
   // Get country from context if available
   const countryContext = useSelectedCountry();
-  // Use context value if available, otherwise use "all" as default
-  const effectiveCountry = countryContext?.selectedCountry || "all";
+  // Use context value if available, otherwise use prop or "all" as default
+  const effectiveCountry = countryContext?.selectedCountry || localSelectedCountry || "all";
+
+  useEffect(() => {
+    if (propSelectedCountry !== "all" && propSelectedCountry !== localSelectedCountry) {
+      setLocalSelectedCountry(propSelectedCountry);
+    }
+    
+    if (countryContext?.selectedCountry && countryContext.selectedCountry !== localSelectedCountry) {
+      setLocalSelectedCountry(countryContext.selectedCountry);
+    }
+  }, [propSelectedCountry, countryContext?.selectedCountry, localSelectedCountry]);
 
   // Use our hook to fetch products with infinite scrolling
   const {
@@ -107,6 +119,13 @@ const Index = ({
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
   };
+  
+  const handleCountryChange = (country: string) => {
+    console.log("Country changed in Index to:", country);
+    setLocalSelectedCountry(country);
+    // Reset region when country changes
+    setSelectedRegion("all");
+  };
 
   const getProductImageUrl = (product: Product) => {
     if (
@@ -146,8 +165,15 @@ const Index = ({
           ]}
         />
         
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <div className="flex flex-row gap-2 w-full">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="w-full max-w-xs">
+              <CountrySelector 
+                selectedCountry={effectiveCountry} 
+                onCountryChange={handleCountryChange} 
+              />
+            </div>
+            
             <RegionSelector 
               selectedRegion={selectedRegion} 
               onRegionChange={handleRegionChange}
