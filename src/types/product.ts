@@ -36,7 +36,7 @@ export enum ValidityPeriod {
 
 export interface ProductImage {
   id: string;
-  product_id: string;
+  product_id?: string; // Make product_id optional since it might not be present in all contexts
   storage_path: string;
   is_main: boolean;
   display_order: number;

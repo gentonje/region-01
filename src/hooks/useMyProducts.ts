@@ -73,7 +73,8 @@ export const useMyProducts = () => {
         };
       });
       
-      return typedProducts as Product[];
+      // Use type assertion to inform TypeScript that our data matches the Product interface
+      return typedProducts as unknown as Product[];
     },
   });
 

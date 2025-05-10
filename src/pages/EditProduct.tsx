@@ -60,7 +60,7 @@ const EditProduct = () => {
       };
 
       // Ensure country_id and country are properly handled for the form
-      const typedProduct = productWithUrls as Product;
+      const typedProduct = productWithUrls as unknown as Product;
       typedProduct.country_id = product.country_id || null;
       typedProduct.country = product.country_id ? String(product.country_id) : null;
 
