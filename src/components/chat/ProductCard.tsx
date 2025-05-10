@@ -52,14 +52,14 @@ export const ProductCard = ({ imageUrl, productDetail, index, onClick }: Product
         )}
       </div>
       
-      <div className="p-2 space-y-1 flex-grow">
+      <div className="p-1 space-y-1 flex-grow">
         <h3 className="font-medium text-base truncate font-serif">{productDetail.title}</h3>
         
         <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 font-sans">
           {/* Could add description here if available */}
         </p>
         
-        <div className="flex justify-between items-center space-x-1 mt-2">
+        <div className="flex justify-between items-center space-x-1 mt-1">
           <span className="text-green-600 dark:text-green-400 font-medium text-sm px-2 py-1 bg-green-50 dark:bg-green-900/20 rounded-full">
             {productDetail.currency} {productDetail.price.toLocaleString()}
           </span>

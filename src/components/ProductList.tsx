@@ -61,7 +61,7 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-1">
         {[...Array(8)].map((_, index) => (
           <div key={index} className="flex justify-center p-1">
             <ProductSkeleton />
@@ -83,7 +83,7 @@ export const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-2">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-1">
       {products.map((product, index) => (
         <div
           key={product.id}

@@ -62,13 +62,13 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="space-y-4 w-full mx-0 px-0">
-      <Card className="w-full max-w-none mx-0 overflow-hidden rounded-none sm:rounded-lg sm:mx-auto">
-        <CardContent className="p-0 sm:p-4">
+    <div className="m-1 p-1 space-y-1 w-full mx-auto">
+      <Card className="w-full max-w-7xl mx-auto overflow-hidden rounded-lg sm:rounded-xl shadow-md m-1 p-1">
+        <CardContent className="p-1 sm:p-2">
           <div className="flex flex-col md:flex-row md:gap-4">
             {/* Left column - Product gallery */}
-            <div className="md:w-1/2 space-y-4">
-              <div className="flex items-center mb-1 p-2 sm:p-0">
+            <div className="md:w-1/2 space-y-2">
+              <div className="flex items-center mb-1 p-1 sm:p-0">
                 <button 
                   onClick={onBack} 
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -80,9 +80,9 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-2 sm:px-0">{displayProduct.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-1 sm:px-0">{displayProduct.title}</h1>
               
-              <div className="flex items-center space-x-2 mb-2 px-2 sm:px-0">
+              <div className="flex items-center space-x-2 mb-2 px-1 sm:px-0">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
                   {displayProduct.category || 'Other'}
                 </span>
@@ -102,7 +102,7 @@ const ProductDetail = ({
             </div>
 
             {/* Right column - Tabs with product details and reviews */}
-            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10 px-2 sm:px-0">
+            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10 px-1 sm:px-0">
               <ProductTabs 
                 product={displayProduct}
                 activeTab={activeTab}
@@ -112,7 +112,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-2 sm:p-4">
+        <CardFooter className="p-1 sm:p-2">
           <ProductActions
             price={displayProduct.price || 0}
             currency={displayProduct.currency || "SSP"}
@@ -126,7 +126,7 @@ const ProductDetail = ({
       </Card>
 
       {/* Similar products section - using full width for mobile */}
-      <div className="w-full mx-0 px-0">
+      <div className="w-full m-1 p-1">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}
