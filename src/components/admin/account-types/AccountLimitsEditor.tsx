@@ -20,23 +20,39 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
     setHasChanges(false);
   }, [accountLimits]);
   
-  // Handle input change
+  // Handle input change - modified to handle empty values
   const handleInputChange = (type: keyof AccountLimits, value: string) => {
-    const numValue = parseInt(value);
-    setPendingLimits({
-      ...pendingLimits,
-      [type]: numValue
-    });
+    // Allow empty values to be entered temporarily
+    if (value === '') {
+      setPendingLimits({
+        ...pendingLimits,
+        [type]: ''
+      });
+    } else {
+      // Only parse if there's a value
+      const numValue = parseInt(value);
+      if (!isNaN(numValue)) {
+        setPendingLimits({
+          ...pendingLimits,
+          [type]: numValue
+        });
+      }
+    }
     setHasChanges(true);
   };
   
-  // Handle save button click
+  // Handle save button click - modified to ensure valid numbers
   const handleSave = () => {
     // Update each changed limit
     Object.keys(pendingLimits).forEach((key) => {
       const limitKey = key as keyof AccountLimits;
-      if (pendingLimits[limitKey] !== accountLimits[limitKey]) {
-        onLimitUpdate(limitKey, pendingLimits[limitKey]);
+      const pendingValue = pendingLimits[limitKey];
+      
+      // Convert empty strings to default values
+      const valueToSave = pendingValue === '' ? 0 : pendingValue;
+      
+      if (valueToSave !== accountLimits[limitKey]) {
+        onLimitUpdate(limitKey, valueToSave as number);
       }
     });
     setHasChanges(false);
@@ -50,8 +66,9 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
         <div className="space-y-1">
           <label className="text-sm font-medium">Basic Account</label>
           <Input
-            type="number"
-            value={pendingLimits?.basic || 5}
+            type="text"
+            inputMode="numeric"
+            value={pendingLimits.basic === null ? '' : pendingLimits.basic}
             onChange={(e) => handleInputChange('basic', e.target.value)}
             className="w-full m-1 p-1"
           />
@@ -60,8 +77,9 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
         <div className="space-y-1">
           <label className="text-sm font-medium">Starter Account</label>
           <Input
-            type="number"
-            value={pendingLimits?.starter || 15}
+            type="text"
+            inputMode="numeric"
+            value={pendingLimits.starter === null ? '' : pendingLimits.starter}
             onChange={(e) => handleInputChange('starter', e.target.value)}
             className="w-full m-1 p-1"
           />
@@ -70,8 +88,9 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
         <div className="space-y-1">
           <label className="text-sm font-medium">Premium Account</label>
           <Input
-            type="number"
-            value={pendingLimits?.premium || 30}
+            type="text"
+            inputMode="numeric"
+            value={pendingLimits.premium === null ? '' : pendingLimits.premium}
             onChange={(e) => handleInputChange('premium', e.target.value)}
             className="w-full m-1 p-1"
           />
