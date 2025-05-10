@@ -28,6 +28,7 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
 
   // Log the product data to debug county value
   console.log("Product data in EditProductForm:", product);
+  console.log("Country ID from product:", product?.country_id);
 
   const [formData, setFormData] = useState<ProductFormData>({
     title: product?.title || "",
@@ -62,6 +63,9 @@ export const EditProductForm = ({ product, onSubmit, isLoading }: EditProductFor
         additionalImagePaths = uploadResult.additionalImagePaths;
         console.log("Images uploaded successfully:", { mainImagePath, additionalImagePaths });
       }
+
+      // Log data for debugging
+      console.log("Submitting with country:", data.country, "and county:", data.county);
 
       // Call the parent onSubmit with both form data and image paths
       await onSubmit({

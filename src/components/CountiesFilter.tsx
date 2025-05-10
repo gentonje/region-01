@@ -36,6 +36,8 @@ export const CountiesFilter = ({
           return;
         }
         
+        console.log("Fetching districts for country ID:", selectedCountry);
+        
         // Use districts table for all countries
         const { data, error } = await supabase
           .from("districts")
@@ -49,7 +51,7 @@ export const CountiesFilter = ({
           return;
         }
 
-        console.log("Fetched districts:", data);
+        console.log(`Fetched ${data?.length || 0} districts for country ${selectedCountry}:`, data);
         setDistricts(data || []);
       } catch (error) {
         console.error("Failed to fetch districts:", error);
@@ -61,15 +63,16 @@ export const CountiesFilter = ({
 
     fetchDistricts();
     
-    // Only reset county selection when country changes
+    // Reset county selection when country changes
     if (previousCountry.current !== selectedCountry) {
-      onCountyChange("all");
+      console.log("Country changed from", previousCountry.current, "to", selectedCountry, "- resetting county");
+      onCountyChange("");
       previousCountry.current = selectedCountry;
     }
   }, [selectedCountry, onCountyChange]);
 
   const renderTriggerContent = () => {
-    if (selectedCounty === "all") {
+    if (selectedCounty === "all" || !selectedCounty) {
       return (
         <div className="flex items-center">
           <MapPin className="w-4 h-4 mr-2" />
@@ -89,7 +92,7 @@ export const CountiesFilter = ({
   return (
     <div className="w-full max-w-xs">
       <Select
-        value={selectedCounty}
+        value={selectedCounty || ""}
         onValueChange={handleDistrictChange}
         disabled={loading || !selectedCountry || selectedCountry === "all"}
       >

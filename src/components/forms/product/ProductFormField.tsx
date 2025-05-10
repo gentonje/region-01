@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import {
   FormItem,
@@ -39,6 +39,13 @@ const formatCategoryName = (category: string) => {
 const ProductFormField = ({ form, name, label, type = "text", step, formData, setFormData, disabled = false }: ProductFormFieldProps) => {
   const { field } = useController({ name, control: form.control });
   const [countryId, setCountryId] = useState<string>(formData.country || "1");
+  
+  // Update country ID when formData changes
+  useEffect(() => {
+    if (formData.country) {
+      setCountryId(formData.country);
+    }
+  }, [formData.country]);
   
   // Handle form value changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -104,6 +111,7 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
             onCountryChange={(value) => {
               setFormData({ ...formData, country: value, county: "" });
               setCountryId(value);
+              console.log("Country changed to:", value);
             }}
           />
         );
