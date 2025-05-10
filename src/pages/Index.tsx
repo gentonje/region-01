@@ -4,9 +4,8 @@ import { useLocation } from "react-router-dom";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
-import { RegionSelector } from "@/components/RegionSelector";
 import { CategoryFilter } from "@/components/CategoryFilter";
-import { CountiesFilter } from "@/components/CountiesFilter"; // Add this import
+import { CountiesFilter } from "@/components/CountiesFilter";
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
@@ -168,16 +167,7 @@ const Index = ({
         
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
           <div className="flex flex-col gap-2 w-full">
-            {/* First row with RegionSelector */}
-            <div className="w-full">
-              <RegionSelector 
-                selectedRegion={selectedRegion} 
-                onRegionChange={handleRegionChange}
-                selectedCountry={effectiveCountry}
-              />
-            </div>
-            
-            {/* Second row with county selector and categories side by side */}
+            {/* One row with county selector and categories side by side */}
             <div className="flex flex-row gap-2 w-full">
               <div className="w-1/2">
                 <CountiesFilter 
