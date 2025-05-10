@@ -51,7 +51,8 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Convert empty strings to default values
       const valueToSave = pendingValue === '' ? 0 : pendingValue;
       
-      if (valueToSave !== accountLimits[limitKey]) {
+      // Fix: Use strict equality check or convert types before comparison
+      if (String(valueToSave) !== String(accountLimits[limitKey])) {
         onLimitUpdate(limitKey, valueToSave as number);
       }
     });
