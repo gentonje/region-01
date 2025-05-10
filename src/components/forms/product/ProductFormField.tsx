@@ -99,29 +99,13 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
       
       case "country":
         return (
-          <Select
-            value={formData.country}
-            onValueChange={(value) => {
+          <CountrySelector
+            selectedCountry={formData.country}
+            onCountryChange={(value) => {
               setFormData({ ...formData, country: value, county: "" });
               setCountryId(value);
             }}
-            disabled={disabled}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent>
-              {/* Fix: Don't use renderAsSelectItems here, instead render countries directly */}
-              <SelectItem value="all">All Countries</SelectItem>
-              {/* Use a useQuery hook to fetch countries directly or embed CountrySelector differently */}
-              {/* TEMPORARY WORKAROUND: Just show basic country selector without flag emojis */}
-              <CountrySelector 
-                selectedCountry={formData.country}
-                onCountryChange={() => {}}
-                renderAsSelectItems={false}
-              />
-            </SelectContent>
-          </Select>
+          />
         );
 
       case "validity_period":
