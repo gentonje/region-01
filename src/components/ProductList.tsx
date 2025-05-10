@@ -61,9 +61,9 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full p-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-2">
         {[...Array(8)].map((_, index) => (
-          <div key={index} className="p-1">
+          <div key={index} className="flex justify-center p-1">
             <ProductSkeleton />
           </div>
         ))}
@@ -73,8 +73,8 @@ export const ProductList = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-1 m-1 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 w-full space-y-1">
-        <div className="max-w-md mx-auto px-1 py-4 space-y-1">
+      <div className="text-center py-4 m-2 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto space-y-2">
+        <div className="max-w-md mx-auto px-4 py-6 space-y-2">
           <h3 className="text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-300 font-serif">{emptyMessage}</h3>
           <p className="text-gray-500 dark:text-gray-400 font-sans">Sorry, we don't have that item in stock at the moment. Try adjusting your search or filters.</p>
         </div>
@@ -83,12 +83,12 @@ export const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full m-1 p-1 space-x-1 space-y-1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-2">
       {products.map((product, index) => (
         <div
           key={product.id}
           ref={index === products.length - 1 ? setLastElementRef : undefined}
-          className="transform transition-transform hover:-translate-y-1 duration-300"
+          className="transform transition-transform hover:-translate-y-1 duration-300 flex justify-center"
         >
           <ProductCard
             product={product}
@@ -104,10 +104,10 @@ export const ProductList = ({
       
       {isFetchingNextPage && (
         <>
-          <div className="p-1"><ProductSkeleton /></div>
-          <div className="p-1"><ProductSkeleton /></div>
-          <div className="p-1"><ProductSkeleton /></div>
-          <div className="p-1"><ProductSkeleton /></div>
+          <div className="flex justify-center p-1"><ProductSkeleton /></div>
+          <div className="flex justify-center p-1"><ProductSkeleton /></div>
+          <div className="flex justify-center p-1"><ProductSkeleton /></div>
+          <div className="flex justify-center p-1"><ProductSkeleton /></div>
         </>
       )}
     </div>

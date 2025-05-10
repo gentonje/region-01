@@ -16,7 +16,7 @@ export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
     if (!message.images || message.images.length === 0) return null;
     
     return (
-      <div className="mt-4 grid grid-cols-2 gap-2 w-full m-1 p-1 space-x-1 space-y-1">
+      <div className="mt-4 flex flex-col gap-3 w-full">
         {message.images.map((imageUrl, index) => {
           const productDetail = message.productDetails?.[index] || null;
           return (
