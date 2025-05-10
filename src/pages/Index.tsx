@@ -124,7 +124,7 @@ const Index = ({
 
   if (selectedProduct) {
     return (
-      <div className="container w-full max-w-none py-0 sm:py-2">
+      <div className="w-full mx-0 px-0 py-0">
         <ProductDetail
           product={selectedProduct}
           onBack={() => setSelectedProduct(null)}

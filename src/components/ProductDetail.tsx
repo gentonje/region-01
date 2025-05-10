@@ -62,9 +62,9 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="w-full">
-      <Card className="w-full overflow-hidden shadow-md border-0">
-        <CardContent className="p-0">
+    <div className="w-full mx-0 px-0">
+      <Card className="w-full overflow-hidden shadow-md border-0 rounded-none mx-0">
+        <CardContent className="p-0 m-0">
           <div className="flex flex-col md:flex-row">
             {/* Left column - Product gallery */}
             <div className="md:w-1/2 flex flex-col">
@@ -114,7 +114,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-0">
+        <CardFooter className="p-0 m-0">
           <ProductActions
             price={displayProduct.price || 0}
             currency={displayProduct.currency || "SSP"}
@@ -128,7 +128,7 @@ const ProductDetail = ({
       </Card>
 
       {/* Similar products section - using full width */}
-      <div className="w-full">
+      <div className="w-full m-0 p-0">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}

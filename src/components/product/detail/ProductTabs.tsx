@@ -14,8 +14,8 @@ interface ProductTabsProps {
 
 export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProps) => {
   return (
-    <Tabs defaultValue={activeTab} className="w-full h-full" onValueChange={onTabChange}>
-      <TabsList className="grid grid-cols-2 w-full mb-0">
+    <Tabs defaultValue={activeTab} className="w-full h-full m-0 p-0" onValueChange={onTabChange}>
+      <TabsList className="grid grid-cols-2 w-full mb-0 rounded-none">
         <TabsTrigger value="details" className="flex items-center">
           <Info className="h-4 w-4 mr-1" />
           Details
@@ -27,8 +27,8 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
       </TabsList>
       
       <div className="h-[calc(100%-40px)] overflow-auto">
-        <TabsContent value="details" className="pt-0 h-full m-0">
-          <div className="space-y-1">
+        <TabsContent value="details" className="pt-0 h-full m-0 p-0">
+          <div className="space-y-1 p-1">
             <div className="grid grid-cols-2 gap-x-1 gap-y-1">
               <div className="bg-gray-50 dark:bg-gray-800/50 p-1 rounded-md border border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-muted-foreground">Category</p>
@@ -65,7 +65,7 @@ export const ProductTabs = ({ product, activeTab, onTabChange }: ProductTabsProp
           </div>
         </TabsContent>
 
-        <TabsContent value="reviews" className="pt-0 h-full m-0">
+        <TabsContent value="reviews" className="pt-0 h-full m-0 p-1">
           <Suspense fallback={<Skeleton className="h-48 w-full" />}>
             <ProductReviews 
               productId={product.id} 

@@ -56,8 +56,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   // If no images or images array is empty, show placeholder
   if (!images || images.length === 0) {
     return (
-      <div>
-        <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
+      <div className="m-0 p-0">
+        <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0">
           <ImageLoader
             src="/placeholder.svg"
             alt={title || "Product placeholder"}
@@ -73,8 +73,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   }
 
   return (
-    <div className="p-0">
-      <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
+    <div className="p-0 m-0">
+      <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0">
         <ImageLoader
           src={mainImageUrl}
           alt={title}
@@ -87,7 +87,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
         />
       </div>
       {images.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto pb-1 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="flex gap-1 overflow-x-auto pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {images.map((image, index) => (
             <div
               key={index}
