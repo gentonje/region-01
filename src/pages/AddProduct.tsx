@@ -82,6 +82,7 @@ const AddProduct = () => {
       let mainImagePath;
       try {
         const countryId = Number(productData.country);
+        // Pass category as string for storage organization
         mainImagePath = await uploadProductImage(mainImage, countryId, productData.category.toString());
       } catch (error) {
         console.error("Error uploading main image:", error);
@@ -108,7 +109,7 @@ const AddProduct = () => {
         title: productData.title,
         description: productData.description || "",
         price: parseFloat(productData.price),
-        category: productData.category, // Use the enum value directly
+        category: productData.category.toString(), // Convert enum to string for Supabase
         available_quantity: parseInt(productData.available_quantity),
         user_id: user.id,
         county: productData.county,
@@ -236,4 +237,3 @@ const AddProduct = () => {
 };
 
 export default AddProduct;
-
