@@ -65,7 +65,7 @@ const ProductCard = ({
   }, [onDelete, product.id]);
 
   return (
-    <Card className="w-full max-w-md overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 m-1 p-1 space-y-1 button-glow-outline">
+    <Card className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 m-1 p-1 space-y-1 button-glow-outline">
       <ProductCardImage
         product={product}
         imageUrl={imageUrl}

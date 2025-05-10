@@ -21,12 +21,12 @@ interface ProductSimilarProps {
 }
 
 const ProductSimilarSkeleton = () => (
-  <div className="p-1 mx-0">
-    <div className="space-y-2 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-2 shadow-sm">
+  <div className="w-full m-1 p-1">
+    <div className="w-full space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
       <Skeleton className="h-[150px] w-full rounded-lg" />
-      <Skeleton className="h-5 w-2/3" />
-      <Skeleton className="h-3 w-full" />
-      <div className="flex justify-between mt-2 space-x-2">
+      <Skeleton className="h-5 w-2/3 m-1" />
+      <Skeleton className="h-3 w-full m-1" />
+      <div className="flex justify-between m-1 space-x-1">
         <Skeleton className="h-5 w-16 rounded-md" />
         <Skeleton className="h-5 w-12 rounded-md" />
       </div>
@@ -45,8 +45,8 @@ export const ProductSimilar = ({
 
   if (isLoading) {
     return (
-      <div className="w-full mx-auto px-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0 mx-0 px-0">
+      <div className="w-full mx-auto p-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 m-1 p-1">
           {[...Array(5)].map((_, index) => (
             <ProductSimilarSkeleton key={index} />
           ))}
@@ -58,24 +58,24 @@ export const ProductSimilar = ({
   if (!products?.length) return null;
 
   return (
-    <div className="w-full mx-auto px-0">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-0 mx-0 px-0">
+    <div className="w-full mx-auto p-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1">
         {products.map((similarProduct) => {
           // Initialize wishlist functionality for each product
           const { isInWishlist, toggleWishlist, isPending } = useWishlistMutation(similarProduct.id);
           
           return (
-            <div key={similarProduct.id} className="p-1 mx-0">
+            <div key={similarProduct.id} className="w-full m-1 p-1">
               <Card 
-                className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer"
+                className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer m-1 p-1 space-y-1"
                 onClick={() => onProductClick(similarProduct)}
               >
                 {/* Product Image Section - Matching main card design */}
-                <div className="w-full relative overflow-hidden bg-gray-100 dark:bg-gray-900">
+                <div className="w-full relative overflow-hidden bg-gray-100 dark:bg-gray-900 flex justify-center">
                   {/* Decorative orange element in top left */}
                   <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
                   
-                  <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900">
+                  <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900 w-full">
                     <ImageLoader
                       src={getProductImageUrl(similarProduct)}
                       alt={similarProduct.title || ""}

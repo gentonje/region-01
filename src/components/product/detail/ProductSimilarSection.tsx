@@ -24,12 +24,12 @@ export const ProductSimilarSection = ({
   }
 
   return (
-    <div className="mt-4 w-full mx-0">
-      <div className="flex items-center mb-2 px-1">
+    <div className="w-full m-1 p-1">
+      <div className="flex items-center m-1 p-1">
         <PackageSearch className="h-5 w-5 mr-1" />
         <h3 className="text-lg font-semibold">Similar Products</h3>
       </div>
-      <div className="w-full mx-0 px-0">
+      <div className="w-full">
         <ProductSimilar
           products={similarProducts || []}
           getProductImageUrl={getProductImageUrl}
