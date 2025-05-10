@@ -1,4 +1,6 @@
+
 import { useState, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
@@ -29,6 +31,7 @@ const Index = ({
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
+  const location = useLocation();
   
   // Get country from context if available
   const countryContext = useSelectedCountry();
@@ -53,6 +56,37 @@ const Index = ({
   });
 
   const products = data?.pages.flat() || [];
+
+  // Effect to handle loading a product from navigation state
+  useEffect(() => {
+    // Check if we have a selectedProductId in the location state
+    const locationState = location.state as { selectedProductId?: string } | null;
+    
+    if (locationState?.selectedProductId) {
+      const loadProductDetails = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*, product_images(*), profiles(*)')
+            .eq('id', locationState.selectedProductId)
+            .single();
+            
+          if (error) {
+            console.error('Error loading product from notification:', error);
+          } else if (data) {
+            setSelectedProduct(data as unknown as Product);
+          }
+        } catch (err) {
+          console.error('Error fetching product details:', err);
+        }
+      };
+      
+      loadProductDetails();
+      
+      // Clear the location state to prevent reloading on future navigations
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const loadMoreProducts = useCallback((node?: Element | null) => {
     if (node && hasNextPage && !isFetchingNextPage) {

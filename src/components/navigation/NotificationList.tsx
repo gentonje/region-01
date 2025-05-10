@@ -21,10 +21,23 @@ export const NotificationList = ({ onClose = () => {} }: NotificationListProps) 
     // Mark notification as read
     markAsRead(notification.id);
     
-    // Navigate to the link if provided
+    // Navigate based on notification type and content
     if (notification.link) {
-      navigate(notification.link);
+      // If notification has related product, navigate to product detail
+      if (notification.related_product_id && notification.link.includes('/products/')) {
+        // First close the notification panel
+        onClose();
+        // Then navigate to the product detail page
+        navigate(`/products`, { state: { selectedProductId: notification.related_product_id } });
+      } else {
+        // For other links, just navigate directly
+        navigate(notification.link);
+        onClose();
+      }
+    } else if (notification.related_product_id) {
+      // Fallback if link is not provided but product ID is
       onClose();
+      navigate(`/products`, { state: { selectedProductId: notification.related_product_id } });
     }
   };
 
@@ -77,8 +90,17 @@ export const NotificationList = ({ onClose = () => {} }: NotificationListProps) 
                 className={`
                   flex items-start gap-3 p-3 cursor-pointer hover:bg-accent/50 border-b last:border-b-0
                   ${notification.read ? 'bg-background' : 'bg-accent/20'}
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
                 `}
                 onClick={() => handleNotificationClick(notification)}
+                tabIndex={0}
+                role="button"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNotificationClick(notification);
+                  }
+                }}
               >
                 <div className="flex-shrink-0 mt-0.5">
                   {notification.thumbnail_url ? (
