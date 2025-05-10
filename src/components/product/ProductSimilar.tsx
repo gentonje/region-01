@@ -23,7 +23,7 @@ interface ProductSimilarProps {
 const ProductSimilarSkeleton = () => (
   <div className="w-full">
     <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
-      <Skeleton className="h-[150px] w-full" />
+      <Skeleton className="h-[120px] w-full" />
       <Skeleton className="h-5 w-2/3 m-1" />
       <Skeleton className="h-3 w-full m-1" />
       <div className="flex justify-between m-1 space-x-1">

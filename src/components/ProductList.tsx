@@ -1,4 +1,3 @@
-
 import React, { useCallback, memo } from "react";
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
@@ -22,12 +21,12 @@ interface ProductListProps {
 
 const ProductSkeleton = memo(() => (
   <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
-    <Skeleton className="h-[200px] w-full" />
-    <Skeleton className="h-6 w-2/3 m-1" />
+    <Skeleton className="h-[168px] w-full" /> {/* 4:3 aspect ratio at the default width */}
+    <Skeleton className="h-4 w-2/3 m-1" />
     <Skeleton className="h-4 w-full m-1" />
     <div className="flex justify-between m-1 space-x-1">
-      <Skeleton className="h-6 w-20 rounded-md" />
-      <Skeleton className="h-6 w-16 rounded-md" />
+      <Skeleton className="h-5 w-20 rounded-md" />
+      <Skeleton className="h-5 w-16 rounded-md" />
     </div>
   </div>
 ));

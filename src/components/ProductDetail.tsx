@@ -80,19 +80,21 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 p-1">{displayProduct.title}</h1>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100 p-1">
+                {displayProduct.title}
+              </h1>
               
               <div className="flex items-center space-x-2 p-1 w-full">
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
+                <span className="px-2 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
                   {displayProduct.category || 'Other'}
                 </span>
-                <span className={`px-2 py-1 ${displayProduct.in_stock ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'} rounded-full text-xs`}>
+                <span className={`px-2 py-0.5 ${displayProduct.in_stock ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'} rounded-full text-xs`}>
                   {displayProduct.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
               </div>
 
               <div className="w-full">
-                <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full" />}>
+                <Suspense fallback={<Skeleton className="aspect-[4/3] w-full" />}>
                   <ProductGallery
                     images={displayProduct.product_images || []}
                     selectedImage={selectedImage}

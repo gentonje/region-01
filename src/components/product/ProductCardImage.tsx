@@ -73,8 +73,8 @@ export const ProductCardImage = memo(({
       {/* Decorative orange element in top left with lower z-index */}
       <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
       
-      {/* Using AspectRatio component for 4:3 ratio */}
-      <AspectRatio ratio={1/1} className="bg-gray-100 dark:bg-gray-900">
+      {/* Using AspectRatio component to match similar product card height */}
+      <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900">
         <ImageLoader
           src={imageUrl}
           alt={product.title || ""}

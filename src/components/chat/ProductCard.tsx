@@ -29,7 +29,7 @@ export const ProductCard = ({ imageUrl, productDetail, index, onClick }: Product
       onClick={onClick}
     >
       <div className="relative w-full overflow-hidden flex justify-center">
-        <AspectRatio ratio={16/9} className="bg-gray-100 dark:bg-gray-900 w-full">
+        <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900 w-full">
           <ImageLoader
             src={imageUrl}
             alt={productDetail?.title || `Product image ${index + 1}`}
@@ -53,14 +53,14 @@ export const ProductCard = ({ imageUrl, productDetail, index, onClick }: Product
       </div>
       
       <div className="p-1 space-y-1 flex-grow">
-        <h3 className="font-medium text-base truncate font-serif">{productDetail.title}</h3>
+        <h3 className="font-medium text-xs truncate font-serif">{productDetail.title}</h3>
         
-        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 font-sans">
+        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1 font-sans">
           {/* Could add description here if available */}
         </p>
         
-        <div className="flex justify-between items-center space-x-1 m-1">
-          <span className="text-green-600 dark:text-green-400 font-medium text-sm px-1 py-1 bg-green-50 dark:bg-green-900/20 rounded-full">
+        <div className="flex justify-between items-center space-x-1">
+          <span className="text-green-600 dark:text-green-400 font-medium text-xs px-1 py-0.5 bg-green-50 dark:bg-green-900/20 rounded-full">
             {productDetail.currency} {productDetail.price.toLocaleString()}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400 truncate flex items-center">
