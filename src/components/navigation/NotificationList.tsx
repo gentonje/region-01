@@ -7,6 +7,7 @@ import { useNotifications, Notification } from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
 import { Check, Bell } from 'lucide-react';
 import { ImageLoader } from '@/components/ImageLoader';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NotificationListProps {
   onClose?: () => void;

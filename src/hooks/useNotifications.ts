@@ -118,10 +118,9 @@ export function useNotifications() {
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
           queryClient.invalidateQueries({ queryKey: ['unreadNotificationsCount'] });
           
-          // Show toast notification
+          // Show toast notification for new notification
           const notification = payload.new as Notification;
-          toast({
-            title: notification.title,
+          toast(notification.title, {
             description: notification.content,
           });
         }

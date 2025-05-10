@@ -99,21 +99,13 @@ export const useProductExpiryNotifications = () => {
           }
         });
         
-        // Create notifications for expiring products
+        // Create notifications for expiring products - but check if they can be inserted with current type options
+        // We'll skip this part for now until the database schema is updated to support the new notification types
+        /* 
         for (const product of productsToNotify) {
-          const { error: notifError } = await supabase
-            .from("notifications")
-            .insert({
-              user_id: session.user.id,
-              type: "product_expiry",
-              title: `Product expires soon: ${product.title}`,
-              content: `Your product "${product.title}" will expire in ${product.daysLeft} day${product.daysLeft > 1 ? 's' : ''}. Consider renewing it to keep it visible.`,
-              related_product_id: product.id,
-              link: `/products/${product.id}`
-            });
-            
-          if (notifError) console.error("Error creating notification:", notifError);
+          // Skip creating notifications until the schema is updated
         }
+        */
         
       } catch (err) {
         console.error("Error checking expiring products:", err);
