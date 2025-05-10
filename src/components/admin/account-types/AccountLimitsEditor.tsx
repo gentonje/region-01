@@ -1,6 +1,9 @@
 
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { AccountLimits } from "@/types/product";
+import { Save } from "lucide-react";
 
 interface AccountLimitsEditorProps {
   accountLimits: AccountLimits;
@@ -8,6 +11,37 @@ interface AccountLimitsEditorProps {
 }
 
 export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLimitsEditorProps) => {
+  const [pendingLimits, setPendingLimits] = useState<AccountLimits>(accountLimits);
+  const [hasChanges, setHasChanges] = useState(false);
+  
+  // Update pending limits when accountLimits prop changes
+  useEffect(() => {
+    setPendingLimits(accountLimits);
+    setHasChanges(false);
+  }, [accountLimits]);
+  
+  // Handle input change
+  const handleInputChange = (type: keyof AccountLimits, value: string) => {
+    const numValue = parseInt(value);
+    setPendingLimits({
+      ...pendingLimits,
+      [type]: numValue
+    });
+    setHasChanges(true);
+  };
+  
+  // Handle save button click
+  const handleSave = () => {
+    // Update each changed limit
+    Object.keys(pendingLimits).forEach((key) => {
+      const limitKey = key as keyof AccountLimits;
+      if (pendingLimits[limitKey] !== accountLimits[limitKey]) {
+        onLimitUpdate(limitKey, pendingLimits[limitKey]);
+      }
+    });
+    setHasChanges(false);
+  };
+
   return (
     <div className="p-1 border rounded-lg bg-white dark:bg-gray-800 w-full">
       <h3 className="text-md font-semibold m-1">Product Upload Limits</h3>
@@ -17,9 +51,10 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
           <label className="text-sm font-medium">Basic Account</label>
           <Input
             type="number"
-            value={accountLimits?.basic || 5}
-            onChange={(e) => onLimitUpdate('basic', parseInt(e.target.value))}
-            className="w-full m-1 p-1"
+            value={pendingLimits?.basic || 5}
+            readOnly
+            disabled
+            className="w-full m-1 p-1 bg-gray-100 cursor-not-allowed"
           />
         </div>
         
@@ -27,8 +62,8 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
           <label className="text-sm font-medium">Starter Account</label>
           <Input
             type="number"
-            value={accountLimits?.starter || 15}
-            onChange={(e) => onLimitUpdate('starter', parseInt(e.target.value))}
+            value={pendingLimits?.starter || 15}
+            onChange={(e) => handleInputChange('starter', e.target.value)}
             className="w-full m-1 p-1"
           />
         </div>
@@ -37,12 +72,25 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
           <label className="text-sm font-medium">Premium Account</label>
           <Input
             type="number"
-            value={accountLimits?.premium || 30}
-            onChange={(e) => onLimitUpdate('premium', parseInt(e.target.value))}
+            value={pendingLimits?.premium || 30}
+            onChange={(e) => handleInputChange('premium', e.target.value)}
             className="w-full m-1 p-1"
           />
         </div>
       </div>
+      
+      {hasChanges && (
+        <div className="flex justify-end mt-2">
+          <Button 
+            onClick={handleSave}
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <Save className="h-4 w-4" />
+            Save Changes
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
