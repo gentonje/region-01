@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import ProductList from "@/components/ProductList";
 import { ProductFilters } from "@/components/ProductFilters";

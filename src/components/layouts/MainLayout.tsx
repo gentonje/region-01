@@ -24,7 +24,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   searchQuery = '',
   onSearchChange,
-  selectedCountry = "all", // Default to "all"
+  selectedCountry = "all", // Always default to "all"
   setSelectedCountry = () => {}, // Provide default empty function
 }) => {
   const { session } = useAuth();

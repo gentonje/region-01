@@ -24,7 +24,7 @@ interface NavigationProps {
 export const Navigation = ({ 
   searchQuery = "", 
   onSearchChange,
-  selectedCountry = "1", // Default to Kenya (id: 1)
+  selectedCountry = "all", // Default to all countries
   onCountryChange = () => {}
 }: NavigationProps) => {
   const navigate = useNavigate();

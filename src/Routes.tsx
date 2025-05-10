@@ -46,8 +46,8 @@ const PageLoader = () => (
 export const Routes = () => {
   const { session, loading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  // Default country for testing is Sudan (you'd fetch this from user preferences or IP detection)
-  const [selectedCountry, setSelectedCountry] = useState("1");
+  // Default to "all" countries instead of a specific country ID
+  const [selectedCountry, setSelectedCountry] = useState("all");
 
   if (loading) {
     return <PageLoader />;

@@ -18,7 +18,7 @@ export const useProducts = ({
   searchQuery, 
   selectedCategory, 
   selectedRegion = "all",
-  selectedCountry = "1", // Default to Kenya (id: 1)
+  selectedCountry = "all", // Default to "all" instead of "1"
   sortOrder,
   showOnlyPublished = false,
   userOnly = false,
