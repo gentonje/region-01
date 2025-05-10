@@ -73,7 +73,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   }
 
   return (
-    <div>
+    <div className="p-0">
       <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
         <ImageLoader
           src={mainImageUrl}
