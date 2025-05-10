@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { CountrySelector } from "./navigation/CountrySelector";
 
 interface NavigationProps {
   searchQuery?: string;
@@ -111,9 +113,11 @@ export const Navigation = ({
         >
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center h-14">
-              {/* Remove the CountrySelector from here */}
               <div className="flex justify-center">
-                {/* Left area can be used for other navigation elements if needed */}
+                <CountrySelector 
+                  selectedCountry={selectedCountry} 
+                  onCountryChange={onCountryChange} 
+                />
               </div>
 
               <div className="flex items-center gap-2">

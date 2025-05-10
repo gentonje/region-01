@@ -33,33 +33,40 @@ export const CountiesFilter = ({
       try {
         setLoading(true);
         
-        if (!selectedCountry || selectedCountry === "all") {
+        // Always fetch districts for the selected country, even if it's "all"
+        // This ensures the dropdown is enabled but just shows no districts
+        if (selectedCountry) {
+          console.log("Fetching districts for country ID:", selectedCountry);
+          
+          // Skip the fetch if the country is "all", but don't disable the control
+          if (selectedCountry === "all") {
+            setDistricts([]);
+            setLoading(false);
+            return;
+          }
+          
+          // Use districts table for all countries
+          const { data, error } = await supabase
+            .from("districts")
+            .select("id, name")
+            .eq("country_id", Number(selectedCountry))
+            .order("name");
+
+          if (error) {
+            console.error("Error fetching districts:", error);
+            toast.error("Failed to load districts");
+            return;
+          }
+
+          console.log(`Fetched ${data?.length || 0} districts for country ${selectedCountry}:`, data);
+          setDistricts(data || []);
+          
+          // Auto-select first district if we have districts and all option is disabled
+          if (!showAllOption && data && data.length > 0 && (!selectedCounty || selectedCounty === "all")) {
+            onCountyChange(data[0].name);
+          }
+        } else {
           setDistricts([]);
-          setLoading(false);
-          return;
-        }
-        
-        console.log("Fetching districts for country ID:", selectedCountry);
-        
-        // Use districts table for all countries
-        const { data, error } = await supabase
-          .from("districts")
-          .select("id, name")
-          .eq("country_id", Number(selectedCountry))
-          .order("name");
-
-        if (error) {
-          console.error("Error fetching districts:", error);
-          toast.error("Failed to load districts");
-          return;
-        }
-
-        console.log(`Fetched ${data?.length || 0} districts for country ${selectedCountry}:`, data);
-        setDistricts(data || []);
-        
-        // Auto-select first district if we have districts and all option is disabled
-        if (!showAllOption && data && data.length > 0 && (!selectedCounty || selectedCounty === "all")) {
-          onCountyChange(data[0].name);
         }
       } catch (error) {
         console.error("Failed to fetch districts:", error);
@@ -98,15 +105,16 @@ export const CountiesFilter = ({
   };
 
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-full">
       <Select
         value={selectedCounty || (showAllOption ? "all" : "")}
         onValueChange={handleDistrictChange}
-        disabled={loading || !selectedCountry || selectedCountry === "all"}
+        // Only disable when the selectedCountry is explicitly undefined
+        disabled={loading || selectedCountry === undefined}
       >
         <SelectTrigger className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <SelectValue>
-            {!selectedCountry || selectedCountry === "all" ? (
+            {selectedCountry === undefined ? (
               "Select country first"
             ) : loading ? (
               "Loading districts..."
