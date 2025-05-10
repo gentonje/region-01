@@ -14,6 +14,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { uploadProductImage } from "@/utils/uploadImage";
 
+// Define accepted category types for Supabase
+type ProductCategoryType = "Electronics" | "Clothing" | "Home & Garden" | "Books" | 
+                          "Sports & Outdoors" | "Toys & Games" | "Health & Beauty" | 
+                          "Automotive" | "Food & Beverages" | "Other";
+
 const AddProduct = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -82,7 +87,7 @@ const AddProduct = () => {
       let mainImagePath;
       try {
         const countryId = Number(productData.country);
-        // Pass category as string for storage organization
+        // Convert category to string for storage organization
         mainImagePath = await uploadProductImage(mainImage, countryId, productData.category.toString());
       } catch (error) {
         console.error("Error uploading main image:", error);
@@ -109,8 +114,8 @@ const AddProduct = () => {
         title: productData.title,
         description: productData.description || "",
         price: parseFloat(productData.price),
-        // Convert ProductCategory enum to one of the accepted string literal types
-        category: productData.category as unknown as Database["public"]["Enums"]["product_category"],
+        // Cast the enum value as a string literal type that Supabase expects
+        category: productData.category.toString() as ProductCategoryType,
         available_quantity: parseInt(productData.available_quantity),
         user_id: user.id,
         county: productData.county,
