@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useController, useFormContext } from "react-hook-form";
 import {
@@ -85,9 +86,9 @@ const ProductFormField = ({ form, name, label, type = "text", step, formData, se
               <SelectValue placeholder="Select category" />
             </SelectTrigger>
             <SelectContent>
-              {Object.values(ProductCategory).map((category) => (
-                <SelectItem key={category} value={category}>
-                  {formatCategoryName(category)}
+              {Object.entries(ProductCategory).map(([key, value]) => (
+                <SelectItem key={key} value={value}>
+                  {formatCategoryName(value)}
                 </SelectItem>
               ))}
             </SelectContent>

@@ -39,7 +39,8 @@ export const CategoryFilter = ({
         // Pre-defined categories if the table doesn't have data yet
         const productCategories = Object.values(ProductCategory);
         
-        setCategories(data?.map(c => c.name) || productCategories);
+        // Make sure we convert to string[] properly
+        setCategories(data?.map(c => c.name as string) || productCategories);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       } finally {

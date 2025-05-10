@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Region } from "@/types/product";
 import { toast } from "sonner";
 import { MapPin } from "lucide-react";
 import { District } from "@/types/districts";
