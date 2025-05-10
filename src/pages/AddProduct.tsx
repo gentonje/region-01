@@ -108,7 +108,7 @@ const AddProduct = () => {
         title: productData.title,
         description: productData.description || "",
         price: parseFloat(productData.price),
-        category: productData.category,
+        category: productData.category.toString(), // Convert enum to string for Supabase
         available_quantity: parseInt(productData.available_quantity),
         user_id: user.id,
         county: productData.county,
