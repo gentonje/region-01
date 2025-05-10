@@ -99,7 +99,7 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
               <ImageLoader
                 src={thumbnailUrls[image.storage_path] || ''}
                 alt={`${title} ${index + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 width={60}
                 height={60}
                 priority={false}

@@ -79,7 +79,7 @@ export const ProductSimilar = ({
                     <ImageLoader
                       src={getProductImageUrl(similarProduct)}
                       alt={similarProduct.title || ""}
-                      className="w-full h-full object-cover opacity-100 dark:opacity-90"
+                      className="w-full h-full object-contain opacity-100 dark:opacity-90"
                       width={400}
                       height={300}
                       priority={false}
