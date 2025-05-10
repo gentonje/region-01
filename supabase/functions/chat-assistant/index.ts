@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
@@ -10,7 +11,7 @@ const corsHeaders = {
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') || 'AIzaSyCj6SIxmupgV2Fg0mlUB_-joeU7L44jpDI';
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
-// Function to extract search criteria from user query with improved price range detection
+// Function to extract search criteria from user query with improved criteria extraction
 const extractSearchCriteria = (query) => {
   console.log("Extracting search criteria from query:", query);
   
@@ -69,6 +70,35 @@ const extractSearchCriteria = (query) => {
         country = '5'; // Rwanda country_id
       }
     }
+    
+    // Region/district extraction - new!
+    const regionPattern = /(?:in|from|at)\s+([a-zA-Z\s]+?)\s+(?:region|district|area|county)/i;
+    const regionMatch = query.match(regionPattern);
+    let region = null;
+    
+    if (regionMatch) {
+      region = regionMatch[1].trim().toLowerCase();
+    }
+    
+    // Date range extraction - new!
+    let dateRange = null;
+    
+    if (query.toLowerCase().includes('today')) {
+      dateRange = 'today';
+    } else if (query.toLowerCase().includes('yesterday')) {
+      dateRange = 'yesterday';
+    } else if (query.toLowerCase().includes('this week')) {
+      dateRange = 'this_week';
+    } else if (query.toLowerCase().includes('last week')) {
+      dateRange = 'last_week';
+    } else if (query.toLowerCase().includes('this month')) {
+      dateRange = 'this_month';
+    } else if (query.toLowerCase().includes('last month')) {
+      dateRange = 'last_month';
+    }
+    
+    // "On offer" detection - new!
+    const isOnOffer = /on\s+offer|special\s+offer|discount|sale/i.test(query);
     
     // Enhanced category extraction with multiple categories
     const categoryMapping = {
@@ -131,14 +161,49 @@ const extractSearchCriteria = (query) => {
       }
     }
     
+    // Extract product title specific keywords
+    const titleKeywords = [];
+    const productNames = [
+      'iPhone', 'Samsung', 'Nokia', 'Huawei', 'Xiaomi', 'Tecno', 'Infinix', 
+      'Sony', 'LG', 'Panasonic', 'Hisense', 'Dell', 'HP', 'Lenovo', 'Asus',
+      'Toyota', 'Honda', 'Nissan', 'Mazda', 'Hyundai', 'Kia'
+    ];
+    
+    for (const name of productNames) {
+      if (query.toLowerCase().includes(name.toLowerCase())) {
+        titleKeywords.push(name);
+      }
+    }
+    
     console.log("Extracted search criteria:", { 
-      minPrice, maxPrice, currency, country, category 
+      minPrice, maxPrice, currency, country, region, category, 
+      dateRange, isOnOffer, titleKeywords 
     });
     
-    return { minPrice, maxPrice, currency, country, category };
+    return { 
+      minPrice, 
+      maxPrice, 
+      currency, 
+      country, 
+      region, 
+      category, 
+      dateRange,
+      isOnOffer,
+      titleKeywords
+    };
   } catch (error) {
     console.error("Error extracting search criteria:", error);
-    return { minPrice: null, maxPrice: null, currency: null, country: null, category: null };
+    return { 
+      minPrice: null, 
+      maxPrice: null, 
+      currency: null, 
+      country: null, 
+      region: null, 
+      category: null,
+      dateRange: null,
+      isOnOffer: false,
+      titleKeywords: []
+    };
   }
 };
 
@@ -185,7 +250,7 @@ const getImageUrl = (supabaseClient, storagePath) => {
 const formatProductResults = (supabaseClient, products, originalCurrency, countryName = null) => {
   if (!products || products.length === 0) {
     // Provide brief response when no products are found
-    let noResultsMessage = "No matching products found.";
+    let noResultsMessage = "Sorry, I don't have that item in stock at the moment. Would you like to see similar products instead?";
     return { 
       text: noResultsMessage,
       images: [],
@@ -205,7 +270,7 @@ const formatProductResults = (supabaseClient, products, originalCurrency, countr
       title: product.title || "Unnamed product",
       price: product.price || 0,
       currency: product.currency || "USD",
-      location: product.country_name || "Unknown location",
+      location: product.county || product.country_name || "Unknown location",
       inStock: product.in_stock !== false
     };
     
@@ -238,6 +303,58 @@ const formatProductResults = (supabaseClient, products, originalCurrency, countr
     images: imageUrls,
     productDetails: productDetails
   };
+};
+
+// Helper function to apply date range filters
+const applyDateFilter = (query, dateRange) => {
+  if (!dateRange) return query;
+  
+  const now = new Date();
+  let startDate, endDate;
+  
+  switch (dateRange) {
+    case 'today':
+      startDate = new Date(now.setHours(0, 0, 0, 0));
+      endDate = new Date();
+      break;
+    case 'yesterday':
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - 1);
+      startDate.setHours(0, 0, 0, 0);
+      
+      endDate = new Date(now);
+      endDate.setDate(endDate.getDate() - 1);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    case 'this_week':
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - startDate.getDay());
+      startDate.setHours(0, 0, 0, 0);
+      
+      endDate = new Date();
+      break;
+    case 'last_week':
+      startDate = new Date(now);
+      startDate.setDate(startDate.getDate() - startDate.getDay() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      
+      endDate = new Date(now);
+      endDate.setDate(endDate.getDate() - endDate.getDay() - 1);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    case 'this_month':
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date();
+      break;
+    case 'last_month':
+      startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      endDate = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+      break;
+    default:
+      return query;
+  }
+  
+  return query.gte('created_at', startDate.toISOString()).lte('created_at', endDate.toISOString());
 };
 
 serve(async (req) => {
@@ -293,7 +410,8 @@ serve(async (req) => {
       /between.*and/i, /under/i, /below/i, /cheaper/i, /expensive/i,
       /show me/i, /display/i, /picture/i, /image/i, /photo/i,
       /car/i, /mobile/i, /phone/i, /tv/i, /laptop/i, /electronics/i,
-      /less than/i, /lee than/i, /juba/i
+      /less than/i, /lee than/i, /juba/i, /from/i, /region/i, /district/i,
+      /today/i, /yesterday/i, /this week/i, /last week/i, /offer/i, /discount/i
     ];
     
     const isProductSearch = productSearchPatterns.some(pattern => pattern.test(query));
@@ -303,7 +421,17 @@ serve(async (req) => {
       console.log("Detected product search query, processing directly...");
       
       // Extract search criteria from the query
-      const { minPrice, maxPrice, currency, country, category } = extractSearchCriteria(query);
+      const { 
+        minPrice, 
+        maxPrice, 
+        currency, 
+        country, 
+        region, 
+        category,
+        dateRange,
+        isOnOffer, 
+        titleKeywords 
+      } = extractSearchCriteria(query);
       
       // Get country name for better error messages
       let countryName = null;
@@ -328,6 +456,7 @@ serve(async (req) => {
             in_stock,
             currency,
             country_id,
+            county,
             product_images (
               id,
               storage_path,
@@ -342,11 +471,28 @@ serve(async (req) => {
           productQuery = productQuery.eq("category", category);
         }
         
+        // Apply title keyword search if available
+        if (titleKeywords && titleKeywords.length > 0) {
+          titleKeywords.forEach(keyword => {
+            productQuery = productQuery.ilike('title', `%${keyword}%`);
+          });
+        }
+        
         // Search for "Juba" specifically - common use case
         if (query.toLowerCase().includes('juba')) {
           productQuery = productQuery.eq("country_id", 3); // South Sudan ID
         } else if (country) {
           productQuery = productQuery.eq("country_id", parseInt(country));
+        }
+        
+        // Apply region/district filter if available
+        if (region) {
+          productQuery = productQuery.ilike("county", `%${region}%`);
+        }
+        
+        // Apply date range filter if specified
+        if (dateRange) {
+          productQuery = applyDateFilter(productQuery, dateRange);
         }
         
         // Handle price filtering (use original price in product's currency)

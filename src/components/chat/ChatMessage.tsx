@@ -16,7 +16,7 @@ export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
     if (!message.images || message.images.length === 0) return null;
     
     return (
-      <div className="mt-4 grid grid-cols-2 gap-2 w-full">
+      <div className="mt-4 grid grid-cols-2 gap-2 w-full m-1 p-1 space-x-1 space-y-1">
         {message.images.map((imageUrl, index) => {
           const productDetail = message.productDetails?.[index] || null;
           return (
@@ -40,7 +40,7 @@ export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
   return (
     <div
       className={cn(
-        "flex w-full",
+        "flex w-full p-1 m-1 space-y-1",
         message.role === 'user' ? 'justify-end' : 'justify-start'
       )}
     >
@@ -70,7 +70,7 @@ export const ChatMessage = ({ message, onProductClick }: ChatMessageProps) => {
           )}
         >
           {/* Message text content */}
-          <div className="whitespace-pre-wrap">{message.content}</div>
+          <div className="whitespace-pre-wrap font-sans">{message.content}</div>
           
           {/* Product details with images */}
           {renderProductDetails(message)}

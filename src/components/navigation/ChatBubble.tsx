@@ -23,6 +23,7 @@ export const ChatBubble = () => {
   const navigate = useNavigate();
   const [isFocused, setIsFocused] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Only show on main products page
   const shouldShowBubble = location.pathname === '/products';
@@ -118,27 +119,17 @@ export const ChatBubble = () => {
 
   const handleProductClick = async (productId: string) => {
     try {
-      // Fetch the product details
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', productId)
-        .single();
-
-      if (error) throw error;
+      // Navigate to product detail based on the product ID
+      console.log("Opening product:", productId);
+      navigate(`/products/${productId}`);
       
-      if (data) {
-        // Close chat
-        setIsOpen(false);
-        
-        // Navigate to product detail
-        navigate(`/products/${productId}`);
-        
-        toast({
-          title: "Opening product",
-          description: `Loading ${data.title}...`,
-        });
-      }
+      // Close chat
+      setIsOpen(false);
+      
+      toast({
+        title: "Opening product",
+        description: `Loading product details...`,
+      });
     } catch (err) {
       console.error('Error opening product:', err);
       toast({
@@ -180,11 +171,16 @@ export const ChatBubble = () => {
         style={{ height: isOpen ? '100%' : 'auto' }}
       >
         <ChatHeader onClose={toggleChat} onClear={handleClearChat} />
-        <ChatMessages 
-          messages={messages} 
-          isLoading={isLoading} 
-          onProductClick={handleProductClick}
-        />
+        <div 
+          ref={messagesContainerRef}
+          className="flex-1 overflow-hidden flex flex-col"
+        >
+          <ChatMessages 
+            messages={messages} 
+            isLoading={isLoading} 
+            onProductClick={handleProductClick}
+          />
+        </div>
         <ChatInput
           ref={inputRef}
           value={messageInput}

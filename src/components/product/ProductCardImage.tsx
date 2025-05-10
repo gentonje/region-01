@@ -53,7 +53,7 @@ export const ProductCardImage = memo(({
 
   return (
     <div 
-      className="w-full relative overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-900"
+      className="w-full relative overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-900 m-1"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
@@ -63,7 +63,7 @@ export const ProductCardImage = memo(({
       <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
       
       {/* Using AspectRatio component for 4:3 ratio */}
-      <AspectRatio ratio={4/3} className="bg-gray-100 dark:bg-gray-900">
+      <AspectRatio ratio={1/1} className="bg-gray-100 dark:bg-gray-900">
         <ImageLoader
           src={imageUrl}
           alt={product.title || ""}
@@ -120,7 +120,7 @@ export const ProductCardImage = memo(({
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 button-shadow-none"
+            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 button-shadow-none m-1"
             onClick={handleWishlistClick}
             disabled={isPending}
             aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}

@@ -43,20 +43,21 @@ export const ProductCardContent = memo(({
   const showBothPrices = product.currency !== selectedCurrency && product.currency;
 
   return (
-    <CardContent className="p-0 space-y-1">
+    <CardContent className="p-1 space-y-1">
       <div className="pt-0">
-        <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 min-w-[100px] text-left px-1">
+        <CardTitle className="text-sm font-medium truncate text-gray-800 dark:text-gray-100 px-1 font-serif">
           {product.title}
         </CardTitle>
       </div>
       
       <div className="h-[20px] overflow-hidden px-1">
-        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1">
+        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-1 font-sans">
           {product.description}
         </p>
       </div>
-      <div className="flex justify-between items-center pt-0 px-1 pb-1">
-        <div className="flex items-center space-x-2">
+      
+      <div className="flex justify-between items-center pt-0 px-1 pb-1 space-x-1">
+        <div className="flex items-center space-x-1">
           {showBothPrices && (
             <span className="text-xs px-1 py-0.5 rounded-full bg-green-100 text-green-800 font-medium whitespace-nowrap inline-block">
               {product.currency} {Math.round(product.price || 0).toLocaleString()}
@@ -67,13 +68,13 @@ export const ProductCardContent = memo(({
           }`}>
             {selectedCurrency} {Math.round(convertedPrice).toLocaleString()}
           </span>
-          
-          {product.views !== undefined && product.views > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {Math.round(product.views)} Views
-            </Badge>
-          )}
         </div>
+        
+        {product.views !== undefined && product.views > 0 && (
+          <Badge variant="secondary" className="text-xs">
+            {Math.round(product.views)} Views
+          </Badge>
+        )}
       </div>
     </CardContent>
   );
