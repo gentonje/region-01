@@ -37,6 +37,14 @@ const AddProduct = () => {
     }
   }, [isProfileComplete, isLoading, navigate]);
 
+  // This function adapts the useState setter to what ProductForm expects
+  const handleFormDataChange = (data: Partial<typeof formData>) => {
+    setFormData(currentData => ({
+      ...currentData,
+      ...data
+    }));
+  };
+
   const handleSubmit = async (productData: typeof formData) => {
     // This would be implemented with actual product submission code
     // It's just a placeholder to satisfy the type requirements
@@ -93,7 +101,7 @@ const AddProduct = () => {
           <h1 className="text-2xl font-bold">Add New Product</h1>
           <ProductForm 
             formData={formData}
-            setFormData={setFormData}
+            setFormData={handleFormDataChange}
             isLoading={isSubmitting}
             submitButtonText="Add Product"
             onSubmit={handleSubmit}
