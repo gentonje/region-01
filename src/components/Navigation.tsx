@@ -4,15 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CartIndicator } from "./navigation/CartIndicator";
 import { UserMenu } from "./navigation/UserMenu";
-import { CountrySelector } from "./navigation/CountrySelector";
 import { ChatBubble } from "./navigation/ChatBubble";
 import { NotificationIcon } from "./navigation/NotificationIcon";
 import { useAuth } from "@/contexts/AuthContext";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
 import { useScrollDirection, ScrollDirection } from "@/hooks/useScrollDirection";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 interface NavigationProps {
   searchQuery?: string;
@@ -112,11 +111,9 @@ export const Navigation = ({
         >
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex justify-between items-center h-14">
+              {/* Remove the CountrySelector from here */}
               <div className="flex justify-center">
-                <CountrySelector 
-                  selectedCountry={selectedCountry} 
-                  onCountryChange={onCountryChange} 
-                />
+                {/* Left area can be used for other navigation elements if needed */}
               </div>
 
               <div className="flex items-center gap-2">
