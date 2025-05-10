@@ -8,9 +8,10 @@ import { profileFormSchema } from "./validation";
 
 type ProfileFormFieldsProps = {
   form: UseFormReturn<z.infer<typeof profileFormSchema>>;
+  requiredFields?: boolean;
 };
 
-export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
+export function ProfileFormFields({ form, requiredFields = false }: ProfileFormFieldsProps) {
   return (
     <>
       <FormField
@@ -18,7 +19,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         name="username"
         render={({ field }) => (
           <FormItem className="space-y-1 m-1">
-            <FormLabel>Username</FormLabel>
+            <FormLabel>
+              Username 
+              {requiredFields && <span className="text-red-500 ml-1">*</span>}
+            </FormLabel>
             <FormControl>
               <Input {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>
@@ -32,7 +36,10 @@ export function ProfileFormFields({ form }: ProfileFormFieldsProps) {
         name="full_name"
         render={({ field }) => (
           <FormItem className="space-y-1 m-1">
-            <FormLabel>Full Name</FormLabel>
+            <FormLabel>
+              Full Name
+              {requiredFields && <span className="text-red-500 ml-1">*</span>}
+            </FormLabel>
             <FormControl>
               <Input {...field} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100" />
             </FormControl>

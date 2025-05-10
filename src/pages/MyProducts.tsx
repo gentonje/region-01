@@ -1,15 +1,19 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ModifyProductsList } from "@/components/ModifyProductsList";
 import { ModifyProductsPagination } from "@/components/ModifyProductsPagination";
 import { Button } from "@/components/ui/button";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { BreadcrumbNav } from "@/components/BreadcrumbNav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Product, ValidityPeriod } from "@/types/product";
+import { useAuth } from "@/contexts/AuthContext";
+import { Profile } from "@/types/profile";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const MyProducts = () => {
   const navigate = useNavigate();
@@ -17,7 +21,47 @@ const MyProducts = () => {
   const [totalPages, setTotalPages] = useState(1);
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState<Profile | null>(null);
+  const [isProfileComplete, setIsProfileComplete] = useState(true);
   const pageSize = 10;
+
+  // Fetch user profile to check if it's complete
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+          
+        if (error) throw error;
+        
+        setUserProfile(data as Profile);
+        
+        // Check if profile is complete (has username and full_name)
+        const isComplete = !!(data?.username && data?.full_name);
+        setIsProfileComplete(isComplete);
+        
+        // Show notification if profile is incomplete
+        if (!isComplete) {
+          toast.warning("Please complete your profile before adding products", {
+            action: {
+              label: "Edit Profile",
+              onClick: () => navigate("/edit-profile")
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+    
+    fetchProfile();
+  }, [user, navigate]);
 
   // Query to fetch user's products
   const {
@@ -113,20 +157,56 @@ const MyProducts = () => {
     navigate(`/edit-product/${productId}`);
   };
 
+  const handleAddProduct = () => {
+    if (!isProfileComplete) {
+      toast.warning("Please complete your profile before adding products", {
+        action: {
+          label: "Edit Profile",
+          onClick: () => navigate("/edit-profile")
+        }
+      });
+      return;
+    }
+    
+    navigate("/add-product");
+  };
+
   return (
-    <div className="container mx-auto px-4 py-6 max-w-6xl">
-      <BreadcrumbNav
-        items={[
-          { href: "/products", label: "Home" },
-          { label: "My Products", isCurrent: true }
-        ]}
-      />
-      
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Products</h1>
-        <Button onClick={() => navigate("/add-product")} className="flex items-center gap-2">
-          <Plus size={16} /> Add New Product
-        </Button>
+    <div className="space-y-1 m-1 p-1 mx-auto max-w-6xl">
+      <div className="space-y-1">
+        <BreadcrumbNav
+          items={[
+            { href: "/products", label: "Home" },
+            { label: "My Products", isCurrent: true }
+          ]}
+        />
+        
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+          <h1 className="text-2xl font-bold">My Products</h1>
+          <Button 
+            onClick={handleAddProduct} 
+            className="flex items-center gap-1"
+            disabled={!isProfileComplete}
+          >
+            <Plus size={16} /> Add New Product
+          </Button>
+        </div>
+
+        {!isProfileComplete && (
+          <Alert variant="warning" className="mb-1">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Your profile is incomplete. Please complete your profile before adding products.
+              <Button 
+                variant="link" 
+                className="px-0 py-0 h-auto"
+                onClick={() => navigate("/edit-profile")}
+              >
+                Complete Profile
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {isLoading ? (
@@ -134,7 +214,7 @@ const MyProducts = () => {
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       ) : products && products.length > 0 ? (
-        <>
+        <div className="space-y-1">
           <ModifyProductsList
             products={products}
             onDelete={handleDelete}
@@ -148,14 +228,25 @@ const MyProducts = () => {
             onPageChange={setCurrentPage}
             isMobile={isMobile}
           />
-        </>
+        </div>
       ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-300 dark:bg-gray-800 dark:border-gray-700">
-          <h3 className="text-lg font-medium mb-2">No products found</h3>
-          <p className="text-muted-foreground mb-4">You haven't created any products yet.</p>
-          <Button onClick={() => navigate("/add-product")} className="flex items-center gap-2">
-            <Plus size={16} /> Add Your First Product
-          </Button>
+        <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-300 dark:bg-gray-800 dark:border-gray-700 space-y-1">
+          <h3 className="text-lg font-medium">No products found</h3>
+          <p className="text-muted-foreground">You haven't created any products yet.</p>
+          {/* Only show the Add First Product button if profile is complete */}
+          {isProfileComplete ? (
+            <Button onClick={handleAddProduct} className="flex items-center gap-1 mt-2">
+              <Plus size={16} /> Add Your First Product
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => navigate("/edit-profile")} 
+              className="flex items-center gap-1 mt-2"
+              variant="secondary"
+            >
+              Complete Your Profile First
+            </Button>
+          )}
         </div>
       )}
     </div>
