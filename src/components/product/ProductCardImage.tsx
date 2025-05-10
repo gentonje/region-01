@@ -53,7 +53,7 @@ export const ProductCardImage = memo(({
 
   return (
     <div 
-      className="w-full relative overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-900 m-1"
+      className="w-full relative overflow-hidden cursor-pointer bg-gray-100 dark:bg-gray-900"
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();
@@ -98,7 +98,7 @@ export const ProductCardImage = memo(({
           product.in_stock 
             ? 'bg-green-500/90 text-white button-glow' 
             : 'bg-red-500/90 text-white button-glow-destructive'
-        } m-1`}
+        }`}
       >
         {product.in_stock ? 'In Stock' : 'Out of Stock'}
       </span>
@@ -109,7 +109,7 @@ export const ProductCardImage = memo(({
           product.product_status === 'published' 
             ? 'bg-green-500/90 text-white button-glow' 
             : 'bg-yellow-500/90 text-white button-glow-amber'
-        } m-1`}>
+        }`}>
           {product.product_status === 'published' ? 'Published' : 'Unpublished'}
         </span>
       )}
@@ -120,7 +120,7 @@ export const ProductCardImage = memo(({
           <Button
             variant="ghost"
             size="icon"
-            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 button-shadow-none m-1"
+            className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 button-shadow-none"
             onClick={handleWishlistClick}
             disabled={isPending}
             aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}

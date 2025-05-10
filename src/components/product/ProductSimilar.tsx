@@ -21,9 +21,9 @@ interface ProductSimilarProps {
 }
 
 const ProductSimilarSkeleton = () => (
-  <div className="w-full m-1 p-1">
-    <div className="w-full space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
-      <Skeleton className="h-[150px] w-full rounded-lg" />
+  <div className="w-full">
+    <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 shadow-sm">
+      <Skeleton className="h-[150px] w-full" />
       <Skeleton className="h-5 w-2/3 m-1" />
       <Skeleton className="h-3 w-full m-1" />
       <div className="flex justify-between m-1 space-x-1">
@@ -45,8 +45,8 @@ export const ProductSimilar = ({
 
   if (isLoading) {
     return (
-      <div className="w-full mx-auto p-1">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1 m-1 p-1">
+      <div className="w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1">
           {[...Array(5)].map((_, index) => (
             <ProductSimilarSkeleton key={index} />
           ))}
@@ -58,16 +58,16 @@ export const ProductSimilar = ({
   if (!products?.length) return null;
 
   return (
-    <div className="w-full mx-auto p-1">
+    <div className="w-full">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1">
         {products.map((similarProduct) => {
           // Initialize wishlist functionality for each product
           const { isInWishlist, toggleWishlist, isPending } = useWishlistMutation(similarProduct.id);
           
           return (
-            <div key={similarProduct.id} className="w-full m-1 p-1">
+            <div key={similarProduct.id} className="w-full">
               <Card 
-                className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer m-1 p-1 space-y-1"
+                className="w-full overflow-hidden group relative transition-all duration-300 hover:shadow-xl bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 cursor-pointer"
                 onClick={() => onProductClick(similarProduct)}
               >
                 {/* Product Image Section - Matching main card design */}

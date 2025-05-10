@@ -56,8 +56,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   // If no images or images array is empty, show placeholder
   if (!images || images.length === 0) {
     return (
-      <div className="space-y-1">
-        <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border border-gray-200 dark:border-gray-700">
+      <div>
+        <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
           <ImageLoader
             src="/placeholder.svg"
             alt={title || "Product placeholder"}
@@ -73,8 +73,8 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
   }
 
   return (
-    <div className="space-y-1">
-      <div className="aspect-square md:aspect-[4/3] relative rounded-lg overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
+    <div>
+      <div className="aspect-square md:aspect-[4/3] relative overflow-hidden bg-gray-100 border-0 dark:border-gray-700">
         <ImageLoader
           src={mainImageUrl}
           alt={title}
@@ -87,12 +87,12 @@ export const ProductGallery = ({ images, selectedImage, onImageSelect, title }: 
         />
       </div>
       {images.length > 1 && (
-        <div className="flex gap-1 overflow-x-auto pb-1 px-0 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="flex gap-1 overflow-x-auto pb-1 pt-1 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
           {images.map((image, index) => (
             <div
               key={index}
-              className={`relative min-w-[60px] h-16 rounded-md overflow-hidden cursor-pointer transition-all border-0 hover:opacity-90 ${
-                selectedImage === image.storage_path ? 'ring-1 ring-primary' : 'border-gray-200 dark:border-gray-700'
+              className={`relative min-w-[60px] h-16 overflow-hidden cursor-pointer transition-all border-0 hover:opacity-90 ${
+                selectedImage === image.storage_path ? 'ring-1 ring-primary' : ''
               }`}
               onClick={() => onImageSelect(image.storage_path)}
             >

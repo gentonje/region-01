@@ -21,8 +21,8 @@ interface ProductListProps {
 }
 
 const ProductSkeleton = memo(() => (
-  <div className="w-full space-y-1 rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1 m-1 shadow-sm">
-    <Skeleton className="h-[200px] w-full rounded-lg" />
+  <div className="w-full rounded-xl overflow-hidden bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
+    <Skeleton className="h-[200px] w-full" />
     <Skeleton className="h-6 w-2/3 m-1" />
     <Skeleton className="h-4 w-full m-1" />
     <div className="flex justify-between m-1 space-x-1">
@@ -61,9 +61,9 @@ export const ProductList = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
         {[...Array(8)].map((_, index) => (
-          <div key={index} className="w-full p-1">
+          <div key={index} className="w-full">
             <ProductSkeleton />
           </div>
         ))}
@@ -73,8 +73,8 @@ export const ProductList = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-4 m-1 p-1 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto w-full space-y-1">
-        <div className="max-w-md mx-auto px-1 py-1 space-y-1">
+      <div className="text-center py-4 rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700 max-w-3xl mx-auto w-full">
+        <div className="max-w-md mx-auto">
           <h3 className="text-xl md:text-2xl font-bold text-gray-700 dark:text-gray-300 font-serif">{emptyMessage}</h3>
           <p className="text-gray-500 dark:text-gray-400 font-sans">Sorry, we don't have that item in stock at the moment. Try adjusting your search or filters.</p>
         </div>
@@ -83,12 +83,12 @@ export const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 w-full max-w-7xl mx-auto p-1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
       {products.map((product, index) => (
         <div
           key={product.id}
           ref={index === products.length - 1 ? setLastElementRef : undefined}
-          className="w-full transform transition-transform hover:-translate-y-1 duration-300 p-1 m-1"
+          className="w-full transform transition-transform hover:-translate-y-1 duration-300"
         >
           <ProductCard
             product={product}
@@ -104,10 +104,10 @@ export const ProductList = ({
       
       {isFetchingNextPage && (
         <>
-          <div className="w-full p-1 m-1"><ProductSkeleton /></div>
-          <div className="w-full p-1 m-1"><ProductSkeleton /></div>
-          <div className="w-full p-1 m-1"><ProductSkeleton /></div>
-          <div className="w-full p-1 m-1"><ProductSkeleton /></div>
+          <div className="w-full"><ProductSkeleton /></div>
+          <div className="w-full"><ProductSkeleton /></div>
+          <div className="w-full"><ProductSkeleton /></div>
+          <div className="w-full"><ProductSkeleton /></div>
         </>
       )}
     </div>

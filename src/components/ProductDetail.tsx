@@ -62,13 +62,13 @@ const ProductDetail = ({
   };
 
   return (
-    <div className="m-1 p-1 space-y-1 w-full mx-auto">
-      <Card className="w-full max-w-7xl mx-auto overflow-hidden rounded-lg sm:rounded-xl shadow-md m-1 p-1">
-        <CardContent className="p-1 sm:p-2">
-          <div className="flex flex-col md:flex-row md:gap-4">
+    <div className="w-full">
+      <Card className="w-full overflow-hidden rounded-lg sm:rounded-xl shadow-md">
+        <CardContent className="p-1">
+          <div className="flex flex-col md:flex-row md:gap-2">
             {/* Left column - Product gallery */}
-            <div className="md:w-1/2 space-y-2 flex flex-col items-center">
-              <div className="flex items-center mb-1 p-1 sm:p-0 w-full">
+            <div className="md:w-1/2 flex flex-col">
+              <div className="flex items-center mb-1 w-full">
                 <button 
                   onClick={onBack} 
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -80,9 +80,9 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-1 sm:px-0 w-full">{displayProduct.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 w-full">{displayProduct.title}</h1>
               
-              <div className="flex items-center space-x-2 mb-2 px-1 sm:px-0 w-full">
+              <div className="flex items-center space-x-2 mb-2 w-full">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
                   {displayProduct.category || 'Other'}
                 </span>
@@ -91,8 +91,8 @@ const ProductDetail = ({
                 </span>
               </div>
 
-              <div className="w-full flex justify-center">
-                <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full rounded-lg" />}>
+              <div className="w-full">
+                <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full" />}>
                   <ProductGallery
                     images={displayProduct.product_images || []}
                     selectedImage={selectedImage}
@@ -104,7 +104,7 @@ const ProductDetail = ({
             </div>
 
             {/* Right column - Tabs with product details and reviews */}
-            <div className="md:w-1/2 mt-4 md:mt-0 md:pt-10 px-1 sm:px-0">
+            <div className="md:w-1/2 mt-2 md:mt-0 md:pt-10">
               <ProductTabs 
                 product={displayProduct}
                 activeTab={activeTab}
@@ -114,7 +114,7 @@ const ProductDetail = ({
           </div>
         </CardContent>
 
-        <CardFooter className="p-1 sm:p-2">
+        <CardFooter className="p-1">
           <ProductActions
             price={displayProduct.price || 0}
             currency={displayProduct.currency || "SSP"}
@@ -127,8 +127,8 @@ const ProductDetail = ({
         </CardFooter>
       </Card>
 
-      {/* Similar products section - using full width for mobile */}
-      <div className="w-full m-1 p-1">
+      {/* Similar products section - using full width */}
+      <div className="w-full">
         <ProductSimilarSection
           similarProducts={similarProducts}
           getProductImageUrl={getProductImageUrl}
