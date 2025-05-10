@@ -15,12 +15,14 @@ interface CountiesFilterProps {
   selectedCounty: string;
   onCountyChange: (county: string) => void;
   selectedCountry?: string; // Country ID
+  showAllOption?: boolean; // New prop to control "All Districts" option
 }
 
 export const CountiesFilter = ({
   selectedCounty,
   onCountyChange,
   selectedCountry = "1", // Default to Kenya (id: 1)
+  showAllOption = true, // Default to showing "All Districts" option
 }: CountiesFilterProps) => {
   const [districts, setDistricts] = useState<{id: number, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,6 +55,11 @@ export const CountiesFilter = ({
 
         console.log(`Fetched ${data?.length || 0} districts for country ${selectedCountry}:`, data);
         setDistricts(data || []);
+        
+        // Auto-select first district if we have districts and all option is disabled
+        if (!showAllOption && data && data.length > 0 && (!selectedCounty || selectedCounty === "all")) {
+          onCountyChange(data[0].name);
+        }
       } catch (error) {
         console.error("Failed to fetch districts:", error);
         toast.error("Failed to load districts");
@@ -69,7 +76,7 @@ export const CountiesFilter = ({
       onCountyChange("");
       previousCountry.current = selectedCountry;
     }
-  }, [selectedCountry, onCountyChange]);
+  }, [selectedCountry, onCountyChange, selectedCounty, showAllOption]);
 
   const renderTriggerContent = () => {
     if (selectedCounty === "all" || !selectedCounty) {
@@ -108,12 +115,14 @@ export const CountiesFilter = ({
           </SelectValue>
         </SelectTrigger>
         <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-          <SelectItem value="all">
-            <div className="flex items-center">
-              <MapPin className="w-4 h-4 mr-2" />
-              <span>All Districts</span>
-            </div>
-          </SelectItem>
+          {showAllOption && (
+            <SelectItem value="all">
+              <div className="flex items-center">
+                <MapPin className="w-4 h-4 mr-2" />
+                <span>All Districts</span>
+              </div>
+            </SelectItem>
+          )}
           {districts.map((district) => (
             <SelectItem key={district.id} value={district.name}>
               {district.name}

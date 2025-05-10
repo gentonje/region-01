@@ -22,12 +22,14 @@ interface CountrySelectorProps {
   selectedCountry: string;
   onCountryChange: (country: string) => void;
   renderAsSelectItems?: boolean;
+  showAllOption?: boolean;
 }
 
 export const CountrySelector = ({
   selectedCountry = "all", // Default to "all"
   onCountryChange,
   renderAsSelectItems = false, // Changed default to false
+  showAllOption = true, // New prop to control visibility of "All Countries" option
 }: CountrySelectorProps) => {
   const [countryFlags, setCountryFlags] = useState<Record<string, JSX.Element>>({});
 
@@ -94,11 +96,20 @@ export const CountrySelector = ({
     );
   }
 
+  // If no countries are loaded yet and we're not showing the All option,
+  // make sure we have a valid default selection
+  useEffect(() => {
+    if (!showAllOption && countries && countries.length > 0 && (selectedCountry === "all" || !selectedCountry)) {
+      // Select the first country by default
+      onCountryChange(countries[0].id.toString());
+    }
+  }, [countries, selectedCountry, showAllOption, onCountryChange]);
+
   return (
     <Select
       value={selectedCountry}
       onValueChange={handleCountryChange}
-      defaultValue="all"
+      defaultValue={showAllOption ? "all" : undefined}
     >
       <SelectTrigger className="w-[180px] h-10 sm:w-[220px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <SelectValue>
@@ -116,12 +127,14 @@ export const CountrySelector = ({
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-        <SelectItem value="all">
-          <div className="flex items-center">
-            <Globe className="w-4 h-4 mr-2" />
-            <span>All Countries</span>
-          </div>
-        </SelectItem>
+        {showAllOption && (
+          <SelectItem value="all">
+            <div className="flex items-center">
+              <Globe className="w-4 h-4 mr-2" />
+              <span>All Countries</span>
+            </div>
+          </SelectItem>
+        )}
         {countries?.map((country) => (
           <SelectItem key={country.id} value={country.id.toString()}>
             <div className="flex items-center">
