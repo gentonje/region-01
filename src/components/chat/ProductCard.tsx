@@ -28,8 +28,8 @@ export const ProductCard = ({ imageUrl, productDetail, index, onClick }: Product
       className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md w-full cursor-pointer hover:shadow-lg transition-shadow m-1 p-1 space-y-1 flex flex-col button-glow-outline"
       onClick={onClick}
     >
-      <div className="relative w-full overflow-hidden">
-        <AspectRatio ratio={16/9} className="bg-gray-100 dark:bg-gray-900">
+      <div className="relative w-full overflow-hidden flex justify-center">
+        <AspectRatio ratio={16/9} className="bg-gray-100 dark:bg-gray-900 w-full">
           <ImageLoader
             src={imageUrl}
             alt={productDetail?.title || `Product image ${index + 1}`}

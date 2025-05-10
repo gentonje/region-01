@@ -67,8 +67,8 @@ const ProductDetail = ({
         <CardContent className="p-1 sm:p-2">
           <div className="flex flex-col md:flex-row md:gap-4">
             {/* Left column - Product gallery */}
-            <div className="md:w-1/2 space-y-2">
-              <div className="flex items-center mb-1 p-1 sm:p-0">
+            <div className="md:w-1/2 space-y-2 flex flex-col items-center">
+              <div className="flex items-center mb-1 p-1 sm:p-0 w-full">
                 <button 
                   onClick={onBack} 
                   className="flex items-center text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
@@ -80,9 +80,9 @@ const ProductDetail = ({
                 </button>
               </div>
               
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-1 sm:px-0">{displayProduct.title}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 px-1 sm:px-0 w-full">{displayProduct.title}</h1>
               
-              <div className="flex items-center space-x-2 mb-2 px-1 sm:px-0">
+              <div className="flex items-center space-x-2 mb-2 px-1 sm:px-0 w-full">
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full text-xs">
                   {displayProduct.category || 'Other'}
                 </span>
@@ -91,14 +91,16 @@ const ProductDetail = ({
                 </span>
               </div>
 
-              <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full rounded-lg" />}>
-                <ProductGallery
-                  images={displayProduct.product_images || []}
-                  selectedImage={selectedImage}
-                  onImageSelect={setSelectedImage}
-                  title={displayProduct.title || ''}
-                />
-              </Suspense>
+              <div className="w-full flex justify-center">
+                <Suspense fallback={<Skeleton className="aspect-square md:aspect-[4/3] w-full rounded-lg" />}>
+                  <ProductGallery
+                    images={displayProduct.product_images || []}
+                    selectedImage={selectedImage}
+                    onImageSelect={setSelectedImage}
+                    title={displayProduct.title || ''}
+                  />
+                </Suspense>
+              </div>
             </div>
 
             {/* Right column - Tabs with product details and reviews */}
