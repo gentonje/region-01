@@ -52,9 +52,8 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
           <Input
             type="number"
             value={pendingLimits?.basic || 5}
-            readOnly
-            disabled
-            className="w-full m-1 p-1 bg-gray-100 cursor-not-allowed"
+            onChange={(e) => handleInputChange('basic', e.target.value)}
+            className="w-full m-1 p-1"
           />
         </div>
         
