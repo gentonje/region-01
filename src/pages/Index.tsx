@@ -6,6 +6,7 @@ import { ProductFilters } from "@/components/ProductFilters";
 import ProductDetail from "@/components/ProductDetail";
 import { RegionSelector } from "@/components/RegionSelector";
 import { CategoryFilter } from "@/components/CategoryFilter";
+import { CountiesFilter } from "@/components/CountiesFilter"; // Add this import
 import { Product } from "@/types/product";
 import { SupportedCurrency } from "@/utils/currencyConverter";
 import { useSelectedCountry } from "@/Routes";
