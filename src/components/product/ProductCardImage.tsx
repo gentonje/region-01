@@ -6,6 +6,7 @@ import { Product } from "@/types/product";
 import { Session } from "@supabase/supabase-js";
 import { memo, useCallback, useState } from "react";
 import { AspectRatio } from "../ui/aspect-ratio";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardImageProps {
   product: Product;
@@ -59,6 +60,16 @@ export const ProductCardImage = memo(({
         onClick?.();
       }}
     >
+      {/* Shop name badge at the top */}
+      {product.shop_name && (
+        <Badge 
+          className="absolute top-1 left-1 z-10 bg-violet-600 text-white px-2 py-1 text-xs font-medium"
+          variant="default"
+        >
+          {product.shop_name}
+        </Badge>
+      )}
+      
       {/* Decorative orange element in top left with lower z-index */}
       <div className="absolute top-0 left-0 z-0 bg-orange-500 h-10 w-20 rounded-r-lg opacity-90"></div>
       
