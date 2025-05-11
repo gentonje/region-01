@@ -51,17 +51,11 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Convert empty strings to default values
       const valueToSave = pendingValue === '' ? 0 : pendingValue;
       
-      // Fixed type comparison: convert both to same type for comparison
+      // Fixed type comparison: convert both values to strings for safe comparison
       const currentValue = accountLimits[limitKey];
-      let hasChanged = false;
       
-      // First check if one is string and one is number
-      if (typeof valueToSave !== typeof currentValue) {
-        hasChanged = true;
-      } else {
-        // If types are the same, compare the values directly
-        hasChanged = valueToSave !== currentValue;
-      }
+      // Explicit type checking and conversion to ensure safe comparison
+      const hasChanged = String(valueToSave) !== String(currentValue);
         
       if (hasChanged) {
         onLimitUpdate(limitKey, valueToSave as number);
