@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -27,9 +27,9 @@ export const UserMenu = () => {
 
   const user = session?.user;
 
-  // Check admin status
+  // Check admin status - improved with shorter staleTime
   const { data: isAdmin } = useQuery({
-    queryKey: ["isAdmin"],
+    queryKey: ["isAdmin", user?.id],
     queryFn: async () => {
       if (!user) return false;
 
@@ -40,11 +40,12 @@ export const UserMenu = () => {
       return data as boolean;
     },
     enabled: !!user,
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes
   });
 
-  // Check super admin status
+  // Check super admin status - improved with shorter staleTime
   const { data: superAdminStatus } = useQuery({
-    queryKey: ["isSuperAdmin"],
+    queryKey: ["isSuperAdmin", user?.id],
     queryFn: async () => {
       if (!user) return false;
 
@@ -56,9 +57,10 @@ export const UserMenu = () => {
       return data as boolean;
     },
     enabled: !!user,
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes
   });
 
-  // Get user's avatar URL and account type
+  // Get user's avatar URL and account type - improved with shorter staleTime and refetchOnMount
   const { data: profile } = useQuery({
     queryKey: ["userProfile", user?.id],
     queryFn: async () => {
@@ -97,6 +99,9 @@ export const UserMenu = () => {
       }
     },
     enabled: !!user,
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const handleSignOut = async () => {
