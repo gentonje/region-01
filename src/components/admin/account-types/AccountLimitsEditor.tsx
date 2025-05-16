@@ -61,7 +61,7 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Compare as strings to avoid type issues
       if (pendingValueStr !== currentValueStr) {
         // Ensure we're passing a number or null to onLimitUpdate
-        const finalValue = (valueToSave === '' || valueToSave === null) ? null : Number(valueToSave);
+        const finalValue = valueToSave === '' || valueToSave === null ? null : Number(valueToSave);
         onLimitUpdate(limitKey, finalValue);
       }
     });
