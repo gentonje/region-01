@@ -54,8 +54,11 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Fixed type comparison: convert both values to strings for safe comparison
       const currentValue = accountLimits[limitKey];
       
-      // Explicit type checking and conversion to ensure safe comparison
-      const hasChanged = String(valueToSave) !== String(currentValue);
+      // Convert to the same type for comparison
+      const pendingValueString = String(valueToSave);
+      const currentValueString = String(currentValue);
+      
+      const hasChanged = pendingValueString !== currentValueString;
         
       if (hasChanged) {
         onLimitUpdate(limitKey, valueToSave as number);
