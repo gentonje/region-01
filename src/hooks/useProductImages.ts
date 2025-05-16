@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -54,7 +55,7 @@ export const useProductImages = (productId?: string) => {
 
       // Upload main image if provided
       if (mainImage) {
-        console.log("Uploading main image...");
+        console.log("Uploading main image:", mainImage.name);
         const fileExt = mainImage.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
         
@@ -69,6 +70,51 @@ export const useProductImages = (productId?: string) => {
 
         mainImagePath = fileName;
         console.log("Main image uploaded successfully:", fileName);
+        
+        // If this is an edit operation with an existing product ID, update the main image in product_images
+        if (productId) {
+          // Check if main image already exists
+          const { data: existingMainImage, error: checkError } = await supabase
+            .from('product_images')
+            .select('id')
+            .eq('product_id', productId)
+            .eq('is_main', true)
+            .single();
+            
+          if (checkError && checkError.code !== 'PGRST116') {
+            console.error("Error checking existing main image:", checkError);
+          }
+          
+          if (existingMainImage) {
+            // Update existing main image
+            const { error: updateError } = await supabase
+              .from('product_images')
+              .update({ storage_path: fileName })
+              .eq('id', existingMainImage.id);
+              
+            if (updateError) {
+              console.error("Error updating main image record:", updateError);
+              throw updateError;
+            }
+            console.log("Updated existing main image record");
+          } else {
+            // Insert new main image
+            const { error: insertError } = await supabase
+              .from('product_images')
+              .insert({
+                product_id: productId,
+                storage_path: fileName,
+                is_main: true,
+                display_order: 0
+              });
+              
+            if (insertError) {
+              console.error("Error inserting main image record:", insertError);
+              throw insertError;
+            }
+            console.log("Inserted new main image record");
+          }
+        }
       }
 
       // Upload additional images

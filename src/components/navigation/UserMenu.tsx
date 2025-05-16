@@ -24,6 +24,7 @@ export const UserMenu = () => {
   const navigate = useNavigate();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [open, setOpen] = useState(false);
 
   const user = session?.user;
 
@@ -111,12 +112,18 @@ export const UserMenu = () => {
 
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light");
+    setOpen(false);
+  };
+
+  const handleMenuItemClick = (callback: () => void) => {
+    callback();
+    setOpen(false);
   };
 
   const displayName = profile?.full_name || profile?.username || user?.email;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="rounded-full overflow-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none">
           <Avatar>
@@ -130,7 +137,7 @@ export const UserMenu = () => {
           </Avatar>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 bg-popover border border-border" sideOffset={5}>
         <div className="flex items-center justify-between px-2">
           <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
           {profile?.account_type && <AccountTypeBadge accountType={profile.account_type as AccountType} />}
@@ -138,7 +145,7 @@ export const UserMenu = () => {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={toggleTheme} className="cursor-pointer">
+        <DropdownMenuItem onClick={() => handleMenuItemClick(toggleTheme)} className="cursor-pointer focus:bg-accent">
           {theme === "dark" ? (
             <div className="flex items-center w-full">
               <Sun className="mr-2 h-4 w-4" />
@@ -155,38 +162,40 @@ export const UserMenu = () => {
         <DropdownMenuSeparator />
         
         <DropdownMenuItem asChild>
-          <Link to="/edit-profile">Profile</Link>
+          <Link to="/edit-profile" onClick={() => setOpen(false)} className="w-full cursor-pointer">Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/my-products">My Products</Link>
+          <Link to="/my-products" onClick={() => setOpen(false)} className="w-full cursor-pointer">My Products</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link to="/wishlist">Wishlist</Link>
+          <Link to="/wishlist" onClick={() => setOpen(false)} className="w-full cursor-pointer">Wishlist</Link>
         </DropdownMenuItem>
         {isAdmin && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Admin</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link to="/admin/users">User Management</Link>
+              <Link to="/admin/users" onClick={() => setOpen(false)} className="w-full cursor-pointer">User Management</Link>
             </DropdownMenuItem>
           </>
         )}
         {isSuperAdmin && (
           <>
             <DropdownMenuItem asChild>
-              <Link to="/admin/manage">Admin Management</Link>
+              <Link to="/admin/manage" onClick={() => setOpen(false)} className="w-full cursor-pointer">Admin Management</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/admin/accounts">Account Management</Link>
+              <Link to="/admin/accounts" onClick={() => setOpen(false)} className="w-full cursor-pointer">Account Management</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link to="/admin/districts">Districts Management</Link>
+              <Link to="/admin/districts" onClick={() => setOpen(false)} className="w-full cursor-pointer">Districts Management</Link>
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleSignOut}>Log out</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleMenuItemClick(handleSignOut)} className="cursor-pointer focus:bg-accent">
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
