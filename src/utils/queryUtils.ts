@@ -21,10 +21,11 @@ export const optimizedSelect = <T>(
     .select(columns, { count: "exact" })
     .range(page * limit, (page + 1) * limit - 1);
 
-  // Apply filters
+  // Apply filters - Using explicit type annotation to avoid deep type instantiation
   Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
-      query = query.eq(key, value);
+      // Use type assertion to avoid the recursive type instantiation
+      query = query.eq(key, value) as typeof query;
     }
   });
 
