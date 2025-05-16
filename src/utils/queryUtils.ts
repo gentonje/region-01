@@ -21,13 +21,13 @@ export const optimizedSelect = <T>(
     .select(columns, { count: "exact" })
     .range(page * limit, (page + 1) * limit - 1);
 
-  // Apply filters - Using explicit type annotation to avoid deep type instantiation
-  Object.entries(filters).forEach(([key, value]) => {
+  // Apply filters safely to avoid recursive type instantiation
+  for (const [key, value] of Object.entries(filters)) {
     if (value !== undefined && value !== null) {
-      // Use type assertion to avoid the recursive type instantiation
-      query = query.eq(key, value) as typeof query;
+      // Use any as a temporary escape from the excessive type instantiation
+      query = (query as any).eq(key, value);
     }
-  });
+  }
 
   return query;
 };

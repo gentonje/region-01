@@ -54,17 +54,12 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Get current value from accountLimits
       const currentValue = accountLimits[limitKey];
       
-      // Safe comparison - convert both to the same type before comparing
-      // This fixes the TypeScript error by making the types explicit
-      let hasChanged = false;
-      if (typeof valueToSave === 'number' && typeof currentValue === 'number') {
-        hasChanged = valueToSave !== currentValue;
-      } else {
-        // Convert both to strings for comparison if types don't match
-        hasChanged = String(valueToSave) !== String(currentValue);
-      }
+      // Safe type comparison - convert both to strings for comparison
+      const pendingValueStr = String(valueToSave);
+      const currentValueStr = String(currentValue);
       
-      if (hasChanged) {
+      // Compare as strings to avoid type issues
+      if (pendingValueStr !== currentValueStr) {
         // Ensure we're passing a number or null to onLimitUpdate
         const finalValue = (valueToSave === '' || valueToSave === null) ? null : Number(valueToSave);
         onLimitUpdate(limitKey, finalValue);
