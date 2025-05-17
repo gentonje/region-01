@@ -24,7 +24,7 @@ export const optimizedSelect = <T>(
   // Apply filters safely to avoid recursive type instantiation
   for (const [key, value] of Object.entries(filters)) {
     if (value !== undefined && value !== null) {
-      // Use any as a temporary escape from the excessive type instantiation
+      // Use type assertion to avoid excessive type instantiation
       query = (query as any).eq(key, value);
     }
   }

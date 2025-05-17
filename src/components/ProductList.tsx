@@ -1,3 +1,4 @@
+
 import React, { useCallback, memo } from "react";
 import { Product } from "@/types/product";
 import ProductCard from "./ProductCard";
@@ -57,10 +58,20 @@ export const ProductList = ({
       observerRef(node);
     }
   }, [ref, inView, observerRef]);
+  
+  // Determine if any products are in the "Automotive" category
+  const hasAutomotiveCategory = products.some(product => 
+    product.category === "Automotive"
+  );
+  
+  // Set the grid columns based on whether there are automotive products
+  const gridColumnsClass = hasAutomotiveCategory 
+    ? "grid-cols-1" 
+    : "grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
+      <div className={`grid ${gridColumnsClass} gap-1 w-full`}>
         {[...Array(8)].map((_, index) => (
           <div key={index} className="w-full">
             <ProductSkeleton />
@@ -82,7 +93,7 @@ export const ProductList = ({
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-1 w-full">
+    <div className={`grid ${gridColumnsClass} gap-1 w-full`}>
       {products.map((product, index) => (
         <div
           key={product.id}
