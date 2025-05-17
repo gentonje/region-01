@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -53,12 +54,8 @@ export const AccountLimitsEditor = ({ accountLimits, onLimitUpdate }: AccountLim
       // Get current value from accountLimits
       const currentValue = accountLimits[limitKey];
       
-      // Convert values to strings for safe comparison
-      const pendingValueStr = String(valueToSave);
-      const currentValueStr = String(currentValue);
-      
-      // Compare as strings to avoid type issues
-      if (pendingValueStr !== currentValueStr) {
+      // Convert both values to strings before comparison to avoid type errors
+      if (String(valueToSave) !== String(currentValue)) {
         // Ensure we're passing a number or null to onLimitUpdate
         const finalValue = valueToSave === '' || valueToSave === null ? null : Number(valueToSave);
         onLimitUpdate(limitKey, finalValue);
